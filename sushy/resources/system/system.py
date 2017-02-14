@@ -45,6 +45,7 @@ class System(base.ResourceBase):
     identity = None
     """The system identity string"""
 
+    # TODO(lucasagomes): Create mappings for the indicator_led
     indicator_led = None
     """Whether the indicator LED is lit or off"""
 
@@ -66,6 +67,7 @@ class System(base.ResourceBase):
     sku = None
     """The system stock-keeping unit"""
 
+    # TODO(lucasagomes): Create mappings for the system_type
     system_type = None
     """The system type"""
 

@@ -48,16 +48,23 @@ class ConnectorTestCase(base.TestCase):
                                          self.data, self.headers)
 
     @mock.patch('sushy.connector.requests.Session', autospec=True)
-    def test__op(self, mock_session):
+    def _test_op(self, headers, expected_headers, mock_session):
         fake_session = mock.Mock()
         mock_session.return_value.__enter__.return_value = fake_session
 
         self.conn._op('GET', path='fake/path', data=self.data,
-                      headers=self.headers)
+                      headers=headers)
         mock_session.assert_called_once_with()
         fake_session.request.assert_called_once_with(
             'GET', 'http://foo.bar:1234/redfish/v1/fake/path',
             data='{"fake": "data"}')
-        expected_headers = {'Content-Type': 'application/json',
-                            'X-Fake': 'header'}
         self.assertEqual(expected_headers, fake_session.headers)
+
+    def test__op(self):
+        expected_headers = self.headers.copy()
+        expected_headers['Content-Type'] = 'application/json'
+        self._test_op(self.headers, expected_headers)
+
+    def test__op_no_headers(self):
+        expected_headers = {'Content-Type': 'application/json'}
+        self._test_op(None, expected_headers)
