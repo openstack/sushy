@@ -14,7 +14,7 @@ project. As the project grows and more features from `Redfish`_ are
 needed we can expand Sushy to fullfil those requirements.
 
 * Free software: Apache license
-* Documentation: https://readthedocs.org/projects/sushy
+* Documentation: http://sushy.rtfd.io
 * Source: http://git.openstack.org/cgit/openstack/sushy
 * Bugs: http://bugs.launchpad.net/sushy
 

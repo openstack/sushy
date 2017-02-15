@@ -9,9 +9,9 @@ Welcome to Sushy's documentation!
 Contents:
 
 .. toctree::
-   :maxdepth: 2
+   :maxdepth: 1
 
-   readme
+   About Sushy <readme>
    installation
    usage
    contributing
