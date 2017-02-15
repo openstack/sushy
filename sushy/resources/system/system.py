@@ -13,6 +13,7 @@
 #    License for the specific language governing permissions and limitations
 #    under the License.
 
+import logging
 import os
 
 from sushy import exceptions
@@ -20,6 +21,8 @@ from sushy.resources import base
 from sushy.resources.system import constants as sys_cons
 from sushy.resources.system import mappings as sys_maps
 from sushy import utils
+
+LOG = logging.getLogger(__name__)
 
 
 class System(base.ResourceBase):
@@ -126,7 +129,9 @@ class System(base.ResourceBase):
 
         allowed_values = reset_action.get('ResetType@Redfish.AllowableValues')
         if not allowed_values:
-            return []
+            LOG.warning('Could not figure out the allowed values for the '
+                        'reset system action for System %s', self.identity)
+            return sys_maps.RESET_SYSTEM_VALUE_MAP.keys()
 
         return [sys_maps.RESET_SYSTEM_VALUE_MAP[v] for v in
                 set(sys_maps.RESET_SYSTEM_VALUE_MAP.keys()).
@@ -154,7 +159,10 @@ class System(base.ResourceBase):
             'BootSourceOverrideTarget@Redfish.AllowableValues')
 
         if not allowed_values:
-            return []
+            LOG.warning('Could not figure out the allowed values for '
+                        'configuring the boot source for System %s',
+                        self.identity)
+            return sys_maps.BOOT_SOURCE_TARGET_MAP.keys()
 
         return [sys_maps.BOOT_SOURCE_TARGET_MAP[v] for v in
                 set(sys_maps.BOOT_SOURCE_TARGET_MAP.keys()).
@@ -243,8 +251,11 @@ class SystemCollection(base.ResourceBase):
         members = []
         for member in self.json.get('Members', []):
             ident = member.get('@odata.id')
-            if ident is not None:
-                ident = os.path.basename(ident)
-                members.append(self.get_member(ident))
+            if ident is None:
+                LOG.warning('Could not find the identity attribute for '
+                            'member %s', member)
+                continue
+            ident = os.path.basename(ident)
+            members.append(self.get_member(ident))
 
         return members

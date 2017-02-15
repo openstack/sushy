@@ -14,9 +14,12 @@
 #    under the License.
 
 import json
+import logging
 import os
 
 import requests
+
+LOG = logging.getLogger(__name__)
 
 
 class Connector(object):
@@ -43,6 +46,12 @@ class Connector(object):
                 data = json.dumps(data)
 
             url = os.path.join(self._url, path)
+            # TODO(lucasagomes): We should mask the data to remove sensitive
+            # information
+            LOG.debug('Issuing a HTTP %(method)s request at %(url)s with '
+                      'the headers "%(headers)s" and data "%(data)s"',
+                      {'method': method, 'url': url, 'headers': headers,
+                       'data': data or ''})
             return session.request(method, url, data=data)
 
     def get(self, path='', data=None, headers=None):

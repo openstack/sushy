@@ -8,7 +8,14 @@ To use sushy in a project:
 
 .. code-block:: python
 
+  import logging
+
   import sushy
+
+  # Enable logging at DEBUG level
+  LOG = logging.getLogger('sushy')
+  LOG.setLevel(logging.DEBUG)
+  LOG.addHandler(logging.StreamHandler())
 
   s = sushy.Sushy('http://127.0.0.1:8000/redfish/v1',
                   username='foo', password='bar')

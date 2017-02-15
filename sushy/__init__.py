@@ -12,6 +12,8 @@
 # License for the specific language governing permissions and limitations
 # under the License.
 
+import logging
+
 import pbr.version
 
 from sushy.main import Sushy
@@ -20,3 +22,6 @@ from sushy.resources.system.constants import *  # noqa
 __all__ = ('Sushy',)
 __version__ = pbr.version.VersionInfo(
     'sushy').version_string()
+
+# Set the default handler to avoid "No handler found" warnings
+logging.getLogger(__name__).addHandler(logging.NullHandler())
