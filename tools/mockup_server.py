@@ -29,7 +29,6 @@ class RequestHandler(BaseHTTPServer.BaseHTTPRequestHandler):
     REDFISH_SUBURI = '/redfish/v1'
 
     def _log_request(self, method):
-        global REQUEST_NUMBER
         print(self.headers)
         content_length = int(self.headers.get('content-length', 0))
         if content_length > 0:
