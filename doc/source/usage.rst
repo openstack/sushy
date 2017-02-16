@@ -73,5 +73,26 @@ To use sushy in a project:
   # Get a list of allowed boot source target values
   print(sys_inst.get_allowed_system_boot_source_values())
 
-.. TODO: Get current boot source device, enabled and mode
-.. TODO: Document how to setup the Redfish mockup server
+
+Running the mockup server
+-------------------------
+
+Sushy ships with a small script at ``tools/mockup_server.py``
+that creates a HTTP server to serve any of the `Redfish mockups
+<https://www.dmtf.org/standards/redfish>`_. This enables users to test
+the library without having a real hardware.
+
+To run it, do:
+
+#. Download the .zip containing the Redfish mockups files from
+   https://www.dmtf.org/standards/redfish, for example::
+
+     wget https://www.dmtf.org/sites/default/files/standards/documents/DSP2043_1.0.0.zip
+
+#. Extract it somewhere in the file-system::
+
+    unzip DSP2043_1.0.0.zip -d <output-path>
+
+#. Now run the ``mockup_server.py`` script::
+
+    python sushy/tools/mockup_server.py -m <output-path>/DSP2043-server
