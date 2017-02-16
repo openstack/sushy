@@ -110,11 +110,11 @@ class System(base.ResourceBase):
         boot_attr = self.json.get('Boot')
         if boot_attr is not None:
             self.boot['target'] = sys_maps.BOOT_SOURCE_TARGET_MAP.get(
-                boot_attr['BootSourceOverrideTarget'])
+                boot_attr.get('BootSourceOverrideTarget'))
             self.boot['enabled'] = sys_maps.BOOT_SOURCE_ENABLED_MAP.get(
-                boot_attr['BootSourceOverrideEnabled'])
+                boot_attr.get('BootSourceOverrideEnabled'))
             self.boot['mode'] = sys_maps.BOOT_SOURCE_MODE_MAP.get(
-                boot_attr['BootSourceOverrideMode'])
+                boot_attr.get('BootSourceOverrideMode'))
 
     def get_allowed_reset_system_values(self):
         actions = self.json.get('Actions')
