@@ -19,12 +19,15 @@ import argparse
 import os
 import sys
 
-from six.moves import BaseHTTPServer
+try:
+    from http import server as http_server
+except ImportError:
+    import BaseHTTPServer as http_server  # Py2
 
 REDFISH_MOCKUP_FILES = None
 
 
-class RequestHandler(BaseHTTPServer.BaseHTTPRequestHandler):
+class RequestHandler(http_server.BaseHTTPRequestHandler):
 
     REDFISH_SUBURI = '/redfish/v1'
 
@@ -86,5 +89,5 @@ if __name__ == '__main__':
         sys.exit(1)
 
     REDFISH_MOCKUP_FILES = os.path.realpath(args.mockup_files)
-    http_server = BaseHTTPServer.HTTPServer(('', args.port), RequestHandler)
-    http_server.serve_forever()
+    httpd = http_server.HTTPServer(('', args.port), RequestHandler)
+    httpd.serve_forever()
