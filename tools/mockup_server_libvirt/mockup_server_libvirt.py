@@ -16,6 +16,7 @@
 #    under the License.
 
 import argparse
+import ssl
 import xml.etree.ElementTree as ET
 
 import flask
@@ -137,10 +138,22 @@ def parse_args():
                         type=str,
                         default='qemu:///system',
                         help='The libvirt URI')
+    parser.add_argument('-c', '--ssl-certificate',
+                        type=str,
+                        help='SSL certificate to use for HTTPS')
+    parser.add_argument('-k', '--ssl-key',
+                        type=str,
+                        help='SSL key to use for HTTPS')
     return parser.parse_args()
 
 
 if __name__ == '__main__':
     args = parse_args()
     LIBVIRT_CONN = libvirt.open(args.libvirt_uri)
-    app.run(host='', port=args.port)
+
+    ssl_context = None
+    if args.ssl_certificate and args.ssl_key:
+        ssl_context = ssl.SSLContext(ssl.PROTOCOL_TLSv1_2)
+        ssl_context.load_cert_chain(args.ssl_certificate, args.ssl_key)
+
+    app.run(host='', port=args.port, ssl_context=ssl_context)

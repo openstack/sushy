@@ -39,7 +39,7 @@ class Connector(object):
             session.headers = headers
             session.verify = self._verify
 
-            if all(self._auth):
+            if all(v is not None for v in self._auth):
                 session.auth = self._auth
 
             if data is not None:

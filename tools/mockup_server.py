@@ -17,6 +17,7 @@
 
 import argparse
 import os
+import ssl
 import sys
 
 try:
@@ -79,6 +80,12 @@ def parse_args():
                         required=True,
                         help=('The path to the Redfish Mockup files in '
                               'the filesystem'))
+    parser.add_argument('-c', '--ssl-certificate',
+                        type=str,
+                        help='SSL certificate to use for HTTPS')
+    parser.add_argument('-k', '--ssl-key',
+                        type=str,
+                        help='SSL key to use for HTTPS')
     return parser.parse_args()
 
 
@@ -90,4 +97,10 @@ if __name__ == '__main__':
 
     REDFISH_MOCKUP_FILES = os.path.realpath(args.mockup_files)
     httpd = http_server.HTTPServer(('', args.port), RequestHandler)
+
+    if args.ssl_certificate and args.ssl_key:
+        httpd.socket = ssl.wrap_socket(
+            httpd.socket, keyfile=args.ssl_key,
+            certfile=args.ssl_certificate, server_side=True)
+
     httpd.serve_forever()

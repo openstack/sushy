@@ -32,7 +32,7 @@ class Sushy(base.ResourceBase):
     uuid = None
     """The Redfish system UUID"""
 
-    def __init__(self, url, username=None, password=None, verify=False):
+    def __init__(self, url, username=None, password=None, verify=True):
         super(Sushy, self).__init__(
             connector.Connector(url, username, password, verify))
 

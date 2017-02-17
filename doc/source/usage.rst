@@ -17,7 +17,7 @@ To use sushy in a project:
   LOG.setLevel(logging.DEBUG)
   LOG.addHandler(logging.StreamHandler())
 
-  s = sushy.Sushy('http://127.0.0.1:8000/redfish/v1',
+  s = sushy.Sushy('http://localhost:8000/redfish/v1',
                   username='foo', password='bar')
 
   # Get the Redfish version
@@ -108,7 +108,7 @@ Sushy also ships a small application at ``tools/mockup_server_libvirt``
 that starts a ReST API that users can use to interact with virtual
 machines using the Redfish protocol. So operations such as changing
 the boot device or the power state will actually affect the virtual
-machines. This allows users to test the library in a mode dynamic way. To
+machines. This allows users to test the library in a more dynamic way. To
 setup it do:
 
 .. code-block:: sh
@@ -119,7 +119,7 @@ setup it do:
   # Create a virtualenv
   virtualenv venv
 
-  # Install the service dependencies::
+  # Install the service dependencies
   venv/bin/pip install -r requirements.txt
 
   # Start the service
@@ -127,3 +127,30 @@ setup it do:
 
 That's it, now you can test Sushy against the
 ``http://locahost:8000/redfish/v1`` endpoint.
+
+
+Enabling SSL
+~~~~~~~~~~~~
+
+Both mockup servers supports `SSL`_ if you want Sushy with it. To set it
+up, first you need to generate key and certificate files with OpenSSL
+use following command::
+
+  openssl req -x509 -newkey rsa:2048 -keyout key.pem -out cert.pem -days 365
+
+Start the mockup server passing the ``--ssl-certificate`` and
+``--ssl-key`` parameters to it to it, for example::
+
+  python sushy/tools/mockup_server.py --ssl-key key.pem --ssl-certificate cert.pem --mockup-files <output-path>/DSP2043-server --port 8000
+
+Now to connect with `SSL`_ to the server use the ``verify`` parameter
+pointing to the certificate file when instantiating Sushy, for example:
+
+.. code-block:: python
+
+  import sushy
+
+  # Note the HTTP"S"
+  s = sushy.Sushy('https://localhost:8000/redfish/v1', verify='cert.pem', username='foo', password='bar')
+
+.. _SSL: https://en.wikipedia.org/wiki/Secure_Sockets_Layer
