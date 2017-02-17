@@ -74,15 +74,18 @@ To use sushy in a project:
   print(sys_inst.get_allowed_system_boot_source_values())
 
 
-Running the mockup server
--------------------------
+Running a mockup server
+-----------------------
 
-Sushy ships with a small script at ``tools/mockup_server.py``
+Static mockup
+~~~~~~~~~~~~~
+
+Sushy ships a small script at ``tools/mockup_server.py``
 that creates a HTTP server to serve any of the `Redfish mockups
-<https://www.dmtf.org/standards/redfish>`_. This enables users to test
-the library without having a real hardware.
-
-To run it, do:
+<https://www.dmtf.org/standards/redfish>`_. The files are static so
+operations like changing the boot device or the power state **will not**
+have any effect. But that should be enough for enabling people to test
+parts of the library. To setup it do:
 
 #. Download the .zip containing the Redfish mockups files from
    https://www.dmtf.org/standards/redfish, for example::
@@ -95,4 +98,32 @@ To run it, do:
 
 #. Now run the ``mockup_server.py`` script::
 
-    python sushy/tools/mockup_server.py -m <output-path>/DSP2043-server
+    python sushy/tools/mockup_server.py --mockup-files <output-path>/DSP2043-server --port 8000
+
+
+Libvirt mockup
+~~~~~~~~~~~~~~
+
+Sushy also ships a small application at ``tools/mockup_server_libvirt``
+that starts a ReST API that users can use to interact with virtual
+machines using the Redfish protocol. So operations such as changing
+the boot device or the power state will actually affect the virtual
+machines. This allows users to test the library in a mode dynamic way. To
+setup it do:
+
+.. code-block:: sh
+
+  # Change your current directory to sushy/tools/mockup_server_libvirt
+  cd sushy/tools/mockup_server_libvirt
+
+  # Create a virtualenv
+  virtualenv venv
+
+  # Install the service dependencies::
+  venv/bin/pip install -r requirements.txt
+
+  # Start the service
+  venv/bin/python mockup_server_libvirt.py --libvirt-uri "qemu:///system" --port 8000
+
+That's it, now you can test Sushy against the
+``http://locahost:8000/redfish/v1`` endpoint.
