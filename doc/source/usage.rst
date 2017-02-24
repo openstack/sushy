@@ -113,17 +113,16 @@ setup it do:
 
 .. code-block:: sh
 
-  # Change your current directory to sushy/tools/mockup_server_libvirt
-  cd sushy/tools/mockup_server_libvirt
+  tox -elibvirt-simulator
 
-  # Create a virtualenv
-  virtualenv venv
+  # Or, running with custom parameters
+  tox -elibvirt-simulator -- --port 8000 --libvirt-uri "qemu:///system"
 
-  # Install the service dependencies
-  venv/bin/pip install -r requirements.txt
+.. note::
+    Installing the dependencies requires libvirt development files.
+    For example, run the following command to install them on Fedora::
 
-  # Start the service
-  venv/bin/python mockup_server_libvirt.py --libvirt-uri "qemu:///system" --port 8000
+        sudo dnf install -y libvirt-devel
 
 That's it, now you can test Sushy against the
 ``http://locahost:8000/redfish/v1`` endpoint.
