@@ -23,6 +23,9 @@ import flask
 import libvirt
 
 app = flask.Flask(__name__)
+# Turn off strict_slashes on all routes
+app.url_map.strict_slashes = False
+
 LIBVIRT_CONN = None
 
 SET_BOOT_DEVICES_MAP = {
