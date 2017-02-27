@@ -23,5 +23,6 @@ __all__ = ('Sushy',)
 __version__ = pbr.version.VersionInfo(
     'sushy').version_string()
 
-# Set the default handler to avoid "No handler found" warnings
+# Set the default handler to avoid "No handler found" warnings. See:
+# https://docs.python.org/3/howto/logging.html#library-config
 logging.getLogger(__name__).addHandler(logging.NullHandler())
