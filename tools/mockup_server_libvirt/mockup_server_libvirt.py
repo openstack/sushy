@@ -28,11 +28,13 @@ app.url_map.strict_slashes = False
 
 LIBVIRT_CONN = None
 
-SET_BOOT_DEVICES_MAP = {
+BOOT_DEVICE_MAP = {
     'Pxe': 'network',
     'Hdd': 'hd',
     'Cd': 'cdrom',
 }
+
+BOOT_DEVICE_MAP_REV = {v: k for k, v in BOOT_DEVICE_MAP.items()}
 
 
 def _get_libvirt_domain(domain):
@@ -67,17 +69,25 @@ def system_resource(identity):
             # domain to be running
             total_cpus = 0
 
+        # Get the current boot device
+        boot_source_target = None
+        tree = ET.fromstring(domain.XMLDesc())
+        boot_element = tree.find('.//boot')
+        if boot_element is not None:
+            boot_source_target = (
+                BOOT_DEVICE_MAP_REV.get(boot_element.get('dev')))
+
         return flask.render_template(
             'system.json', identity=identity, uuid=domain.UUIDString(),
             power_state=power_state, total_memory_gb=total_memory_gb,
-            total_cpus=total_cpus)
+            total_cpus=total_cpus, boot_source_target=boot_source_target)
 
     elif flask.request.method == 'PATCH':
         boot = flask.request.json.get('Boot')
         if not boot:
             return 'PATCH only works for the Boot element', 400
 
-        target = SET_BOOT_DEVICES_MAP.get(boot.get('BootSourceOverrideTarget'))
+        target = BOOT_DEVICE_MAP.get(boot.get('BootSourceOverrideTarget'))
         if not target:
             return 'Missing the BootSourceOverrideTarget element', 400
 

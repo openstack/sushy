@@ -20,8 +20,8 @@
     "IndicatorLED": "Off",
     "PowerState": "{{ power_state }}",
     "Boot": {
-        "BootSourceOverrideEnabled": "Once",
-        "BootSourceOverrideTarget": "Pxe",
+        "BootSourceOverrideEnabled": "Continuous",
+        "BootSourceOverrideTarget": "{{ boot_source_target }}",
         "BootSourceOverrideTarget@Redfish.AllowableValues": [
             "Pxe",
             "Cd",
