@@ -15,29 +15,49 @@
 
 
 class SushyError(Exception):
+    """Basic exception for errors raised by Sushy"""
+
     message = None
 
-    def __init__(self, message=None, **kwargs):
+    def __init__(self, **kwargs):
         if self.message and kwargs:
             self.message = self.message % kwargs
-        else:
-            self.message = message
 
         super(SushyError, self).__init__(self.message)
 
 
-class ResourceNotFoundError(SushyError):
-    message = 'Resource %(resource)s not found'
+class ConnectionError(SushyError):
+    message = 'Unable to connect to %(url)s. Error: %(error)s'
 
 
 class MissingAttributeError(SushyError):
-    message = 'The attribute %(attribute)s is missing in %(resource)s'
+    message = ('The attribute %(attribute)s is missing from the '
+               'resource %(resource)s')
 
 
 class MissingActionError(SushyError):
-    message = 'The action %(action)s is missing in %(resource)s'
+    message = ('The action %(action)s is missing from the '
+               'resource %(resource)s')
 
 
 class InvalidParameterValueError(SushyError):
     message = ('The parameter "%(parameter)s" value "%(value)s" is invalid. '
                'Valid values are: %(valid_values)s')
+
+
+class HTTPError(SushyError):
+    """Basic exception for HTTP errors"""
+
+    status_code = None
+    message = ('Error issuing a %(method)s request at %(url)s. '
+               'Error: %(error)s')
+
+    def __init__(self, status_code=None, **kwargs):
+        super(HTTPError, self).__init__(**kwargs)
+        if status_code is not None:
+            self.status_code = status_code
+
+
+class ResourceNotFoundError(HTTPError):
+    status_code = 404
+    message = 'Resource %(resource)s not found'

@@ -19,6 +19,8 @@ import os
 
 import requests
 
+from sushy import exceptions
+
 LOG = logging.getLogger(__name__)
 
 
@@ -52,7 +54,20 @@ class Connector(object):
                       'the headers "%(headers)s" and data "%(data)s"',
                       {'method': method, 'url': url, 'headers': headers,
                        'data': data or ''})
-            return session.request(method, url, data=data)
+            try:
+                response = session.request(method, url, data=data)
+            except requests.ConnectionError as e:
+                raise exceptions.ConnectionError(url=url, error=e)
+
+            LOG.debug('Response: Status code: %d', response.status_code)
+            try:
+                response.raise_for_status()
+            except requests.HTTPError as e:
+                raise exceptions.HTTPError(
+                    method=method, url=url, error=e,
+                    status_code=e.response.status_code)
+
+            return response
 
     def get(self, path='', data=None, headers=None):
         return self._op('GET', path, data, headers)

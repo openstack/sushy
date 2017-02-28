@@ -16,7 +16,6 @@
 import abc
 
 import six
-from six.moves import http_client
 
 from sushy import exceptions
 
@@ -31,9 +30,12 @@ class ResourceBase(object):
         self.refresh()
 
     def refresh(self):
-        resp = self._conn.get(path=self._path)
-        if resp.status_code == http_client.NOT_FOUND:
-            raise exceptions.ResourceNotFoundError(resource=self._path)
+        try:
+            resp = self._conn.get(path=self._path)
+        except exceptions.HTTPError as e:
+            if e.status_code == 404:
+                raise exceptions.ResourceNotFoundError(resource=self._path)
+            raise
 
         self._json = resp.json()
         self._parse_attributes()

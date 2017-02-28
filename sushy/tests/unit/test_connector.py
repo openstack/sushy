@@ -14,8 +14,10 @@
 #    under the License.
 
 import mock
+import requests
 
 from sushy import connector
+from sushy import exceptions
 from sushy.tests.unit import base
 
 
@@ -68,3 +70,22 @@ class ConnectorTestCase(base.TestCase):
     def test__op_no_headers(self):
         expected_headers = {'Content-Type': 'application/json'}
         self._test_op(None, expected_headers)
+
+    @mock.patch('sushy.connector.requests.Session', autospec=True)
+    def test__op_connection_error(self, mock_session):
+        fake_session = mock.Mock()
+        mock_session.return_value.__enter__.return_value = fake_session
+        fake_session.request.side_effect = requests.exceptions.ConnectionError
+
+        self.assertRaises(exceptions.ConnectionError, self.conn._op, 'GET')
+
+    @mock.patch('sushy.connector.requests.Session', autospec=True)
+    def test__op_http_error(self, mock_session):
+        fake_session = mock.Mock()
+        mock_session.return_value.__enter__.return_value = fake_session
+        fake_response = fake_session.request.return_value
+        fake_response.status_code = 400
+        fake_response.raise_for_status.side_effect = (
+            requests.exceptions.HTTPError(response=fake_response))
+
+        self.assertRaises(exceptions.HTTPError, self.conn._op, 'GET')
