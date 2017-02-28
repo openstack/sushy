@@ -14,6 +14,8 @@
 #    under the License.
 
 
+import mock
+
 from sushy.tests.unit import base
 from sushy import utils
 
@@ -25,11 +27,14 @@ class UtilsTestCase(base.TestCase):
         expected = {'value0': 'key0', 'value1': 'key1'}
         self.assertEqual(expected, utils.revert_dictionary(source))
 
-    def test_get_members_ids(self):
+    @mock.patch.object(utils.LOG, 'warning', autospec=True)
+    def test_get_members_ids(self, log_mock):
         members = [{"@odata.id": "/redfish/v1/Systems/FOO"},
+                   {"other_key": "/redfish/v1/Systems/FUN"},
                    {"@odata.id": "/redfish/v1/Systems/BAR/"}]
         expected = ('FOO', 'BAR')
         self.assertEqual(expected, utils.get_members_ids(members))
+        self.assertEqual(1, log_mock.call_count)
 
     def test_strip_redfish_base(self):
         expected = 'Systems/1'

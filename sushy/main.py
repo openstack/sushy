@@ -26,9 +26,6 @@ class Sushy(base.ResourceBase):
     name = None
     """The Redfish system name"""
 
-    redfish_version = None
-    """The Redfish system version"""
-
     uuid = None
     """The Redfish system UUID"""
 

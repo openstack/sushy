@@ -14,7 +14,6 @@
 #    under the License.
 
 import logging
-import os
 
 from sushy import exceptions
 from sushy.resources import base
@@ -26,9 +25,6 @@ LOG = logging.getLogger(__name__)
 
 
 class System(base.ResourceBase):
-
-    redfish_version = None
-    """The Redfish version"""
 
     asset_tag = None
     """The system asset tag"""
@@ -85,8 +81,8 @@ class System(base.ResourceBase):
         :param redfish_version: The version of RedFish. Used to construct
             the object according to schema of the given version.
         """
-        super(System, self).__init__(connector, 'Systems/%s' % identity)
-        self.redfish_version = redfish_version
+        super(System, self).__init__(connector, 'Systems/%s' % identity,
+                                     redfish_version)
 
     def _parse_attributes(self):
         self.asset_tag = self.json.get('AssetTag')
@@ -206,11 +202,11 @@ class System(base.ResourceBase):
         Set the boot source to use on next reboot of the System.
 
         :param target: The target boot source.
-        :enabled: The frequency, whether to set it for the next
+        :param enabled: The frequency, whether to set it for the next
             reboot only (BOOT_SOURCE_ENABLED_ONCE) or persistent to all
             future reboots (BOOT_SOURCE_ENABLED_CONTINUOUS) or disabled
             (BOOT_SOURCE_ENABLED_DISABLED).
-        :mode: The boot mode, UEFI (BOOT_SOURCE_MODE_UEFI) or
+        :param mode: The boot mode, UEFI (BOOT_SOURCE_MODE_UEFI) or
             BIOS (BOOT_SOURCE_MODE_BIOS).
         :raises: InvalidParameterValueError, if any information passed is
             invalid.
@@ -252,16 +248,11 @@ class System(base.ResourceBase):
     # for those resources.
 
 
-class SystemCollection(base.ResourceBase):
+class SystemCollection(base.ResourceCollectionBase):
 
-    redfish_version = None
-    """The Redfish version"""
-
-    name = None
-    """The name of the collection"""
-
-    members_identities = None
-    """A tuple with the members identities"""
+    @property
+    def _resource_type(self):
+        return System
 
     def __init__(self, connector, redfish_version=None):
         """A class representing a ComputerSystemCollection
@@ -270,36 +261,5 @@ class SystemCollection(base.ResourceBase):
         :param redfish_version: The version of RedFish. Used to construct
             the object according to schema of the given version.
         """
-        super(SystemCollection, self).__init__(connector, 'Systems')
-        self.redfish_version = redfish_version
-
-    def _parse_attributes(self):
-        self.name = self.json.get('Name')
-        self.members_identities = (
-            utils.get_members_ids(self.json.get('Members', [])))
-
-    def get_member(self, identity):
-        """Given the identity return a System object
-
-        :param identity: The identity of the System resource
-        :returns: The System object
-        """
-        return System(self._conn, identity,
-                      redfish_version=self.redfish_version)
-
-    def get_members(self):
-        """Return a list of System objects present in the collection
-
-        :returns: A list of System objects
-        """
-        members = []
-        for member in self.json.get('Members', []):
-            ident = member.get('@odata.id')
-            if ident is None:
-                LOG.warning('Could not find the identity attribute for '
-                            'member %s', member)
-                continue
-            ident = os.path.basename(ident)
-            members.append(self.get_member(ident))
-
-        return members
+        super(SystemCollection, self).__init__(connector, 'Systems',
+                                               redfish_version)

@@ -18,19 +18,40 @@ import abc
 import six
 
 from sushy import exceptions
+from sushy import utils
 
 
 @six.add_metaclass(abc.ABCMeta)
 class ResourceBase(object):
 
-    def __init__(self, connector, path=''):
+    redfish_version = None
+    """The Redfish version"""
+
+    def __init__(self, connector, path='', redfish_version=None):
+        """A class representing the base of any Redfish resource
+
+        Invokes the ``refresh()`` method of resource for the first
+        time from here (constructor).
+        :param connector: A Connector instance
+        :param path: sub-URI path to the resource.
+        :param redfish_version: The version of RedFish. Used to construct
+            the object according to schema of the given version.
+        """
         self._conn = connector
         self._path = path
         self._json = None
+        self.redfish_version = redfish_version
         self.refresh()
 
     def refresh(self):
-        """Refresh the resource."""
+        """Refresh the resource
+
+        Freshly retrieves/fetches the resource attributes and invokes
+        ``_parse_attributes()`` method on successful retrieval.
+        :raises: ResourceNotFoundError
+        :raises: ConnectionError
+        :raises: HTTPError
+        """
         try:
             resp = self._conn.get(path=self._path)
         except exceptions.HTTPError as e:
@@ -56,3 +77,57 @@ class ResourceBase(object):
         This method should be overwritten and is responsible for parsing
         all the attributes of a resource.
         """
+
+
+@six.add_metaclass(abc.ABCMeta)
+class ResourceCollectionBase(ResourceBase):
+
+    name = None
+    """The name of the collection"""
+
+    members_identities = None
+    """A tuple with the members identities"""
+
+    def __init__(self, connector, path, redfish_version=None):
+        """A class representing the base of any Redfish resource collection
+
+        It gets inherited ``ResourceBase`` and invokes the base class
+        constructor.
+        :param connector: A Connector instance
+        :param path: sub-URI path to the resource collection.
+        :param redfish_version: The version of RedFish. Used to construct
+            the object according to schema of the given version.
+        """
+        super(ResourceCollectionBase, self).__init__(connector, path,
+                                                     redfish_version)
+
+    @property
+    @abc.abstractmethod
+    def _resource_type(self):
+        """The resource class that the collection contains.
+
+        Override this property to specify the resource class that the
+        collection contains.
+        """
+
+    def _parse_attributes(self):
+        self.name = self.json.get('Name')
+        self.members_identities = (
+            utils.get_members_ids(self.json.get('Members', [])))
+
+    def get_member(self, identity):
+        """Given the identity return a ``_resource_type`` object
+
+        :param identity: The identity of the ``_resource_type`` resource
+        :returns: The ``_resource_type`` object
+        :raises: ResourceNotFoundError
+        """
+        return self._resource_type(self._conn, identity,
+                                   redfish_version=self.redfish_version)
+
+    def get_members(self):
+        """Return a list of ``_resource_type`` objects present in collection
+
+        :returns: A list of ``_resource_type`` objects
+        """
+        return [self.get_member(id_) for id_ in self.members_identities]

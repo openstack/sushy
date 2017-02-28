@@ -13,7 +13,10 @@
 #    License for the specific language governing permissions and limitations
 #    under the License.
 
+import logging
 import os
+
+LOG = logging.getLogger(__name__)
 
 
 def revert_dictionary(dictionary):
@@ -37,6 +40,8 @@ def get_members_ids(members):
     for member in members:
         identity = member.get('@odata.id')
         if not identity:
+            LOG.warning('Could not find the \'@odata.id\' attribute for '
+                        'member %s', member)
             continue
         members_list.append(os.path.basename(identity.rstrip('/')))
 
