@@ -4,3 +4,6 @@ source = sushy
 
 [report]
 ignore_errors = True
+
+[html]
+directory = cover
