@@ -56,26 +56,39 @@ def system_collection_resource():
         'system_collection.json', system_count=len(domains), systems=domains)
 
 
+def _get_total_cpus(domain, tree):
+    total_cpus = 0
+    if domain.isActive():
+        total_cpus = domain.maxVcpus()
+    else:
+        # If we can't get it from maxVcpus() try to find it by
+        # inspecting the domain XML
+        if total_cpus <= 0:
+            vcpu_element = tree.find('.//vcpu')
+            if vcpu_element is not None:
+                total_cpus = int(vcpu_element.text)
+    return total_cpus
+
+
+def _get_boot_source_target(tree):
+    boot_source_target = None
+    boot_element = tree.find('.//boot')
+    if boot_element is not None:
+        boot_source_target = (
+            BOOT_DEVICE_MAP_REV.get(boot_element.get('dev')))
+    return boot_source_target
+
+
 @app.route('/redfish/v1/Systems/<identity>', methods=['GET', 'PATCH'])
 def system_resource(identity):
     domain = _get_libvirt_domain(identity)
     if flask.request.method == 'GET':
         power_state = 'On' if domain.isActive() else 'Off'
         total_memory_gb = int(domain.maxMemory() / 1024 / 1024)
-        try:
-            total_cpus = domain.maxVcpus()
-        except libvirt.libvirtError:
-            # NOTE(lucasagomes): Getting the maxVcpus() requires the
-            # domain to be running
-            total_cpus = 0
 
-        # Get the current boot device
-        boot_source_target = None
         tree = ET.fromstring(domain.XMLDesc())
-        boot_element = tree.find('.//boot')
-        if boot_element is not None:
-            boot_source_target = (
-                BOOT_DEVICE_MAP_REV.get(boot_element.get('dev')))
+        total_cpus = _get_total_cpus(domain, tree)
+        boot_source_target = _get_boot_source_target(tree)
 
         return flask.render_template(
             'system.json', identity=identity, uuid=domain.UUIDString(),
