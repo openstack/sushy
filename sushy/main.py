@@ -14,21 +14,27 @@
 #    under the License.
 
 from sushy import connector
-from sushy import exceptions
 from sushy.resources import base
+from sushy.resources.manager import manager
 from sushy.resources.system import system
 
 
 class Sushy(base.ResourceBase):
 
-    identity = None
-    """The Redfish system identity"""
+    identity = base.Field('Id', required=True)
+    """The Redfish root service identity"""
 
-    name = None
-    """The Redfish system name"""
+    name = base.Field('Name')
+    """The Redfish root service name"""
 
-    uuid = None
-    """The Redfish system UUID"""
+    uuid = base.Field('UUID')
+    """The Redfish root service UUID"""
+
+    _systems_path = base.Field(['Systems', '@odata.id'], required=True)
+    """SystemCollection path"""
+
+    _managers_path = base.Field(['Managers', '@odata.id'], required=True)
+    """ManagerCollection path"""
 
     def __init__(self, base_url, username=None, password=None,
                  root_prefix='/redfish/v1/', verify=True):
@@ -55,18 +61,8 @@ class Sushy(base.ResourceBase):
             path=self._root_prefix)
 
     def _parse_attributes(self):
-        self.identity = self.json.get('Id')
-        self.name = self.json.get('Name')
+        super(Sushy, self)._parse_attributes()
         self.redfish_version = self.json.get('RedfishVersion')
-        self.uuid = self.json.get('UUID')
-
-    def _get_system_collection_path(self):
-        """Helper function to find the SystemCollection path"""
-        systems_col = self.json.get('Systems')
-        if not systems_col:
-            raise exceptions.MissingAttributeError(attribute='Systems',
-                                                   resource=self._path)
-        return systems_col.get('@odata.id')
 
     def get_system_collection(self):
         """Get the SystemCollection object
@@ -75,9 +71,8 @@ class Sushy(base.ResourceBase):
             not found
         :returns: a SystemCollection object
         """
-        return system.SystemCollection(
-            self._conn, self._get_system_collection_path(),
-            redfish_version=self.redfish_version)
+        return system.SystemCollection(self._conn, self._systems_path,
+                                       redfish_version=self.redfish_version)
 
     def get_system(self, identity):
         """Given the identity return a System object
@@ -87,3 +82,22 @@ class Sushy(base.ResourceBase):
         """
         return system.System(self._conn, identity,
                              redfish_version=self.redfish_version)
+
+    def get_manager_collection(self):
+        """Get the ManagerCollection object
+
+        :raises: MissingAttributeError, if the collection attribute is
+            not found
+        :returns: a ManagerCollection object
+        """
+        return manager.ManagerCollection(self._conn, self._managers_path,
+                                         redfish_version=self.redfish_version)
+
+    def get_manager(self, identity):
+        """Given the identity return a Manager object
+
+        :param identity: The identity of the Manager resource
+        :returns: The Manager object
+        """
+        return manager.Manager(self._conn, identity,
+                               redfish_version=self.redfish_version)

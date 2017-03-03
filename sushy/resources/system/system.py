@@ -17,6 +17,7 @@ import logging
 
 from sushy import exceptions
 from sushy.resources import base
+from sushy.resources import common
 from sushy.resources.system import constants as sys_cons
 from sushy.resources.system import mappings as sys_maps
 from sushy.resources.system import processor
@@ -25,15 +26,8 @@ from sushy.resources.system import processor
 LOG = logging.getLogger(__name__)
 
 
-class ResetActionField(base.CompositeField):
-    allowed_values = base.Field('ResetType@Redfish.AllowableValues',
-                                adapter=list)
-
-    target_uri = base.Field('target', required=True)
-
-
 class ActionsField(base.CompositeField):
-    reset = ResetActionField('#ComputerSystem.Reset')
+    reset = common.ResetActionField('#ComputerSystem.Reset')
 
 
 class BootField(base.CompositeField):
