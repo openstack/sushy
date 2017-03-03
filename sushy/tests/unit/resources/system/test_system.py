@@ -54,6 +54,23 @@ class SystemTestCase(base.TestCase):
         self.assertEqual(sushy.SYSTEM_POWER_STATE_ON,
                          self.sys_inst.power_state)
 
+    def test_get_reset_action_element(self):
+        value = self.sys_inst._get_reset_action_element()
+        expected = {
+            "target": "/redfish/v1/Systems/437XR1138R2/Actions/"
+                      "ComputerSystem.Reset",
+            "ResetType@Redfish.AllowableValues": [
+                "On",
+                "ForceOff",
+                "GracefulShutdown",
+                "GracefulRestart",
+                "ForceRestart",
+                "Nmi",
+                "ForceOn",
+                "PushPowerButton"
+            ]}
+        self.assertEqual(expected, value)
+
     def test_get_allowed_reset_system_values(self):
         values = self.sys_inst.get_allowed_reset_system_values()
         expected = [sushy.RESET_GRACEFUL_SHUTDOWN,
@@ -65,6 +82,11 @@ class SystemTestCase(base.TestCase):
                     sushy.RESET_NMI,
                     sushy.RESET_PUSH_POWER_BUTTON]
         self.assertEqual(sorted(expected), sorted(values))
+
+    def test_get_reset_system_path(self):
+        value = self.sys_inst._get_reset_system_path()
+        expected = 'Systems/437XR1138R2/Actions/ComputerSystem.Reset'
+        self.assertEqual(expected, value)
 
     def test_reset_system(self):
         self.sys_inst.reset_system(sushy.RESET_FORCE_OFF)

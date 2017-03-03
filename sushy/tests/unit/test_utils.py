@@ -30,3 +30,16 @@ class UtilsTestCase(base.TestCase):
                    {"@odata.id": "/redfish/v1/Systems/BAR"}]
         expected = ('FOO', 'BAR')
         self.assertEqual(expected, utils.get_members_ids(members))
+
+    def test_strip_redfish_base(self):
+        expected = 'Systems/1'
+        self.assertEqual(expected, utils.strip_redfish_base('Systems/1'))
+        self.assertEqual(expected, utils.strip_redfish_base('/Systems/1'))
+        self.assertEqual(expected,
+                         utils.strip_redfish_base('/redfish/v1/Systems/1'))
+        self.assertEqual(expected,
+                         utils.strip_redfish_base('redfish/v1/Systems/1'))
+        self.assertEqual(expected,
+                         utils.strip_redfish_base('/redfish/v2/Systems/1'))
+        self.assertEqual(expected,
+                         utils.strip_redfish_base('redfish/v2/Systems/1'))

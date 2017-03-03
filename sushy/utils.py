@@ -41,3 +41,23 @@ def get_members_ids(members):
         members_list.append(os.path.basename(identity))
 
     return tuple(members_list)
+
+
+def strip_redfish_base(path):
+    """Strip redfish base 'redfish/v1/' from path
+
+    :param path: A string of redfish resource path
+    :returns: path without redfish base 'redfish/v1/'
+
+    """
+    sub_path = path.lstrip('/')
+
+    # To support further redfish version, didn't hardcode to 'redfish/v1'
+    redfish_base_path = 'redfish/v'
+
+    if sub_path.startswith(redfish_base_path):
+        # Find next occurrence of '/' after redfish base path and strip the
+        # base path before it
+        sub_path = sub_path[sub_path.find('/', len(redfish_base_path)) + 1:]
+
+    return sub_path

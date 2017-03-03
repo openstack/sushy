@@ -116,7 +116,7 @@ class System(base.ResourceBase):
             self.boot['mode'] = sys_maps.BOOT_SOURCE_MODE_MAP.get(
                 boot_attr.get('BootSourceOverrideMode'))
 
-    def get_allowed_reset_system_values(self):
+    def _get_reset_action_element(self):
         actions = self.json.get('Actions')
         if not actions:
             raise exceptions.MissingAttributeError(attribute='Actions',
@@ -126,6 +126,10 @@ class System(base.ResourceBase):
         if not reset_action:
             raise exceptions.MissingActionError(action='#ComputerSystem.Reset',
                                                 resource=self._path)
+        return reset_action
+
+    def get_allowed_reset_system_values(self):
+        reset_action = self._get_reset_action_element()
 
         allowed_values = reset_action.get('ResetType@Redfish.AllowableValues')
         if not allowed_values:
@@ -137,6 +141,16 @@ class System(base.ResourceBase):
                 set(sys_maps.RESET_SYSTEM_VALUE_MAP.keys()).
                 intersection(allowed_values)]
 
+    def _get_reset_system_path(self):
+        reset_action = self._get_reset_action_element()
+
+        target_url = reset_action.get('target')
+        if not target_url:
+            raise exceptions.MissingAttributeError(attribute='target',
+                                                   resource=self._path)
+
+        return utils.strip_redfish_base(target_url)
+
     def reset_system(self, value):
         valid_resets = self.get_allowed_reset_system_values()
         if value not in valid_resets:
@@ -144,7 +158,8 @@ class System(base.ResourceBase):
                 parameter='value', value=value, valid_values=valid_resets)
 
         value = sys_maps.RESET_SYSTEM_VALUE_MAP_REV[value]
-        path = self.path + '/Actions/ComputerSystem.Reset'
+
+        path = self._get_reset_system_path()
         # TODO(lucasagomes): Check the return code and response body ?
         #                    Probably we should call refresh() as well.
         self._conn.post(path, data={'ResetType': value})
