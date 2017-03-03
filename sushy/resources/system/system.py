@@ -135,19 +135,20 @@ class System(base.ResourceBase):
         if not allowed_values:
             LOG.warning('Could not figure out the allowed values for the '
                         'reset system action for System %s', self.identity)
-            return sys_maps.RESET_SYSTEM_VALUE_MAP.keys()
+            return set(sys_maps.RESET_SYSTEM_VALUE_MAP_REV)
 
-        return [sys_maps.RESET_SYSTEM_VALUE_MAP[v] for v in
-                set(sys_maps.RESET_SYSTEM_VALUE_MAP.keys()).
-                intersection(allowed_values)]
+        return set([sys_maps.RESET_SYSTEM_VALUE_MAP[v] for v in
+                    set(sys_maps.RESET_SYSTEM_VALUE_MAP).
+                    intersection(allowed_values)])
 
     def _get_reset_system_path(self):
         reset_action = self._get_reset_action_element()
 
         target_url = reset_action.get('target')
         if not target_url:
-            raise exceptions.MissingAttributeError(attribute='target',
-                                                   resource=self._path)
+            raise exceptions.MissingAttributeError(
+                attribute='Actions/ComputerSystem.Reset/target',
+                resource=self._path)
 
         return utils.strip_redfish_base(target_url)
 
@@ -177,11 +178,11 @@ class System(base.ResourceBase):
             LOG.warning('Could not figure out the allowed values for '
                         'configuring the boot source for System %s',
                         self.identity)
-            return sys_maps.BOOT_SOURCE_TARGET_MAP.keys()
+            return set(sys_maps.BOOT_SOURCE_TARGET_MAP_REV)
 
-        return [sys_maps.BOOT_SOURCE_TARGET_MAP[v] for v in
-                set(sys_maps.BOOT_SOURCE_TARGET_MAP.keys()).
-                intersection(allowed_values)]
+        return set([sys_maps.BOOT_SOURCE_TARGET_MAP[v] for v in
+                    set(sys_maps.BOOT_SOURCE_TARGET_MAP).
+                    intersection(allowed_values)])
 
     def set_system_boot_source(self, target,
                                enabled=sys_cons.BOOT_SOURCE_ENABLED_ONCE,
@@ -194,7 +195,7 @@ class System(base.ResourceBase):
         if enabled not in sys_maps.BOOT_SOURCE_ENABLED_MAP_REV:
             raise exceptions.InvalidParameterValueError(
                 parameter='enabled', value=enabled,
-                valid_values=sys_maps.BOOT_SOURCE_TARGET_MAP_REV.keys())
+                valid_values=list(sys_maps.BOOT_SOURCE_TARGET_MAP_REV))
 
         data = {
             'Boot': {
@@ -209,7 +210,7 @@ class System(base.ResourceBase):
             if mode not in sys_maps.BOOT_SOURCE_MODE_MAP_REV:
                 raise exceptions.InvalidParameterValueError(
                     parameter='mode', value=mode,
-                    valid_values=sys_maps.BOOT_SOURCE_MODE_MAP_REV.keys())
+                    valid_values=list(sys_maps.BOOT_SOURCE_MODE_MAP_REV))
 
             data['Boot']['BootSourceOverrideMode'] = (
                 sys_maps.BOOT_SOURCE_MODE_MAP_REV[mode])

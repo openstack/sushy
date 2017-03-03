@@ -118,8 +118,7 @@
                 "GracefulRestart",
                 "ForceRestart",
                 "Nmi",
-                "ForceOn",
-                "PushPowerButton"
+                "ForceOn"
             ]
         },
         "Oem": {
