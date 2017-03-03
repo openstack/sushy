@@ -15,25 +15,8 @@ needed we can expand Sushy to fullfil those requirements.
 
 * Free software: Apache license
 * Documentation: http://sushy.rtfd.io
+* Usage: http://sushy.readthedocs.io/en/latest/usage.html
 * Source: http://git.openstack.org/cgit/openstack/sushy
 * Bugs: http://bugs.launchpad.net/sushy
-
-Features
---------
-
-* Abstraction around the SystemCollection and System resources (Basic
-  server identification and asset information)
-* Systems power management (Both soft and hard; Including NMI injection)
-* Changing systems boot device, frequency (Once or permanently) and mode
-  (UEFI or BIOS)
-
-Check out the :ref:`usage` page.
-
-TODO
-----
-
-* Collect sensor data (Health state, temperature, fans etc...)
-* System inspection (Number of CPUs, memory and disk size)
-* Serial console
 
 .. _Redfish: http://www.dmtf.org/standards/redfish
