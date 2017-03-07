@@ -38,7 +38,7 @@ def get_members_ids(members):
         identity = member.get('@odata.id')
         if not identity:
             continue
-        members_list.append(os.path.basename(identity))
+        members_list.append(os.path.basename(identity.rstrip('/')))
 
     return tuple(members_list)
 

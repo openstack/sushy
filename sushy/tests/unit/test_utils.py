@@ -27,7 +27,7 @@ class UtilsTestCase(base.TestCase):
 
     def test_get_members_ids(self):
         members = [{"@odata.id": "/redfish/v1/Systems/FOO"},
-                   {"@odata.id": "/redfish/v1/Systems/BAR"}]
+                   {"@odata.id": "/redfish/v1/Systems/BAR/"}]
         expected = ('FOO', 'BAR')
         self.assertEqual(expected, utils.get_members_ids(members))
 
