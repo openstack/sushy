@@ -129,6 +129,10 @@ class System(base.ResourceBase):
         return reset_action
 
     def get_allowed_reset_system_values(self):
+        """Get the allowed values for resetting the system.
+
+        :returns: A set with the allowed values.
+        """
         reset_action = self._get_reset_action_element()
 
         allowed_values = reset_action.get('ResetType@Redfish.AllowableValues')
@@ -153,6 +157,12 @@ class System(base.ResourceBase):
         return utils.strip_redfish_base(target_url)
 
     def reset_system(self, value):
+        """Reset the system.
+
+        :param value: The target value.
+        :raises: InvalidParameterValueError, if the target value is not
+            allowed.
+        """
         valid_resets = self.get_allowed_reset_system_values()
         if value not in valid_resets:
             raise exceptions.InvalidParameterValueError(
@@ -166,6 +176,10 @@ class System(base.ResourceBase):
         self._conn.post(path, data={'ResetType': value})
 
     def get_allowed_system_boot_source_values(self):
+        """Get the allowed values for changing the boot source.
+
+        :returns: A set with the allowed values.
+        """
         boot = self.json.get('Boot')
         if not boot:
             raise exceptions.MissingAttributeError(attribute='Boot',
@@ -187,6 +201,20 @@ class System(base.ResourceBase):
     def set_system_boot_source(self, target,
                                enabled=sys_cons.BOOT_SOURCE_ENABLED_ONCE,
                                mode=None):
+        """Set the boot source.
+
+        Set the boot source to use on next reboot of the System.
+
+        :param target: The target boot source.
+        :enabled: The frequency, whether to set it for the next
+            reboot only (BOOT_SOURCE_ENABLED_ONCE) or persistent to all
+            future reboots (BOOT_SOURCE_ENABLED_CONTINUOUS) or disabled
+            (BOOT_SOURCE_ENABLED_DISABLED).
+        :mode: The boot mode, UEFI (BOOT_SOURCE_MODE_UEFI) or
+            BIOS (BOOT_SOURCE_MODE_BIOS).
+        :raises: InvalidParameterValueError, if any information passed is
+            invalid.
+        """
         valid_targets = self.get_allowed_system_boot_source_values()
         if target not in valid_targets:
             raise exceptions.InvalidParameterValueError(

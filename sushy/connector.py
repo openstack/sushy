@@ -32,6 +32,17 @@ class Connector(object):
         self._verify = verify
 
     def _op(self, method, path='', data=None, headers=None):
+        """Generic RESTful request handler.
+
+        :param method: The HTTP method to be used, e.g: GET, POST,
+            PUT, PATCH, etc...
+        :param path: The sub-URI path to the resource.
+        :param data: Optional JSON data.
+        :param headers: Optional dictionary of headers.
+        :returns: The response object from the requests library.
+        :raises: ConnectionError
+        :raises: HTTPError
+        """
         if headers is None:
             headers = {}
 
@@ -70,10 +81,37 @@ class Connector(object):
             return response
 
     def get(self, path='', data=None, headers=None):
+        """HTTP GET method.
+
+        :param path: Optional sub-URI path to the resource.
+        :param data: Optional JSON data.
+        :param headers: Optional dictionary of headers.
+        :returns: The response object from the requests library.
+        :raises: ConnectionError
+        :raises: HTTPError
+        """
         return self._op('GET', path, data, headers)
 
     def post(self, path='', data=None, headers=None):
+        """HTTP POST method.
+
+        :param path: Optional sub-URI path to the resource.
+        :param data: Optional JSON data.
+        :param headers: Optional dictionary of headers.
+        :returns: The response object from the requests library.
+        :raises: ConnectionError
+        :raises: HTTPError
+        """
         return self._op('POST', path, data, headers)
 
     def patch(self, path='', data=None, headers=None):
+        """HTTP PATCH method.
+
+        :param path: Optional sub-URI path to the resource.
+        :param data: Optional JSON data.
+        :param headers: Optional dictionary of headers.
+        :returns: The response object from the requests library.
+        :raises: ConnectionError
+        :raises: HTTPError
+        """
         return self._op('PATCH', path, data, headers)

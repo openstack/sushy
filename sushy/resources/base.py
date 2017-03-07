@@ -30,6 +30,7 @@ class ResourceBase(object):
         self.refresh()
 
     def refresh(self):
+        """Refresh the resource."""
         try:
             resp = self._conn.get(path=self._path)
         except exceptions.HTTPError as e:
