@@ -19,6 +19,7 @@ import mock
 
 import sushy
 from sushy import exceptions
+from sushy.resources.system import processor
 from sushy.resources.system import system
 from sushy.tests.unit import base
 
@@ -54,6 +55,9 @@ class SystemTestCase(base.TestCase):
                          self.sys_inst.uuid)
         self.assertEqual(sushy.SYSTEM_POWER_STATE_ON,
                          self.sys_inst.power_state)
+        self.assertEqual((96, "OK"),
+                         self.sys_inst.memory_summary)
+        self.assertIsNone(self.sys_inst._processors)
 
     def test_get__reset_action_element(self):
         value = self.sys_inst._get_reset_action_element()
@@ -217,6 +221,135 @@ class SystemTestCase(base.TestCase):
                           self.sys_inst.set_system_boot_source,
                           sushy.BOOT_SOURCE_TARGET_HDD,
                           enabled='invalid-enabled')
+
+    def test__get_processor_collection_path_missing_processors_attr(self):
+        self.sys_inst._json.pop('Processors')
+        self.assertRaisesRegex(
+            exceptions.MissingAttributeError, 'attribute Processors',
+            self.sys_inst._get_processor_collection_path)
+
+    def test_memory_summary_missing_attr(self):
+        self.assertIsInstance(self.sys_inst.memory_summary,
+                              system.MemorySummary)
+        self.assertEqual(96, self.sys_inst.memory_summary.size_gib)
+        self.assertEqual("OK", self.sys_inst.memory_summary.health)
+
+        # | GIVEN |
+        self.sys_inst._json['MemorySummary']['Status'].pop('HealthRollup')
+        # | WHEN |
+        self.sys_inst._parse_attributes()
+        # | THEN |
+        self.assertEqual(96, self.sys_inst.memory_summary.size_gib)
+        self.assertEqual(None, self.sys_inst.memory_summary.health)
+
+        # | GIVEN |
+        self.sys_inst._json['MemorySummary'].pop('Status')
+        # | WHEN |
+        self.sys_inst._parse_attributes()
+        # | THEN |
+        self.assertEqual(96, self.sys_inst.memory_summary.size_gib)
+        self.assertEqual(None, self.sys_inst.memory_summary.health)
+
+        # | GIVEN |
+        self.sys_inst._json['MemorySummary'].pop('TotalSystemMemoryGiB')
+        # | WHEN |
+        self.sys_inst._parse_attributes()
+        # | THEN |
+        self.assertEqual(None, self.sys_inst.memory_summary.size_gib)
+        self.assertEqual(None, self.sys_inst.memory_summary.health)
+
+        # | GIVEN |
+        self.sys_inst._json.pop('MemorySummary')
+        # | WHEN |
+        self.sys_inst._parse_attributes()
+        # | THEN |
+        self.assertEqual(None, self.sys_inst.memory_summary)
+
+    def test_processors(self):
+        # check for the underneath variable value
+        self.assertIsNone(self.sys_inst._processors)
+        # | GIVEN |
+        self.conn.get.return_value.json.reset_mock()
+        with open('sushy/tests/unit/json_samples/processor_collection.json',
+                  'r') as f:
+            self.conn.get.return_value.json.return_value = json.loads(f.read())
+        # | WHEN |
+        actual_processors = self.sys_inst.processors
+        # | THEN |
+        self.assertIsInstance(actual_processors,
+                              processor.ProcessorCollection)
+        self.conn.get.return_value.json.assert_called_once_with()
+
+        # reset mock
+        self.conn.get.return_value.json.reset_mock()
+        # | WHEN & THEN |
+        # tests for same object on invoking subsequently
+        self.assertIs(actual_processors,
+                      self.sys_inst.processors)
+        self.conn.get.return_value.json.assert_not_called()
+
+    def test_processors_on_refresh(self):
+        # | GIVEN |
+        with open('sushy/tests/unit/json_samples/processor_collection.json',
+                  'r') as f:
+            self.conn.get.return_value.json.return_value = json.loads(f.read())
+        # | WHEN & THEN |
+        self.assertIsInstance(self.sys_inst.processors,
+                              processor.ProcessorCollection)
+
+        # On refreshing the system instance...
+        with open('sushy/tests/unit/json_samples/system.json', 'r') as f:
+            self.conn.get.return_value.json.return_value = json.loads(f.read())
+        self.sys_inst.refresh()
+
+        # | WHEN & THEN |
+        self.assertIsNone(self.sys_inst._processors)
+
+        # | GIVEN |
+        with open('sushy/tests/unit/json_samples/processor_collection.json',
+                  'r') as f:
+            self.conn.get.return_value.json.return_value = json.loads(f.read())
+        # | WHEN & THEN |
+        self.assertIsInstance(self.sys_inst.processors,
+                              processor.ProcessorCollection)
+
+    def _setUp_processor_summary(self):
+        self.conn.get.return_value.json.reset_mock()
+        with open('sushy/tests/unit/json_samples/processor_collection.json',
+                  'r') as f:
+            self.conn.get.return_value.json.return_value = json.loads(f.read())
+
+        # fetch processors for the first time
+        self.sys_inst.processors
+
+        successive_return_values = []
+        with open('sushy/tests/unit/json_samples/processor.json', 'r') as f:
+            successive_return_values.append(json.loads(f.read()))
+        with open('sushy/tests/unit/json_samples/processor2.json', 'r') as f:
+            successive_return_values.append(json.loads(f.read()))
+
+        self.conn.get.return_value.json.side_effect = successive_return_values
+
+    def test_processor_summary(self):
+        # | GIVEN |
+        self._setUp_processor_summary()
+        # | WHEN |
+        actual_processor_summary = self.sys_inst.processors.summary
+        # | THEN |
+        self.assertEqual((16, sushy.PROCESSOR_ARCH_x86),
+                         actual_processor_summary)
+        self.assertEqual(16, actual_processor_summary.count)
+        self.assertEqual(sushy.PROCESSOR_ARCH_x86,
+                         actual_processor_summary.architecture)
+
+        # reset mock
+        self.conn.get.return_value.json.reset_mock()
+
+        # | WHEN & THEN |
+        # tests for same object on invoking subsequently
+        self.assertIs(actual_processor_summary,
+                      self.sys_inst.processors.summary)
+        self.conn.get.return_value.json.assert_not_called()
 
 
 class SystemCollectionTestCase(base.TestCase):

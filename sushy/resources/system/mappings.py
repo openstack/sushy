@@ -71,3 +71,14 @@ BOOT_SOURCE_ENABLED_MAP = {
 }
 
 BOOT_SOURCE_ENABLED_MAP_REV = utils.revert_dictionary(BOOT_SOURCE_ENABLED_MAP)
+
+PROCESSOR_ARCH_VALUE_MAP = {
+    'x86': sys_cons.PROCESSOR_ARCH_x86,
+    'IA-64': sys_cons.PROCESSOR_ARCH_IA_64,
+    'ARM': sys_cons.PROCESSOR_ARCH_ARM,
+    'MIPS': sys_cons.PROCESSOR_ARCH_MIPS,
+    'OEM': sys_cons.PROCESSOR_ARCH_OEM,
+}
+
+PROCESSOR_ARCH_VALUE_MAP_REV = (
+    utils.revert_dictionary(PROCESSOR_ARCH_VALUE_MAP))
