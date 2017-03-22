@@ -17,14 +17,13 @@ To use sushy in a project:
   LOG.setLevel(logging.DEBUG)
   LOG.addHandler(logging.StreamHandler())
 
-  s = sushy.Sushy('http://localhost:8000/redfish/v1',
-                  username='foo', password='bar')
+  s = sushy.Sushy('http://localhost:8000', username='foo', password='bar')
 
   # Get the Redfish version
   print(s.redfish_version)
 
   # Instantiate a system object
-  sys_inst = s.get_system('437XR1138R2')
+  sys_inst = s.get_system('/redfish/v1/Systems/437XR1138R2')
 
 
   # Using system collections
@@ -124,8 +123,8 @@ setup it do:
 
         sudo dnf install -y libvirt-devel
 
-That's it, now you can test Sushy against the
-``http://locahost:8000/redfish/v1`` endpoint.
+That's it, now you can test Sushy against the ``http://locahost:8000``
+endpoint.
 
 
 Enabling SSL
@@ -150,6 +149,6 @@ pointing to the certificate file when instantiating Sushy, for example:
   import sushy
 
   # Note the HTTP"S"
-  s = sushy.Sushy('https://localhost:8000/redfish/v1', verify='cert.pem', username='foo', password='bar')
+  s = sushy.Sushy('https://localhost:8000', verify='cert.pem', username='foo', password='bar')
 
 .. _SSL: https://en.wikipedia.org/wiki/Secure_Sockets_Layer

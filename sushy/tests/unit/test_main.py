@@ -18,6 +18,7 @@ import json
 import mock
 
 from sushy import connector
+from sushy import exceptions
 from sushy import main
 from sushy.resources.system import system
 from sushy.tests.unit import base
@@ -31,14 +32,14 @@ class MainTestCase(base.TestCase):
         self.conn = mock.Mock()
         mock_connector.return_code = self.conn
         self.root = main.Sushy(
-            'http://foo.bar:1234/redfish/v1', username='foo', password='bar',
+            'http://foo.bar:1234', username='foo', password='bar',
             verify=True)
-        mock_connector.assert_called_once_with(
-            'http://foo.bar:1234/redfish/v1', 'foo', 'bar', True)
-
-    def test__parse_attributes(self):
         with open('sushy/tests/unit/json_samples/root.json', 'r') as f:
             self.root._json = json.loads(f.read())
+        mock_connector.assert_called_once_with(
+            'http://foo.bar:1234', 'foo', 'bar', True)
+
+    def test__parse_attributes(self):
         self.root._parse_attributes()
         self.assertEqual('RootService', self.root.identity)
         self.assertEqual('Root Service', self.root.name)
@@ -46,11 +47,23 @@ class MainTestCase(base.TestCase):
         self.assertEqual('92384634-2938-2342-8820-489239905423',
                          self.root.uuid)
 
+    def test__get_system_collection_path(self):
+        self.assertEqual(
+            '/redfish/v1/Systems', self.root._get_system_collection_path())
+
+    def test__get_system_collection_path_missing_systems_attr(self):
+        self.root._json.pop('Systems')
+        self.assertRaisesRegex(
+            exceptions.MissingAttributeError,
+            'The attribute Systems is missing',
+            self.root._get_system_collection_path)
+
     @mock.patch.object(system, 'SystemCollection', autospec=True)
     def test_get_system_collection(self, mock_system_collection):
         self.root.get_system_collection()
         mock_system_collection.assert_called_once_with(
-            self.root._conn, redfish_version=self.root.redfish_version)
+            self.root._conn, '/redfish/v1/Systems',
+            redfish_version=self.root.redfish_version)
 
     @mock.patch.object(system, 'System', autospec=True)
     def test_get_system(self, mock_system):

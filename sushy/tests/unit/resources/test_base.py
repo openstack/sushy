@@ -127,7 +127,7 @@ class ResourceCollectionBaseTestCase(base.TestCase):
 
     def test_get_members(self):
         # | GIVEN |
-        # setting some valid member identities
+        # setting some valid member paths
         member_ids = ('1', '2')
         self.test_resource_collection.members_identities = member_ids
         # | WHEN |

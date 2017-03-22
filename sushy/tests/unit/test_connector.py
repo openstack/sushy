@@ -26,7 +26,7 @@ class ConnectorTestCase(base.TestCase):
     def setUp(self):
         super(ConnectorTestCase, self).setUp()
         self.conn = connector.Connector(
-            'http://foo.bar:1234/redfish/v1', username='user',
+            'http://foo.bar:1234', username='user',
             password='pass', verify=True)
         self.data = {'fake': 'data'}
         self.headers = {'X-Fake': 'header'}
@@ -58,7 +58,7 @@ class ConnectorTestCase(base.TestCase):
                       headers=headers)
         mock_session.assert_called_once_with()
         fake_session.request.assert_called_once_with(
-            'GET', 'http://foo.bar:1234/redfish/v1/fake/path',
+            'GET', 'http://foo.bar:1234/fake/path',
             data='{"fake": "data"}')
         self.assertEqual(expected_headers, fake_session.headers)
 

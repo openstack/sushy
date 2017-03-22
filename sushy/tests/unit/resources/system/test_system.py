@@ -31,8 +31,9 @@ class SystemTestCase(base.TestCase):
         with open('sushy/tests/unit/json_samples/system.json', 'r') as f:
             self.conn.get.return_value.json.return_value = json.loads(f.read())
 
-        self.sys_inst = system.System(self.conn, '437XR1138R2',
-                                      redfish_version='1.0.2')
+        self.sys_inst = system.System(
+            self.conn, '/redfish/v1/Systems/437XR1138R2',
+            redfish_version='1.0.2')
 
     def test__parse_attributes(self):
         self.sys_inst._parse_attributes()
@@ -117,7 +118,8 @@ class SystemTestCase(base.TestCase):
 
     def test__get_reset_system_path(self):
         value = self.sys_inst._get_reset_system_path()
-        expected = 'Systems/437XR1138R2/Actions/ComputerSystem.Reset'
+        expected = (
+            '/redfish/v1/Systems/437XR1138R2/Actions/ComputerSystem.Reset')
         self.assertEqual(expected, value)
 
     @mock.patch.object(system.System, '_get_reset_action_element',
@@ -133,7 +135,7 @@ class SystemTestCase(base.TestCase):
     def test_reset_system(self):
         self.sys_inst.reset_system(sushy.RESET_FORCE_OFF)
         self.sys_inst._conn.post.assert_called_once_with(
-            'Systems/437XR1138R2/Actions/ComputerSystem.Reset',
+            '/redfish/v1/Systems/437XR1138R2/Actions/ComputerSystem.Reset',
             data={'ResetType': 'ForceOff'})
 
     def test_reset_system_invalid_value(self):
@@ -191,7 +193,7 @@ class SystemTestCase(base.TestCase):
             enabled=sushy.BOOT_SOURCE_ENABLED_CONTINUOUS,
             mode=sushy.BOOT_SOURCE_MODE_UEFI)
         self.sys_inst._conn.patch.assert_called_once_with(
-            'Systems/437XR1138R2',
+            '/redfish/v1/Systems/437XR1138R2',
             data={'Boot': {'BootSourceOverrideEnabled': 'Continuous',
                            'BootSourceOverrideTarget': 'Pxe',
                            'BootSourceOverrideMode': 'UEFI'}})
@@ -201,7 +203,7 @@ class SystemTestCase(base.TestCase):
             sushy.BOOT_SOURCE_TARGET_HDD,
             enabled=sushy.BOOT_SOURCE_ENABLED_ONCE)
         self.sys_inst._conn.patch.assert_called_once_with(
-            'Systems/437XR1138R2',
+            '/redfish/v1/Systems/437XR1138R2',
             data={'Boot': {'BootSourceOverrideEnabled': 'Once',
                            'BootSourceOverrideTarget': 'Hdd'}})
 
@@ -225,27 +227,28 @@ class SystemCollectionTestCase(base.TestCase):
         with open('sushy/tests/unit/json_samples/'
                   'system_collection.json', 'r') as f:
             self.conn.get.return_value.json.return_value = json.loads(f.read())
-        self.sys_col = system.SystemCollection(self.conn,
-                                               redfish_version='1.0.2')
+        self.sys_col = system.SystemCollection(
+            self.conn, '/redfish/v1/Systems', redfish_version='1.0.2')
 
     def test__parse_attributes(self):
         self.sys_col._parse_attributes()
         self.assertEqual('1.0.2', self.sys_col.redfish_version)
         self.assertEqual('Computer System Collection', self.sys_col.name)
-        self.assertEqual(('437XR1138R2',), self.sys_col.members_identities)
+        self.assertEqual(('/redfish/v1/Systems/437XR1138R2',),
+                         self.sys_col.members_identities)
 
     @mock.patch.object(system, 'System', autospec=True)
     def test_get_member(self, mock_system):
-        self.sys_col.get_member('437XR1138R2')
+        self.sys_col.get_member('/redfish/v1/Systems/437XR1138R2')
         mock_system.assert_called_once_with(
-            self.sys_col._conn, '437XR1138R2',
+            self.sys_col._conn, '/redfish/v1/Systems/437XR1138R2',
             redfish_version=self.sys_col.redfish_version)
 
     @mock.patch.object(system, 'System', autospec=True)
     def test_get_members(self, mock_system):
         members = self.sys_col.get_members()
         mock_system.assert_called_once_with(
-            self.sys_col._conn, '437XR1138R2',
+            self.sys_col._conn, '/redfish/v1/Systems/437XR1138R2',
             redfish_version=self.sys_col.redfish_version)
         self.assertIsInstance(members, list)
         self.assertEqual(1, len(members))

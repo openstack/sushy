@@ -14,7 +14,6 @@
 #    under the License.
 
 import logging
-import os
 
 LOG = logging.getLogger(__name__)
 
@@ -29,40 +28,20 @@ def revert_dictionary(dictionary):
     return {v: k for k, v in dictionary.items()}
 
 
-def get_members_ids(members):
+def get_members_identities(members):
     """Extract and return a tuple of members identities
 
     :param members: A list of members in JSON format
-    :returns: A tuple containing the members identities
+    :returns: A tuple containing the members paths
 
     """
     members_list = []
     for member in members:
-        identity = member.get('@odata.id')
-        if not identity:
+        path = member.get('@odata.id')
+        if not path:
             LOG.warning('Could not find the \'@odata.id\' attribute for '
                         'member %s', member)
             continue
-        members_list.append(os.path.basename(identity.rstrip('/')))
+        members_list.append(path.rstrip('/'))
 
     return tuple(members_list)
-
-
-def strip_redfish_base(path):
-    """Strip redfish base 'redfish/v1/' from path
-
-    :param path: A string of redfish resource path
-    :returns: path without redfish base 'redfish/v1/'
-
-    """
-    sub_path = path.lstrip('/')
-
-    # To support further redfish version, didn't hardcode to 'redfish/v1'
-    redfish_base_path = 'redfish/v'
-
-    if sub_path.startswith(redfish_base_path):
-        # Find next occurrence of '/' after redfish base path and strip the
-        # base path before it
-        sub_path = sub_path[sub_path.find('/', len(redfish_base_path)) + 1:]
-
-    return sub_path

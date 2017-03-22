@@ -15,9 +15,9 @@
 
 import json
 import logging
-import os
 
 import requests
+from six.moves.urllib import parse
 
 from sushy import exceptions
 
@@ -58,7 +58,7 @@ class Connector(object):
             if data is not None:
                 data = json.dumps(data)
 
-            url = os.path.join(self._url, path)
+            url = parse.urljoin(self._url, path)
             # TODO(lucasagomes): We should mask the data to remove sensitive
             # information
             LOG.debug('Issuing a HTTP %(method)s request at %(url)s with '

@@ -19,7 +19,6 @@ from sushy import exceptions
 from sushy.resources import base
 from sushy.resources.system import constants as sys_cons
 from sushy.resources.system import mappings as sys_maps
-from sushy import utils
 
 LOG = logging.getLogger(__name__)
 
@@ -77,12 +76,11 @@ class System(base.ResourceBase):
         """A class representing a ComputerSystem
 
         :param connector: A Connector instance
-        :param identity: The id of the ComputerSystem
+        :param identity: The identity of the System resource
         :param redfish_version: The version of RedFish. Used to construct
             the object according to schema of the given version.
         """
-        super(System, self).__init__(connector, 'Systems/%s' % identity,
-                                     redfish_version)
+        super(System, self).__init__(connector, identity, redfish_version)
 
     def _parse_attributes(self):
         self.asset_tag = self.json.get('AssetTag')
@@ -144,13 +142,13 @@ class System(base.ResourceBase):
     def _get_reset_system_path(self):
         reset_action = self._get_reset_action_element()
 
-        target_url = reset_action.get('target')
-        if not target_url:
+        target_uri = reset_action.get('target')
+        if not target_uri:
             raise exceptions.MissingAttributeError(
                 attribute='Actions/ComputerSystem.Reset/target',
                 resource=self._path)
 
-        return utils.strip_redfish_base(target_url)
+        return target_uri
 
     def reset_system(self, value):
         """Reset the system.
@@ -165,11 +163,11 @@ class System(base.ResourceBase):
                 parameter='value', value=value, valid_values=valid_resets)
 
         value = sys_maps.RESET_SYSTEM_VALUE_MAP_REV[value]
+        target_uri = self._get_reset_system_path()
 
-        path = self._get_reset_system_path()
         # TODO(lucasagomes): Check the return code and response body ?
         #                    Probably we should call refresh() as well.
-        self._conn.post(path, data={'ResetType': value})
+        self._conn.post(target_uri, data={'ResetType': value})
 
     def get_allowed_system_boot_source_values(self):
         """Get the allowed values for changing the boot source.
@@ -254,12 +252,13 @@ class SystemCollection(base.ResourceCollectionBase):
     def _resource_type(self):
         return System
 
-    def __init__(self, connector, redfish_version=None):
+    def __init__(self, connector, path, redfish_version=None):
         """A class representing a ComputerSystemCollection
 
         :param connector: A Connector instance
+        :param path: The canonical path to the System collection resource
         :param redfish_version: The version of RedFish. Used to construct
             the object according to schema of the given version.
         """
-        super(SystemCollection, self).__init__(connector, 'Systems',
+        super(SystemCollection, self).__init__(connector, path,
                                                redfish_version)

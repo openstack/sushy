@@ -113,12 +113,12 @@ class ResourceCollectionBase(ResourceBase):
     def _parse_attributes(self):
         self.name = self.json.get('Name')
         self.members_identities = (
-            utils.get_members_ids(self.json.get('Members', [])))
+            utils.get_members_identities(self.json.get('Members', [])))
 
     def get_member(self, identity):
         """Given the identity return a ``_resource_type`` object
 
-        :param identity: The identity of the ``_resource_type`` resource
+        :param identity: The identity of the ``_resource_type``
         :returns: The ``_resource_type`` object
         :raises: ResourceNotFoundError
         """

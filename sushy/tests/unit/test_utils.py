@@ -28,23 +28,10 @@ class UtilsTestCase(base.TestCase):
         self.assertEqual(expected, utils.revert_dictionary(source))
 
     @mock.patch.object(utils.LOG, 'warning', autospec=True)
-    def test_get_members_ids(self, log_mock):
+    def test_get_members_identities(self, log_mock):
         members = [{"@odata.id": "/redfish/v1/Systems/FOO"},
                    {"other_key": "/redfish/v1/Systems/FUN"},
                    {"@odata.id": "/redfish/v1/Systems/BAR/"}]
-        expected = ('FOO', 'BAR')
-        self.assertEqual(expected, utils.get_members_ids(members))
+        expected = ('/redfish/v1/Systems/FOO', '/redfish/v1/Systems/BAR')
+        self.assertEqual(expected, utils.get_members_identities(members))
         self.assertEqual(1, log_mock.call_count)
-
-    def test_strip_redfish_base(self):
-        expected = 'Systems/1'
-        self.assertEqual(expected, utils.strip_redfish_base('Systems/1'))
-        self.assertEqual(expected, utils.strip_redfish_base('/Systems/1'))
-        self.assertEqual(expected,
-                         utils.strip_redfish_base('/redfish/v1/Systems/1'))
-        self.assertEqual(expected,
-                         utils.strip_redfish_base('redfish/v1/Systems/1'))
-        self.assertEqual(expected,
-                         utils.strip_redfish_base('/redfish/v2/Systems/1'))
-        self.assertEqual(expected,
-                         utils.strip_redfish_base('redfish/v2/Systems/1'))

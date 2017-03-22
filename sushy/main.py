@@ -14,6 +14,7 @@
 #    under the License.
 
 from sushy import connector
+from sushy import exceptions
 from sushy.resources import base
 from sushy.resources.system import system
 
@@ -29,9 +30,29 @@ class Sushy(base.ResourceBase):
     uuid = None
     """The Redfish system UUID"""
 
-    def __init__(self, url, username=None, password=None, verify=True):
+    def __init__(self, base_url, username=None, password=None,
+                 root_prefix='/redfish/v1/', verify=True):
+        """A class representing a RootService
+
+        :param base_url: The base URL to the Redfish controller. It
+            should include scheme and authority portion of the URL. For
+            example: https://mgmt.vendor.com
+        :param username: User account with admin/server-profile access
+            privilege
+        :param password: User account password
+        :param root_prefix: The default URL prefix. This part includes
+            the root service and version. Defaults to /redfish/v1
+        :param verify: Either a boolean value, a path to a CA_BUNDLE
+            file or directory with certificates of trusted CAs. If set to
+            True the driver will verify the host certificates; if False
+            the driver will ignore verifying the SSL certificate; if it's
+            a path the driver will use the specified certificate or one of
+            the certificates in the directory. Defaults to True.
+        """
+        self._root_prefix = root_prefix
         super(Sushy, self).__init__(
-            connector.Connector(url, username, password, verify))
+            connector.Connector(base_url, username, password, verify),
+            path=self._root_prefix)
 
     def _parse_attributes(self):
         self.identity = self.json.get('Id')
@@ -39,13 +60,24 @@ class Sushy(base.ResourceBase):
         self.redfish_version = self.json.get('RedfishVersion')
         self.uuid = self.json.get('UUID')
 
+    def _get_system_collection_path(self):
+        """Helper function to find the SystemCollection path"""
+        systems_col = self.json.get('Systems')
+        if not systems_col:
+            raise exceptions.MissingAttributeError(attribute='Systems',
+                                                   resource=self._path)
+        return systems_col.get('@odata.id')
+
     def get_system_collection(self):
         """Get the SystemCollection object
 
+        :raises: MissingAttributeError, if the collection attribute is
+            not found
         :returns: a SystemCollection object
         """
-        return system.SystemCollection(self._conn,
-                                       redfish_version=self.redfish_version)
+        return system.SystemCollection(
+            self._conn, self._get_system_collection_path(),
+            redfish_version=self.redfish_version)
 
     def get_system(self, identity):
         """Given the identity return a System object
