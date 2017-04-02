@@ -19,6 +19,7 @@ from sushy import exceptions
 from sushy.resources import base
 from sushy.resources import common
 from sushy.resources.system import constants as sys_cons
+from sushy.resources.system import ethernet_interface
 from sushy.resources.system import mappings as sys_maps
 from sushy.resources.system import processor
 from sushy import utils
@@ -117,6 +118,8 @@ class System(base.ResourceBase):
     _processors = None  # ref to ProcessorCollection instance
 
     _actions = ActionsField('Actions', required=True)
+
+    _ethernet_interfaces = None
 
     def __init__(self, connector, identity, redfish_version=None):
         """A class representing a ComputerSystem
@@ -241,11 +244,7 @@ class System(base.ResourceBase):
 
     def _get_processor_collection_path(self):
         """Helper function to find the ProcessorCollection path"""
-        processor_col = self.json.get('Processors')
-        if not processor_col:
-            raise exceptions.MissingAttributeError(attribute='Processors',
-                                                   resource=self._path)
-        return processor_col.get('@odata.id')
+        return utils.get_sub_resource_path_by(self, 'Processors')
 
     @property
     def processors(self):
@@ -264,6 +263,18 @@ class System(base.ResourceBase):
     def refresh(self):
         super(System, self).refresh()
         self._processors = None
+        self._ethernet_interfaces = None
+
+    @property
+    def ethernet_interfaces(self):
+        if self._ethernet_interfaces is None:
+            self._ethernet_interfaces = (
+                ethernet_interface.EthernetInterfaceCollection(
+                    self._conn,
+                    utils.get_sub_resource_path_by(self, "EthernetInterfaces"),
+                    redfish_version=self.redfish_version))
+
+        return self._ethernet_interfaces
 
 
 class SystemCollection(base.ResourceCollectionBase):

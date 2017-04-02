@@ -15,6 +15,8 @@
 
 import logging
 
+from sushy import exceptions
+
 LOG = logging.getLogger(__name__)
 
 
@@ -57,3 +59,22 @@ def int_or_none(x):
     if x is None:
         return None
     return int(x)
+
+
+def get_sub_resource_path_by(resource, subresource_name):
+    """Helper function to find the subresource path
+
+    :param resource: ResourceBase instance on which the name
+        gets queried upon.
+    :param subresource_name: name of the resource field to
+        fetch the '@odata.id' from.
+    """
+    subresource_element = resource.json.get(subresource_name)
+    if not subresource_element:
+        raise exceptions.MissingAttributeError(attribute=subresource_name,
+                                               resource=resource.path)
+    if '@odata.id' not in subresource_element:
+        raise exceptions.MissingAttributeError(
+            attribute=(subresource_name + '/@odata.id'),
+            resource=resource.path)
+    return subresource_element['@odata.id']

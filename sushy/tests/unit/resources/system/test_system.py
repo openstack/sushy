@@ -19,6 +19,8 @@ import mock
 
 import sushy
 from sushy import exceptions
+from sushy.resources.system import constants as sys_cons
+from sushy.resources.system import ethernet_interface
 from sushy.resources.system import processor
 from sushy.resources.system import system
 from sushy.tests.unit import base
@@ -58,6 +60,7 @@ class SystemTestCase(base.TestCase):
         self.assertEqual(96, self.sys_inst.memory_summary.size_gib)
         self.assertEqual("OK", self.sys_inst.memory_summary.health)
         self.assertIsNone(self.sys_inst._processors)
+        self.assertIsNone(self.sys_inst._ethernet_interfaces)
 
     def test__parse_attributes_missing_actions(self):
         self.sys_inst.json.pop('Actions')
@@ -337,6 +340,28 @@ class SystemTestCase(base.TestCase):
         self.assertIs(actual_processor_summary,
                       self.sys_inst.processors.summary)
         self.conn.get.return_value.json.assert_not_called()
+
+    def test_ethernet_interfaces(self):
+        self.conn.get.return_value.json.reset_mock()
+        eth_coll_return_value = None
+        eth_return_value = None
+        path = ('sushy/tests/unit/json_samples/'
+                'ethernet_interfaces_collection.json')
+        with open(path, 'r') as f:
+            eth_coll_return_value = json.loads(f.read())
+        with open('sushy/tests/unit/json_samples/ethernet_interfaces.json',
+                  'r') as f:
+            eth_return_value = (json.loads(f.read()))
+
+        self.conn.get.return_value.json.side_effect = [eth_coll_return_value,
+                                                       eth_return_value]
+
+        self.assertIsNone(self.sys_inst._ethernet_interfaces)
+        actual_macs = self.sys_inst.ethernet_interfaces.summary
+        self.assertEqual({'12:44:6A:3B:04:11': sys_cons.HEALTH_STATE_ENABLED},
+                         actual_macs)
+        self.assertIsInstance(self.sys_inst._ethernet_interfaces,
+                              ethernet_interface.EthernetInterfaceCollection)
 
 
 class SystemCollectionTestCase(base.TestCase):

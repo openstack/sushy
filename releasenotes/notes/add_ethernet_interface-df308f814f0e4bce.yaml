@@ -1,0 +1,5 @@
+---
+features:
+  - |
+    Adds the "EthernetInterfaces" to the library.
+    It also returns the list of connected MACs.
