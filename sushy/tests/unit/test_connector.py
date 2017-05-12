@@ -15,7 +15,6 @@
 
 import json
 
-import fixtures
 import mock
 import requests
 
@@ -62,32 +61,28 @@ class ConnectorOpTestCase(base.TestCase):
             password='pass', verify=True)
         self.data = {'fake': 'data'}
         self.headers = {'X-Fake': 'header'}
-        self.session_fixture = self.useFixture(
-            fixtures.MockPatchObject(connector.requests, 'Session',
-                                     autospec=True)
-        )
-        self.session = (
-            self.session_fixture.mock.return_value.__enter__.return_value)
+        self.session = mock.Mock(spec=requests.Session)
+        self.conn._session = self.session
         self.request = self.session.request
-
-    def _test_op(self, headers, expected_headers):
         self.request.return_value.status_code = 200
 
-        self.conn._op('GET', path='fake/path', data=self.data,
-                      headers=headers)
+    def test_ok_get(self):
+        expected_headers = self.headers.copy()
+
+        self.conn._op('GET', path='fake/path', headers=self.headers)
         self.request.assert_called_once_with(
             'GET', 'http://foo.bar:1234/fake/path',
-            data='{"fake": "data"}')
-        self.assertEqual(expected_headers, self.session.headers)
+            data=None, headers=expected_headers)
 
-    def test_ok_with_headers(self):
+    def test_ok_post(self):
         expected_headers = self.headers.copy()
         expected_headers['Content-Type'] = 'application/json'
-        self._test_op(self.headers, expected_headers)
 
-    def test_ok_no_headers(self):
-        expected_headers = {'Content-Type': 'application/json'}
-        self._test_op(None, expected_headers)
+        self.conn._op('POST', path='fake/path', data=self.data,
+                      headers=self.headers)
+        self.request.assert_called_once_with(
+            'POST', 'http://foo.bar:1234/fake/path',
+            data=json.dumps(self.data), headers=expected_headers)
 
     def test_connection_error(self):
         self.request.side_effect = requests.exceptions.ConnectionError

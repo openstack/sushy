@@ -28,8 +28,14 @@ class Connector(object):
 
     def __init__(self, url, username=None, password=None, verify=True):
         self._url = url
-        self._auth = (username, password)
-        self._verify = verify
+        self._session = requests.Session()
+        self._session.verify = verify
+        if username and password:
+            self._session.auth = (username, password)
+
+    def close(self):
+        """Close this connector and the associated HTTP session."""
+        self._session.close()
 
     def _op(self, method, path='', data=None, headers=None):
         """Generic RESTful request handler.
@@ -46,37 +52,30 @@ class Connector(object):
         if headers is None:
             headers = {}
 
-        headers['Content-Type'] = 'application/json'
+        if data is not None:
+            data = json.dumps(data)
+            headers['Content-Type'] = 'application/json'
 
-        with requests.Session() as session:
-            session.headers = headers
-            session.verify = self._verify
+        url = parse.urljoin(self._url, path)
+        # TODO(lucasagomes): We should mask the data to remove sensitive
+        # information
+        LOG.debug('HTTP request: %(method)s %(url)s; '
+                  'headers: %(headers)s; body: %(data)s',
+                  {'method': method, 'url': url, 'headers': headers,
+                   'data': data})
+        try:
+            response = self._session.request(method, url, data=data,
+                                             headers=headers)
+        except requests.ConnectionError as e:
+            raise exceptions.ConnectionError(url=url, error=e)
 
-            if all(v is not None for v in self._auth):
-                session.auth = self._auth
+        exceptions.raise_for_response(method, url, response)
+        LOG.debug('HTTP response for %(method)s %(url)s: '
+                  'status code: %(code)s',
+                  {'method': method, 'url': url,
+                   'code': response.status_code})
 
-            if data is not None:
-                data = json.dumps(data)
-
-            url = parse.urljoin(self._url, path)
-            # TODO(lucasagomes): We should mask the data to remove sensitive
-            # information
-            LOG.debug('HTTP request: %(method)s %(url)s; '
-                      'headers: %(headers)s; body: %(data)s',
-                      {'method': method, 'url': url, 'headers': headers,
-                       'data': data})
-            try:
-                response = session.request(method, url, data=data)
-            except requests.ConnectionError as e:
-                raise exceptions.ConnectionError(url=url, error=e)
-
-            exceptions.raise_for_response(method, url, response)
-            LOG.debug('HTTP response for %(method)s %(url)s: '
-                      'status code: %(code)s',
-                      {'method': method, 'url': url,
-                       'code': response.status_code})
-
-            return response
+        return response
 
     def get(self, path='', data=None, headers=None):
         """HTTP GET method.
@@ -113,3 +112,9 @@ class Connector(object):
         :raises: HTTPError
         """
         return self._op('PATCH', path, data, headers)
+
+    def __enter__(self):
+        return self
+
+    def __exit__(self, *_args):
+        self.close()
