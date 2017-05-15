@@ -13,7 +13,6 @@
 #    License for the specific language governing permissions and limitations
 #    under the License.
 
-import collections
 import logging
 
 from sushy import exceptions
@@ -22,73 +21,107 @@ from sushy.resources.system import constants as sys_cons
 from sushy.resources.system import mappings as sys_maps
 from sushy.resources.system import processor
 
-# Representation of Memory information summary
-MemorySummary = collections.namedtuple('MemorySummary',
-                                       ['size_gib', 'health'])
+
 LOG = logging.getLogger(__name__)
+
+
+class ResetActionField(base.CompositeField):
+    allowed_values = base.Field('ResetType@Redfish.AllowableValues',
+                                adapter=list)
+
+    target_uri = base.Field('target', required=True)
+
+
+class ActionsField(base.CompositeField):
+    reset = ResetActionField('#ComputerSystem.Reset')
+
+
+class BootField(base.CompositeField):
+    allowed_values = base.Field(
+        'BootSourceOverrideTarget@Redfish.AllowableValues',
+        adapter=list)
+
+    enabled = base.MappedField('BootSourceOverrideEnabled',
+                               sys_maps.BOOT_SOURCE_ENABLED_MAP)
+
+    mode = base.MappedField('BootSourceOverrideMode',
+                            sys_maps.BOOT_SOURCE_MODE_MAP)
+
+    target = base.MappedField('BootSourceOverrideTarget',
+                              sys_maps.BOOT_SOURCE_TARGET_MAP)
+
+
+class MemorySummaryField(base.CompositeField):
+    health = base.Field(['Status', 'HealthRollup'])
+    """The overall health state of memory.
+
+    This signifies health state of memory along with its dependent resources.
+    """
+
+    size_gib = base.Field('TotalSystemMemoryGiB', adapter=int)
+    """The size of memory of the system in GiB.
+
+    This signifies the total installed, operating system-accessible memory
+    (RAM), measured in GiB.
+    """
 
 
 class System(base.ResourceBase):
 
-    asset_tag = None
+    asset_tag = base.Field('AssetTag')
     """The system asset tag"""
 
-    bios_version = None
+    bios_version = base.Field('BiosVersion')
     """The system BIOS version"""
 
-    boot = None
+    boot = BootField('Boot', required=True)
     """A dictionary containg the current boot device, frequency and mode"""
 
-    description = None
+    description = base.Field('Description')
     """The system description"""
 
-    hostname = None
+    hostname = base.Field('HostName')
     """The system hostname"""
 
-    identity = None
+    identity = base.Field('Id', required=True)
     """The system identity string"""
 
     # TODO(lucasagomes): Create mappings for the indicator_led
-    indicator_led = None
+    indicator_led = base.Field('IndicatorLED')
     """Whether the indicator LED is lit or off"""
 
-    manufacturer = None
+    manufacturer = base.Field('Manufacturer')
     """The system manufacturer"""
 
-    name = None
+    name = base.Field('Name')
     """The system name"""
 
-    part_number = None
+    part_number = base.Field('PartNumber')
     """The system part number"""
 
-    power_state = None
+    power_state = base.MappedField('PowerState',
+                                   sys_maps.SYSTEM_POWER_STATE_MAP)
     """The system power state"""
 
-    serial_number = None
+    serial_number = base.Field('SerialNumber')
     """The system serial number"""
 
-    sku = None
+    sku = base.Field('SKU')
     """The system stock-keeping unit"""
 
     # TODO(lucasagomes): Create mappings for the system_type
-    system_type = None
+    system_type = base.Field('SystemType')
     """The system type"""
 
-    uuid = None
+    uuid = base.Field('UUID')
     """The system UUID"""
 
-    memory_summary = None
-    """The summary info of memory of the system in general detail
-
-        It is a namedtuple containing the following:
-            size_gib: The size of memory of the system in GiB. This signifies
-                the total installed, operating system-accessible memory (RAM),
-                measured in GiB.
-            health: The overall health state of memory. This signifies
-                health state of memory along with its dependent resources.
-    """
+    memory_summary = MemorySummaryField('MemorySummary')
+    """The summary info of memory of the system in general detail"""
 
     _processors = None  # ref to ProcessorCollection instance
+
+    _actions = ActionsField('Actions', required=True)
 
     def __init__(self, connector, identity, redfish_version=None):
         """A class representing a ComputerSystem
@@ -100,56 +133,9 @@ class System(base.ResourceBase):
         """
         super(System, self).__init__(connector, identity, redfish_version)
 
-    def _parse_attributes(self):
-        self.asset_tag = self.json.get('AssetTag')
-        self.bios_version = self.json.get('BiosVersion')
-        self.description = self.json.get('Description')
-        self.hostname = self.json.get('HostName')
-        self.identity = self.json.get('Id')
-        self.indicator_led = self.json.get('IndicatorLED')
-        self.manufacturer = self.json.get('Manufacturer')
-        self.name = self.json.get('Name')
-        self.part_number = self.json.get('PartNumber')
-        self.serial_number = self.json.get('SerialNumber')
-        self.sku = self.json.get('SKU')
-        self.system_type = self.json.get('SystemType')
-        self.uuid = self.json.get('UUID')
-        self.power_state = sys_maps.SYSTEM_POWER_STATE_MAP.get(
-            self.json.get('PowerState'))
-
-        # Parse the boot attribute
-        self.boot = {}
-        boot_attr = self.json.get('Boot')
-        if boot_attr is not None:
-            self.boot['target'] = sys_maps.BOOT_SOURCE_TARGET_MAP.get(
-                boot_attr.get('BootSourceOverrideTarget'))
-            self.boot['enabled'] = sys_maps.BOOT_SOURCE_ENABLED_MAP.get(
-                boot_attr.get('BootSourceOverrideEnabled'))
-            self.boot['mode'] = sys_maps.BOOT_SOURCE_MODE_MAP.get(
-                boot_attr.get('BootSourceOverrideMode'))
-
-        # Parse memory_summary attribute
-        self.memory_summary = None
-        memory_summary_attr = self.json.get('MemorySummary')
-        if memory_summary_attr is not None:
-            memory_size_gib = memory_summary_attr.get('TotalSystemMemoryGiB')
-            try:
-                memory_health = memory_summary_attr['Status']['HealthRollup']
-            except KeyError:
-                memory_health = None
-            self.memory_summary = MemorySummary(size_gib=memory_size_gib,
-                                                health=memory_health)
-
-        # Reset processor related attributes
-        self._processors = None
-
     def _get_reset_action_element(self):
-        actions = self.json.get('Actions')
-        if not actions:
-            raise exceptions.MissingAttributeError(attribute='Actions',
-                                                   resource=self._path)
-
-        reset_action = actions.get('#ComputerSystem.Reset')
+        reset_action = self._actions.reset
+        # TODO(dtantsur): make this check also declarative?
         if not reset_action:
             raise exceptions.MissingActionError(action='#ComputerSystem.Reset',
                                                 resource=self._path)
@@ -162,26 +148,14 @@ class System(base.ResourceBase):
         """
         reset_action = self._get_reset_action_element()
 
-        allowed_values = reset_action.get('ResetType@Redfish.AllowableValues')
-        if not allowed_values:
+        if not reset_action.allowed_values:
             LOG.warning('Could not figure out the allowed values for the '
                         'reset system action for System %s', self.identity)
             return set(sys_maps.RESET_SYSTEM_VALUE_MAP_REV)
 
         return set([sys_maps.RESET_SYSTEM_VALUE_MAP[v] for v in
                     set(sys_maps.RESET_SYSTEM_VALUE_MAP).
-                    intersection(allowed_values)])
-
-    def _get_reset_system_path(self):
-        reset_action = self._get_reset_action_element()
-
-        target_uri = reset_action.get('target')
-        if not target_uri:
-            raise exceptions.MissingAttributeError(
-                attribute='Actions/ComputerSystem.Reset/target',
-                resource=self._path)
-
-        return target_uri
+                    intersection(reset_action.allowed_values)])
 
     def reset_system(self, value):
         """Reset the system.
@@ -196,7 +170,7 @@ class System(base.ResourceBase):
                 parameter='value', value=value, valid_values=valid_resets)
 
         value = sys_maps.RESET_SYSTEM_VALUE_MAP_REV[value]
-        target_uri = self._get_reset_system_path()
+        target_uri = self._get_reset_action_element().target_uri
 
         # TODO(lucasagomes): Check the return code and response body ?
         #                    Probably we should call refresh() as well.
@@ -207,15 +181,7 @@ class System(base.ResourceBase):
 
         :returns: A set with the allowed values.
         """
-        boot = self.json.get('Boot')
-        if not boot:
-            raise exceptions.MissingAttributeError(attribute='Boot',
-                                                   resource=self._path)
-
-        allowed_values = boot.get(
-            'BootSourceOverrideTarget@Redfish.AllowableValues')
-
-        if not allowed_values:
+        if not self.boot.allowed_values:
             LOG.warning('Could not figure out the allowed values for '
                         'configuring the boot source for System %s',
                         self.identity)
@@ -223,7 +189,7 @@ class System(base.ResourceBase):
 
         return set([sys_maps.BOOT_SOURCE_TARGET_MAP[v] for v in
                     set(sys_maps.BOOT_SOURCE_TARGET_MAP).
-                    intersection(allowed_values)])
+                    intersection(self.boot.allowed_values)])
 
     def set_system_boot_source(self, target,
                                enabled=sys_cons.BOOT_SOURCE_ENABLED_ONCE,
@@ -299,6 +265,10 @@ class System(base.ResourceBase):
                 redfish_version=self.redfish_version)
 
         return self._processors
+
+    def refresh(self):
+        super(System, self).refresh()
+        self._processors = None
 
 
 class SystemCollection(base.ResourceCollectionBase):
