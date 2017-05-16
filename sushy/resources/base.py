@@ -14,11 +14,14 @@
 #    under the License.
 
 import abc
+import logging
 
 import six
 
-from sushy import exceptions
 from sushy import utils
+
+
+LOG = logging.getLogger(__name__)
 
 
 @six.add_metaclass(abc.ABCMeta)
@@ -52,14 +55,10 @@ class ResourceBase(object):
         :raises: ConnectionError
         :raises: HTTPError
         """
-        try:
-            resp = self._conn.get(path=self._path)
-        except exceptions.HTTPError as e:
-            if e.status_code == 404:
-                raise exceptions.ResourceNotFoundError(resource=self._path)
-            raise
-
-        self._json = resp.json()
+        self._json = self._conn.get(path=self._path).json()
+        LOG.debug('Received representation of %(type)s %(path)s: %(json)s',
+                  {'type': self.__class__.__name__,
+                   'path': self._path, 'json': self._json})
         self._parse_attributes()
 
     @property
@@ -114,6 +113,9 @@ class ResourceCollectionBase(ResourceBase):
         self.name = self.json.get('Name')
         self.members_identities = (
             utils.get_members_identities(self.json.get('Members', [])))
+        LOG.debug('Received %(count)d member(s) for %(type)s %(path)s',
+                  {'count': len(self.members_identities),
+                   'type': self.__class__.__name__, 'path': self._path})
 
     def get_member(self, identity):
         """Given the identity return a ``_resource_type`` object

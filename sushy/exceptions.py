@@ -13,6 +13,11 @@
 #    License for the specific language governing permissions and limitations
 #    under the License.
 
+import logging
+
+
+LOG = logging.getLogger(__name__)
+
 
 class SushyError(Exception):
     """Basic exception for errors raised by Sushy"""
@@ -49,15 +54,71 @@ class HTTPError(SushyError):
     """Basic exception for HTTP errors"""
 
     status_code = None
-    message = ('Error issuing a %(method)s request at %(url)s. '
-               'Error: %(error)s')
+    """HTTP status code."""
 
-    def __init__(self, status_code=None, **kwargs):
+    body = None
+    """Error JSON body, if present."""
+
+    code = 'Base.1.0.GeneralError'
+    """Error code defined in the Redfish specification, if present."""
+
+    detail = None
+    """Error message defined in the Redfish specification, if present."""
+
+    message = ('HTTP %(method)s %(url)s returned code %(code)s. %(error)s')
+
+    def __init__(self, method, url, response):
+        self.status_code = response.status_code
+        try:
+            body = response.json()
+        except ValueError:
+            LOG.warning('Error response from %(method)s %(url)s '
+                        'with status code %(code)s has no JSON body',
+                        {'method': method, 'url': url, 'code':
+                         self.status_code})
+            error = 'unknown error'
+        else:
+            # TODO(dtantsur): parse @Message.ExtendedInfo
+            self.body = body.get('error', {})
+            self.code = self.body.get('code', 'Base.1.0.GeneralError')
+            self.detail = self.body.get('message')
+            error = '%s: %s' % (self.code, self.detail or 'unknown error')
+
+        kwargs = {'method': method, 'url': url, 'code': self.status_code,
+                  'error': error}
+        LOG.debug('HTTP response for %(method)s %(url)s: '
+                  'status code: %(code)s, error: %(error)s', kwargs)
         super(HTTPError, self).__init__(**kwargs)
-        if status_code is not None:
-            self.status_code = status_code
+
+
+class BadRequestError(HTTPError):
+    pass
 
 
 class ResourceNotFoundError(HTTPError):
-    status_code = 404
-    message = 'Resource %(resource)s not found'
+    # Overwrite the complex generic message with a simpler one.
+    message = 'Resource %(url)s not found'
+
+
+class ServerSideError(HTTPError):
+    pass
+
+
+class AccessError(HTTPError):
+    pass
+
+
+def raise_for_response(method, url, response):
+    """Raise a correct error class, if needed."""
+    if response.status_code < 400:
+        return
+    elif response.status_code == 404:
+        raise ResourceNotFoundError(method, url, response)
+    elif response.status_code == 400:
+        raise BadRequestError(method, url, response)
+    elif response.status_code in (401, 403):
+        raise AccessError(method, url, response)
+    elif response.status_code >= 500:
+        raise ServerSideError(method, url, response)
+    else:
+        raise HTTPError(method, url, response)

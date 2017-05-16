@@ -13,6 +13,9 @@
 #    License for the specific language governing permissions and limitations
 #    under the License.
 
+import json
+
+import fixtures
 import mock
 import requests
 
@@ -21,10 +24,10 @@ from sushy import exceptions
 from sushy.tests.unit import base
 
 
-class ConnectorTestCase(base.TestCase):
+class ConnectorMethodsTestCase(base.TestCase):
 
     def setUp(self):
-        super(ConnectorTestCase, self).setUp()
+        super(ConnectorMethodsTestCase, self).setUp()
         self.conn = connector.Connector(
             'http://foo.bar:1234', username='user',
             password='pass', verify=True)
@@ -49,43 +52,98 @@ class ConnectorTestCase(base.TestCase):
         mock__op.assert_called_once_with(mock.ANY, 'PATCH', 'fake/path',
                                          self.data, self.headers)
 
-    @mock.patch('sushy.connector.requests.Session', autospec=True)
-    def _test_op(self, headers, expected_headers, mock_session):
-        fake_session = mock.Mock()
-        mock_session.return_value.__enter__.return_value = fake_session
+
+class ConnectorOpTestCase(base.TestCase):
+
+    def setUp(self):
+        super(ConnectorOpTestCase, self).setUp()
+        self.conn = connector.Connector(
+            'http://foo.bar:1234', username='user',
+            password='pass', verify=True)
+        self.data = {'fake': 'data'}
+        self.headers = {'X-Fake': 'header'}
+        self.session_fixture = self.useFixture(
+            fixtures.MockPatchObject(connector.requests, 'Session',
+                                     autospec=True)
+        )
+        self.session = (
+            self.session_fixture.mock.return_value.__enter__.return_value)
+        self.request = self.session.request
+
+    def _test_op(self, headers, expected_headers):
+        self.request.return_value.status_code = 200
 
         self.conn._op('GET', path='fake/path', data=self.data,
                       headers=headers)
-        mock_session.assert_called_once_with()
-        fake_session.request.assert_called_once_with(
+        self.request.assert_called_once_with(
             'GET', 'http://foo.bar:1234/fake/path',
             data='{"fake": "data"}')
-        self.assertEqual(expected_headers, fake_session.headers)
+        self.assertEqual(expected_headers, self.session.headers)
 
-    def test__op(self):
+    def test_ok_with_headers(self):
         expected_headers = self.headers.copy()
         expected_headers['Content-Type'] = 'application/json'
         self._test_op(self.headers, expected_headers)
 
-    def test__op_no_headers(self):
+    def test_ok_no_headers(self):
         expected_headers = {'Content-Type': 'application/json'}
         self._test_op(None, expected_headers)
 
-    @mock.patch('sushy.connector.requests.Session', autospec=True)
-    def test__op_connection_error(self, mock_session):
-        fake_session = mock.Mock()
-        mock_session.return_value.__enter__.return_value = fake_session
-        fake_session.request.side_effect = requests.exceptions.ConnectionError
-
+    def test_connection_error(self):
+        self.request.side_effect = requests.exceptions.ConnectionError
         self.assertRaises(exceptions.ConnectionError, self.conn._op, 'GET')
 
-    @mock.patch('sushy.connector.requests.Session', autospec=True)
-    def test__op_http_error(self, mock_session):
-        fake_session = mock.Mock()
-        mock_session.return_value.__enter__.return_value = fake_session
-        fake_response = fake_session.request.return_value
-        fake_response.status_code = 400
-        fake_response.raise_for_status.side_effect = (
-            requests.exceptions.HTTPError(response=fake_response))
+    def test_unknown_http_error(self):
+        self.request.return_value.status_code = 409
+        self.request.return_value.json.side_effect = ValueError('no json')
 
-        self.assertRaises(exceptions.HTTPError, self.conn._op, 'GET')
+        with self.assertRaisesRegex(exceptions.HTTPError,
+                                    'unknown error') as cm:
+            self.conn._op('GET', 'http://foo.bar')
+        exc = cm.exception
+        self.assertEqual(409, exc.status_code)
+        self.assertIsNone(exc.body)
+        self.assertIsNone(exc.detail)
+
+    def test_known_http_error(self):
+        self.request.return_value.status_code = 400
+        with open('sushy/tests/unit/json_samples/error.json', 'r') as f:
+            self.request.return_value.json.return_value = json.load(f)
+
+        with self.assertRaisesRegex(exceptions.BadRequestError,
+                                    'A general error has occurred') as cm:
+            self.conn._op('GET', 'http://foo.bar')
+        exc = cm.exception
+        self.assertEqual(400, exc.status_code)
+        self.assertIsNotNone(exc.body)
+        self.assertIn('A general error has occurred', exc.detail)
+
+    def test_not_found_error(self):
+        self.request.return_value.status_code = 404
+        self.request.return_value.json.side_effect = ValueError('no json')
+
+        with self.assertRaisesRegex(exceptions.ResourceNotFoundError,
+                                    'Resource http://foo.bar not found') as cm:
+            self.conn._op('GET', 'http://foo.bar')
+        exc = cm.exception
+        self.assertEqual(404, exc.status_code)
+
+    def test_server_error(self):
+        self.request.return_value.status_code = 500
+        self.request.return_value.json.side_effect = ValueError('no json')
+
+        with self.assertRaisesRegex(exceptions.ServerSideError,
+                                    'unknown error') as cm:
+            self.conn._op('GET', 'http://foo.bar')
+        exc = cm.exception
+        self.assertEqual(500, exc.status_code)
+
+    def test_access_error(self):
+        self.request.return_value.status_code = 403
+        self.request.return_value.json.side_effect = ValueError('no json')
+
+        with self.assertRaisesRegex(exceptions.AccessError,
+                                    'unknown error') as cm:
+            self.conn._op('GET', 'http://foo.bar')
+        exc = cm.exception
+        self.assertEqual(403, exc.status_code)

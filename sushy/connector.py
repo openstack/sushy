@@ -61,22 +61,20 @@ class Connector(object):
             url = parse.urljoin(self._url, path)
             # TODO(lucasagomes): We should mask the data to remove sensitive
             # information
-            LOG.debug('Issuing a HTTP %(method)s request at %(url)s with '
-                      'the headers "%(headers)s" and data "%(data)s"',
+            LOG.debug('HTTP request: %(method)s %(url)s; '
+                      'headers: %(headers)s; body: %(data)s',
                       {'method': method, 'url': url, 'headers': headers,
-                       'data': data or ''})
+                       'data': data})
             try:
                 response = session.request(method, url, data=data)
             except requests.ConnectionError as e:
                 raise exceptions.ConnectionError(url=url, error=e)
 
-            LOG.debug('Response: Status code: %d', response.status_code)
-            try:
-                response.raise_for_status()
-            except requests.HTTPError as e:
-                raise exceptions.HTTPError(
-                    method=method, url=url, error=e,
-                    status_code=e.response.status_code)
+            exceptions.raise_for_response(method, url, response)
+            LOG.debug('HTTP response for %(method)s %(url)s: '
+                      'status code: %(code)s',
+                      {'method': method, 'url': url,
+                       'code': response.status_code})
 
             return response
 
