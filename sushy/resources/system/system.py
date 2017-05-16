@@ -13,13 +13,18 @@
 #    License for the specific language governing permissions and limitations
 #    under the License.
 
+import collections
 import logging
 
 from sushy import exceptions
 from sushy.resources import base
 from sushy.resources.system import constants as sys_cons
 from sushy.resources.system import mappings as sys_maps
+from sushy.resources.system import processor
 
+# Representation of Memory information summary
+MemorySummary = collections.namedtuple('MemorySummary',
+                                       ['size_gib', 'health'])
 LOG = logging.getLogger(__name__)
 
 
@@ -72,6 +77,19 @@ class System(base.ResourceBase):
     uuid = None
     """The system UUID"""
 
+    memory_summary = None
+    """The summary info of memory of the system in general detail
+
+        It is a namedtuple containing the following:
+            size_gib: The size of memory of the system in GiB. This signifies
+                the total installed, operating system-accessible memory (RAM),
+                measured in GiB.
+            health: The overall health state of memory. This signifies
+                health state of memory along with its dependent resources.
+    """
+
+    _processors = None  # ref to ProcessorCollection instance
+
     def __init__(self, connector, identity, redfish_version=None):
         """A class representing a ComputerSystem
 
@@ -109,6 +127,21 @@ class System(base.ResourceBase):
                 boot_attr.get('BootSourceOverrideEnabled'))
             self.boot['mode'] = sys_maps.BOOT_SOURCE_MODE_MAP.get(
                 boot_attr.get('BootSourceOverrideMode'))
+
+        # Parse memory_summary attribute
+        self.memory_summary = None
+        memory_summary_attr = self.json.get('MemorySummary')
+        if memory_summary_attr is not None:
+            memory_size_gib = memory_summary_attr.get('TotalSystemMemoryGiB')
+            try:
+                memory_health = memory_summary_attr['Status']['HealthRollup']
+            except KeyError:
+                memory_health = None
+            self.memory_summary = MemorySummary(size_gib=memory_size_gib,
+                                                health=memory_health)
+
+        # Reset processor related attributes
+        self._processors = None
 
     def _get_reset_action_element(self):
         actions = self.json.get('Actions')
@@ -244,6 +277,28 @@ class System(base.ResourceBase):
     # TODO(lucasagomes): All system have a Manager and Chassis object,
     # include a get_manager() and get_chassis() once we have an abstraction
     # for those resources.
+
+    def _get_processor_collection_path(self):
+        """Helper function to find the ProcessorCollection path"""
+        processor_col = self.json.get('Processors')
+        if not processor_col:
+            raise exceptions.MissingAttributeError(attribute='Processors',
+                                                   resource=self._path)
+        return processor_col.get('@odata.id')
+
+    @property
+    def processors(self):
+        """Property to provide reference to `ProcessorCollection` instance
+
+        It is calculated once when the first time it is queried. On refresh,
+        this property gets reset.
+        """
+        if self._processors is None:
+            self._processors = processor.ProcessorCollection(
+                self._conn, self._get_processor_collection_path(),
+                redfish_version=self.redfish_version)
+
+        return self._processors
 
 
 class SystemCollection(base.ResourceCollectionBase):

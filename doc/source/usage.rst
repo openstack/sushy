@@ -72,6 +72,12 @@ To use sushy in a project:
   # Get a list of allowed boot source target values
   print(sys_inst.get_allowed_system_boot_source_values())
 
+  # Get the memory summary
+  print(sys_inst.memory_summary)
+
+  # Get the processor summary
+  print(sys_inst.processors.summary)
+
 
 If you do not have any real baremetal machine that supports the Redfish
 protocol you can look at the :ref:`contributing` page to learn how to

@@ -96,3 +96,15 @@ BOOT_SOURCE_MODE_UEFI = 'uefi'
 BOOT_SOURCE_ENABLED_ONCE = 'once'
 BOOT_SOURCE_ENABLED_CONTINUOUS = 'continuous'
 BOOT_SOURCE_ENABLED_DISABLED = 'disabled'
+
+# Processor related constants
+# Values comes from the Redfish Processor json-schema 1.0.0:
+# http://redfish.dmtf.org/schemas/v1/Processor.v1_0_0.json
+
+# Processor Architecture constants
+
+PROCESSOR_ARCH_x86 = 'x86 or x86-64'
+PROCESSOR_ARCH_IA_64 = 'Intel Itanium'
+PROCESSOR_ARCH_ARM = 'ARM'
+PROCESSOR_ARCH_MIPS = 'MIPS'
+PROCESSOR_ARCH_OEM = 'OEM-defined'
