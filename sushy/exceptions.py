@@ -40,6 +40,11 @@ class MissingAttributeError(SushyError):
                'resource %(resource)s')
 
 
+class MalformedAttributeError(SushyError):
+    message = ('The attribute %(attribute)s is malformed in the '
+               'resource %(resource)s: %(error)s')
+
+
 class MissingActionError(SushyError):
     message = ('The action %(action)s is missing from the '
                'resource %(resource)s')

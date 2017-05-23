@@ -55,37 +55,49 @@ class SystemTestCase(base.TestCase):
                          self.sys_inst.uuid)
         self.assertEqual(sushy.SYSTEM_POWER_STATE_ON,
                          self.sys_inst.power_state)
-        self.assertEqual((96, "OK"),
-                         self.sys_inst.memory_summary)
+        self.assertEqual(96, self.sys_inst.memory_summary.size_gib)
+        self.assertEqual("OK", self.sys_inst.memory_summary.health)
         self.assertIsNone(self.sys_inst._processors)
+
+    def test__parse_attributes_missing_actions(self):
+        self.sys_inst.json.pop('Actions')
+        self.assertRaisesRegex(
+            exceptions.MissingAttributeError, 'attribute Actions',
+            self.sys_inst._parse_attributes)
+
+    def test__parse_attributes_missing_boot(self):
+        self.sys_inst.json.pop('Boot')
+        self.assertRaisesRegex(
+            exceptions.MissingAttributeError, 'attribute Boot',
+            self.sys_inst._parse_attributes)
+
+    def test__parse_attributes_missing_reset_target(self):
+        self.sys_inst.json['Actions']['#ComputerSystem.Reset'].pop(
+            'target')
+        self.assertRaisesRegex(
+            exceptions.MissingAttributeError,
+            'attribute Actions/#ComputerSystem.Reset/target',
+            self.sys_inst._parse_attributes)
 
     def test_get__reset_action_element(self):
         value = self.sys_inst._get_reset_action_element()
-        expected = {
-            "target": "/redfish/v1/Systems/437XR1138R2/Actions/"
-                      "ComputerSystem.Reset",
-            "ResetType@Redfish.AllowableValues": [
-                "On",
-                "ForceOff",
-                "GracefulShutdown",
-                "GracefulRestart",
-                "ForceRestart",
-                "Nmi",
-                "ForceOn"
-            ]}
-        self.assertEqual(expected, value)
-
-    def test_get__reset_action_element_missing_actions_attr(self):
-        self.sys_inst._json.pop('Actions')
-        self.assertRaisesRegex(
-            exceptions.MissingAttributeError, 'attribute Actions',
-            self.sys_inst._get_reset_action_element)
+        self.assertEqual("/redfish/v1/Systems/437XR1138R2/Actions/"
+                         "ComputerSystem.Reset",
+                         value.target_uri)
+        self.assertEqual(["On",
+                          "ForceOff",
+                          "GracefulShutdown",
+                          "GracefulRestart",
+                          "ForceRestart",
+                          "Nmi",
+                          "ForceOn"
+                          ],
+                         value.allowed_values)
 
     def test_get__reset_action_element_missing_reset_action(self):
-        action = '#ComputerSystem.Reset'
-        self.sys_inst._json['Actions'].pop(action)
+        self.sys_inst._actions.reset = None
         self.assertRaisesRegex(
-            exceptions.MissingActionError, 'action %s' % action,
+            exceptions.MissingActionError, 'action #ComputerSystem.Reset',
             self.sys_inst._get_reset_action_element)
 
     def test_get_allowed_reset_system_values(self):
@@ -101,11 +113,9 @@ class SystemTestCase(base.TestCase):
         self.assertIsInstance(values, set)
 
     @mock.patch.object(system.LOG, 'warning', autospec=True)
-    @mock.patch.object(system.System, '_get_reset_action_element',
-                       autospec=True)
     def test_get_allowed_reset_system_values_no_values_specified(
-            self, mock_get_reset_action, mock_log):
-        mock_get_reset_action.return_value = {}
+            self, mock_log):
+        self.sys_inst._actions.reset.allowed_values = {}
         values = self.sys_inst.get_allowed_reset_system_values()
         # Assert it returns all values if it can't get the specific ones
         expected = set([sushy.RESET_GRACEFUL_SHUTDOWN,
@@ -119,22 +129,6 @@ class SystemTestCase(base.TestCase):
         self.assertEqual(expected, values)
         self.assertIsInstance(values, set)
         self.assertEqual(1, mock_log.call_count)
-
-    def test__get_reset_system_path(self):
-        value = self.sys_inst._get_reset_system_path()
-        expected = (
-            '/redfish/v1/Systems/437XR1138R2/Actions/ComputerSystem.Reset')
-        self.assertEqual(expected, value)
-
-    @mock.patch.object(system.System, '_get_reset_action_element',
-                       autospec=True)
-    def test__get_reset_system_path_missing_target_attr(
-            self, mock_get_reset_action):
-        mock_get_reset_action.return_value = {}
-        self.assertRaisesRegex(
-            exceptions.MissingAttributeError,
-            'attribute Actions/ComputerSystem.Reset/target',
-            self.sys_inst._get_reset_system_path)
 
     def test_reset_system(self):
         self.sys_inst.reset_system(sushy.RESET_FORCE_OFF)
@@ -161,17 +155,10 @@ class SystemTestCase(base.TestCase):
         self.assertEqual(expected, values)
         self.assertIsInstance(values, set)
 
-    def test_get_allowed_system_boot_source_values_missing_boot_attr(self):
-        self.sys_inst._json.pop('Boot')
-        self.assertRaisesRegex(
-            exceptions.MissingAttributeError, 'attribute Boot',
-            self.sys_inst.get_allowed_system_boot_source_values)
-
     @mock.patch.object(system.LOG, 'warning', autospec=True)
     def test_get_allowed_system_boot_source_values_no_values_specified(
             self, mock_log):
-        self.sys_inst._json['Boot'].pop(
-            'BootSourceOverrideTarget@Redfish.AllowableValues')
+        self.sys_inst.boot.allowed_values = None
         values = self.sys_inst.get_allowed_system_boot_source_values()
         # Assert it returns all values if it can't get the specific ones
         expected = set([sushy.BOOT_SOURCE_TARGET_NONE,
@@ -229,11 +216,6 @@ class SystemTestCase(base.TestCase):
             self.sys_inst._get_processor_collection_path)
 
     def test_memory_summary_missing_attr(self):
-        self.assertIsInstance(self.sys_inst.memory_summary,
-                              system.MemorySummary)
-        self.assertEqual(96, self.sys_inst.memory_summary.size_gib)
-        self.assertEqual("OK", self.sys_inst.memory_summary.health)
-
         # | GIVEN |
         self.sys_inst._json['MemorySummary']['Status'].pop('HealthRollup')
         # | WHEN |

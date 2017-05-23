@@ -26,36 +26,37 @@ LOG = logging.getLogger(__name__)
 
 class Processor(base.ResourceBase):
 
-    identity = None
+    identity = base.Field('Id', required=True)
     """The processor identity string"""
 
-    socket = None
+    socket = base.Field('Socket')
     """The socket or location of the processor"""
 
     # TODO(deray): Create mappings for the processor_type
-    processor_type = None
+    processor_type = base.Field('ProcessorType')
     """The type of processor"""
 
-    processor_architecture = None
+    processor_architecture = base.MappedField(
+        'ProcessorArchitecture', sys_maps.PROCESSOR_ARCH_VALUE_MAP)
     """The architecture of the processor"""
 
     # TODO(deray): Create mappings for the instruction_set
-    instruction_set = None
+    instruction_set = base.Field('InstructionSet')
     """The instruction set of the processor"""
 
-    manufacturer = None
+    manufacturer = base.Field('Manufacturer')
     """The processor manufacturer"""
 
-    model = None
+    model = base.Field('Model')
     """The product model number of this device"""
 
-    max_speed_mhz = None
+    max_speed_mhz = base.Field('MaxSpeedMHz', adapter=int)
     """The maximum clock speed of the processor in MHz."""
 
-    total_cores = None
+    total_cores = base.Field('TotalCores', adapter=int)
     """The total number of cores contained in this processor"""
 
-    total_threads = None
+    total_threads = base.Field('TotalThreads', adapter=int)
     """The total number of execution threads supported by this processor"""
 
     def __init__(self, connector, identity, redfish_version=None):
@@ -67,20 +68,6 @@ class Processor(base.ResourceBase):
             the object according to schema of the given version.
         """
         super(Processor, self).__init__(connector, identity, redfish_version)
-
-    def _parse_attributes(self):
-        self.identity = self.json.get('Id')
-        self.socket = self.json.get('Socket')
-        self.processor_type = self.json.get('ProcessorType')
-        self.processor_architecture = (
-            sys_maps.PROCESSOR_ARCH_VALUE_MAP.get(
-                self.json.get('ProcessorArchitecture')))
-        self.instruction_set = self.json.get('InstructionSet')
-        self.manufacturer = self.json.get('Manufacturer')
-        self.model = self.json.get('Model')
-        self.max_speed_mhz = self.json.get('MaxSpeedMHz')
-        self.total_cores = self.json.get('TotalCores')
-        self.total_threads = self.json.get('TotalThreads')
 
 
 class ProcessorCollection(base.ResourceCollectionBase):
