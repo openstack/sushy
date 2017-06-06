@@ -19,6 +19,7 @@ import mock
 import requests
 from six.moves import http_client
 
+from sushy import auth as sushy_auth
 from sushy import connector
 from sushy import exceptions
 from sushy.tests.unit import base
@@ -26,11 +27,13 @@ from sushy.tests.unit import base
 
 class ConnectorMethodsTestCase(base.TestCase):
 
-    def setUp(self):
+    @mock.patch.object(sushy_auth, 'SessionOrBasicAuth', autospec=True)
+    def setUp(self, mock_auth):
+        mock_auth.get_session_key.return_value = None
         super(ConnectorMethodsTestCase, self).setUp()
         self.conn = connector.Connector(
-            'http://foo.bar:1234', username='user',
-            password='pass', verify=True)
+            'http://foo.bar:1234', verify=True)
+        self.conn._auth = mock_auth
         self.data = {'fake': 'data'}
         self.headers = {'X-Fake': 'header'}
 
@@ -69,14 +72,39 @@ class ConnectorMethodsTestCase(base.TestCase):
         mock__op.assert_called_once_with(mock.ANY, 'DELETE', 'fake/path',
                                          self.data, self.headers)
 
+    def test_set_auth(self):
+        mock_auth = mock.MagicMock()
+        self.conn.set_auth(mock_auth)
+        self.assertEqual(mock_auth, self.conn._auth)
+
+    def test_set_http_basic_auth(self):
+        self.conn.set_http_basic_auth('foo', 'secret')
+        self.assertEqual(('foo', 'secret'), self.conn._session.auth)
+
+    def test_set_http_session_auth(self):
+        self.conn.set_http_session_auth('hash-token')
+        self.assertTrue('X-Auth-Token' in self.conn._session.headers)
+        self.assertEqual(
+            'hash-token', self.conn._session.headers['X-Auth-Token'])
+
+    def test_close(self):
+        session = mock.Mock(spec=requests.Session)
+        self.conn._session = session
+        self.conn.close()
+        session.close.assert_called_once_with()
+
 
 class ConnectorOpTestCase(base.TestCase):
 
-    def setUp(self):
+    @mock.patch.object(sushy_auth, 'SessionOrBasicAuth', autospec=True)
+    def setUp(self, mock_auth):
+        mock_auth.get_session_key.return_value = None
+        mock_auth._session_key = None
+        self.auth = mock_auth
         super(ConnectorOpTestCase, self).setUp()
         self.conn = connector.Connector(
-            'http://foo.bar:1234', username='user',
-            password='pass', verify=True)
+            'http://foo.bar:1234', verify=True)
+        self.conn._auth = mock_auth
         self.data = {'fake': 'data'}
         self.headers = {'X-Fake': 'header'}
         self.session = mock.Mock(spec=requests.Session)
@@ -119,6 +147,55 @@ class ConnectorOpTestCase(base.TestCase):
         self.request.assert_called_once_with(
             'DELETE', 'http://foo.bar:1234/fake/path',
             data=None, headers=expected_headers)
+
+    def test_ok_post_with_session(self):
+        self.conn._session.headers = {}
+        self.conn._session.headers['X-Auth-Token'] = 'asdf1234'
+        expected_headers = self.headers.copy()
+        expected_headers['Content-Type'] = 'application/json'
+
+        self.conn._op('POST', path='fake/path', data=self.data,
+                      headers=self.headers)
+        self.request.assert_called_once_with(
+            'POST', 'http://foo.bar:1234/fake/path',
+            data=json.dumps(self.data), headers=expected_headers)
+        self.assertEqual(self.conn._session.headers,
+                         {'X-Auth-Token': 'asdf1234'})
+
+    def test_timed_out_session_unable_to_create_session(self):
+        self.conn._auth.can_refresh_session.return_value = False
+        expected_headers = self.headers.copy()
+        expected_headers['Content-Type'] = 'application/json'
+        self.conn._session = self.session
+        self.request = self.session.request
+        self.request.return_value.status_code = http_client.FORBIDDEN
+        self.request.return_value.json.side_effect = ValueError('no json')
+        with self.assertRaisesRegex(exceptions.AccessError,
+                                    'unknown error') as ae:
+            self.conn._op('POST', path='fake/path', data=self.data,
+                          headers=self.headers)
+        exc = ae.exception
+        self.assertEqual(http_client.FORBIDDEN, exc.status_code)
+
+    def test_timed_out_session_re_established(self):
+        self.auth._session_key = 'asdf1234'
+        self.auth.get_session_key.return_value = 'asdf1234'
+        self.conn._auth = self.auth
+        self.session = mock.Mock(spec=requests.Session)
+        self.conn._session = self.session
+        self.request = self.session.request
+        first_expected_headers = self.headers.copy()
+        first_expected_headers['Content-Type'] = 'application/json'
+        first_response = mock.Mock()
+        first_response.status_code = http_client.FORBIDDEN
+        second_response = mock.Mock()
+        second_response.status_code = http_client.OK
+        second_response.json = {'Test': 'Testing'}
+        self.request.side_effect = [first_response, second_response]
+        response = self.conn._op('POST', path='fake/path', data=self.data,
+                                 headers=self.headers)
+        self.auth.refresh_session.assert_called_with()
+        self.assertEqual(response.json, second_response.json)
 
     def test_connection_error(self):
         self.request.side_effect = requests.exceptions.ConnectionError
@@ -171,6 +248,8 @@ class ConnectorOpTestCase(base.TestCase):
         self.assertEqual(http_client.INTERNAL_SERVER_ERROR, exc.status_code)
 
     def test_access_error(self):
+        self.conn._auth.can_refresh_session.return_value = False
+
         self.request.return_value.status_code = http_client.FORBIDDEN
         self.request.return_value.json.side_effect = ValueError('no json')
 
