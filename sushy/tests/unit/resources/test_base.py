@@ -96,7 +96,7 @@ class ResourceCollectionBaseTestCase(base.TestCase):
         # | WHEN |
         result = self.test_resource_collection.get_member('1')
         # | THEN |
-        self.assertTrue(isinstance(result, TestResource))
+        self.assertIsInstance(result, TestResource)
         self.assertEqual('1', result.identity)
         self.assertEqual('1.0.x', result.redfish_version)
 
@@ -120,9 +120,9 @@ class ResourceCollectionBaseTestCase(base.TestCase):
         # | WHEN |
         result = self.test_resource_collection.get_members()
         # | THEN |
-        self.assertTrue(isinstance(result, list))
+        self.assertIsInstance(result, list)
         for val in result:
-            self.assertTrue(isinstance(val, TestResource))
+            self.assertIsInstance(val, TestResource)
             self.assertTrue(val.identity in member_ids)
             self.assertEqual('1.0.x', val.redfish_version)
 
