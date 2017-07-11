@@ -222,7 +222,7 @@ class SystemTestCase(base.TestCase):
         self.sys_inst._parse_attributes()
         # | THEN |
         self.assertEqual(96, self.sys_inst.memory_summary.size_gib)
-        self.assertEqual(None, self.sys_inst.memory_summary.health)
+        self.assertIsNone(self.sys_inst.memory_summary.health)
 
         # | GIVEN |
         self.sys_inst._json['MemorySummary'].pop('Status')
@@ -230,22 +230,22 @@ class SystemTestCase(base.TestCase):
         self.sys_inst._parse_attributes()
         # | THEN |
         self.assertEqual(96, self.sys_inst.memory_summary.size_gib)
-        self.assertEqual(None, self.sys_inst.memory_summary.health)
+        self.assertIsNone(self.sys_inst.memory_summary.health)
 
         # | GIVEN |
         self.sys_inst._json['MemorySummary'].pop('TotalSystemMemoryGiB')
         # | WHEN |
         self.sys_inst._parse_attributes()
         # | THEN |
-        self.assertEqual(None, self.sys_inst.memory_summary.size_gib)
-        self.assertEqual(None, self.sys_inst.memory_summary.health)
+        self.assertIsNone(self.sys_inst.memory_summary.size_gib)
+        self.assertIsNone(self.sys_inst.memory_summary.health)
 
         # | GIVEN |
         self.sys_inst._json.pop('MemorySummary')
         # | WHEN |
         self.sys_inst._parse_attributes()
         # | THEN |
-        self.assertEqual(None, self.sys_inst.memory_summary)
+        self.assertIsNone(self.sys_inst.memory_summary)
 
     def test_processors(self):
         # check for the underneath variable value
