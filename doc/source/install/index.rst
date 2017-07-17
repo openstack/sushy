@@ -1,6 +1,6 @@
-============
-Installation
-============
+================
+Installing Sushy
+================
 
 At the command line::
 

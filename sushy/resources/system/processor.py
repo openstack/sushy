@@ -77,10 +77,7 @@ class ProcessorCollection(base.ResourceCollectionBase):
         return Processor
 
     _summary = None
-    """The summary of processors of the system in general detail
-
-    This has to be accessed by exposed :prop:`summary`.
-    """
+    """The summary of processors of the system in general detail"""
 
     @property
     def summary(self):
@@ -88,10 +85,9 @@ class ProcessorCollection(base.ResourceCollectionBase):
 
         It is calculated once when the first time it is queried. On refresh,
         this property gets reset.
-        :returns: A namedtuple containing the following:
-            count: The number of processors in the system. To be precise,
-                   it returns the number of logical CPUs (threads).
-            architecture: The architecture of the processor/s.
+
+        :returns: A namedtuple containing the ``count`` of processors
+            in regards to logical CPUs, and their ``architecture``.
         """
         if self._summary is None:
             count, architecture = 0, None

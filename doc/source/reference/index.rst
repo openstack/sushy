@@ -1,7 +1,9 @@
-.. include:: ../../README.rst
+=======================
+Sushy Library Reference
+=======================
 
 Features
---------
+========
 
 * Abstraction around the SystemCollection and System resources (Basic
   server identification and asset information)
@@ -9,11 +11,27 @@ Features
 * Changing systems boot device, frequency (Once or permanently) and mode
   (UEFI or BIOS)
 
-Check out the :ref:`usage` page.
+.. toctree::
+   :maxdepth: 2
 
-TODO
-----
+   usage
+
+Missing Features
+================
+
+These are some features that sushy is presently missing.
 
 * Collect sensor data (Health state, temperature, fans etc...)
 * System inspection (Number of CPUs, memory and disk size)
 * Serial console
+
+Sushy Python API Reference
+==========================
+
+* :ref:`modindex`
+
+.. # api/autoindex is hidden since it's in the modindex link above.
+.. toctree::
+  :hidden:
+
+  api/autoindex

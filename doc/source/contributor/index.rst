@@ -1,9 +1,12 @@
 .. _contributing:
 
-============
-Contributing
-============
-.. include:: ../../CONTRIBUTING.rst
+=====================
+Contributing to Sushy
+=====================
+
+How to contribute
+=================
+.. include:: ../../../CONTRIBUTING.rst
 
 
 Running a Redfish emulator
