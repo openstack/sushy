@@ -88,8 +88,8 @@ class System(base.ResourceBase):
     identity = base.Field('Id', required=True)
     """The system identity string"""
 
-    # TODO(lucasagomes): Create mappings for the indicator_led
-    indicator_led = base.Field('IndicatorLED')
+    indicator_led = base.MappedField('IndicatorLED',
+                                     sys_maps.SYSTEM_INDICATOR_LED_MAP)
     """Whether the indicator LED is lit or off"""
 
     manufacturer = base.Field('Manufacturer')

@@ -44,6 +44,20 @@ SYSTEM_POWER_STATE_POWERING_OFF = 'powering off'
 """A temporary state between On and Off. The power off action can take
    time while the OS is in the shutdown process"""
 
+# Indicator LED Constants
+
+SYSTEM_INDICATOR_LED_LIT = 'Lit'
+"""The Indicator LED is lit"""
+
+SYSTEM_INDICATOR_LED_BLINKING = 'Blinking'
+"""The Indicator LED is blinking"""
+
+SYSTEM_INDICATOR_LED_OFF = 'Off'
+"""The Indicator LED is off"""
+
+SYSTEM_INDICATOR_LED_UNKNOWN = 'Unknown'
+"""The state of the Indicator LED cannot be determine"""
+
 # Boot source target constants
 
 BOOT_SOURCE_TARGET_NONE = 'none'
