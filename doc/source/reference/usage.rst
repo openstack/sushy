@@ -1,7 +1,7 @@
 ..  _usage:
 
-Usaging Sushy
-=============
+Using Sushy
+===========
 
 To use sushy in a project:
 
