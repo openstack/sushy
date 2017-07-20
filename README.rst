@@ -1,6 +1,5 @@
-=====
-Sushy
-=====
+About Sushy
+===========
 
 Sushy is a Python library to communicate with `Redfish`_ based systems.
 
@@ -14,9 +13,9 @@ project. As the project grows and more features from `Redfish`_ are
 needed we can expand Sushy to fullfil those requirements.
 
 * Free software: Apache license
-* Documentation: http://sushy.rtfd.io
-* Usage: http://sushy.readthedocs.io/en/latest/usage.html
-* Source: http://git.openstack.org/cgit/openstack/sushy
-* Bugs: http://bugs.launchpad.net/sushy
+* Documentation: https://docs.openstack.org/sushy/latest/
+* Usage: https://docs.openstack.org/sushy/latest/reference/usage.html
+* Source: https://git.openstack.org/cgit/openstack/sushy
+* Bugs: https://bugs.launchpad.net/sushy
 
 .. _Redfish: http://www.dmtf.org/standards/redfish

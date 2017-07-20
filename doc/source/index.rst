@@ -3,23 +3,20 @@
    You can adapt this file completely to your liking, but it should at least
    contain the root `toctree` directive.
 
+=================================
 Welcome to Sushy's documentation!
 =================================
 
-Contents:
+.. include:: ../../README.rst
+
+Documentation
+=============
 
 .. toctree::
-   :maxdepth: 2
+   :maxdepth: 1
 
-   About Sushy <readme>
-   installation
-   usage
-   contributing
-
-Indices and tables
-==================
+   install/index
+   contributor/index
+   reference/index
 
 * :ref:`genindex`
-* :ref:`modindex`
-* :ref:`search`
-
