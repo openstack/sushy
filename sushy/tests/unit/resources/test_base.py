@@ -36,11 +36,27 @@ class ResourceBaseTestCase(base.TestCase):
         self.conn = mock.Mock()
         self.base_resource = BaseResource(connector=self.conn, path='/Foo',
                                           redfish_version='1.0.2')
+        self.assertFalse(self.base_resource._is_stale)
         # refresh() is called in the constructor
         self.conn.reset_mock()
 
     def test_refresh(self):
         self.base_resource.refresh()
+        self.conn.get.assert_not_called()
+
+    def test_refresh_force(self):
+        self.base_resource.refresh(force=True)
+        self.conn.get.assert_called_once_with(path='/Foo')
+
+    def test_invalidate(self):
+        self.base_resource.invalidate()
+        self.conn.get.assert_not_called()
+
+        self.base_resource.refresh()
+        self.conn.get.assert_called_once_with(path='/Foo')
+
+    def test_invalidate_force_refresh(self):
+        self.base_resource.invalidate(force_refresh=True)
         self.conn.get.assert_called_once_with(path='/Foo')
 
 
@@ -187,37 +203,39 @@ class FieldTestCase(base.TestCase):
 
     def test_missing_required(self):
         del self.json['String']
-        self.assertRaisesRegex(exceptions.MissingAttributeError,
-                               'String', self.test_resource.refresh)
+        self.assertRaisesRegex(
+            exceptions.MissingAttributeError,
+            'String', self.test_resource.refresh, force=True)
 
     def test_missing_nested_required(self):
         del self.json['Nested']['String']
-        self.assertRaisesRegex(exceptions.MissingAttributeError,
-                               'Nested/String', self.test_resource.refresh)
+        self.assertRaisesRegex(
+            exceptions.MissingAttributeError,
+            'Nested/String', self.test_resource.refresh, force=True)
 
     def test_missing_nested_required2(self):
         del self.json['Nested']['Object']['Field']
         self.assertRaisesRegex(exceptions.MissingAttributeError,
                                'Nested/Object/Field',
-                               self.test_resource.refresh)
+                               self.test_resource.refresh, force=True)
 
     def test_malformed_int(self):
         self.json['Integer'] = 'banana'
         self.assertRaisesRegex(
             exceptions.MalformedAttributeError,
             'attribute Integer is malformed.*invalid literal for int',
-            self.test_resource.refresh)
+            self.test_resource.refresh, force=True)
 
     def test_malformed_nested_int(self):
         self.json['Nested']['Integer'] = 'banana'
         self.assertRaisesRegex(
             exceptions.MalformedAttributeError,
             'attribute Nested/Integer is malformed.*invalid literal for int',
-            self.test_resource.refresh)
+            self.test_resource.refresh, force=True)
 
     def test_mapping_missing(self):
         self.json['Nested']['Mapped'] = 'banana'
-        self.test_resource.refresh()
+        self.test_resource.refresh(force=True)
 
         self.assertIsNone(self.test_resource.nested.mapped)
 

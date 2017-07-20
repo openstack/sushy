@@ -248,25 +248,28 @@ class System(base.ResourceBase):
 
     @property
     def processors(self):
-        """Property to provide reference to `ProcessorCollection` instance
+        """Property to reference `ProcessorCollection` instance
 
-        It is calculated once when the first time it is queried. On refresh,
-        this property gets reset.
+        It is set once when the first time it is queried. On refresh,
+        this property is marked as stale (greedy-refresh not done).
+        Here the actual refresh of the sub-resource happens, if stale.
         """
         if self._processors is None:
             self._processors = processor.ProcessorCollection(
                 self._conn, self._get_processor_collection_path(),
                 redfish_version=self.redfish_version)
 
+        self._processors.refresh(force=False)
         return self._processors
-
-    def refresh(self):
-        super(System, self).refresh()
-        self._processors = None
-        self._ethernet_interfaces = None
 
     @property
     def ethernet_interfaces(self):
+        """Property to reference `EthernetInterfaceCollection` instance
+
+        It is set once when the first time it is queried. On refresh,
+        this property is marked as stale (greedy-refresh not done).
+        Here the actual refresh of the sub-resource happens, if stale.
+        """
         if self._ethernet_interfaces is None:
             self._ethernet_interfaces = (
                 ethernet_interface.EthernetInterfaceCollection(
@@ -274,7 +277,20 @@ class System(base.ResourceBase):
                     utils.get_sub_resource_path_by(self, "EthernetInterfaces"),
                     redfish_version=self.redfish_version))
 
+        self._ethernet_interfaces.refresh(force=False)
         return self._ethernet_interfaces
+
+    def _do_refresh(self, force=False):
+        """Do custom resource specific refresh activities
+
+        On refresh, all sub-resources are marked as stale, i.e.
+        greedy-refresh not done for them unless forced by ``force``
+        argument.
+        """
+        if self._processors is not None:
+            self._processors.invalidate(force)
+        if self._ethernet_interfaces is not None:
+            self._ethernet_interfaces.invalidate(force)
 
 
 class SystemCollection(base.ResourceCollectionBase):

@@ -290,10 +290,13 @@ class SystemTestCase(base.TestCase):
         # On refreshing the system instance...
         with open('sushy/tests/unit/json_samples/system.json', 'r') as f:
             self.conn.get.return_value.json.return_value = json.loads(f.read())
+
+        self.sys_inst.invalidate()
         self.sys_inst.refresh()
 
         # | WHEN & THEN |
-        self.assertIsNone(self.sys_inst._processors)
+        self.assertIsNotNone(self.sys_inst._processors)
+        self.assertTrue(self.sys_inst._processors._is_stale)
 
         # | GIVEN |
         with open('sushy/tests/unit/json_samples/processor_collection.json',
@@ -302,6 +305,7 @@ class SystemTestCase(base.TestCase):
         # | WHEN & THEN |
         self.assertIsInstance(self.sys_inst.processors,
                               processor.ProcessorCollection)
+        self.assertFalse(self.sys_inst._processors._is_stale)
 
     def _setUp_processor_summary(self):
         self.conn.get.return_value.json.reset_mock()

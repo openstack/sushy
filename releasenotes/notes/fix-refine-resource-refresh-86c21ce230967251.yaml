@@ -1,0 +1,6 @@
+---
+fixes:
+  - |
+    The library now supports reloading of the attributes by invoking
+    ``refresh()`` method for nested resources in contrast to recreation.
+    Resources can now be marked stale by invoking ``invalidate()``.

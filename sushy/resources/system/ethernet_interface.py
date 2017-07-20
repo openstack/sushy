@@ -79,6 +79,11 @@ class EthernetInterfaceCollection(base.ResourceCollectionBase):
             self._summary = mac_dict
         return self._summary
 
-    def refresh(self):
-        super(EthernetInterfaceCollection, self).refresh()
+    def _do_refresh(self, force=False):
+        """Do custom resource specific refresh activities
+
+        On refresh, all sub-resources are marked as stale, i.e.
+        greedy-refresh not done for them unless forced by ``force``
+        argument.
+        """
         self._summary = None
