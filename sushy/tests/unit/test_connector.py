@@ -51,6 +51,13 @@ class ConnectorMethodsTestCase(base.TestCase):
         mock__op.assert_called_once_with(mock.ANY, 'PATCH', 'fake/path',
                                          self.data, self.headers)
 
+    @mock.patch.object(connector.Connector, '_op', autospec=True)
+    def test_delete(self, mock__op):
+        self.conn.delete(path='fake/path', data=self.data.copy(),
+                         headers=self.headers.copy())
+        mock__op.assert_called_once_with(mock.ANY, 'DELETE', 'fake/path',
+                                         self.data, self.headers)
+
 
 class ConnectorOpTestCase(base.TestCase):
 
@@ -83,6 +90,14 @@ class ConnectorOpTestCase(base.TestCase):
         self.request.assert_called_once_with(
             'POST', 'http://foo.bar:1234/fake/path',
             data=json.dumps(self.data), headers=expected_headers)
+
+    def test_ok_delete(self):
+        expected_headers = self.headers.copy()
+
+        self.conn._op('DELETE', path='fake/path', headers=self.headers.copy())
+        self.request.assert_called_once_with(
+            'DELETE', 'http://foo.bar:1234/fake/path',
+            data=None, headers=expected_headers)
 
     def test_connection_error(self):
         self.request.side_effect = requests.exceptions.ConnectionError
