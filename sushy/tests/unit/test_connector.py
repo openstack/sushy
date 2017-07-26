@@ -35,19 +35,22 @@ class ConnectorMethodsTestCase(base.TestCase):
 
     @mock.patch.object(connector.Connector, '_op', autospec=True)
     def test_get(self, mock__op):
-        self.conn.get(path='fake/path', data=self.data, headers=self.headers)
+        self.conn.get(path='fake/path', data=self.data.copy(),
+                      headers=self.headers.copy())
         mock__op.assert_called_once_with(mock.ANY, 'GET', 'fake/path',
                                          self.data, self.headers)
 
     @mock.patch.object(connector.Connector, '_op', autospec=True)
     def test_post(self, mock__op):
-        self.conn.post(path='fake/path', data=self.data, headers=self.headers)
+        self.conn.post(path='fake/path', data=self.data.copy(),
+                       headers=self.headers.copy())
         mock__op.assert_called_once_with(mock.ANY, 'POST', 'fake/path',
                                          self.data, self.headers)
 
     @mock.patch.object(connector.Connector, '_op', autospec=True)
     def test_patch(self, mock__op):
-        self.conn.patch(path='fake/path', data=self.data, headers=self.headers)
+        self.conn.patch(path='fake/path', data=self.data.copy(),
+                        headers=self.headers.copy())
         mock__op.assert_called_once_with(mock.ANY, 'PATCH', 'fake/path',
                                          self.data, self.headers)
 
@@ -85,7 +88,7 @@ class ConnectorOpTestCase(base.TestCase):
         expected_headers = self.headers.copy()
         expected_headers['Content-Type'] = 'application/json'
 
-        self.conn._op('POST', path='fake/path', data=self.data,
+        self.conn._op('POST', path='fake/path', data=self.data.copy(),
                       headers=self.headers)
         self.request.assert_called_once_with(
             'POST', 'http://foo.bar:1234/fake/path',
