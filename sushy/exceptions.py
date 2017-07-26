@@ -15,6 +15,8 @@
 
 import logging
 
+from six.moves import http_client
+
 
 LOG = logging.getLogger(__name__)
 
@@ -115,15 +117,16 @@ class AccessError(HTTPError):
 
 def raise_for_response(method, url, response):
     """Raise a correct error class, if needed."""
-    if response.status_code < 400:
+    if response.status_code < http_client.BAD_REQUEST:
         return
-    elif response.status_code == 404:
+    elif response.status_code == http_client.NOT_FOUND:
         raise ResourceNotFoundError(method, url, response)
-    elif response.status_code == 400:
+    elif response.status_code == http_client.BAD_REQUEST:
         raise BadRequestError(method, url, response)
-    elif response.status_code in (401, 403):
+    elif response.status_code in (http_client.UNAUTHORIZED,
+                                  http_client.FORBIDDEN):
         raise AccessError(method, url, response)
-    elif response.status_code >= 500:
+    elif response.status_code >= http_client.INTERNAL_SERVER_ERROR:
         raise ServerSideError(method, url, response)
     else:
         raise HTTPError(method, url, response)

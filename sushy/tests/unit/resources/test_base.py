@@ -16,6 +16,7 @@
 import copy
 
 import mock
+from six.moves import http_client
 
 from sushy import exceptions
 from sushy.resources import base as resource_base
@@ -106,7 +107,7 @@ class ResourceCollectionBaseTestCase(base.TestCase):
         self.test_resource_collection.members_identities = ('1',)
         self.conn.get.side_effect = exceptions.ResourceNotFoundError(
             method='GET', url='http://foo.bar:8000/redfish/v1/Fakes/2',
-            response=mock.Mock(status_code=404))
+            response=mock.Mock(status_code=http_client.NOT_FOUND))
         # | WHEN & THEN |
         self.assertRaises(exceptions.ResourceNotFoundError,
                           self.test_resource_collection.get_member, '2')
