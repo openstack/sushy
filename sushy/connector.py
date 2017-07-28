@@ -113,6 +113,18 @@ class Connector(object):
         """
         return self._op('PATCH', path, data, headers)
 
+    def delete(self, path='', data=None, headers=None):
+        """HTTP DELETE method.
+
+        :param path: Optional sub-URI path to the resource.
+        :param data: Optional JSON data.
+        :param headers: Optional dictionary of headers.
+        :returns: The response object from the requests library.
+        :raises: ConnectionError
+        :raises: HTTPError
+        """
+        return self._op('DELETE', path, data, headers)
+
     def __enter__(self):
         return self
 
