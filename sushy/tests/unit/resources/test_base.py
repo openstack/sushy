@@ -138,7 +138,17 @@ TEST_JSON = {
             'Field': 'field value'
         },
         'Mapped': 'raw'
-    }
+    },
+    'ListField': [
+        {
+            'String': 'a third string',
+            'Integer': 1
+        },
+        {
+            'String': 'a fourth string',
+            'Integer': 2
+        }
+    ]
 }
 
 
@@ -155,10 +165,16 @@ class NestedTestField(resource_base.CompositeField):
     non_existing = resource_base.Field('NonExisting', default=3.14)
 
 
+class TestListField(resource_base.ListField):
+    string = resource_base.Field('String', required=True)
+    integer = resource_base.Field('Integer', adapter=int)
+
+
 class ComplexResource(resource_base.ResourceBase):
     string = resource_base.Field('String', required=True)
     integer = resource_base.Field('Integer', adapter=int)
     nested = NestedTestField('Nested')
+    field_list = TestListField('ListField')
     non_existing_nested = NestedTestField('NonExistingNested')
     non_existing_mapped = resource_base.MappedField('NonExistingMapped',
                                                     MAPPING)
@@ -181,6 +197,9 @@ class FieldTestCase(base.TestCase):
         self.assertEqual('field value', self.test_resource.nested.nested_field)
         self.assertEqual('real', self.test_resource.nested.mapped)
         self.assertEqual(3.14, self.test_resource.nested.non_existing)
+        self.assertEqual('a third string',
+                         self.test_resource.field_list[0].string)
+        self.assertEqual(2, self.test_resource.field_list[1].integer)
         self.assertIsNone(self.test_resource.non_existing_nested)
         self.assertIsNone(self.test_resource.non_existing_mapped)
 
