@@ -17,6 +17,7 @@ import json
 
 import mock
 import requests
+from six.moves import http_client
 
 from sushy import connector
 from sushy import exceptions
@@ -74,7 +75,7 @@ class ConnectorOpTestCase(base.TestCase):
         self.session = mock.Mock(spec=requests.Session)
         self.conn._session = self.session
         self.request = self.session.request
-        self.request.return_value.status_code = 200
+        self.request.return_value.status_code = http_client.OK
 
     def test_ok_get(self):
         expected_headers = self.headers.copy()
@@ -107,19 +108,19 @@ class ConnectorOpTestCase(base.TestCase):
         self.assertRaises(exceptions.ConnectionError, self.conn._op, 'GET')
 
     def test_unknown_http_error(self):
-        self.request.return_value.status_code = 409
+        self.request.return_value.status_code = http_client.CONFLICT
         self.request.return_value.json.side_effect = ValueError('no json')
 
         with self.assertRaisesRegex(exceptions.HTTPError,
                                     'unknown error') as cm:
             self.conn._op('GET', 'http://foo.bar')
         exc = cm.exception
-        self.assertEqual(409, exc.status_code)
+        self.assertEqual(http_client.CONFLICT, exc.status_code)
         self.assertIsNone(exc.body)
         self.assertIsNone(exc.detail)
 
     def test_known_http_error(self):
-        self.request.return_value.status_code = 400
+        self.request.return_value.status_code = http_client.BAD_REQUEST
         with open('sushy/tests/unit/json_samples/error.json', 'r') as f:
             self.request.return_value.json.return_value = json.load(f)
 
@@ -127,36 +128,37 @@ class ConnectorOpTestCase(base.TestCase):
                                     'A general error has occurred') as cm:
             self.conn._op('GET', 'http://foo.bar')
         exc = cm.exception
-        self.assertEqual(400, exc.status_code)
+        self.assertEqual(http_client.BAD_REQUEST, exc.status_code)
         self.assertIsNotNone(exc.body)
         self.assertIn('A general error has occurred', exc.detail)
 
     def test_not_found_error(self):
-        self.request.return_value.status_code = 404
+        self.request.return_value.status_code = http_client.NOT_FOUND
         self.request.return_value.json.side_effect = ValueError('no json')
 
         with self.assertRaisesRegex(exceptions.ResourceNotFoundError,
                                     'Resource http://foo.bar not found') as cm:
             self.conn._op('GET', 'http://foo.bar')
         exc = cm.exception
-        self.assertEqual(404, exc.status_code)
+        self.assertEqual(http_client.NOT_FOUND, exc.status_code)
 
     def test_server_error(self):
-        self.request.return_value.status_code = 500
+        self.request.return_value.status_code = (
+            http_client.INTERNAL_SERVER_ERROR)
         self.request.return_value.json.side_effect = ValueError('no json')
 
         with self.assertRaisesRegex(exceptions.ServerSideError,
                                     'unknown error') as cm:
             self.conn._op('GET', 'http://foo.bar')
         exc = cm.exception
-        self.assertEqual(500, exc.status_code)
+        self.assertEqual(http_client.INTERNAL_SERVER_ERROR, exc.status_code)
 
     def test_access_error(self):
-        self.request.return_value.status_code = 403
+        self.request.return_value.status_code = http_client.FORBIDDEN
         self.request.return_value.json.side_effect = ValueError('no json')
 
         with self.assertRaisesRegex(exceptions.AccessError,
                                     'unknown error') as cm:
             self.conn._op('GET', 'http://foo.bar')
         exc = cm.exception
-        self.assertEqual(403, exc.status_code)
+        self.assertEqual(http_client.FORBIDDEN, exc.status_code)
