@@ -56,6 +56,13 @@ class ConnectorMethodsTestCase(base.TestCase):
                                          self.data, self.headers)
 
     @mock.patch.object(connector.Connector, '_op', autospec=True)
+    def test_put(self, mock__op):
+        self.conn.put(path='fake/path', data=self.data.copy(),
+                      headers=self.headers.copy())
+        mock__op.assert_called_once_with(mock.ANY, 'PUT', 'fake/path',
+                                         self.data, self.headers)
+
+    @mock.patch.object(connector.Connector, '_op', autospec=True)
     def test_delete(self, mock__op):
         self.conn.delete(path='fake/path', data=self.data.copy(),
                          headers=self.headers.copy())
@@ -93,6 +100,16 @@ class ConnectorOpTestCase(base.TestCase):
                       headers=self.headers)
         self.request.assert_called_once_with(
             'POST', 'http://foo.bar:1234/fake/path',
+            data=json.dumps(self.data), headers=expected_headers)
+
+    def test_ok_put(self):
+        expected_headers = self.headers.copy()
+        expected_headers['Content-Type'] = 'application/json'
+
+        self.conn._op('PUT', path='fake/path', data=self.data.copy(),
+                      headers=self.headers)
+        self.request.assert_called_once_with(
+            'PUT', 'http://foo.bar:1234/fake/path',
             data=json.dumps(self.data), headers=expected_headers)
 
     def test_ok_delete(self):
