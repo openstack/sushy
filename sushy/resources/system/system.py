@@ -21,6 +21,7 @@ from sushy.resources import common
 from sushy.resources.system import constants as sys_cons
 from sushy.resources.system import mappings as sys_maps
 from sushy.resources.system import processor
+from sushy import utils
 
 
 LOG = logging.getLogger(__name__)
@@ -52,7 +53,7 @@ class MemorySummaryField(base.CompositeField):
     This signifies health state of memory along with its dependent resources.
     """
 
-    size_gib = base.Field('TotalSystemMemoryGiB', adapter=int)
+    size_gib = base.Field('TotalSystemMemoryGiB', adapter=utils.int_or_none)
     """The size of memory of the system in GiB.
 
     This signifies the total installed, operating system-accessible memory

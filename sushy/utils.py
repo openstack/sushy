@@ -45,3 +45,15 @@ def get_members_identities(members):
         members_list.append(path.rstrip('/'))
 
     return tuple(members_list)
+
+
+def int_or_none(x):
+    """Given a value x it cast as int or None
+
+    :param x: The value to transform and return
+    :returns: Either None or x cast to an int
+
+    """
+    if x is None:
+        return None
+    return int(x)

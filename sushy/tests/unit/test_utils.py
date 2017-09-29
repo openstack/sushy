@@ -35,3 +35,7 @@ class UtilsTestCase(base.TestCase):
         expected = ('/redfish/v1/Systems/FOO', '/redfish/v1/Systems/BAR')
         self.assertEqual(expected, utils.get_members_identities(members))
         self.assertEqual(1, log_mock.call_count)
+
+    def test_int_or_none(self):
+        self.assertEqual(1, utils.int_or_none('1'))
+        self.assertIsNone(None, utils.int_or_none(None))

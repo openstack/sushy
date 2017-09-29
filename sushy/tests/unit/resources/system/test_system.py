@@ -79,6 +79,11 @@ class SystemTestCase(base.TestCase):
             'attribute Actions/#ComputerSystem.Reset/target',
             self.sys_inst._parse_attributes)
 
+    def test__parse_attributes_null_memory_capacity(self):
+        self.sys_inst.json['MemorySummary']['TotalSystemMemoryGiB'] = None
+        self.sys_inst._parse_attributes()
+        self.assertIsNone(self.sys_inst.memory_summary.size_gib)
+
     def test_get__reset_action_element(self):
         value = self.sys_inst._get_reset_action_element()
         self.assertEqual("/redfish/v1/Systems/437XR1138R2/Actions/"
