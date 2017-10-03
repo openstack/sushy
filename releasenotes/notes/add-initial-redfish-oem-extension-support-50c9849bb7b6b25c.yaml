@@ -1,0 +1,13 @@
+---
+features:
+  - |
+    Adds foundation for supporting resource extensibility proposed as
+    OEM extensibility in Redfish specification [1] to the library.
+
+      * Provides an attribute 'oem_vendors' in Resource classes to
+        discover the available OEM extensions.
+      * Provides a method 'get_oem_extension()' in Resource classes
+        to get the vendor defined resource OEM extension object, if
+        discovered.
+
+    [1] http://redfish.dmtf.org/schemas/DSP0266_1.1.html#resource-extensibility

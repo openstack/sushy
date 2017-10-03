@@ -24,6 +24,7 @@ import zipfile
 import six
 
 from sushy import exceptions
+from sushy.resources import oem
 from sushy import utils
 
 
@@ -305,6 +306,9 @@ class ResourceBase(object):
     redfish_version = None
     """The Redfish version"""
 
+    oem_vendors = Field('Oem', adapter=list)
+    """The list of OEM extension names for this resource."""
+
     def __init__(self,
                  connector,
                  path='',
@@ -419,6 +423,22 @@ class ResourceBase(object):
     @property
     def path(self):
         return self._path
+
+    @property
+    def resource_name(self):
+        return utils.camelcase_to_underscore_joined(self.__class__.__name__)
+
+    def get_oem_extension(self, vendor):
+        """Get the OEM extension instance for this resource by OEM vendor
+
+        :param vendor: the OEM vendor string which is the vendor-specific
+            extensibility identifier. Examples are 'Contoso', 'Hpe'.
+            Possible value can be got from ``oem_vendors`` attribute.
+        :returns: the Redfish resource OEM extension instance.
+        :raises: OEMExtensionNotFoundError
+        """
+        return oem.get_resource_extension_by_vendor(
+            self.resource_name, vendor, self)
 
 
 @six.add_metaclass(abc.ABCMeta)

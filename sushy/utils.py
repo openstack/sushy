@@ -15,6 +15,7 @@
 
 import collections
 import logging
+import threading
 
 import six
 
@@ -281,3 +282,50 @@ def cache_clear(res_selfie, force_refresh, only_these=None):
                     break
         else:
             setattr(res_selfie, cache_attr_name, None)
+
+
+def camelcase_to_underscore_joined(camelcase_str):
+    """Convert camelCase string to underscore_joined string
+
+    :param camelcase_str: The camelCase string
+    :returns: the equivalent underscore_joined string
+    """
+    if not camelcase_str:
+        raise ValueError('"camelcase_str" cannot be empty')
+
+    r = camelcase_str[0].lower()
+    for i, letter in enumerate(camelcase_str[1:], 1):
+        if letter.isupper():
+            try:
+                if (camelcase_str[i - 1].islower()
+                        or camelcase_str[i + 1].islower()):
+                    r += '_'
+            except IndexError:
+                pass
+
+        r += letter.lower()
+
+    return r
+
+
+def synchronized(wrapped):
+    """Simple synchronization decorator.
+
+    Decorating a method like so:
+
+    .. code-block:: python
+
+      @synchronized
+      def foo(self, *args):
+        ...
+
+    ensures that only one thread will execute the foo method at a time.
+    """
+    lock = threading.RLock()
+
+    @six.wraps(wrapped)
+    def wrapper(*args, **kwargs):
+        with lock:
+            return wrapped(*args, **kwargs)
+
+    return wrapper

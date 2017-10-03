@@ -61,6 +61,14 @@ class ArchiveParsingError(SushyError):
     message = 'Failed parsing archive "%(path)s": %(error)s'
 
 
+class ExtensionError(SushyError):
+    message = ('Sushy Extension Error: %(error)s')
+
+
+class OEMExtensionNotFoundError(SushyError):
+    message = 'No %(resource)s OEM extension found by name "%(name)s".'
+
+
 class HTTPError(SushyError):
     """Basic exception for HTTP errors"""
 

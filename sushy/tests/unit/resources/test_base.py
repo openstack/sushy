@@ -25,10 +25,33 @@ from sushy.tests.unit import base
 import zipfile
 
 
+BASE_RESOURCE_JSON = {
+    "@odata.type": "#FauxResource.v1_0_0.FauxResource",
+    "Id": "1111AAAA",
+    "Name": "Faux Resource",
+    "@odata.id": "/redfish/v1/FauxResource/1111AAAA",
+    "Oem": {
+        "Contoso": {
+            "@odata.type": "http://contoso.com/schemas/extensions.v1_2_1#contoso.AnvilTypes1",  # noqa
+            "slogan": "Contoso never fail",
+            "disclaimer": "* Most of the time"
+        },
+        "EID_412_ASB_123": {
+            "@odata.type": "http://AnotherStandardsBody/schemas.v1_0_1#styleInfoExt",  # noqa
+            "Style": "Executive"
+        }
+    }
+}
+
+
 class BaseResource(resource_base.ResourceBase):
 
     def _parse_attributes(self):
         pass
+
+
+class BaseResource2(resource_base.ResourceBase):
+    pass
 
 
 class ResourceBaseTestCase(base.TestCase):
@@ -36,9 +59,13 @@ class ResourceBaseTestCase(base.TestCase):
     def setUp(self):
         super(ResourceBaseTestCase, self).setUp()
         self.conn = mock.Mock()
+        self.conn.get.return_value.json.return_value = (
+            copy.deepcopy(BASE_RESOURCE_JSON))
         self.base_resource = BaseResource(connector=self.conn, path='/Foo',
                                           redfish_version='1.0.2')
         self.assertFalse(self.base_resource._is_stale)
+        self.base_resource2 = BaseResource2(connector=self.conn, path='/Foo',
+                                            redfish_version='1.0.2')
         # refresh() is called in the constructor
         self.conn.reset_mock()
 
@@ -101,6 +128,11 @@ class ResourceBaseTestCase(base.TestCase):
                           redfish_version='1.0.2',
                           reader=resource_base.
                           JsonArchiveReader('Test.2.0.json'))
+
+    def test__parse_attributes(self):
+        for oem_vendor in self.base_resource2.oem_vendors:
+            self.assertTrue(oem_vendor in ('Contoso', 'EID_412_ASB_123'))
+        self.assertEqual('base_resource2', self.base_resource2.resource_name)
 
 
 class TestResource(resource_base.ResourceBase):
