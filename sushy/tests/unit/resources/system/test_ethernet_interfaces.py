@@ -16,6 +16,7 @@ import mock
 
 from sushy.resources.system import constants as sys_cons
 from sushy.resources.system import ethernet_interface
+from sushy.resources.system import mappings as sys_map
 from sushy.tests.unit import base
 
 
@@ -42,7 +43,7 @@ class EthernetInterfaceTestCase(base.TestCase):
         self.assertEqual(
             '12:44:6A:3B:04:11', self.sys_eth.permanent_mac_address)
         self.assertEqual('12:44:6A:3B:04:11', self.sys_eth.mac_address)
-        self.assertEqual('Enabled', self.sys_eth.status.state)
+        self.assertEqual('enabled', self.sys_eth.status.state)
         self.assertEqual('OK', self.sys_eth.status.health)
         self.assertEqual(1000, self.sys_eth.speed_mbps)
 
@@ -92,12 +93,15 @@ class EthernetInterfaceCollectionTestCase(base.TestCase):
         self.assertIsInstance(members, list)
         self.assertEqual(1, len(members))
 
-    def test_eth_summary(self):
+    def test_summary(self):
         self.assertIsNone(self.sys_eth_col._summary)
         self.conn.get.return_value.json.reset_mock()
         path = 'sushy/tests/unit/json_samples/ethernet_interfaces.json'
         with open(path, 'r') as f:
             self.conn.get.return_value.json.return_value = json.loads(f.read())
-        expected_summary = {'12:44:6A:3B:04:11': sys_cons.HEALTH_STATE_ENABLED}
+        expected_summary = {
+            '12:44:6A:3B:04:11':
+            sys_map.HEALTH_STATE_VALUE_MAP_REV.get(
+                sys_cons.HEALTH_STATE_ENABLED)}
         actual_summary = self.sys_eth_col.summary
         self.assertEqual(expected_summary, actual_summary)

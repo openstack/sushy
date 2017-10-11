@@ -21,6 +21,7 @@ import sushy
 from sushy import exceptions
 from sushy.resources.system import constants as sys_cons
 from sushy.resources.system import ethernet_interface
+from sushy.resources.system import mappings as sys_map
 from sushy.resources.system import processor
 from sushy.resources.system import system
 from sushy.tests.unit import base
@@ -358,8 +359,11 @@ class SystemTestCase(base.TestCase):
 
         self.assertIsNone(self.sys_inst._ethernet_interfaces)
         actual_macs = self.sys_inst.ethernet_interfaces.summary
-        self.assertEqual({'12:44:6A:3B:04:11': sys_cons.HEALTH_STATE_ENABLED},
-                         actual_macs)
+        expected_macs = (
+            {'12:44:6A:3B:04:11':
+             sys_map.HEALTH_STATE_VALUE_MAP_REV.get(
+                 sys_cons.HEALTH_STATE_ENABLED)})
+        self.assertEqual(expected_macs, actual_macs)
         self.assertIsInstance(self.sys_inst._ethernet_interfaces,
                               ethernet_interface.EthernetInterfaceCollection)
 
