@@ -1,0 +1,16 @@
+- job:
+    name: sushy-tempest-dsvm-ironic-ipa-partition-redfish-src
+    parent: legacy-dsvm-base
+    run: playbooks/legacy/sushy-tempest-dsvm-ironic-ipa-partition-redfish-src/run.yaml
+    post-run: playbooks/legacy/sushy-tempest-dsvm-ironic-ipa-partition-redfish-src/post.yaml
+    timeout: 5400
+    required-projects:
+      - openstack-infra/devstack-gate
+      - openstack/ironic
+      - openstack/ironic-lib
+      - openstack/ironic-python-agent
+      - openstack/pyghmi
+      - openstack/python-ironicclient
+      - openstack/sushy
+      - openstack/tempest
+      - openstack/virtualbmc
