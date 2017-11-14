@@ -2,13 +2,7 @@
     name: openstack/sushy
     check:
       jobs:
-        - sushy-tempest-dsvm-ironic-ipa-partition-redfish-src:
-            irrelevant-files:
-              - ^(test-|)requirements.txt$
-              - ^setup.cfg$
+        - sushy-tempest-dsvm-ironic-ipa-partition-redfish-src
     gate:
       jobs:
-        - sushy-tempest-dsvm-ironic-ipa-partition-redfish-src:
-            irrelevant-files:
-              - ^(test-|)requirements.txt$
-              - ^setup.cfg$
+        - sushy-tempest-dsvm-ironic-ipa-partition-redfish-src
