@@ -153,6 +153,40 @@ class CompositeField(collections.Mapping, Field):
         return iter(self._subfields)
 
 
+class ListField(Field):
+    """Base class for fields consisting of a list of several sub-fields."""
+
+    def __init__(self, *args, **kwargs):
+        super(ListField, self).__init__(*args, **kwargs)
+        self._subfields = dict(_collect_fields(self))
+
+    def _load(self, body, resource, nested_in=None):
+        """Load the field list.
+
+        :param body: parent JSON body.
+        :param resource: parent resource.
+        :param nested_in: parent resource name (for error reporting only).
+        :returns: a new list object containing subfields.
+        """
+        nested_in = (nested_in or []) + self._path
+        values = super(ListField, self)._load(body, resource)
+        if values is None:
+            return None
+
+        # Initialize the list that will contain each field instance
+        instances = []
+        for value in values:
+            instance = copy.copy(self)
+            for attr, field in self._subfields.items():
+                # Hide the Field object behind the real value
+                setattr(instance, attr, field._load(value,
+                                                    resource,
+                                                    nested_in))
+            instances.append(instance)
+
+        return instances
+
+
 class MappedField(Field):
     """Field taking real value from a mapping."""
 
