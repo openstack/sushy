@@ -1,0 +1,7 @@
+---
+other:
+  - |
+    Changes the values for the constants ``HEALTH_STATE_ENABLED``,
+    ``HEALTH_STATE_DISABLED``, ``HEALTH_OK``, ``HEALTH_WARNING``
+    and ``HEALTH_CRITICAL``. These could be correctly used
+    with their mapped values in mappings.py.

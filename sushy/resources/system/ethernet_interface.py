@@ -62,20 +62,26 @@ class EthernetInterfaceCollection(base.ResourceCollectionBase):
 
     @property
     def summary(self):
-        """Summary MAC addresses and interfaces state
+        """Summary of MAC addresses and interfaces state
 
         This filters the MACs whose health is OK,
         which means the MACs in both 'Enabled' and 'Disabled' States
         are returned.
-        :returns dictionary in the format {'aa:bb:cc:dd:ee:ff': 'Enabled'}
+
+        :returns: dictionary in the format
+            {'aa:bb:cc:dd:ee:ff': 'Enabled',
+            'aa:bb:aa:aa:aa:aa': 'Disabled'}
         """
         if self._summary is None:
             mac_dict = {}
             for eth in self.get_members():
-                if eth.mac_address is not None:
-                    if (eth.status is not None and
-                            eth.status.health == sys_cons.HEALTH_OK):
-                        mac_dict[eth.mac_address] = eth.status.state
+                if (eth.mac_address is not None and eth.status is not None):
+                    if (eth.status.health ==
+                            sys_map.HEALTH_VALUE_MAP_REV.get(
+                                sys_cons.HEALTH_OK)):
+                        state = sys_map.HEALTH_STATE_VALUE_MAP_REV.get(
+                            eth.status.state)
+                        mac_dict[eth.mac_address] = state
             self._summary = mac_dict
         return self._summary
 

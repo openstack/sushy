@@ -69,12 +69,23 @@ def get_sub_resource_path_by(resource, subresource_name):
     :param subresource_name: name of the resource field to
         fetch the '@odata.id' from.
     """
-    subresource_element = resource.json.get(subresource_name)
-    if not subresource_element:
-        raise exceptions.MissingAttributeError(attribute=subresource_name,
-                                               resource=resource.path)
-    if '@odata.id' not in subresource_element:
+    if not subresource_name:
+        raise ValueError('"subresource_name" cannot be empty')
+
+    if not isinstance(subresource_name, list):
+        subresource_name = [subresource_name]
+
+    body = resource.json
+    for path_item in subresource_name:
+        body = body.get(path_item, {})
+
+    if not body:
         raise exceptions.MissingAttributeError(
-            attribute=(subresource_name + '/@odata.id'),
+            attribute='/'.join(subresource_name), resource=resource.path)
+
+    if '@odata.id' not in body:
+        raise exceptions.MissingAttributeError(
+            attribute='/'.join(subresource_name) + '/@odata.id',
             resource=resource.path)
-    return subresource_element['@odata.id']
+
+    return body['@odata.id']
