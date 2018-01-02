@@ -197,6 +197,11 @@ class ResourceBase(object):
         self._path = path
         self._json = None
         self.redfish_version = redfish_version
+        # Note(deray): Indicates if the resource holds stale data or not.
+        # Starting off with True and eventually gets set to False when
+        # attribute values are fetched.
+        self._is_stale = True
+
         self.refresh()
 
     def _parse_attributes(self):
@@ -205,20 +210,66 @@ class ResourceBase(object):
             # Hide the Field object behind the real value
             setattr(self, attr, field._load(self.json, self))
 
-    def refresh(self):
+    def refresh(self, force=False):
         """Refresh the resource
 
         Freshly retrieves/fetches the resource attributes and invokes
         ``_parse_attributes()`` method on successful retrieval.
+        Advised not to override this method in concrete ResourceBase classes.
+        Resource classes can place their refresh specific operations in
+        ``_do_refresh()`` method, if needed. This method represents the
+        template method in the paradigm of Template design pattern.
+
+        :param force: will force refresh the resource and its sub-resources,
+            if set to True.
         :raises: ResourceNotFoundError
         :raises: ConnectionError
         :raises: HTTPError
         """
+        # Note(deray): Don't re-fetch / invalidate the sub-resources if the
+        # resource is "_not_ stale" (i.e. fresh) OR _not_ forced.
+        if not self._is_stale and not force:
+            return
+
         self._json = self._conn.get(path=self._path).json()
         LOG.debug('Received representation of %(type)s %(path)s: %(json)s',
                   {'type': self.__class__.__name__,
                    'path': self._path, 'json': self._json})
         self._parse_attributes()
+        self._do_refresh(force)
+
+        # Mark it fresh
+        self._is_stale = False
+
+    def _do_refresh(self, force):
+        """Primitive method to be overridden by refresh related activities.
+
+        Derived classes are supposed to override this method with the
+        resource specific refresh operations to be performed. This is a
+        primitive method in the paradigm of Template design pattern.
+
+        :param force: should force refresh the resource and its sub-resources,
+            if set to True.
+        :raises: ResourceNotFoundError
+        :raises: ConnectionError
+        :raises: HTTPError
+        """
+
+    def invalidate(self, force_refresh=False):
+        """Mark the resource as stale, prompting refresh() before getting used.
+
+        If ``force_refresh`` is set to True, then it invokes ``refresh()``
+        on the resource.
+
+        :param force_refresh: will invoke refresh on the resource,
+            if set to True.
+        :raises: ResourceNotFoundError
+        :raises: ConnectionError
+        :raises: HTTPError
+        """
+        self._is_stale = True
+        if force_refresh:
+            self.refresh()
 
     @property
     def json(self):

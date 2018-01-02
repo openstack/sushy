@@ -140,7 +140,7 @@ class ProcessorCollectionTestCase(base.TestCase):
         with open('sushy/tests/unit/json_samples/'
                   'processor_collection.json', 'r') as f:
             self.conn.get.return_value.json.return_value = json.loads(f.read())
-        self.sys_processor_col.refresh()
+        self.sys_processor_col.refresh(force=True)
 
         # | WHEN & THEN |
         self.assertIsNone(self.sys_processor_col._summary)
