@@ -249,9 +249,9 @@ class ResourceBase(object):
 
         Freshly retrieves/fetches the resource attributes and invokes
         ``_parse_attributes()`` method on successful retrieval.
-        Advised not to override this method in concrete ResourceBase classes.
-        Resource classes can place their refresh specific operations in
-        ``_do_refresh()`` method, if needed. This method represents the
+        It is recommended not to override this method in concrete ResourceBase
+        classes. Resource classes can place their refresh specific operations
+        in ``_do_refresh()`` method, if needed. This method represents the
         template method in the paradigm of Template design pattern.
 
         :param force: will force refresh the resource and its sub-resources,
