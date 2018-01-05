@@ -22,7 +22,7 @@ Missing Features
 These are some features that sushy is presently missing.
 
 * Collect sensor data (Health state, temperature, fans etc...)
-* System inspection (Number of CPUs, memory and disk size)
+* System disk size
 * Serial console
 
 Sushy Python API Reference
