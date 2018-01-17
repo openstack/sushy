@@ -1,0 +1,18 @@
+{
+    "Content-Security-Policy": "default-src 'none'; script-src 'self' 'unsafe-inline' 'unsafe-eval'; connect-src 'self'; img-src 'self'; frame-src 'self'; font-src 'self'; object-src 'self'; style-src 'self' 'unsafe-inline'",
+    "ETag": "'W/\"7dc5e2b9\"'",
+    "Cache-Control": "max-age=0, no-cache, no-store, must-revalidate",
+    "Location": "/redfish/v1/SessionService/Sessions/151edd65d41c0b89",
+    "Connection": "Keep-Alive",
+    "X-XSS-Protection": "1; mode=block",
+    "X-Auth-Token": "adc530e2016a0ea98c76c087f0e4b76f",
+    "Expires": "0",
+    "X-Frame-Options": "SAMEORIGIN",
+    "Content-Length": "392",
+    "X-Content-Type-Options": "nosniff",
+    "Content-Type": "application/json;charset=utf-8",
+    "OData-Version": "4.0",
+    "Keep-Alive": "timeout=1, max=32",
+    "Strict-Transport-Security": "max-age=31536000; includeSubDomains",
+    "Date": "Tue, 06 Jun 2017 17:07:48 GMT"
+}

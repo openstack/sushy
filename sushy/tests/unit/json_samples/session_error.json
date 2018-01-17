@@ -1,0 +1,17 @@
+{
+  "error": {
+    "code": "Base.1.0.GeneralError",
+    "message": "A general error has occurred. See ExtendedInfo for more information.",
+    "@Message.ExtendedInfo": [
+      {
+        "@odata.type": "/redfish/v1/$metadata#MessageRegistry.1.0.0.MessageRegistry",
+        "MessageId": "Base.1.0.NoValidSession",
+        "RelatedProperties": [],
+        "Message": "There is no valid session established with the implementation.",
+        "MessageArgs": [],
+        "Severity": "Critical",
+        "Resolution": "Establish as session before attempting any operations."
+      }
+    ]
+  }
+}

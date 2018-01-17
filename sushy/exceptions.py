@@ -115,6 +115,11 @@ class AccessError(HTTPError):
     pass
 
 
+class MissingXAuthToken(HTTPError):
+    message = ('No X-Auth-Token returned from remote host when '
+               'attempting to establish a session. Error: %(error)s')
+
+
 def raise_for_response(method, url, response):
     """Raise a correct error class, if needed."""
     if response.status_code < http_client.BAD_REQUEST:

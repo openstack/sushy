@@ -17,27 +17,34 @@ import json
 
 import mock
 
+from sushy import auth
 from sushy import connector
 from sushy import main
 from sushy.resources.manager import manager
+from sushy.resources.sessionservice import session
+from sushy.resources.sessionservice import sessionservice
 from sushy.resources.system import system
 from sushy.tests.unit import base
 
 
 class MainTestCase(base.TestCase):
 
+    @mock.patch.object(auth, 'SessionOrBasicAuth', autospec=True)
     @mock.patch.object(connector, 'Connector', autospec=True)
-    def setUp(self, mock_connector):
+    @mock.patch.object(sessionservice, 'SessionService', autospec=True)
+    def setUp(self, mock_session_service, mock_connector, mock_auth):
         super(MainTestCase, self).setUp()
         self.conn = mock.Mock()
+        self.sess_serv = mock.Mock()
+        self.sess_serv.create_session.return_value = (None, None)
+        mock_session_service.return_value = self.sess_serv
         mock_connector.return_value = self.conn
         with open('sushy/tests/unit/json_samples/root.json', 'r') as f:
             self.conn.get.return_value.json.return_value = json.loads(f.read())
-        self.root = main.Sushy(
-            'http://foo.bar:1234', username='foo', password='bar',
-            verify=True)
+        self.root = main.Sushy('http://foo.bar:1234',
+                               verify=True, auth=mock_auth)
         mock_connector.assert_called_once_with(
-            'http://foo.bar:1234', 'foo', 'bar', True)
+            'http://foo.bar:1234', True)
 
     def test__parse_attributes(self):
         self.root._parse_attributes()
@@ -48,6 +55,14 @@ class MainTestCase(base.TestCase):
                          self.root.uuid)
         self.assertEqual('/redfish/v1/Systems', self.root._systems_path)
         self.assertEqual('/redfish/v1/Managers', self.root._managers_path)
+        self.assertEqual('/redfish/v1/SessionService',
+                         self.root._session_service_path)
+
+    @mock.patch.object(connector, 'Connector', autospec=True)
+    def test__init_throws_exception(self, mock_Connector):
+        self.assertRaises(
+            ValueError, main.Sushy, 'http://foo.bar:1234',
+            'foo', 'bar', auth=mock.MagicMock())
 
     @mock.patch.object(system, 'SystemCollection', autospec=True)
     def test_get_system_collection(self, mock_system_collection):
@@ -75,4 +90,18 @@ class MainTestCase(base.TestCase):
         self.root.get_manager('fake-manager-id')
         Manager_mock.assert_called_once_with(
             self.root._conn, 'fake-manager-id',
+            redfish_version=self.root.redfish_version)
+
+    @mock.patch.object(sessionservice, 'SessionService', autospec=True)
+    def test_get_sessionservice(self, mock_sess_serv):
+        self.root.get_session_service()
+        mock_sess_serv.assert_called_once_with(
+            self.root._conn, '/redfish/v1/SessionService',
+            redfish_version=self.root.redfish_version)
+
+    @mock.patch.object(session, 'Session', autospec=True)
+    def test_get_session(self, mock_sess):
+        self.root.get_session('asdf')
+        mock_sess.assert_called_once_with(
+            self.root._conn, 'asdf',
             redfish_version=self.root.redfish_version)

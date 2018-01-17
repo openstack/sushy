@@ -26,12 +26,24 @@ LOG = logging.getLogger(__name__)
 
 class Connector(object):
 
-    def __init__(self, url, username=None, password=None, verify=True):
+    def __init__(self, url, verify=True):
         self._url = url
+        self._verify = verify
         self._session = requests.Session()
-        self._session.verify = verify
-        if username and password:
-            self._session.auth = (username, password)
+        self._session.verify = self._verify
+
+    def set_auth(self, auth):
+        """Sets the authentication mechanism for our connector."""
+        self._auth = auth
+
+    def set_http_basic_auth(self, username, password):
+        """Sets the http basic authentication information."""
+        self._session.auth = (username, password)
+
+    def set_http_session_auth(self, session_auth_token):
+        """Sets the session authentication information."""
+        self._session.auth = None
+        self._session.headers.update({'X-Auth-Token': session_auth_token})
 
     def close(self):
         """Close this connector and the associated HTTP session."""
@@ -49,11 +61,12 @@ class Connector(object):
         :raises: ConnectionError
         :raises: HTTPError
         """
+        json_data = None
         if headers is None:
             headers = {}
 
         if data is not None:
-            data = json.dumps(data)
+            json_data = json.dumps(data)
             headers['Content-Type'] = 'application/json'
 
         url = parse.urljoin(self._url, path)
@@ -62,14 +75,30 @@ class Connector(object):
         LOG.debug('HTTP request: %(method)s %(url)s; '
                   'headers: %(headers)s; body: %(data)s',
                   {'method': method, 'url': url, 'headers': headers,
-                   'data': data})
+                   'data': json_data})
         try:
-            response = self._session.request(method, url, data=data,
+            response = self._session.request(method, url,
+                                             data=json_data,
                                              headers=headers)
         except requests.ConnectionError as e:
             raise exceptions.ConnectionError(url=url, error=e)
+        # If we received an AccessError, and we
+        # previously established a redfish session
+        # there is a chance that the session has timed-out.
+        # Attempt to re-establish a session.
+        try:
+            exceptions.raise_for_response(method, url, response)
+        except exceptions.AccessError:
+            if self._auth.can_refresh_session():
+                self._auth.refresh_session()
+                LOG.debug("Authentication refreshed successfully, "
+                          "retrying the call.")
+                response = self._session.request(method, url,
+                                                 data=json_data,
+                                                 headers=headers)
+            else:
+                raise
 
-        exceptions.raise_for_response(method, url, response)
         LOG.debug('HTTP response for %(method)s %(url)s: '
                   'status code: %(code)s',
                   {'method': method, 'url': url,

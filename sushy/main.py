@@ -12,11 +12,17 @@
 #    WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
 #    License for the specific language governing permissions and limitations
 #    under the License.
+import logging
 
+from sushy import auth as sushy_auth
 from sushy import connector
 from sushy.resources import base
 from sushy.resources.manager import manager
+from sushy.resources.sessionservice import session
+from sushy.resources.sessionservice import sessionservice
 from sushy.resources.system import system
+
+LOG = logging.getLogger(__name__)
 
 
 class Sushy(base.ResourceBase):
@@ -36,8 +42,13 @@ class Sushy(base.ResourceBase):
     _managers_path = base.Field(['Managers', '@odata.id'], required=True)
     """ManagerCollection path"""
 
+    _session_service_path = base.Field(['SessionService', '@odata.id'],
+                                       required=True)
+    """SessionService path"""
+
     def __init__(self, base_url, username=None, password=None,
-                 root_prefix='/redfish/v1/', verify=True):
+                 root_prefix='/redfish/v1/', verify=True,
+                 auth=None):
         """A class representing a RootService
 
         :param base_url: The base URL to the Redfish controller. It
@@ -54,11 +65,24 @@ class Sushy(base.ResourceBase):
             the driver will ignore verifying the SSL certificate; if it's
             a path the driver will use the specified certificate or one of
             the certificates in the directory. Defaults to True.
+        :param auth: An authentication mechanism to utilize.
         """
         self._root_prefix = root_prefix
+        if (auth is not None and (password is not None or
+                                  username is not None)):
+            msg = ('Username or Password were provided to Sushy '
+                   'when an authentication mechanism was specified.')
+            raise ValueError(msg)
+        else:
+            auth = sushy_auth.SessionOrBasicAuth(username=username,
+                                                 password=password)
+
         super(Sushy, self).__init__(
-            connector.Connector(base_url, username, password, verify),
+            connector.Connector(base_url, verify),
             path=self._root_prefix)
+        self._auth = auth
+        self._auth.set_context(self, self._conn)
+        self._auth.authenticate()
 
     def _parse_attributes(self):
         super(Sushy, self)._parse_attributes()
@@ -100,4 +124,23 @@ class Sushy(base.ResourceBase):
         :returns: The Manager object
         """
         return manager.Manager(self._conn, identity,
+                               redfish_version=self.redfish_version)
+
+    def get_session_service(self):
+        """Get the SessionService object
+
+        :raises: MissingAttributeError, if the collection attribue is not found
+        :returns: as SessionCollection object
+        """
+        return sessionservice.SessionService(
+            self._conn, self._session_service_path,
+            redfish_version=self.redfish_version)
+
+    def get_session(self, identity):
+        """Given the identity return a Session object
+
+        :param identity: The identity of the session resource
+        :returns: The Session object
+        """
+        return session.Session(self._conn, identity,
                                redfish_version=self.redfish_version)

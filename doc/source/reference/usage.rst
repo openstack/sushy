@@ -5,6 +5,53 @@ Using Sushy
 
 To use sushy in a project:
 
+-----------------------------------------
+Specifying an authentication type
+-----------------------------------------
+
+There are three authentication objects. By default we use SessionOrBasicAuth.
+Authentication Modes:
+auth.SessionOrBasicAuth: Use session based authentication. If we are unable
+to create a session we will fallback to basic authentication.
+auth.BasicAuth: Use basic authentication only.
+auth.SessionAuth: Use session based authentication only.
+
+.. code-block:: python
+
+  import logging
+
+  import sushy
+  from sushy import auth
+
+  # Enable logging at DEBUG level
+  LOG = logging.getLogger('sushy')
+  LOG.setLevel(logging.DEBUG)
+  LOG.addHandler(logging.StreamHandler())
+
+  basic_auth = auth.BasicAuth(username='foo', password='bar')
+  session_auth = auth.SessionAuth(username='foo', password='bar')
+  session_or_basic_auth = auth.SessionOrBasicAuth(username='foo',
+                                                  password='bar')
+
+  s = sushy.Sushy('http://localhost:8000/redfish/v1',
+                  auth=basic_auth)
+
+  s = sushy.Sushy('http://localhost:8000/redfish/v1',
+                  auth=session_auth)
+
+  s = sushy.Sushy('http://localhost:8000/redfish/v1',
+                  auth=session_or_basic_auth)
+
+  # It is important to note that you can
+  # call sushy without supplying an
+  # authentication object. In that case we
+  # will use the SessionOrBasicAuth authentication
+  # object in an attempt to connect to all different
+  # types of redfish servers.
+  s = sushy.Sushy('http://localhost:8000/redfish/v1',
+                  username='foo',
+                  password='bar')
+
 ----------------------------------------
 Creating and using a sushy system object
 ----------------------------------------
@@ -149,6 +196,51 @@ Creating and using a sushy manager object
 
   # Refresh the manager object
   mgr_inst.refresh()
+
+-------------------------------------------------
+Creating and using a sushy session service object
+-------------------------------------------------
+
+.. code-block:: python
+
+  import logging
+
+  import sushy
+
+  # Enable logging at DEBUG level
+  LOG = logging.getLogger('sushy')
+  LOG.setLevel(logging.DEBUG)
+  LOG.addHandler(logging.StreamHandler())
+
+  s = sushy.Sushy('http://localhost:8000/redfish/v1',
+                  username='foo', password='bar')
+
+  # Instantiate a SessionService object
+  sess_serv = s.get_session_service()
+
+  # Get SessionCollection
+  sess_col = sess_serv.sessions
+
+  # Print the ID of the sessions available in the collection
+  print(sess_col.members_identities)
+
+  # Get a list of systems objects available in the collection
+  sess_col_insts = sess_col.get_members()
+
+  # Instantiate a session object, same as getting it directly
+  sess_inst = sess_col.get_member(sess_col.members_identities[0])
+  # Getting it directly
+  sess_inst = s.get_session(sess_col.members_identities[0])
+
+  # Delete the session
+  sess_inst.delete()
+
+  # Create a new session
+  session_key, session_id = sess_serv.create_session(
+    username='foo', password='bar')
+
+  # Delete a session
+  sess_serv.close_session(sess_col.members_identities[0])
 
 
 If you do not have any real baremetal machine that supports the Redfish
