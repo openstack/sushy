@@ -94,6 +94,14 @@ Creating and using a sushy system object
   sys_inst = sys_col.get_member(sys_col.members_identities[0])
 
   # Refresh the system collection object
+  #
+  # In order to reload a resource post its initialization it has to be marked
+  # as stale (i.e. invoking 'invalidate()') first and then 'refresh()' has to
+  # be called. This will only reload the resource w/o reloading/refreshing its
+  # sub-resources (lazy-refresh of sub-resources).
+  # Note that calling 'refresh()' only, i.e. w/o calling 'invalidate()' first,
+  # will be a no-op wrt resource reload in this case.
+  sys_col.invalidate()
   sys_col.refresh()
 
 
@@ -106,8 +114,15 @@ Creating and using a sushy system object
   # Get a list of allowed reset values
   print(sys_inst.get_allowed_reset_system_values())
 
-  # Refresh the system object
-  sys_inst.refresh()
+  # Refresh the system object (with all its sub-resources)
+  #
+  # Alternatively, this is the other way of reloading a resource object:
+  # The resource can be reloaded w/o the need of marking it stale
+  # (i.e. not invoking 'invalidate()'). It is achieved when the "force"
+  # argument of 'refresh()' method is set to True. Do note that the
+  # sub-resources of the resource being reloaded will also get reloaded
+  # (greedy-refresh of sub-resources) when this mode is adopted.
+  sys_inst.refresh(force=True)
 
   # Get the current power state
   print(sys_inst.power_state)
@@ -173,6 +188,7 @@ Creating and using a sushy manager object
   mgr_inst = mgr_col.get_member(mgr_col.members_identities[0])
 
   # Refresh the manager collection object
+  mgr_col.invalidate()
   mgr_col.refresh()
 
 
@@ -194,8 +210,8 @@ Creating and using a sushy manager object
   # Reset the manager
   mgr_inst.reset_manager(sushy.RESET_MANAGER_FORCE_RESTART)
 
-  # Refresh the manager object
-  mgr_inst.refresh()
+  # Refresh the manager object (with all its sub-resources)
+  mgr_inst.refresh(force=True)
 
 -------------------------------------------------
 Creating and using a sushy session service object
