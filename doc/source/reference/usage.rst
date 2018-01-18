@@ -95,13 +95,7 @@ Creating and using a sushy system object
 
   # Refresh the system collection object
   #
-  # In order to reload a resource post its initialization it has to be marked
-  # as stale (i.e. invoking 'invalidate()') first and then 'refresh()' has to
-  # be called. This will only reload the resource w/o reloading/refreshing its
-  # sub-resources (lazy-refresh of sub-resources).
-  # Note that calling 'refresh()' only, i.e. w/o calling 'invalidate()' first,
-  # will be a no-op wrt resource reload in this case.
-  sys_col.invalidate()
+  # See below for more options on how to refresh resources.
   sys_col.refresh()
 
 
@@ -115,14 +109,16 @@ Creating and using a sushy system object
   print(sys_inst.get_allowed_reset_system_values())
 
   # Refresh the system object (with all its sub-resources)
-  #
-  # Alternatively, this is the other way of reloading a resource object:
-  # The resource can be reloaded w/o the need of marking it stale
-  # (i.e. not invoking 'invalidate()'). It is achieved when the "force"
-  # argument of 'refresh()' method is set to True. Do note that the
-  # sub-resources of the resource being reloaded will also get reloaded
-  # (greedy-refresh of sub-resources) when this mode is adopted.
-  sys_inst.refresh(force=True)
+  sys_inst.refresh()
+
+  # Alternatively, you can only refresh the resource if it is stale by passing
+  # force=False:
+  sys_inst.refresh(force=False)
+
+  # A resource can be marked stale by calling invalidate. Note that its
+  # subresources won't be marked as stale, and thus they won't be refreshed by
+  # a call to refresh(force=False)
+  sys_inst.invalidate()
 
   # Get the current power state
   print(sys_inst.power_state)

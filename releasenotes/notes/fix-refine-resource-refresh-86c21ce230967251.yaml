@@ -1,6 +1,6 @@
 ---
-fixes:
+features:
   - |
-    The library now supports reloading of the attributes by invoking
-    ``refresh()`` method for nested resources in contrast to recreation.
-    Resources can now be marked stale by invoking ``invalidate()``.
+    New ``force`` argument to the ``refresh`` method on resources can be set to
+    ``False`` to prevent refreshing of resources that are not stale. Resources
+    can be marked as stale by calling a new ``invalidate`` method.

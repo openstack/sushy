@@ -244,7 +244,7 @@ class ResourceBase(object):
             # Hide the Field object behind the real value
             setattr(self, attr, field._load(self.json, self))
 
-    def refresh(self, force=False):
+    def refresh(self, force=True):
         """Refresh the resource
 
         Freshly retrieves/fetches the resource attributes and invokes
@@ -254,8 +254,9 @@ class ResourceBase(object):
         in ``_do_refresh()`` method, if needed. This method represents the
         template method in the paradigm of Template design pattern.
 
-        :param force: will force refresh the resource and its sub-resources,
-            if set to True.
+        :param force: if set to False, will only refresh if the resource is
+            marked as stale, otherwise neither it nor its subresources will
+            be refreshed.
         :raises: ResourceNotFoundError
         :raises: ConnectionError
         :raises: HTTPError
