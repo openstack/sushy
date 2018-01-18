@@ -26,11 +26,17 @@ LOG = logging.getLogger(__name__)
 
 class Connector(object):
 
-    def __init__(self, url, verify=True):
+    def __init__(self, url, username=None, password=None, verify=True):
         self._url = url
         self._verify = verify
         self._session = requests.Session()
         self._session.verify = self._verify
+        if username or password:
+            LOG.warning('Passing username and password to Connector is '
+                        'deprecated. Authentication is passed through '
+                        'set_auth now, support for these arguments will '
+                        'be removed in the future')
+            self.set_http_basic_auth(username, password)
 
     def set_auth(self, auth):
         """Sets the authentication mechanism for our connector."""

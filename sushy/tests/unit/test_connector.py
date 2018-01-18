@@ -37,6 +37,12 @@ class ConnectorMethodsTestCase(base.TestCase):
         self.data = {'fake': 'data'}
         self.headers = {'X-Fake': 'header'}
 
+    def test_init_with_credentials(self):
+        conn = connector.Connector('http://foo.bar:1234',
+                                   username='admin',
+                                   password='password')
+        self.assertEqual(conn._session.auth, ('admin', 'password'))
+
     @mock.patch.object(connector.Connector, '_op', autospec=True)
     def test_get(self, mock__op):
         self.conn.get(path='fake/path', data=self.data.copy(),
