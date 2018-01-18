@@ -15,7 +15,7 @@
 import logging
 
 from sushy import auth as sushy_auth
-from sushy import connector
+from sushy import connector as sushy_connector
 from sushy.resources import base
 from sushy.resources.manager import manager
 from sushy.resources.sessionservice import session
@@ -48,7 +48,7 @@ class Sushy(base.ResourceBase):
 
     def __init__(self, base_url, username=None, password=None,
                  root_prefix='/redfish/v1/', verify=True,
-                 auth=None):
+                 auth=None, connector=None):
         """A class representing a RootService
 
         :param base_url: The base URL to the Redfish controller. It
@@ -66,6 +66,7 @@ class Sushy(base.ResourceBase):
             a path the driver will use the specified certificate or one of
             the certificates in the directory. Defaults to True.
         :param auth: An authentication mechanism to utilize.
+        :param connector: A user-defined connector object. Defaults to None.
         """
         self._root_prefix = root_prefix
         if (auth is not None and (password is not None or
@@ -78,7 +79,7 @@ class Sushy(base.ResourceBase):
                                                  password=password)
 
         super(Sushy, self).__init__(
-            connector.Connector(base_url, verify),
+            connector or sushy_connector.Connector(base_url, verify),
             path=self._root_prefix)
         self._auth = auth
         self._auth.set_context(self, self._conn)
