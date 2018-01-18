@@ -40,19 +40,19 @@ class ResourceBaseTestCase(base.TestCase):
         # refresh() is called in the constructor
         self.conn.reset_mock()
 
-    def test_refresh(self):
-        self.base_resource.refresh()
+    def test_refresh_no_force(self):
+        self.base_resource.refresh(force=False)
         self.conn.get.assert_not_called()
 
     def test_refresh_force(self):
-        self.base_resource.refresh(force=True)
+        self.base_resource.refresh()
         self.conn.get.assert_called_once_with(path='/Foo')
 
     def test_invalidate(self):
         self.base_resource.invalidate()
         self.conn.get.assert_not_called()
 
-        self.base_resource.refresh()
+        self.base_resource.refresh(force=False)
         self.conn.get.assert_called_once_with(path='/Foo')
 
     def test_invalidate_force_refresh(self):

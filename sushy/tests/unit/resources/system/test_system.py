@@ -293,7 +293,7 @@ class SystemTestCase(base.TestCase):
             self.conn.get.return_value.json.return_value = json.loads(f.read())
 
         self.sys_inst.invalidate()
-        self.sys_inst.refresh()
+        self.sys_inst.refresh(force=False)
 
         # | WHEN & THEN |
         self.assertIsNotNone(self.sys_inst._processors)
