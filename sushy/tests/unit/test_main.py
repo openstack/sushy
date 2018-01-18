@@ -64,6 +64,18 @@ class MainTestCase(base.TestCase):
             ValueError, main.Sushy, 'http://foo.bar:1234',
             'foo', 'bar', auth=mock.MagicMock())
 
+    @mock.patch.object(connector, 'Connector', autospec=True)
+    def test_custom_connector(self, mock_Sushy_Connector):
+        connector_mock = mock.MagicMock()
+        with open('sushy/tests/unit/json_samples/root.json', 'r') as f:
+            connector_mock.get.return_value.json.return_value = (
+                json.loads(f.read()))
+        main.Sushy('http://foo.bar:1234', 'foo', 'bar',
+                   connector=connector_mock)
+        self.assertTrue(connector_mock.post.called)
+        self.assertTrue(connector_mock.get.called)
+        self.assertFalse(mock_Sushy_Connector.called)
+
     @mock.patch.object(system, 'SystemCollection', autospec=True)
     def test_get_system_collection(self, mock_system_collection):
         self.root.get_system_collection()
