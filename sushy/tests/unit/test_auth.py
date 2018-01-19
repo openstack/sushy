@@ -138,6 +138,14 @@ class SessionAuthTestCase(base.TestCase):
         self.conn.set_http_session_auth.assert_called_once_with(self.sess_key)
 
     def test_can_refresh_session(self):
+        mock_sess_serv = mock.Mock()
+        mock_sess_serv.create_session.return_value = (self.sess_key,
+                                                      self.sess_uri)
+        self.root.get_session_service.return_value = mock_sess_serv
+
+        self.sess_auth.set_context(self.root, self.conn)
+        self.sess_auth.authenticate()
+
         self.assertTrue(self.sess_auth.can_refresh_session())
 
     def test_refresh(self):
