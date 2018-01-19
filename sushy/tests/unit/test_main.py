@@ -44,7 +44,7 @@ class MainTestCase(base.TestCase):
         self.root = main.Sushy('http://foo.bar:1234',
                                verify=True, auth=mock_auth)
         mock_connector.assert_called_once_with(
-            'http://foo.bar:1234', True)
+            'http://foo.bar:1234', verify=True)
 
     def test__parse_attributes(self):
         self.root._parse_attributes()

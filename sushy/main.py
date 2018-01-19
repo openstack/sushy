@@ -74,12 +74,12 @@ class Sushy(base.ResourceBase):
             msg = ('Username or Password were provided to Sushy '
                    'when an authentication mechanism was specified.')
             raise ValueError(msg)
-        else:
+        if auth is None:
             auth = sushy_auth.SessionOrBasicAuth(username=username,
                                                  password=password)
 
         super(Sushy, self).__init__(
-            connector or sushy_connector.Connector(base_url, verify),
+            connector or sushy_connector.Connector(base_url, verify=verify),
             path=self._root_prefix)
         self._auth = auth
         self._auth.set_context(self, self._conn)
