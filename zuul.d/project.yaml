@@ -1,5 +1,4 @@
 - project:
-    name: openstack/sushy
     check:
       jobs:
         - sushy-tempest-dsvm-ironic-ipa-partition-redfish-src
