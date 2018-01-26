@@ -156,7 +156,8 @@ class SessionAuth(AuthBase):
 
     def can_refresh_session(self):
         """Method to assert if session based refresh can be done."""
-        return True
+        return (self._session_key is not None and
+                self._session_resource_id is not None)
 
     def refresh_session(self):
         """Method to refresh a session to a Redfish controller.
@@ -222,11 +223,6 @@ class SessionOrBasicAuth(SessionAuth):
             self.reset_session_attrs()
             self.basic_auth.set_context(self._root_resource, self._connector)
             self.basic_auth.authenticate()
-
-    def can_refresh_session(self):
-        """Method to assert if session based refresh can be done."""
-        return (self._session_key is not None and
-                self._session_resource_id is not None)
 
     def refresh_session(self):
         """Method to refresh a session to a Redfish controller.
