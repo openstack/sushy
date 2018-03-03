@@ -213,10 +213,14 @@ class SystemTestCase(base.TestCase):
                           'invalid-target')
 
     def test_set_system_boot_source_invalid_enabled(self):
-        self.assertRaises(exceptions.InvalidParameterValueError,
-                          self.sys_inst.set_system_boot_source,
-                          sushy.BOOT_SOURCE_TARGET_HDD,
-                          enabled='invalid-enabled')
+        with self.assertRaisesRegex(
+            exceptions.InvalidParameterValueError,
+            '"enabled" value.*{0}'.format(
+                list(sys_map.BOOT_SOURCE_ENABLED_MAP_REV))):
+
+            self.sys_inst.set_system_boot_source(
+                sushy.BOOT_SOURCE_TARGET_HDD,
+                enabled='invalid-enabled')
 
     def test__get_processor_collection_path_missing_processors_attr(self):
         self.sys_inst._json.pop('Processors')
