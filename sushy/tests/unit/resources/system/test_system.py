@@ -56,6 +56,9 @@ class SystemTestCase(base.TestCase):
         self.assertEqual('Physical', self.sys_inst.system_type)
         self.assertEqual('38947555-7742-3448-3784-823347823834',
                          self.sys_inst.uuid)
+        self.assertEqual('Enabled', self.sys_inst.status.state)
+        self.assertEqual('OK', self.sys_inst.status.health)
+        self.assertEqual('OK', self.sys_inst.status.health_rollup)
         self.assertEqual(sushy.SYSTEM_POWER_STATE_ON,
                          self.sys_inst.power_state)
         self.assertEqual(96, self.sys_inst.memory_summary.size_gib)
