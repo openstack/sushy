@@ -14,6 +14,7 @@
 #    under the License.
 
 from sushy import connector
+from sushy import exceptions
 from sushy.resources import base
 from sushy.resources.manager import manager
 from sushy.resources.system import system
@@ -30,10 +31,10 @@ class Sushy(base.ResourceBase):
     uuid = base.Field('UUID')
     """The Redfish root service UUID"""
 
-    _systems_path = base.Field(['Systems', '@odata.id'], required=True)
+    _systems_path = base.Field(['Systems', '@odata.id'])
     """SystemCollection path"""
 
-    _managers_path = base.Field(['Managers', '@odata.id'], required=True)
+    _managers_path = base.Field(['Managers', '@odata.id'])
     """ManagerCollection path"""
 
     def __init__(self, base_url, username=None, password=None,
@@ -71,6 +72,10 @@ class Sushy(base.ResourceBase):
             not found
         :returns: a SystemCollection object
         """
+        if not self._systems_path:
+            raise exceptions.MissingAttributeError(
+                attribute='Systems/@odata.id', resource=self._path)
+
         return system.SystemCollection(self._conn, self._systems_path,
                                        redfish_version=self.redfish_version)
 
@@ -90,6 +95,10 @@ class Sushy(base.ResourceBase):
             not found
         :returns: a ManagerCollection object
         """
+        if not self._managers_path:
+            raise exceptions.MissingAttributeError(
+                attribute='Managers/@odata.id', resource=self._path)
+
         return manager.ManagerCollection(self._conn, self._managers_path,
                                          redfish_version=self.redfish_version)
 

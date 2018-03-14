@@ -18,6 +18,7 @@ import json
 import mock
 
 from sushy import connector
+from sushy import exceptions
 from sushy import main
 from sushy.resources.manager import manager
 from sushy.resources.system import system
@@ -76,3 +77,26 @@ class MainTestCase(base.TestCase):
         Manager_mock.assert_called_once_with(
             self.root._conn, 'fake-manager-id',
             redfish_version=self.root.redfish_version)
+
+
+class BareMinimumMainTestCase(base.TestCase):
+
+    @mock.patch.object(connector, 'Connector', autospec=True)
+    def setUp(self, mock_connector):
+        super(BareMinimumMainTestCase, self).setUp()
+        self.conn = mock.Mock()
+        mock_connector.return_value = self.conn
+        with open('sushy/tests/unit/json_samples/'
+                  'bare_minimum_root.json', 'r') as f:
+            self.conn.get.return_value.json.return_value = json.loads(f.read())
+        self.root = main.Sushy('http://foo.bar:1234', verify=True)
+
+    def test_get_system_collection_when_systems_attr_absent(self):
+        self.assertRaisesRegex(
+            exceptions.MissingAttributeError,
+            'Systems/@odata.id', self.root.get_system_collection)
+
+    def test_get_manager_collection_when_managers_attr_absent(self):
+        self.assertRaisesRegex(
+            exceptions.MissingAttributeError,
+            'Managers/@odata.id', self.root.get_manager_collection)
