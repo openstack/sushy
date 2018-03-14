@@ -1,0 +1,5 @@
+---
+critical:
+  - |
+    Fixes authentication failure when SessionService attribute is
+    not present in the root resource.

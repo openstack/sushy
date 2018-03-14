@@ -19,6 +19,7 @@ import mock
 
 from sushy import auth
 from sushy import connector
+from sushy import exceptions
 from sushy import main
 from sushy.resources.manager import manager
 from sushy.resources.sessionservice import session
@@ -117,3 +118,30 @@ class MainTestCase(base.TestCase):
         mock_sess.assert_called_once_with(
             self.root._conn, 'asdf',
             redfish_version=self.root.redfish_version)
+
+
+class BareMinimumMainTestCase(base.TestCase):
+
+    def setUp(self):
+        super(BareMinimumMainTestCase, self).setUp()
+        self.conn = mock.MagicMock()
+        with open('sushy/tests/unit/json_samples/'
+                  'bare_minimum_root.json', 'r') as f:
+            self.conn.get.return_value.json.return_value = json.loads(f.read())
+        self.root = main.Sushy('http://foo.bar:1234', verify=True,
+                               auth=mock.MagicMock(), connector=self.conn)
+
+    def test_get_system_collection_when_systems_attr_absent(self):
+        self.assertRaisesRegex(
+            exceptions.MissingAttributeError,
+            'Systems/@odata.id', self.root.get_system_collection)
+
+    def test_get_manager_collection_when_managers_attr_absent(self):
+        self.assertRaisesRegex(
+            exceptions.MissingAttributeError,
+            'Managers/@odata.id', self.root.get_manager_collection)
+
+    def test_get_session_service_when_sessionservice_attr_absent(self):
+        self.assertRaisesRegex(
+            exceptions.MissingAttributeError,
+            'SessionService/@odata.id', self.root.get_session_service)
