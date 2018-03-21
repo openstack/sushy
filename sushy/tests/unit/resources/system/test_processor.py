@@ -46,9 +46,26 @@ class ProcessorTestCase(base.TestCase):
                          self.sys_processor.manufacturer)
         self.assertEqual('Multi-Core Intel(R) Xeon(R) processor 7xxx Series',
                          self.sys_processor.model)
+        self.assertEqual('0x42',
+                         self.sys_processor.processor_id.effective_family)
+        self.assertEqual('0x61',
+                         self.sys_processor.processor_id.effective_model)
+        self.assertEqual('0x34AC34DC8901274A',
+                         self.sys_processor.processor_id.
+                         identification_registers)
+        self.assertEqual('0x429943',
+                         self.sys_processor.processor_id.microcode_info)
+        self.assertEqual('0x1',
+                         self.sys_processor.processor_id.step)
+        self.assertEqual('GenuineIntel',
+                         self.sys_processor.processor_id.vendor_id)
+
         self.assertEqual(3700, self.sys_processor.max_speed_mhz)
         self.assertEqual(8, self.sys_processor.total_cores)
         self.assertEqual(16, self.sys_processor.total_threads)
+        self.assertEqual('Enabled', self.sys_processor.status.state)
+        self.assertEqual('OK', self.sys_processor.status.health)
+        self.assertEqual('OK', self.sys_processor.status.health_rollup)
 
 
 class ProcessorCollectionTestCase(base.TestCase):
