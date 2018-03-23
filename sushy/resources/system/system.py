@@ -62,6 +62,12 @@ class MemorySummaryField(base.CompositeField):
     """
 
 
+class StatusField(base.CompositeField):
+    state = base.Field('State')
+    health = base.Field('Health')
+    health_rollup = base.Field('HealthRollup')
+
+
 class System(base.ResourceBase):
 
     asset_tag = base.Field('AssetTag')
@@ -104,6 +110,9 @@ class System(base.ResourceBase):
 
     sku = base.Field('SKU')
     """The system stock-keeping unit"""
+
+    status = StatusField('Status')
+    """The system status"""
 
     # TODO(lucasagomes): Create mappings for the system_type
     system_type = base.Field('SystemType')
