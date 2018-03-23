@@ -16,6 +16,7 @@ import logging
 
 from sushy import auth as sushy_auth
 from sushy import connector as sushy_connector
+from sushy import exceptions
 from sushy.resources import base
 from sushy.resources.manager import manager
 from sushy.resources.sessionservice import session
@@ -36,14 +37,13 @@ class Sushy(base.ResourceBase):
     uuid = base.Field('UUID')
     """The Redfish root service UUID"""
 
-    _systems_path = base.Field(['Systems', '@odata.id'], required=True)
+    _systems_path = base.Field(['Systems', '@odata.id'])
     """SystemCollection path"""
 
-    _managers_path = base.Field(['Managers', '@odata.id'], required=True)
+    _managers_path = base.Field(['Managers', '@odata.id'])
     """ManagerCollection path"""
 
-    _session_service_path = base.Field(['SessionService', '@odata.id'],
-                                       required=True)
+    _session_service_path = base.Field(['SessionService', '@odata.id'])
     """SessionService path"""
 
     def __init__(self, base_url, username=None, password=None,
@@ -96,6 +96,10 @@ class Sushy(base.ResourceBase):
             not found
         :returns: a SystemCollection object
         """
+        if not self._systems_path:
+            raise exceptions.MissingAttributeError(
+                attribute='Systems/@odata.id', resource=self._path)
+
         return system.SystemCollection(self._conn, self._systems_path,
                                        redfish_version=self.redfish_version)
 
@@ -115,6 +119,10 @@ class Sushy(base.ResourceBase):
             not found
         :returns: a ManagerCollection object
         """
+        if not self._managers_path:
+            raise exceptions.MissingAttributeError(
+                attribute='Managers/@odata.id', resource=self._path)
+
         return manager.ManagerCollection(self._conn, self._managers_path,
                                          redfish_version=self.redfish_version)
 
@@ -130,9 +138,14 @@ class Sushy(base.ResourceBase):
     def get_session_service(self):
         """Get the SessionService object
 
-        :raises: MissingAttributeError, if the collection attribue is not found
+        :raises: MissingAttributeError, if the collection attribute is
+            not found
         :returns: as SessionCollection object
         """
+        if not self._session_service_path:
+            raise exceptions.MissingAttributeError(
+                attribute='SessionService/@odata.id', resource=self._path)
+
         return sessionservice.SessionService(
             self._conn, self._session_service_path,
             redfish_version=self.redfish_version)
