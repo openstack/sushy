@@ -214,7 +214,7 @@ class System(base.ResourceBase):
         if enabled not in sys_maps.BOOT_SOURCE_ENABLED_MAP_REV:
             raise exceptions.InvalidParameterValueError(
                 parameter='enabled', value=enabled,
-                valid_values=list(sys_maps.BOOT_SOURCE_TARGET_MAP_REV))
+                valid_values=list(sys_maps.BOOT_SOURCE_ENABLED_MAP_REV))
 
         data = {
             'Boot': {
