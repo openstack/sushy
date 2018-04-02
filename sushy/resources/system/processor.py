@@ -24,6 +24,39 @@ ProcessorSummary = collections.namedtuple('ProcessorSummary',
 LOG = logging.getLogger(__name__)
 
 
+class ProcessorIdField(base.CompositeField):
+
+    effective_family = base.Field('EffectiveFamily')
+    """The processor effective family"""
+
+    effective_model = base.Field('EffectiveModel')
+    """The processor effective model"""
+
+    identification_registers = base.Field('IdentificationRegisters')
+    """The processor identification registers"""
+
+    microcode_info = base.Field('MicrocodeInfo')
+    """The processor microcode info"""
+
+    step = base.Field('Step')
+    """The processor stepping"""
+
+    vendor_id = base.Field('VendorID')
+    """The processor vendor id"""
+
+
+class StatusField(base.CompositeField):
+
+    health = base.Field('Health')
+    """The processor health"""
+
+    health_rollup = base.Field('HealthRollup')
+    """The processor health rollup"""
+
+    state = base.Field('State')
+    """The processor state"""
+
+
 class Processor(base.ResourceBase):
 
     identity = base.Field('Id', required=True)
@@ -52,6 +85,12 @@ class Processor(base.ResourceBase):
 
     max_speed_mhz = base.Field('MaxSpeedMHz', adapter=int)
     """The maximum clock speed of the processor in MHz."""
+
+    processor_id = ProcessorIdField('ProcessorId')
+    """The processor id"""
+
+    status = StatusField('Status')
+    """The processor status"""
 
     total_cores = base.Field('TotalCores', adapter=int)
     """The total number of cores contained in this processor"""
