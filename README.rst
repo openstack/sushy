@@ -16,6 +16,6 @@ needed we can expand Sushy to fullfil those requirements.
 * Documentation: https://docs.openstack.org/sushy/latest/
 * Usage: https://docs.openstack.org/sushy/latest/reference/usage.html
 * Source: https://git.openstack.org/cgit/openstack/sushy
-* Bugs: https://bugs.launchpad.net/sushy
+* Bugs: https://storyboard.openstack.org/#!/project/960
 
 .. _Redfish: http://www.dmtf.org/standards/redfish
