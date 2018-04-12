@@ -1,0 +1,21 @@
+{
+    "@odata.type": "#VolumeCollection.VolumeCollection",
+    "Name": "Storage Volume Collection",
+    "Description": "Storage Volume Collection",
+    "Members@odata.count": 3,
+    "Members": [
+        {
+            "@odata.id": "/redfish/v1/Systems/437XR1138R2/Storage/1/Volumes/1"
+        },
+        {
+            "@odata.id": "/redfish/v1/Systems/437XR1138R2/Storage/1/Volumes/2"
+        },
+        {
+            "@odata.id": "/redfish/v1/Systems/437XR1138R2/Storage/1/Volumes/3"
+        }
+    ],
+    "Oem": {},
+    "@odata.context": "/redfish/v1/$metadata#VolumeCollection.VolumeCollection",
+    "@odata.id": "/redfish/v1/Systems/437XR1138R2/Storage/1/Volumes",
+    "@Redfish.Copyright": "Copyright 2014-2017 Distributed Management Task Force, Inc. (DMTF). For the full DMTF copyright policy, see http://www.dmtf.org/about/policies/copyright."
+}

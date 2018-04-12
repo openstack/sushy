@@ -1,0 +1,44 @@
+{
+    "@odata.type": "#Volume.v1_0_3.Volume",
+    "Id": "1",
+    "Name": "Virtual Disk 1",
+    "Status": {
+        "@odata.type": "#Resource.Status",
+        "State": "Enabled",
+        "Health": "OK"
+    },
+    "Encrypted": false,
+    "VolumeType": "Mirrored",
+    "CapacityBytes": 899527000000,
+    "Identifiers": [
+        {
+            "@odata.type": "#Resource.v1_1_0.Identifier",
+            "DurableNameFormat": "UUID",
+            "DurableName": "38f1818b-111e-463a-aa19-fa54f792e468"
+        }
+    ],
+    "Links": {
+        "@odata.type": "#Volume.v1_0_0.Links",
+        "Drives": [
+            {
+                "@odata.id": "/redfish/v1/Systems/437XR1138R2/Storage/1/Drives/3F5A8C54207B7233"
+            },
+            {
+                "@odata.id": "/redfish/v1/Systems/437XR1138R2/Storage/1/Drives/35D38F11ACEF7BD3"
+            }
+        ]
+    },
+    "Actions": {
+        "@odata.type": "#Volume.v1_0_0.Actions",
+        "#Volume.Initialize": {
+            "target": "/redfish/v1/Systems/3/Storage/RAIDIntegrated/Volumes/1/Actions/Volume.Initialize",
+            "InitializeType@Redfish.AllowableValues": [
+                "Fast",
+                "Slow"
+            ]
+        }
+    },
+    "@odata.context": "/redfish/v1/$metadata#Volume.Volume",
+    "@odata.id": "/redfish/v1/Systems/437XR1138R2/Storage/1/Volumes/1",
+    "@Redfish.Copyright": "Copyright 2014-2017 Distributed Management Task Force, Inc. (DMTF). For the full DMTF copyright policy, see http://www.dmtf.org/about/policies/copyright."
+}

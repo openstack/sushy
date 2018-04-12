@@ -1,0 +1,41 @@
+{
+    "@odata.type": "#Volume.v1_0_3.Volume",
+    "Id": "2",
+    "Name": "Virtual Disk 2",
+    "Status": {
+        "@odata.type": "#Resource.Status",
+        "State": "Enabled",
+        "Health": "OK"
+    },
+    "Encrypted": false,
+    "VolumeType": "NonRedundant",
+    "CapacityBytes": 107374182400,
+    "Identifiers": [
+        {
+            "@odata.type": "#Resource.v1_1_0.Identifier",
+            "DurableNameFormat": "UUID",
+            "DurableName": "0324c96c-8031-4f5e-886c-50cd90aca854"
+        }
+    ],
+    "Links": {
+        "@odata.type": "#Volume.v1_0_0.Links",
+        "Drives": [
+            {
+                "@odata.id": "/redfish/v1/Systems/437XR1138R2/Storage/1/Drives/3D58ECBC375FD9F2"
+            }
+        ]
+    },
+    "Actions": {
+        "@odata.type": "#Volume.v1_0_0.Actions",
+        "#Volume.Initialize": {
+            "target": "/redfish/v1/Systems/3/Storage/RAIDIntegrated/Volumes/1/Actions/Volume.Initialize",
+            "InitializeType@Redfish.AllowableValues": [
+                "Fast",
+                "Slow"
+            ]
+        }
+    },
+    "@odata.context": "/redfish/v1/$metadata#Volume.Volume",
+    "@odata.id": "/redfish/v1/Systems/437XR1138R2/Storage/1/Volumes/2",
+    "@Redfish.Copyright": "Copyright 2014-2017 Distributed Management Task Force, Inc. (DMTF). For the full DMTF copyright policy, see http://www.dmtf.org/about/policies/copyright."
+}

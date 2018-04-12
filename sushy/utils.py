@@ -89,3 +89,20 @@ def get_sub_resource_path_by(resource, subresource_name):
             resource=resource.path)
 
     return body['@odata.id']
+
+
+def max_safe(iterable, default=0):
+    """Helper wrapper over builtin max() function.
+
+    This function is just a wrapper over builtin max() w/o ``key`` argument.
+    The ``default`` argument specifies an object to return if the provided
+    ``iterable`` is empty. Also it filters out the None type values.
+    :param iterable: an iterable
+    :param default: 0 by default
+    """
+
+    try:
+        return max([x for x in iterable if x is not None])
+    except ValueError:
+        # TypeError is not caught here as that should be thrown.
+        return default

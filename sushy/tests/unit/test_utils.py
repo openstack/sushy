@@ -90,3 +90,9 @@ class UtilsTestCase(base.TestCase):
             '"subresource_name" cannot be empty',
             utils.get_sub_resource_path_by,
             self.sys_inst, '')
+
+    def test_max_safe(self):
+        self.assertEqual(10, utils.max_safe([1, 3, 2, 8, 5, 10, 6]))
+        self.assertEqual(821, utils.max_safe([15, 300, 270, None, 821, None]))
+        self.assertEqual(0, utils.max_safe([]))
+        self.assertIsNone(utils.max_safe([], default=None))
