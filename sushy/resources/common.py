@@ -11,6 +11,7 @@
 # under the License.
 
 from sushy.resources import base
+from sushy.resources import mappings as res_maps
 
 
 class ActionField(base.CompositeField):
@@ -23,7 +24,22 @@ class ResetActionField(ActionField):
 
 
 class IdRefField(base.CompositeField):
-    """Reference to the resource for updating settings"""
+    """Reference to the resource odata identity field."""
 
     resource_uri = base.Field('@odata.id')
     """The unique identifier for a resource"""
+
+
+class StatusField(base.CompositeField):
+    """This Field describes the status of a resource and its children.
+
+    This field shall contain any state or health properties of a resource.
+    """
+    health = base.MappedField('Health', res_maps.HEALTH_VALUE_MAP)
+    """Represents health of resource w/o considering its dependent resources"""
+
+    health_rollup = base.MappedField('HealthRollup', res_maps.HEALTH_VALUE_MAP)
+    """Represents health state of resource and its dependent resources"""
+
+    state = base.MappedField('State', res_maps.STATE_VALUE_MAP)
+    """Indicates the known state of the resource, such as if it is enabled."""

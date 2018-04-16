@@ -16,6 +16,7 @@ import collections
 import logging
 
 from sushy.resources import base
+from sushy.resources import common
 from sushy.resources.system import mappings as sys_maps
 
 # Representation of Summary of Processor information
@@ -43,18 +44,6 @@ class ProcessorIdField(base.CompositeField):
 
     vendor_id = base.Field('VendorID')
     """The processor vendor id"""
-
-
-class StatusField(base.CompositeField):
-
-    health = base.Field('Health')
-    """The processor health"""
-
-    health_rollup = base.Field('HealthRollup')
-    """The processor health rollup"""
-
-    state = base.Field('State')
-    """The processor state"""
 
 
 class Processor(base.ResourceBase):
@@ -89,7 +78,7 @@ class Processor(base.ResourceBase):
     processor_id = ProcessorIdField('ProcessorId')
     """The processor id"""
 
-    status = StatusField('Status')
+    status = common.StatusField('Status')
     """The processor status"""
 
     total_cores = base.Field('TotalCores', adapter=int)

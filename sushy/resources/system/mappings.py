@@ -89,20 +89,3 @@ PROCESSOR_ARCH_VALUE_MAP = {
 
 PROCESSOR_ARCH_VALUE_MAP_REV = (
     utils.revert_dictionary(PROCESSOR_ARCH_VALUE_MAP))
-
-HEALTH_STATE_VALUE_MAP = {
-    'Enabled': sys_cons.HEALTH_STATE_ENABLED,
-    'Disabled': sys_cons.HEALTH_STATE_DISABLED,
-}
-
-HEALTH_STATE_VALUE_MAP_REV = (
-    utils.revert_dictionary(HEALTH_STATE_VALUE_MAP))
-
-HEALTH_VALUE_MAP = {
-    'OK': sys_cons.HEALTH_OK,
-    'Warning': sys_cons.HEALTH_WARNING,
-    'Critical': sys_cons.HEALTH_CRITICAL
-}
-
-HEALTH_VALUE_MAP_REV = (
-    utils.revert_dictionary(HEALTH_VALUE_MAP))

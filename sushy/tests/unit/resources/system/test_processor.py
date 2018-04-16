@@ -17,6 +17,7 @@ import json
 import mock
 
 import sushy
+from sushy.resources import constants as res_cons
 from sushy.resources.system import processor
 from sushy.tests.unit import base
 
@@ -63,9 +64,11 @@ class ProcessorTestCase(base.TestCase):
         self.assertEqual(3700, self.sys_processor.max_speed_mhz)
         self.assertEqual(8, self.sys_processor.total_cores)
         self.assertEqual(16, self.sys_processor.total_threads)
-        self.assertEqual('Enabled', self.sys_processor.status.state)
-        self.assertEqual('OK', self.sys_processor.status.health)
-        self.assertEqual('OK', self.sys_processor.status.health_rollup)
+        self.assertEqual(res_cons.STATE_ENABLED,
+                         self.sys_processor.status.state)
+        self.assertEqual(res_cons.HEALTH_OK, self.sys_processor.status.health)
+        self.assertEqual(res_cons.HEALTH_OK,
+                         self.sys_processor.status.health_rollup)
 
 
 class ProcessorCollectionTestCase(base.TestCase):

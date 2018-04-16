@@ -31,8 +31,7 @@ class StorageTestCase(base.TestCase):
     def setUp(self):
         super(StorageTestCase, self).setUp()
         self.conn = mock.Mock()
-        storage_file = 'sushy/tests/unit/json_samples/storage.json'
-        with open(storage_file, 'r') as f:
+        with open('sushy/tests/unit/json_samples/storage.json') as f:
             self.conn.get.return_value.json.return_value = json.load(f)
 
         self.storage = storage.Storage(

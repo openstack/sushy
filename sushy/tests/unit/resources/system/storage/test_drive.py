@@ -23,8 +23,7 @@ class DriveTestCase(base.TestCase):
     def setUp(self):
         super(DriveTestCase, self).setUp()
         self.conn = mock.Mock()
-        drive_file = 'sushy/tests/unit/json_samples/drive.json'
-        with open(drive_file, 'r') as f:
+        with open('sushy/tests/unit/json_samples/drive.json') as f:
             self.conn.get.return_value.json.return_value = json.load(f)
 
         self.stor_drive = drive.Drive(

@@ -1,0 +1,5 @@
+---
+features:
+  - |
+    Adds the "SimpleStorage" to the library. It also provides the max size
+    available (in bytes) among all its directly attached devices.

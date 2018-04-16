@@ -19,8 +19,8 @@ import mock
 
 import sushy
 from sushy import exceptions
+from sushy.resources import constants as res_cons
 from sushy.resources.system import bios
-from sushy.resources.system import constants as sys_cons
 from sushy.resources.system import ethernet_interface
 from sushy.resources.system import mappings as sys_map
 from sushy.resources.system import processor
@@ -58,9 +58,10 @@ class SystemTestCase(base.TestCase):
         self.assertEqual('Physical', self.sys_inst.system_type)
         self.assertEqual('38947555-7742-3448-3784-823347823834',
                          self.sys_inst.uuid)
-        self.assertEqual('Enabled', self.sys_inst.status.state)
-        self.assertEqual('OK', self.sys_inst.status.health)
-        self.assertEqual('OK', self.sys_inst.status.health_rollup)
+        self.assertEqual(res_cons.STATE_ENABLED, self.sys_inst.status.state)
+        self.assertEqual(res_cons.HEALTH_OK, self.sys_inst.status.health)
+        self.assertEqual(res_cons.HEALTH_OK,
+                         self.sys_inst.status.health_rollup)
         self.assertEqual(sushy.SYSTEM_POWER_STATE_ON,
                          self.sys_inst.power_state)
         self.assertEqual(96, self.sys_inst.memory_summary.size_gib)
@@ -374,9 +375,7 @@ class SystemTestCase(base.TestCase):
         self.assertIsNone(self.sys_inst._ethernet_interfaces)
         actual_macs = self.sys_inst.ethernet_interfaces.summary
         expected_macs = (
-            {'12:44:6A:3B:04:11':
-             sys_map.HEALTH_STATE_VALUE_MAP_REV.get(
-                 sys_cons.HEALTH_STATE_ENABLED)})
+            {'12:44:6A:3B:04:11': res_cons.STATE_ENABLED})
         self.assertEqual(expected_macs, actual_macs)
         self.assertIsInstance(self.sys_inst._ethernet_interfaces,
                               ethernet_interface.EthernetInterfaceCollection)

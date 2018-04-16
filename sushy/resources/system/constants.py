@@ -122,10 +122,3 @@ PROCESSOR_ARCH_IA_64 = 'Intel Itanium'
 PROCESSOR_ARCH_ARM = 'ARM'
 PROCESSOR_ARCH_MIPS = 'MIPS'
 PROCESSOR_ARCH_OEM = 'OEM-defined'
-
-# Health related constants.
-HEALTH_STATE_ENABLED = 'enabled'
-HEALTH_STATE_DISABLED = 'disabled'
-HEALTH_OK = 'ok'
-HEALTH_WARNING = 'warning'
-HEALTH_CRITICAL = 'critical'

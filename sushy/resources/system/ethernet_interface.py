@@ -16,16 +16,10 @@
 import logging
 
 from sushy.resources import base
-from sushy.resources.system import constants as sys_cons
-from sushy.resources.system import mappings as sys_map
+from sushy.resources import common
+from sushy.resources import constants as res_cons
 
 LOG = logging.getLogger(__name__)
-
-
-class HealthStatusField(base.CompositeField):
-    state = base.MappedField(
-        'State', sys_map.HEALTH_STATE_VALUE_MAP)
-    health = base.Field('Health')
 
 
 class EthernetInterface(base.ResourceBase):
@@ -49,7 +43,8 @@ class EthernetInterface(base.ResourceBase):
     speed_mbps = base.Field('SpeedMbps')
     """This is the current speed in Mbps of this interface."""
 
-    status = HealthStatusField("Status")
+    status = common.StatusField("Status")
+    """Describes the status and health of this interface."""
 
 
 class EthernetInterfaceCollection(base.ResourceCollectionBase):
@@ -69,19 +64,15 @@ class EthernetInterfaceCollection(base.ResourceCollectionBase):
         are returned.
 
         :returns: dictionary in the format
-            {'aa:bb:cc:dd:ee:ff': 'Enabled',
-            'aa:bb:aa:aa:aa:aa': 'Disabled'}
+            {'aa:bb:cc:dd:ee:ff': sushy.STATE_ENABLED,
+            'aa:bb:aa:aa:aa:aa': sushy.STATE_DISABLED}
         """
         if self._summary is None:
             mac_dict = {}
             for eth in self.get_members():
-                if (eth.mac_address is not None and eth.status is not None):
-                    if (eth.status.health ==
-                            sys_map.HEALTH_VALUE_MAP_REV.get(
-                                sys_cons.HEALTH_OK)):
-                        state = sys_map.HEALTH_STATE_VALUE_MAP_REV.get(
-                            eth.status.state)
-                        mac_dict[eth.mac_address] = state
+                if eth.mac_address is not None and eth.status is not None:
+                    if eth.status.health == res_cons.HEALTH_OK:
+                        mac_dict[eth.mac_address] = eth.status.state
             self._summary = mac_dict
         return self._summary
 
