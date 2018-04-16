@@ -1,0 +1,74 @@
+{
+    "@odata.type": "#Storage.v1_3_0.Storage",
+    "Id": "1",
+    "Name": "Local Storage Controller",
+    "Description": "Integrated RAID Controller",
+    "Status": {
+        "@odata.type": "#Resource.Status",
+        "State": "Enabled",
+        "Health": "OK",
+        "HealthRollup": "OK"
+    },
+    "StorageControllers": [
+        {
+            "@odata.id": "/redfish/v1/Systems/437XR1138R2/Storage/1#/StorageControllers/0",
+            "@odata.type": "#Storage.v1_3_0.StorageController",
+            "MemberId": "0",
+            "Name": "Contoso Integrated RAID",
+            "Status": {
+                "@odata.type": "#Resource.Status",
+                "State": "Enabled",
+                "Health": "OK"
+            },
+            "Identifiers": [
+                {
+                    "@odata.type": "#Resource.v1_1_0.Identifier",
+                    "DurableNameFormat": "NAA",
+                    "DurableName": "345C59DBD970859C"
+                }
+            ],
+            "Manufacturer": "Contoso",
+            "Model": "12Gbs Integrated RAID",
+            "SerialNumber": "2M220100SL",
+            "PartNumber": "CT18754",
+            "SpeedGbps": 12,
+            "FirmwareVersion": "1.0.0.7",
+            "SupportedControllerProtocols": [
+                "PCIe"
+            ],
+            "SupportedDeviceProtocols": [
+                "SAS",
+                "SATA"
+            ]
+        }
+    ],
+    "Drives": [
+        {
+            "@odata.id": "/redfish/v1/Systems/437XR1138R2/Storage/1/Drives/35D38F11ACEF7BD3"
+        },
+        {
+            "@odata.id": "/redfish/v1/Systems/437XR1138R2/Storage/1/Drives/3F5A8C54207B7233"
+        },
+        {
+            "@odata.id": "/redfish/v1/Systems/437XR1138R2/Storage/1/Drives/32ADF365C6C1B7BD"
+        },
+        {
+            "@odata.id": "/redfish/v1/Systems/437XR1138R2/Storage/1/Drives/3D58ECBC375FD9F2"
+        }
+    ],
+    "Volumes": {
+        "@odata.id": "/redfish/v1/Systems/437XR1138R2/Storage/1/Volumes"
+    },
+    "Links": {
+        "@odata.type": "#Storage.v1_0_0.Storage"
+    },
+    "Actions": {
+        "@odata.type": "#Storage.v1_0_0.Actions",
+        "#Storage.SetEncryptionKey": {
+            "target": "/redfish/v1/Systems/437XR1138R2/Storage/1/Actions/Storage.SetEncryptionKey"
+        }
+    },
+    "@odata.context": "/redfish/v1/$metadata#Storage.Storage",
+    "@odata.id": "/redfish/v1/Systems/437XR1138R2/Storage/1",
+    "@Redfish.Copyright": "Copyright 2014-2017 Distributed Management Task Force, Inc. (DMTF). For the full DMTF copyright policy, see http://www.dmtf.org/about/policies/copyright."
+}

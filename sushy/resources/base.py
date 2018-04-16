@@ -224,7 +224,7 @@ class ResourceBase(object):
         time from here (constructor).
         :param connector: A Connector instance
         :param path: sub-URI path to the resource.
-        :param redfish_version: The version of RedFish. Used to construct
+        :param redfish_version: The version of Redfish. Used to construct
             the object according to schema of the given version.
         """
         self._conn = connector
@@ -328,11 +328,11 @@ class ResourceCollectionBase(ResourceBase):
     def __init__(self, connector, path, redfish_version=None):
         """A class representing the base of any Redfish resource collection
 
-        It gets inherited ``ResourceBase`` and invokes the base class
+        It gets inherited from ``ResourceBase`` and invokes the base class
         constructor.
         :param connector: A Connector instance
         :param path: sub-URI path to the resource collection.
-        :param redfish_version: The version of RedFish. Used to construct
+        :param redfish_version: The version of Redfish. Used to construct
             the object according to schema of the given version.
         """
         super(ResourceCollectionBase, self).__init__(connector, path,
