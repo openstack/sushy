@@ -1,0 +1,6 @@
+---
+features:
+  - |
+    Adds the Storage resource to the library. It also provides the
+    max size available (in bytes) of drives and volumes that can be
+    accessed from storage.

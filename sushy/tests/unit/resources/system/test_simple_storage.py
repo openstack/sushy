@@ -79,12 +79,10 @@ class SimpleStorageCollectionTestCase(base.TestCase):
     @mock.patch.object(simple_storage, 'SimpleStorage', autospec=True)
     def test_get_members(self, SimpleStorage_mock):
         members = self.simpl_stor_col.get_members()
-        calls = [
-            mock.call(self.simpl_stor_col._conn,
-                      '/redfish/v1/Systems/437XR1138R2/SimpleStorage/1',
-                      redfish_version=self.simpl_stor_col.redfish_version),
-        ]
-        SimpleStorage_mock.assert_has_calls(calls)
+        SimpleStorage_mock.assert_called_once_with(
+            self.simpl_stor_col._conn,
+            '/redfish/v1/Systems/437XR1138R2/SimpleStorage/1',
+            redfish_version=self.simpl_stor_col.redfish_version)
         self.assertIsInstance(members, list)
         self.assertEqual(1, len(members))
 
