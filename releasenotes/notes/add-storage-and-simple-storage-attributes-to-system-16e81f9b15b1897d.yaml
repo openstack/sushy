@@ -1,0 +1,12 @@
+---
+features:
+  - |
+    Exposes the ``simple_storage`` and ``storage`` properties from system
+    resource in sushy.
+
+    * ``simple_storage`` property indicates a collection of storage
+      controllers and their directly-attached devices associated with the
+      system.
+    * ``storage`` property refers to a collection of storage subsystem
+      associated with system. Resources such as drives and volumes can be
+      accessed from that subsystem.

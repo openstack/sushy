@@ -102,7 +102,7 @@ def max_safe(iterable, default=0):
     """
 
     try:
-        return max([x for x in iterable if x is not None])
+        return max(x for x in iterable if x is not None)
     except ValueError:
         # TypeError is not caught here as that should be thrown.
         return default
