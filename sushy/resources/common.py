@@ -20,3 +20,10 @@ class ActionField(base.CompositeField):
 class ResetActionField(ActionField):
     allowed_values = base.Field('ResetType@Redfish.AllowableValues',
                                 adapter=list)
+
+
+class IdRefField(base.CompositeField):
+    """Reference to the resource for updating settings"""
+
+    resource_uri = base.Field('@odata.id')
+    """The unique identifier for a resource"""

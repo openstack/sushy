@@ -18,6 +18,7 @@ import logging
 from sushy import exceptions
 from sushy.resources import base
 from sushy.resources import common
+from sushy.resources.system import bios
 from sushy.resources.system import constants as sys_cons
 from sushy.resources.system import ethernet_interface
 from sushy.resources.system import mappings as sys_maps
@@ -129,6 +130,8 @@ class System(base.ResourceBase):
     _actions = ActionsField('Actions', required=True)
 
     _ethernet_interfaces = None
+
+    _bios = None
 
     def __init__(self, connector, identity, redfish_version=None):
         """A class representing a ComputerSystem
@@ -289,6 +292,23 @@ class System(base.ResourceBase):
         self._ethernet_interfaces.refresh(force=False)
         return self._ethernet_interfaces
 
+    @property
+    def bios(self):
+        """Property to reference `Bios` instance
+
+        It is set once when the first time it is queried. On refresh,
+        this property is marked as stale (greedy-refresh not done).
+        Here the actual refresh of the sub-resource happens, if stale.
+        """
+        if self._bios is None:
+            self._bios = bios.Bios(
+                self._conn,
+                utils.get_sub_resource_path_by(self, 'Bios'),
+                redfish_version=self.redfish_version)
+
+        self._bios.refresh(force=False)
+        return self._bios
+
     def _do_refresh(self, force=False):
         """Do custom resource specific refresh activities
 
@@ -300,6 +320,8 @@ class System(base.ResourceBase):
             self._processors.invalidate(force)
         if self._ethernet_interfaces is not None:
             self._ethernet_interfaces.invalidate(force)
+        if self._bios is not None:
+            self._bios.invalidate(force)
 
 
 class SystemCollection(base.ResourceCollectionBase):

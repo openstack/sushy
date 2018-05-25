@@ -19,6 +19,7 @@ import mock
 
 import sushy
 from sushy import exceptions
+from sushy.resources.system import bios
 from sushy.resources.system import constants as sys_cons
 from sushy.resources.system import ethernet_interface
 from sushy.resources.system import mappings as sys_map
@@ -66,6 +67,7 @@ class SystemTestCase(base.TestCase):
         self.assertEqual("OK", self.sys_inst.memory_summary.health)
         self.assertIsNone(self.sys_inst._processors)
         self.assertIsNone(self.sys_inst._ethernet_interfaces)
+        self.assertIsNone(self.sys_inst._bios)
 
     def test__parse_attributes_missing_actions(self):
         self.sys_inst.json.pop('Actions')
@@ -378,6 +380,18 @@ class SystemTestCase(base.TestCase):
         self.assertEqual(expected_macs, actual_macs)
         self.assertIsInstance(self.sys_inst._ethernet_interfaces,
                               ethernet_interface.EthernetInterfaceCollection)
+
+    def test_bios(self):
+        self.conn.get.return_value.json.reset_mock()
+        bios_return_value = None
+        with open('sushy/tests/unit/json_samples/bios.json', 'r') as f:
+            bios_return_value = json.loads(f.read())
+        self.conn.get.return_value.json.side_effect = [bios_return_value]
+
+        self.assertIsNone(self.sys_inst._bios)
+        self.assertIsInstance(self.sys_inst.bios, bios.Bios)
+        self.assertEqual('BIOS Configuration Current Settings',
+                         self.sys_inst.bios.name)
 
 
 class SystemCollectionTestCase(base.TestCase):
