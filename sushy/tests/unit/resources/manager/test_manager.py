@@ -17,6 +17,7 @@ import mock
 import sushy
 from sushy import exceptions
 from sushy.resources.manager import manager
+from sushy.resources.manager import virtual_media
 from sushy.tests.unit import base
 
 
@@ -53,6 +54,7 @@ class ManagerTestCase(base.TestCase):
         self.assertEqual(sushy.MANAGER_TYPE_BMC, self.manager.manager_type)
         self.assertEqual('58893887-8974-2487-2389-841168418919',
                          self.manager.uuid)
+        self.assertIsNone(self.manager._virtual_media)
 
     def test_get_supported_graphical_console_types(self):
         # | GIVEN |
@@ -205,6 +207,64 @@ class ManagerTestCase(base.TestCase):
     def test_reset_manager_with_invalid_value(self):
         self.assertRaises(exceptions.InvalidParameterValueError,
                           self.manager.reset_manager, 'invalid-value')
+
+    def test_virtual_media(self):
+        # | GIVEN |
+        with open('sushy/tests/unit/json_samples/'
+                  'virtual_media_collection.json') as f:
+            virtual_media_collection_return_value = json.load(f)
+
+        with open('sushy/tests/unit/json_samples/'
+                  'virtual_media.json') as f:
+            virtual_media_return_value = json.load(f)
+
+        self.conn.get.return_value.json.side_effect = [
+            virtual_media_collection_return_value, virtual_media_return_value]
+
+        # | WHEN |
+        actual_virtual_media = self.manager.virtual_media
+
+        # | THEN |
+        self.assertIsInstance(actual_virtual_media,
+                              virtual_media.VirtualMediaCollection)
+        self.assertEqual(actual_virtual_media.name, 'Virtual Media Services')
+
+        member = actual_virtual_media.get_member('Floppy1')
+
+        self.assertEqual(member.image_name, "Sardine2.1.43.35.6a")
+        self.assertTrue(member.inserted)
+        self.assertFalse(member.write_protected)
+
+    def test_virtual_media_on_refresh(self):
+        # | GIVEN |
+        with open('sushy/tests/unit/json_samples/'
+                  'virtual_media_collection.json') as f:
+            self.conn.get.return_value.json.return_value = json.load(f)
+
+        # | WHEN & THEN |
+        self.assertIsInstance(self.manager.virtual_media,
+                              virtual_media.VirtualMediaCollection)
+
+        # On refreshing the manager instance...
+        with open('sushy/tests/unit/json_samples/manager.json', 'r') as f:
+            self.conn.get.return_value.json.return_value = json.loads(f.read())
+
+        self.manager.invalidate()
+        self.manager.refresh(force=False)
+
+        # | WHEN & THEN |
+        self.assertIsNotNone(self.manager._virtual_media)
+        self.assertTrue(self.manager._virtual_media._is_stale)
+
+        # | GIVEN |
+        with open('sushy/tests/unit/json_samples/'
+                  'virtual_media_collection.json') as f:
+            self.conn.get.return_value.json.return_value = json.load(f)
+
+        # | WHEN & THEN |
+        self.assertIsInstance(self.manager.virtual_media,
+                              virtual_media.VirtualMediaCollection)
+        self.assertFalse(self.manager._virtual_media._is_stale)
 
 
 class ManagerCollectionTestCase(base.TestCase):

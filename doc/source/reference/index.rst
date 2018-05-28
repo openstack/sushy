@@ -10,6 +10,7 @@ Features
 * Systems power management (Both soft and hard; Including NMI injection)
 * Changing systems boot device, frequency (Once or permanently) and mode
   (UEFI or BIOS)
+* Virtual media management
 * SessionManagement
 
 .. toctree::

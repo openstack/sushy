@@ -16,6 +16,9 @@ from sushy import exceptions
 from sushy.resources import base
 from sushy.resources import common
 from sushy.resources.manager import mappings as mgr_maps
+from sushy.resources.manager import virtual_media
+from sushy import utils
+
 
 LOG = logging.getLogger(__name__)
 
@@ -74,6 +77,8 @@ class Manager(base.ResourceBase):
 
     _actions = ActionsField('Actions', required=True)
 
+    _virtual_media = None
+
     def __init__(self, connector, identity, redfish_version=None):
         """A class representing a Manager
 
@@ -83,6 +88,10 @@ class Manager(base.ResourceBase):
             the object according to schema of the given version.
         """
         super(Manager, self).__init__(connector, identity, redfish_version)
+
+    def _do_refresh(self, force=False):
+        if self._virtual_media is not None:
+            self._virtual_media.invalidate(force)
 
     def get_supported_graphical_console_types(self):
         """Get the supported values for Graphical Console connection types.
@@ -177,6 +186,17 @@ class Manager(base.ResourceBase):
         LOG.debug('Resetting the Manager %s ...', self.identity)
         self._conn.post(target_uri, data={'ResetType': value})
         LOG.info('The Manager %s is being reset', self.identity)
+
+    @property
+    def virtual_media(self):
+        if self._virtual_media is None:
+            self._virtual_media = virtual_media.VirtualMediaCollection(
+                self._conn,
+                utils.get_sub_resource_path_by(self, 'VirtualMedia'),
+                redfish_version=self.redfish_version)
+
+        self._virtual_media.refresh(force=False)
+        return self._virtual_media
 
 
 class ManagerCollection(base.ResourceCollectionBase):

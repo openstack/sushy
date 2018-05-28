@@ -59,3 +59,17 @@ COMMAND_SHELL_VALUE_MAP = {
 
 COMMAND_SHELL_VALUE_MAP_REV = (
     utils.revert_dictionary(COMMAND_SHELL_VALUE_MAP))
+
+MEDIA_TYPE_MAP = {
+    'CD': mgr_cons.VIRTUAL_MEDIA_CD,
+    'DVD': mgr_cons.VIRTUAL_MEDIA_DVD,
+    'Floppy': mgr_cons.VIRTUAL_MEDIA_FLOPPY,
+    'USBStick': mgr_cons.VIRTUAL_MEDIA_USBSTICK
+}
+
+CONNECTED_VIA_MAP = {
+    "Applet": mgr_cons.CONNECTED_VIA_APPLET,
+    "NotConnected": mgr_cons.CONNECTED_VIA_NOT_CONNECTED,
+    "Oem": mgr_cons.CONNECTED_VIA_OEM,
+    "URI": mgr_cons.CONNECTED_VIA_URI
+}
