@@ -13,8 +13,10 @@
 from sushy.resources import base
 
 
-class ResetActionField(base.CompositeField):
+class ActionField(base.CompositeField):
+    target_uri = base.Field('target', required=True)
+
+
+class ResetActionField(ActionField):
     allowed_values = base.Field('ResetType@Redfish.AllowableValues',
                                 adapter=list)
-
-    target_uri = base.Field('target', required=True)
