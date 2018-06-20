@@ -1,0 +1,6 @@
+---
+fixes:
+  - |
+    Fixes malformed value of the ``BootSourceOverrideMode`` element which goes
+    against the Redfish schema and causes some of the boot mode calls to
+    fail.
