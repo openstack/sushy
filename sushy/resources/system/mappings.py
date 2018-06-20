@@ -58,7 +58,7 @@ BOOT_SOURCE_TARGET_MAP = {
 BOOT_SOURCE_TARGET_MAP_REV = utils.revert_dictionary(BOOT_SOURCE_TARGET_MAP)
 
 BOOT_SOURCE_MODE_MAP = {
-    'BIOS': sys_cons.BOOT_SOURCE_MODE_BIOS,
+    'Legacy': sys_cons.BOOT_SOURCE_MODE_BIOS,
     'UEFI': sys_cons.BOOT_SOURCE_MODE_UEFI,
 }
 
