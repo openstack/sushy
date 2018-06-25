@@ -1,0 +1,22 @@
+{
+    "@Redfish.Settings": {
+            "@odata.type": "#Settings.v1_0_0.Settings",
+            "ETag": "9234ac83b9700123cc32",
+            "Messages": [{
+                "MessageId": "Base.1.0.SettingsFailed",
+                "Message": "Settings update failed due to invalid value",
+                "Severity": "High",
+                "Resolution": "Fix the value and try again",
+                "MessageArgs": [
+                    "arg1"
+                ],
+                "RelatedProperties": [
+                    "#/Attributes/ProcTurboMode"
+                ]
+            }],
+            "SettingsObject": {
+                "@odata.id": "/redfish/v1/Systems/437XR1138R2/BIOS/Settings"
+            },
+            "Time": "2016-03-07T14:44.30-05:00"
+        }
+}
