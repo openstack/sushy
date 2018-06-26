@@ -50,7 +50,7 @@ class BiosTestCase(base.TestCase):
         self.assertIsNone(self.sys_bios.description)
         self.assertEqual('123', self.sys_bios._etag)
         self.assertEqual('BiosAttributeRegistryP89.v1_0_0',
-                         self.sys_bios.attribute_registry)
+                         self.sys_bios._attribute_registry)
         self.assertEqual('', self.sys_bios.attributes['AdminPhone'])
         self.assertEqual('Uefi', self.sys_bios.attributes['BootMode'])
         self.assertEqual(0, self.sys_bios.attributes['ProcCoreDisable'])

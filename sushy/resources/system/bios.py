@@ -39,7 +39,7 @@ class Bios(base.ResourceBase):
     description = base.Field('Description')
     """Human-readable description of the BIOS resource"""
 
-    attribute_registry = base.Field('AttributeRegistry')
+    _attribute_registry = base.Field('AttributeRegistry')
     """The Resource ID of the Attribute Registry
     for the BIOS Attributes resource
     """
