@@ -60,15 +60,4 @@ class SettingsFieldTestCase(base.TestCase):
         instance.commit(conn, {'Attributes': {'key': 'value'}})
         conn.patch.assert_called_once_with(
             '/redfish/v1/Systems/437XR1138R2/BIOS/Settings',
-            data={'Attributes': {'key': 'value'}}, headers=None)
-
-    def test_commit_with_etag(self):
-        conn = mock.Mock()
-        instance = self.settings._load(self.json, conn)
-        instance.commit(conn,
-                        {'Attributes': {'key': 'value'}},
-                        '123')
-        conn.patch.assert_called_once_with(
-            '/redfish/v1/Systems/437XR1138R2/BIOS/Settings',
-            data={'Attributes': {'key': 'value'}},
-            headers={'If-Match': '123'})
+            data={'Attributes': {'key': 'value'}})

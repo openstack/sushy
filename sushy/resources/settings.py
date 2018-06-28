@@ -78,7 +78,7 @@ class SettingsField(base.CompositeField):
     """Represents the results of the last time the values of the Settings
     resource were applied to the server"""
 
-    def commit(self, connector, value, etag=None):
+    def commit(self, connector, value):
         """Commits new settings values
 
         The new values will be applied when the system or a service
@@ -92,9 +92,7 @@ class SettingsField(base.CompositeField):
             the new values will not be committed
         """
 
-        connector.patch(self.resource_uri,
-                        data=value,
-                        headers={'If-Match': etag} if etag else None)
+        connector.patch(self.resource_uri, data=value)
 
     @property
     def resource_uri(self):

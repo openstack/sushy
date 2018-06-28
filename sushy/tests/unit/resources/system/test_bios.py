@@ -48,7 +48,6 @@ class BiosTestCase(base.TestCase):
         self.assertEqual('BIOS Configuration Current Settings',
                          self.sys_bios.name)
         self.assertIsNone(self.sys_bios.description)
-        self.assertEqual('123', self.sys_bios._etag)
         self.assertEqual('BiosAttributeRegistryP89.v1_0_0',
                          self.sys_bios.attribute_registry)
         self.assertEqual('', self.sys_bios.attributes['AdminPhone'])
@@ -65,8 +64,7 @@ class BiosTestCase(base.TestCase):
         self.sys_bios.set_attribute('ProcTurboMode', 'Disabled')
         self.sys_bios._conn.patch.assert_called_once_with(
             '/redfish/v1/Systems/437XR1138R2/BIOS/Settings',
-            data={'Attributes': {'ProcTurboMode': 'Disabled'}},
-            headers={'If-Match': '123'})
+            data={'Attributes': {'ProcTurboMode': 'Disabled'}})
 
     def test_set_attribute_on_refresh(self):
         # make it to instantiate pending attributes
@@ -83,8 +81,7 @@ class BiosTestCase(base.TestCase):
         self.sys_bios._conn.patch.assert_called_once_with(
             '/redfish/v1/Systems/437XR1138R2/BIOS/Settings',
             data={'Attributes': {'ProcTurboMode': 'Disabled',
-                                 'UsbControl': 'UsbDisabled'}},
-            headers={'If-Match': '123'})
+                                 'UsbControl': 'UsbDisabled'}})
 
     def test_set_attributes_on_refresh(self):
         # make it to instantiate pending attributes
