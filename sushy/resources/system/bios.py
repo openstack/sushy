@@ -56,8 +56,6 @@ class Bios(base.ResourceBase):
 
     _actions = ActionsField('Actions')
 
-    _etag = base.Field('@odata.etag')
-
     _pending_settings_resource = None
 
     @property
@@ -98,8 +96,7 @@ class Bios(base.ResourceBase):
         :param value: Key-value pairs for attribute name and value
         """
         self._settings.commit(self._conn,
-                              {'Attributes': value},
-                              self._etag)
+                              {'Attributes': value})
         if self._pending_settings_resource:
             self._pending_settings_resource.invalidate()
 
