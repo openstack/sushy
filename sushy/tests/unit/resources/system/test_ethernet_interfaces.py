@@ -25,9 +25,9 @@ class EthernetInterfaceTestCase(base.TestCase):
     def setUp(self):
         super(EthernetInterfaceTestCase, self).setUp()
         self.conn = mock.Mock()
-        eth_file = 'sushy/tests/unit/json_samples/ethernet_interfaces.json'
-        with open(eth_file, 'r') as f:
-            self.conn.get.return_value.json.return_value = json.loads(f.read())
+        with open('sushy/tests/unit/json_samples/'
+                  'ethernet_interfaces.json') as f:
+            self.conn.get.return_value.json.return_value = json.load(f)
 
         eth_path = ("/redfish/v1/Systems/437XR1138R2/EthernetInterfaces/"
                     "12446A3B0411")
@@ -54,8 +54,8 @@ class EthernetInterfaceCollectionTestCase(base.TestCase):
         super(EthernetInterfaceCollectionTestCase, self).setUp()
         self.conn = mock.Mock()
         with open('sushy/tests/unit/json_samples/'
-                  'ethernet_interfaces_collection.json', 'r') as f:
-            self.conn.get.return_value.json.return_value = json.loads(f.read())
+                  'ethernet_interfaces_collection.json') as f:
+            self.conn.get.return_value.json.return_value = json.load(f)
         self.sys_eth_col = ethernet_interface.EthernetInterfaceCollection(
             self.conn, '/redfish/v1/Systems/437XR1138R2/EthernetInterfaces',
             redfish_version='1.0.2')
@@ -96,9 +96,9 @@ class EthernetInterfaceCollectionTestCase(base.TestCase):
     def test_summary(self):
         self.assertIsNone(self.sys_eth_col._summary)
         self.conn.get.return_value.json.reset_mock()
-        path = 'sushy/tests/unit/json_samples/ethernet_interfaces.json'
-        with open(path, 'r') as f:
-            self.conn.get.return_value.json.return_value = json.loads(f.read())
+        with open('sushy/tests/unit/json_samples/'
+                  'ethernet_interfaces.json') as f:
+            self.conn.get.return_value.json.return_value = json.load(f)
         expected_summary = {
             '12:44:6A:3B:04:11':
             sys_map.HEALTH_STATE_VALUE_MAP_REV.get(

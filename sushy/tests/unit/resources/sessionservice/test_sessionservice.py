@@ -28,9 +28,8 @@ class SessionServiceTestCase(base.TestCase):
     def setUp(self):
         super(SessionServiceTestCase, self).setUp()
         self.conn = mock.Mock()
-        js_f = 'sushy/tests/unit/json_samples/session_service.json'
-        with open(js_f, 'r') as f:
-            self.conn.get.return_value.json.return_value = json.loads(f.read())
+        with open('sushy/tests/unit/json_samples/session_service.json') as f:
+            self.conn.get.return_value.json.return_value = json.load(f)
 
         self.sess_serv_inst = sessionservice.SessionService(
             self.conn, '/redfish/v1/SessionService',
@@ -78,8 +77,8 @@ class SessionServiceTestCase(base.TestCase):
 
     def test_create_session(self):
         with open('sushy/tests/unit/json_samples/'
-                  'session_creation_headers.json', 'r') as f:
-            self.conn.post.return_value.headers = json.loads(f.read())
+                  'session_creation_headers.json') as f:
+            self.conn.post.return_value.headers = json.load(f)
 
         session_key, session_uri = (
             self.sess_serv_inst.create_session('foo', 'secret'))
@@ -91,8 +90,8 @@ class SessionServiceTestCase(base.TestCase):
     def test_create_session_unknown_path(self):
         del self.sess_serv_inst.json['Sessions']
         with open('sushy/tests/unit/json_samples/'
-                  'session_creation_headers.json', 'r') as f:
-            self.conn.post.return_value.headers = json.loads(f.read())
+                  'session_creation_headers.json') as f:
+            self.conn.post.return_value.headers = json.load(f)
 
         session_key, session_uri = (
             self.sess_serv_inst.create_session('foo', 'secret'))
@@ -109,8 +108,8 @@ class SessionServiceTestCase(base.TestCase):
 
     def test_create_session_missing_x_auth_token(self):
         with open('sushy/tests/unit/json_samples/'
-                  'session_creation_headers.json', 'r') as f:
-            self.conn.post.return_value.headers = json.loads(f.read())
+                  'session_creation_headers.json') as f:
+            self.conn.post.return_value.headers = json.load(f)
 
         self.conn.post.return_value.headers.pop('X-Auth-Token')
         self.assertRaisesRegex(
@@ -120,8 +119,8 @@ class SessionServiceTestCase(base.TestCase):
     @mock.patch.object(sessionservice, 'LOG', autospec=True)
     def test_create_session_missing_location(self, mock_LOG):
         with open('sushy/tests/unit/json_samples/'
-                  'session_creation_headers.json', 'r') as f:
-            self.conn.post.return_value.headers = json.loads(f.read())
+                  'session_creation_headers.json') as f:
+            self.conn.post.return_value.headers = json.load(f)
 
         self.conn.post.return_value.headers.pop('Location')
         self.sess_serv_inst.create_session('foo', 'bar')
@@ -130,8 +129,8 @@ class SessionServiceTestCase(base.TestCase):
     def _setUp_sessions(self):
         self.conn.get.return_value.json.reset_mock()
         successive_return_values = []
-        with open('sushy/tests/unit/json_samples/session.json', 'r') as f:
-            successive_return_values.append(json.loads(f.read()))
+        with open('sushy/tests/unit/json_samples/session.json') as f:
+            successive_return_values.append(json.load(f))
         self.conn.get.return_value.json.side_effect = successive_return_values
 
     def test_sessions(self):
@@ -162,8 +161,8 @@ class SessionServiceTestCase(base.TestCase):
 
         self.conn.get.return_value.json.side_effect = None
         # On refreshing the sess_serv_inst instance...
-        with open('sushy/tests/unit/json_samples/session.json', 'r') as f:
-            self.conn.get.return_value.json.return_value = json.loads(f.read())
+        with open('sushy/tests/unit/json_samples/session.json') as f:
+            self.conn.get.return_value.json.return_value = json.load(f)
         self.sess_serv_inst.refresh(force=True)
 
         # | WHEN & THEN |

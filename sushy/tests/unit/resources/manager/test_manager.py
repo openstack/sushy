@@ -25,8 +25,8 @@ class ManagerTestCase(base.TestCase):
     def setUp(self):
         super(ManagerTestCase, self).setUp()
         self.conn = mock.Mock()
-        with open('sushy/tests/unit/json_samples/manager.json', 'r') as f:
-            self.conn.get.return_value.json.return_value = json.loads(f.read())
+        with open('sushy/tests/unit/json_samples/manager.json') as f:
+            self.conn.get.return_value.json.return_value = json.load(f)
 
         self.manager = manager.Manager(self.conn, '/redfish/v1/Managers/BMC',
                                        redfish_version='1.0.2')
@@ -213,8 +213,8 @@ class ManagerCollectionTestCase(base.TestCase):
         super(ManagerCollectionTestCase, self).setUp()
         self.conn = mock.Mock()
         with open('sushy/tests/unit/json_samples/'
-                  'manager_collection.json', 'r') as f:
-            self.conn.get.return_value.json.return_value = json.loads(f.read())
+                  'manager_collection.json') as f:
+            self.conn.get.return_value.json.return_value = json.load(f)
         self.managers = manager.ManagerCollection(
             self.conn, '/redfish/v1/Managers', redfish_version='1.0.2')
 

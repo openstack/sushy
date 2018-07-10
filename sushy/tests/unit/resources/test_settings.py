@@ -24,9 +24,8 @@ class SettingsFieldTestCase(base.TestCase):
 
     def setUp(self):
         super(SettingsFieldTestCase, self).setUp()
-        with open('sushy/tests/unit/json_samples/settings.json',
-                  'r') as f:
-            self.json = json.loads(f.read())
+        with open('sushy/tests/unit/json_samples/settings.json') as f:
+            self.json = json.load(f)
 
         self.settings = settings.SettingsField()
 

@@ -46,8 +46,8 @@ class UtilsTestCase(base.TestCase):
     def setUp(self):
         super(UtilsTestCase, self).setUp()
         self.conn = mock.MagicMock()
-        with open('sushy/tests/unit/json_samples/system.json', 'r') as f:
-            system_json = json.loads(f.read())
+        with open('sushy/tests/unit/json_samples/system.json') as f:
+            system_json = json.load(f)
         self.conn.get.return_value.json.return_value = system_json
 
         self.sys_inst = system.System(self.conn,

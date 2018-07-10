@@ -27,8 +27,8 @@ class SessionTestCase(base.TestCase):
         super(SessionTestCase, self).setUp()
         self.conn = mock.Mock()
         self.auth = mock.Mock()
-        with open('sushy/tests/unit/json_samples/session.json', 'r') as f:
-            sample_json = json.loads(f.read())
+        with open('sushy/tests/unit/json_samples/session.json') as f:
+            sample_json = json.load(f)
             self.conn.get.return_value.json.return_value = sample_json
             self.auth._session_key = 'fake_x_auth_token'
             self.auth._session_uri = sample_json['@odata.id']
@@ -66,9 +66,9 @@ class SessionCollectionTestCase(base.TestCase):
     def setUp(self):
         super(SessionCollectionTestCase, self).setUp()
         self.conn = mock.Mock()
-        js_f = 'sushy/tests/unit/json_samples/session_collection.json'
-        with open(js_f, 'r') as f:
-            self.conn.get.return_value.json.return_value = json.loads(f.read())
+        with open('sushy/tests/unit/json_samples/'
+                  'session_collection.json') as f:
+            self.conn.get.return_value.json.return_value = json.load(f)
 
         self.sess_col = session.SessionCollection(
             self.conn, '/redfish/v1/SessionService/Sessions',

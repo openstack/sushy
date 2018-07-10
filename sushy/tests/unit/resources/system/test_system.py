@@ -33,8 +33,8 @@ class SystemTestCase(base.TestCase):
     def setUp(self):
         super(SystemTestCase, self).setUp()
         self.conn = mock.Mock()
-        with open('sushy/tests/unit/json_samples/system.json', 'r') as f:
-            self.conn.get.return_value.json.return_value = json.loads(f.read())
+        with open('sushy/tests/unit/json_samples/system.json') as f:
+            self.conn.get.return_value.json.return_value = json.load(f)
 
         self.sys_inst = system.System(
             self.conn, '/redfish/v1/Systems/437XR1138R2',
@@ -271,9 +271,9 @@ class SystemTestCase(base.TestCase):
         self.assertIsNone(self.sys_inst._processors)
         # | GIVEN |
         self.conn.get.return_value.json.reset_mock()
-        with open('sushy/tests/unit/json_samples/processor_collection.json',
-                  'r') as f:
-            self.conn.get.return_value.json.return_value = json.loads(f.read())
+        with open('sushy/tests/unit/json_samples/'
+                  'processor_collection.json') as f:
+            self.conn.get.return_value.json.return_value = json.load(f)
         # | WHEN |
         actual_processors = self.sys_inst.processors
         # | THEN |
@@ -291,16 +291,16 @@ class SystemTestCase(base.TestCase):
 
     def test_processors_on_refresh(self):
         # | GIVEN |
-        with open('sushy/tests/unit/json_samples/processor_collection.json',
-                  'r') as f:
-            self.conn.get.return_value.json.return_value = json.loads(f.read())
+        with open('sushy/tests/unit/json_samples/'
+                  'processor_collection.json') as f:
+            self.conn.get.return_value.json.return_value = json.load(f)
         # | WHEN & THEN |
         self.assertIsInstance(self.sys_inst.processors,
                               processor.ProcessorCollection)
 
         # On refreshing the system instance...
-        with open('sushy/tests/unit/json_samples/system.json', 'r') as f:
-            self.conn.get.return_value.json.return_value = json.loads(f.read())
+        with open('sushy/tests/unit/json_samples/system.json') as f:
+            self.conn.get.return_value.json.return_value = json.load(f)
 
         self.sys_inst.invalidate()
         self.sys_inst.refresh(force=False)
@@ -310,9 +310,9 @@ class SystemTestCase(base.TestCase):
         self.assertTrue(self.sys_inst._processors._is_stale)
 
         # | GIVEN |
-        with open('sushy/tests/unit/json_samples/processor_collection.json',
-                  'r') as f:
-            self.conn.get.return_value.json.return_value = json.loads(f.read())
+        with open('sushy/tests/unit/json_samples/'
+                  'processor_collection.json') as f:
+            self.conn.get.return_value.json.return_value = json.load(f)
         # | WHEN & THEN |
         self.assertIsInstance(self.sys_inst.processors,
                               processor.ProcessorCollection)
@@ -320,18 +320,19 @@ class SystemTestCase(base.TestCase):
 
     def _setUp_processor_summary(self):
         self.conn.get.return_value.json.reset_mock()
-        with open('sushy/tests/unit/json_samples/processor_collection.json',
-                  'r') as f:
-            self.conn.get.return_value.json.return_value = json.loads(f.read())
+        with open('sushy/tests/unit/json_samples/'
+                  'processor_collection.json') as f:
+            self.conn.get.return_value.json.return_value = json.load(f)
 
         # fetch processors for the first time
         self.sys_inst.processors
 
         successive_return_values = []
-        with open('sushy/tests/unit/json_samples/processor.json', 'r') as f:
-            successive_return_values.append(json.loads(f.read()))
-        with open('sushy/tests/unit/json_samples/processor2.json', 'r') as f:
-            successive_return_values.append(json.loads(f.read()))
+        file_names = ['sushy/tests/unit/json_samples/processor.json',
+                      'sushy/tests/unit/json_samples/processor2.json']
+        for file_name in file_names:
+            with open(file_name) as f:
+                successive_return_values.append(json.load(f))
 
         self.conn.get.return_value.json.side_effect = successive_return_values
 
@@ -360,13 +361,12 @@ class SystemTestCase(base.TestCase):
         self.conn.get.return_value.json.reset_mock()
         eth_coll_return_value = None
         eth_return_value = None
-        path = ('sushy/tests/unit/json_samples/'
-                'ethernet_interfaces_collection.json')
-        with open(path, 'r') as f:
-            eth_coll_return_value = json.loads(f.read())
-        with open('sushy/tests/unit/json_samples/ethernet_interfaces.json',
-                  'r') as f:
-            eth_return_value = (json.loads(f.read()))
+        with open('sushy/tests/unit/json_samples/'
+                  'ethernet_interfaces_collection.json') as f:
+            eth_coll_return_value = json.load(f)
+        with open('sushy/tests/unit/json_samples/'
+                  'ethernet_interfaces.json') as f:
+            eth_return_value = json.load(f)
 
         self.conn.get.return_value.json.side_effect = [eth_coll_return_value,
                                                        eth_return_value]
@@ -384,8 +384,8 @@ class SystemTestCase(base.TestCase):
     def test_bios(self):
         self.conn.get.return_value.json.reset_mock()
         bios_return_value = None
-        with open('sushy/tests/unit/json_samples/bios.json', 'r') as f:
-            bios_return_value = json.loads(f.read())
+        with open('sushy/tests/unit/json_samples/bios.json') as f:
+            bios_return_value = json.load(f)
         self.conn.get.return_value.json.side_effect = [bios_return_value]
 
         self.assertIsNone(self.sys_inst._bios)
@@ -400,8 +400,8 @@ class SystemCollectionTestCase(base.TestCase):
         super(SystemCollectionTestCase, self).setUp()
         self.conn = mock.Mock()
         with open('sushy/tests/unit/json_samples/'
-                  'system_collection.json', 'r') as f:
-            self.conn.get.return_value.json.return_value = json.loads(f.read())
+                  'system_collection.json') as f:
+            self.conn.get.return_value.json.return_value = json.load(f)
         self.sys_col = system.SystemCollection(
             self.conn, '/redfish/v1/Systems', redfish_version='1.0.2')
 

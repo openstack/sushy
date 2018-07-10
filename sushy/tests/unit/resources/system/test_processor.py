@@ -26,8 +26,8 @@ class ProcessorTestCase(base.TestCase):
     def setUp(self):
         super(ProcessorTestCase, self).setUp()
         self.conn = mock.Mock()
-        with open('sushy/tests/unit/json_samples/processor.json', 'r') as f:
-            self.conn.get.return_value.json.return_value = json.loads(f.read())
+        with open('sushy/tests/unit/json_samples/processor.json') as f:
+            self.conn.get.return_value.json.return_value = json.load(f)
 
         self.sys_processor = processor.Processor(
             self.conn, '/redfish/v1/Systems/437XR1138R2/Processors/CPU1',
@@ -74,8 +74,8 @@ class ProcessorCollectionTestCase(base.TestCase):
         super(ProcessorCollectionTestCase, self).setUp()
         self.conn = mock.Mock()
         with open('sushy/tests/unit/json_samples/'
-                  'processor_collection.json', 'r') as f:
-            self.conn.get.return_value.json.return_value = json.loads(f.read())
+                  'processor_collection.json') as f:
+            self.conn.get.return_value.json.return_value = json.load(f)
         self.sys_processor_col = processor.ProcessorCollection(
             self.conn, '/redfish/v1/Systems/437XR1138R2/Processors',
             redfish_version='1.0.2')
@@ -115,10 +115,11 @@ class ProcessorCollectionTestCase(base.TestCase):
     def _setUp_processor_summary(self):
         self.conn.get.return_value.json.reset_mock()
         successive_return_values = []
-        with open('sushy/tests/unit/json_samples/processor.json', 'r') as f:
-            successive_return_values.append(json.loads(f.read()))
-        with open('sushy/tests/unit/json_samples/processor2.json', 'r') as f:
-            successive_return_values.append(json.loads(f.read()))
+        file_names = ['sushy/tests/unit/json_samples/processor.json',
+                      'sushy/tests/unit/json_samples/processor2.json']
+        for file_name in file_names:
+            with open(file_name) as f:
+                successive_return_values.append(json.load(f))
 
         self.conn.get.return_value.json.side_effect = successive_return_values
 
@@ -155,8 +156,8 @@ class ProcessorCollectionTestCase(base.TestCase):
         self.conn.get.return_value.json.side_effect = None
         # On refreshing the sys_processor_col instance...
         with open('sushy/tests/unit/json_samples/'
-                  'processor_collection.json', 'r') as f:
-            self.conn.get.return_value.json.return_value = json.loads(f.read())
+                  'processor_collection.json') as f:
+            self.conn.get.return_value.json.return_value = json.load(f)
         self.sys_processor_col.refresh(force=True)
 
         # | WHEN & THEN |

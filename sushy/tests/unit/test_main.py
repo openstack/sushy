@@ -40,8 +40,8 @@ class MainTestCase(base.TestCase):
         self.sess_serv.create_session.return_value = (None, None)
         mock_session_service.return_value = self.sess_serv
         mock_connector.return_value = self.conn
-        with open('sushy/tests/unit/json_samples/root.json', 'r') as f:
-            self.conn.get.return_value.json.return_value = json.loads(f.read())
+        with open('sushy/tests/unit/json_samples/root.json') as f:
+            self.conn.get.return_value.json.return_value = json.load(f)
         self.root = main.Sushy('http://foo.bar:1234',
                                verify=True, auth=mock_auth)
         mock_connector.assert_called_once_with(
@@ -68,9 +68,9 @@ class MainTestCase(base.TestCase):
     @mock.patch.object(connector, 'Connector', autospec=True)
     def test_custom_connector(self, mock_Sushy_Connector):
         connector_mock = mock.MagicMock()
-        with open('sushy/tests/unit/json_samples/root.json', 'r') as f:
+        with open('sushy/tests/unit/json_samples/root.json') as f:
             connector_mock.get.return_value.json.return_value = (
-                json.loads(f.read()))
+                json.load(f))
         main.Sushy('http://foo.bar:1234', 'foo', 'bar',
                    connector=connector_mock)
         self.assertTrue(connector_mock.post.called)
@@ -126,8 +126,8 @@ class BareMinimumMainTestCase(base.TestCase):
         super(BareMinimumMainTestCase, self).setUp()
         self.conn = mock.MagicMock()
         with open('sushy/tests/unit/json_samples/'
-                  'bare_minimum_root.json', 'r') as f:
-            self.conn.get.return_value.json.return_value = json.loads(f.read())
+                  'bare_minimum_root.json') as f:
+            self.conn.get.return_value.json.return_value = json.load(f)
         self.root = main.Sushy('http://foo.bar:1234', verify=True,
                                auth=mock.MagicMock(), connector=self.conn)
 

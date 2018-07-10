@@ -23,9 +23,8 @@ class VolumeTestCase(base.TestCase):
     def setUp(self):
         super(VolumeTestCase, self).setUp()
         self.conn = mock.Mock()
-        volume_file = 'sushy/tests/unit/json_samples/volume.json'
-        with open(volume_file, 'r') as f:
-            self.conn.get.return_value.json.return_value = json.loads(f.read())
+        with open('sushy/tests/unit/json_samples/volume.json') as f:
+            self.conn.get.return_value.json.return_value = json.load(f)
 
         self.stor_volume = volume.Volume(
             self.conn, '/redfish/v1/Systems/437XR1138R2/Storage/1/Volumes/1',
@@ -45,8 +44,8 @@ class VolumeCollectionTestCase(base.TestCase):
         super(VolumeCollectionTestCase, self).setUp()
         self.conn = mock.Mock()
         with open('sushy/tests/unit/json_samples/'
-                  'volume_collection.json', 'r') as f:
-            self.conn.get.return_value.json.return_value = json.loads(f.read())
+                  'volume_collection.json') as f:
+            self.conn.get.return_value.json.return_value = json.load(f)
         self.stor_vol_col = volume.VolumeCollection(
             self.conn, '/redfish/v1/Systems/437XR1138R2/Storage/1/Volumes',
             redfish_version='1.0.2')
@@ -91,12 +90,12 @@ class VolumeCollectionTestCase(base.TestCase):
         self.conn.get.return_value.json.reset_mock()
 
         successive_return_values = []
-        with open('sushy/tests/unit/json_samples/volume.json', 'r') as f:
-            successive_return_values.append(json.loads(f.read()))
-        with open('sushy/tests/unit/json_samples/volume2.json', 'r') as f:
-            successive_return_values.append(json.loads(f.read()))
-        with open('sushy/tests/unit/json_samples/volume3.json', 'r') as f:
-            successive_return_values.append(json.loads(f.read()))
+        file_names = ['sushy/tests/unit/json_samples/volume.json',
+                      'sushy/tests/unit/json_samples/volume2.json',
+                      'sushy/tests/unit/json_samples/volume3.json']
+        for file_name in file_names:
+            with open(file_name) as f:
+                successive_return_values.append(json.load(f))
         self.conn.get.return_value.json.side_effect = successive_return_values
 
         self.assertEqual(1073741824000, self.stor_vol_col.max_size_bytes)
@@ -112,12 +111,12 @@ class VolumeCollectionTestCase(base.TestCase):
         self.conn.get.return_value.json.reset_mock()
 
         successive_return_values = []
-        with open('sushy/tests/unit/json_samples/volume.json', 'r') as f:
-            successive_return_values.append(json.loads(f.read()))
-        with open('sushy/tests/unit/json_samples/volume2.json', 'r') as f:
-            successive_return_values.append(json.loads(f.read()))
-        with open('sushy/tests/unit/json_samples/volume3.json', 'r') as f:
-            successive_return_values.append(json.loads(f.read()))
+        file_names = ['sushy/tests/unit/json_samples/volume.json',
+                      'sushy/tests/unit/json_samples/volume2.json',
+                      'sushy/tests/unit/json_samples/volume3.json']
+        for file_name in file_names:
+            with open(file_name) as f:
+                successive_return_values.append(json.load(f))
         self.conn.get.return_value.json.side_effect = successive_return_values
 
         self.assertEqual(1073741824000, self.stor_vol_col.max_size_bytes)

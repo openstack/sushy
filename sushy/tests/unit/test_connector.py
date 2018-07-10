@@ -221,7 +221,7 @@ class ConnectorOpTestCase(base.TestCase):
 
     def test_known_http_error(self):
         self.request.return_value.status_code = http_client.BAD_REQUEST
-        with open('sushy/tests/unit/json_samples/error.json', 'r') as f:
+        with open('sushy/tests/unit/json_samples/error.json') as f:
             self.request.return_value.json.return_value = json.load(f)
 
         with self.assertRaisesRegex(exceptions.BadRequestError,

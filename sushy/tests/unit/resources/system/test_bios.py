@@ -26,11 +26,10 @@ class BiosTestCase(base.TestCase):
     def setUp(self):
         super(BiosTestCase, self).setUp()
         self.conn = mock.Mock()
-        with open('sushy/tests/unit/json_samples/bios.json', 'r') as f:
-            bios_json = json.loads(f.read())
-        with open('sushy/tests/unit/json_samples/bios_settings.json',
-                  'r') as f:
-            bios_settings_json = json.loads(f.read())
+        with open('sushy/tests/unit/json_samples/bios.json') as f:
+            bios_json = json.load(f)
+        with open('sushy/tests/unit/json_samples/bios_settings.json') as f:
+            bios_settings_json = json.load(f)
 
         self.conn.get.return_value.json.side_effect = [
             bios_json,
