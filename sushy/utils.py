@@ -13,11 +13,16 @@
 #    License for the specific language governing permissions and limitations
 #    under the License.
 
+import collections
 import logging
+
+import six
 
 from sushy import exceptions
 
 LOG = logging.getLogger(__name__)
+
+CACHE_ATTR_NAMES_VAR_NAME = '_cache_attr_names'
 
 
 def revert_dictionary(dictionary):
@@ -97,6 +102,7 @@ def max_safe(iterable, default=0):
     This function is just a wrapper over builtin max() w/o ``key`` argument.
     The ``default`` argument specifies an object to return if the provided
     ``iterable`` is empty. Also it filters out the None type values.
+
     :param iterable: an iterable
     :param default: 0 by default
     """
@@ -106,3 +112,157 @@ def max_safe(iterable, default=0):
     except ValueError:
         # TypeError is not caught here as that should be thrown.
         return default
+
+
+def setdefaultattr(obj, name, default):
+    """Python's ``dict.setdefault`` applied on Python objects.
+
+    If name is an attribute with obj, return its value. If not, set name
+    attribute with a value of default and return default.
+
+    :param obj: a python object
+    :param name: name of attribute
+    :param default: default value to be set
+    """
+
+    try:
+        return getattr(obj, name)
+    except AttributeError:
+        setattr(obj, name, default)
+    return default
+
+
+def cache_it(res_accessor_method):
+    """Utility decorator to cache the return value of the decorated method.
+
+    This decorator is to be used with any Sushy resource class method.
+    This will internally create an attribute on the resource namely
+    ``_cache_<decorated_method_name>``. This is referred to as the "caching
+    attribute". This attribute will eventually hold the resultant value from
+    the method invocation (when method gets first time called) and for every
+    subsequent calls to that method this cached value will get returned. It
+    expects the decorated method to contain its own logic of evaluation.
+
+    This also assigns a variable named ``_cache_attr_names`` on the resource.
+    This variable maintains a collection of all the existing
+    "caching attribute" names.
+
+    To invalidate or clear the cache use :py:func:`~cache_clear`.
+    Usage:
+
+    .. code-block:: python
+
+      class SomeResource(base.ResourceBase):
+        ...
+        @cache_it
+        def get_summary(self):
+          # do some calculation and return the result
+          # and this result will be cached.
+          return result
+        ...
+        def _do_refresh(self, force):
+          cache_clear(self, force)
+
+    If the returned value is a Sushy resource instance or an Iterable whose
+    element is of type Sushy resource it handles the case of calling the
+    ``refresh()`` method of that resource. This is done to avoid unnecessary
+    recreation of a new resource instance which got already created at the
+    first place in contrast to fresh retrieval of the resource json data.
+    Again, the ``force`` argument is deliberately set to False to do only the
+    "light refresh" of the resource (only the fresh retrieval of resource)
+    instead of doing the complete exhaustive "cascading refresh" (resource
+    with all its nested subresources recursively).
+
+    .. code-block:: python
+
+      class SomeResource(base.ResourceBase):
+        ...
+        @property
+        @cache_it
+        def nested_resource(self):
+          return NestedResource(
+            self._conn, "Path/to/NestedResource",
+            redfish_version=self.redfish_version)
+        ...
+        def _do_refresh(self, force):
+          # selective attribute clearing
+          cache_clear(self, force, only_these=['nested_resource'])
+
+    Do note that this is not thread safe. So guard your code to protect it
+    from any kind of concurrency issues while using this decorator.
+
+    :param res_accessor_method: the resource accessor decorated method.
+
+    """
+    cache_attr_name = '_cache_' + res_accessor_method.__name__
+
+    @six.wraps(res_accessor_method)
+    def func_wrapper(res_selfie):
+
+        cache_attr_val = getattr(res_selfie, cache_attr_name, None)
+        if cache_attr_val is None:
+
+            cache_attr_val = res_accessor_method(res_selfie)
+            setattr(res_selfie, cache_attr_name, cache_attr_val)
+
+            # Note(deray): Each resource instance maintains a collection of
+            # all the cache attribute names in a private attribute.
+            cache_attr_names = setdefaultattr(
+                res_selfie, CACHE_ATTR_NAMES_VAR_NAME, set())
+            cache_attr_names.add(cache_attr_name)
+
+        from sushy.resources import base
+
+        if isinstance(cache_attr_val, base.ResourceBase):
+            cache_attr_val.refresh(force=False)
+        elif isinstance(cache_attr_val, collections.Iterable):
+            for elem in cache_attr_val:
+                if isinstance(elem, base.ResourceBase):
+                    elem.refresh(force=False)
+
+        return cache_attr_val
+
+    return func_wrapper
+
+
+def cache_clear(res_selfie, force_refresh, only_these=None):
+    """Clear some or all cached values of the resource.
+
+    If the cache variable refers to a resource instance then the
+    ``invalidate()`` method is called on that. Otherwise it is set to None.
+    Should there be a need to force refresh the resource and its sub-resources,
+    "cascading refresh", ``force_refresh`` is to be set to True.
+
+    This is the complimentary method of ``cache_it`` decorator.
+
+    :param res_selfie: the resource instance.
+    :param force_refresh: force_refresh argument of ``invalidate()`` method.
+    :param only_these: expects an Iterable of specific method names
+        for which the cached value/s need to be cleared only. When None, all
+        the cached values are cleared.
+    """
+    cache_attr_names = setdefaultattr(
+        res_selfie, CACHE_ATTR_NAMES_VAR_NAME, set())
+    if only_these is not None:
+        if not isinstance(only_these, collections.Iterable):
+            raise TypeError("'only_these' must be Iterable.")
+
+        cache_attr_names = cache_attr_names.intersection(
+            '_cache_' + attr for attr in only_these)
+
+    for cache_attr_name in cache_attr_names:
+        cache_attr_val = getattr(res_selfie, cache_attr_name)
+
+        from sushy.resources import base
+
+        if isinstance(cache_attr_val, base.ResourceBase):
+            cache_attr_val.invalidate(force_refresh)
+        elif isinstance(cache_attr_val, collections.Iterable):
+            for elem in cache_attr_val:
+                if isinstance(elem, base.ResourceBase):
+                    elem.invalidate(force_refresh)
+                else:
+                    setattr(res_selfie, cache_attr_name, None)
+                    break
+        else:
+            setattr(res_selfie, cache_attr_name, None)

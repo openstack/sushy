@@ -19,6 +19,7 @@ from sushy import exceptions
 from sushy.resources import base
 from sushy.resources import common
 from sushy.resources import settings
+from sushy import utils
 
 LOG = logging.getLogger(__name__)
 
@@ -56,7 +57,13 @@ class Bios(base.ResourceBase):
 
     _actions = ActionsField('Actions')
 
-    _pending_settings_resource = None
+    @property
+    @utils.cache_it
+    def _pending_settings_resource(self):
+        """Pending BIOS settings resource"""
+        return Bios(
+            self._conn, self._settings.resource_uri,
+            redfish_version=self.redfish_version)
 
     @property
     def pending_attributes(self):
@@ -65,13 +72,6 @@ class Bios(base.ResourceBase):
         BIOS attributes that have been comitted to the system,
         but for them to take effect system restart is necessary
         """
-
-        if not self._pending_settings_resource:
-            self._pending_settings_resource = Bios(
-                self._conn,
-                self._settings.resource_uri,
-                redfish_version=self.redfish_version)
-        self._pending_settings_resource.refresh(force=False)
         return self._pending_settings_resource.attributes
 
     def set_attribute(self, key, value):
@@ -97,8 +97,8 @@ class Bios(base.ResourceBase):
         """
         self._settings.commit(self._conn,
                               {'Attributes': value})
-        if self._pending_settings_resource:
-            self._pending_settings_resource.invalidate()
+        utils.cache_clear(self, force_refresh=False,
+                          only_these=['_pending_settings_resource'])
 
     def _get_reset_bios_action_element(self):
         actions = self._actions
@@ -155,5 +155,5 @@ class Bios(base.ResourceBase):
         greedy-refresh not done for them unless forced by ``force``
         argument.
         """
-        if self._pending_settings_resource is not None:
-            self._pending_settings_resource.invalidate(force)
+        super(Bios, self)._do_refresh(force=force)
+        utils.cache_clear(self, force)

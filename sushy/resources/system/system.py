@@ -123,21 +123,6 @@ class System(base.ResourceBase):
 
     _actions = ActionsField('Actions', required=True)
 
-    # reference to ProcessorCollection instance
-    _processors = None
-
-    # reference to EthernetInterfaceCollection instance
-    _ethernet_interfaces = None
-
-    # reference to BIOS instance
-    _bios = None
-
-    # reference to SimpleStorageCollection instance
-    _simple_storage = None
-
-    # reference to StorageCollection instance
-    _storage = None
-
     def __init__(self, connector, identity, redfish_version=None):
         """A class representing a ComputerSystem
 
@@ -264,6 +249,7 @@ class System(base.ResourceBase):
         return utils.get_sub_resource_path_by(self, 'Processors')
 
     @property
+    @utils.cache_it
     def processors(self):
         """Property to reference `ProcessorCollection` instance
 
@@ -271,15 +257,12 @@ class System(base.ResourceBase):
         this property is marked as stale (greedy-refresh not done).
         Here the actual refresh of the sub-resource happens, if stale.
         """
-        if self._processors is None:
-            self._processors = processor.ProcessorCollection(
-                self._conn, self._get_processor_collection_path(),
-                redfish_version=self.redfish_version)
-
-        self._processors.refresh(force=False)
-        return self._processors
+        return processor.ProcessorCollection(
+            self._conn, self._get_processor_collection_path(),
+            redfish_version=self.redfish_version)
 
     @property
+    @utils.cache_it
     def ethernet_interfaces(self):
         """Property to reference `EthernetInterfaceCollection` instance
 
@@ -287,17 +270,13 @@ class System(base.ResourceBase):
         this property is marked as stale (greedy-refresh not done).
         Here the actual refresh of the sub-resource happens, if stale.
         """
-        if self._ethernet_interfaces is None:
-            self._ethernet_interfaces = (
-                ethernet_interface.EthernetInterfaceCollection(
-                    self._conn,
-                    utils.get_sub_resource_path_by(self, "EthernetInterfaces"),
-                    redfish_version=self.redfish_version))
-
-        self._ethernet_interfaces.refresh(force=False)
-        return self._ethernet_interfaces
+        return ethernet_interface.EthernetInterfaceCollection(
+            self._conn,
+            utils.get_sub_resource_path_by(self, "EthernetInterfaces"),
+            redfish_version=self.redfish_version)
 
     @property
+    @utils.cache_it
     def bios(self):
         """Property to reference `Bios` instance
 
@@ -305,16 +284,13 @@ class System(base.ResourceBase):
         this property is marked as stale (greedy-refresh not done).
         Here the actual refresh of the sub-resource happens, if stale.
         """
-        if self._bios is None:
-            self._bios = bios.Bios(
-                self._conn,
-                utils.get_sub_resource_path_by(self, 'Bios'),
-                redfish_version=self.redfish_version)
-
-        self._bios.refresh(force=False)
-        return self._bios
+        return bios.Bios(
+            self._conn,
+            utils.get_sub_resource_path_by(self, 'Bios'),
+            redfish_version=self.redfish_version)
 
     @property
+    @utils.cache_it
     def simple_storage(self):
         """A collection of simple storage associated with system.
 
@@ -330,16 +306,12 @@ class System(base.ResourceBase):
             is missing.
         :returns: `SimpleStorageCollection` instance
         """
-        if self._simple_storage is None:
-            self._simple_storage = sys_simple_storage.SimpleStorageCollection(
-                self._conn,
-                utils.get_sub_resource_path_by(self, "SimpleStorage"),
-                redfish_version=self.redfish_version)
-
-        self._simple_storage.refresh(force=False)
-        return self._simple_storage
+        return sys_simple_storage.SimpleStorageCollection(
+            self._conn, utils.get_sub_resource_path_by(self, "SimpleStorage"),
+            redfish_version=self.redfish_version)
 
     @property
+    @utils.cache_it
     def storage(self):
         """A collection of storage subsystems associated with system.
 
@@ -356,31 +328,19 @@ class System(base.ResourceBase):
             is missing.
         :returns: `StorageCollection` instance
         """
-        if self._storage is None:
-            self._storage = sys_storage.StorageCollection(
-                self._conn, utils.get_sub_resource_path_by(self, "Storage"),
-                redfish_version=self.redfish_version)
+        return sys_storage.StorageCollection(
+            self._conn, utils.get_sub_resource_path_by(self, "Storage"),
+            redfish_version=self.redfish_version)
 
-        self._storage.refresh(force=False)
-        return self._storage
-
-    def _do_refresh(self, force=False):
+    def _do_refresh(self, force):
         """Do custom resource specific refresh activities
 
         On refresh, all sub-resources are marked as stale, i.e.
         greedy-refresh not done for them unless forced by ``force``
         argument.
         """
-        if self._processors is not None:
-            self._processors.invalidate(force)
-        if self._ethernet_interfaces is not None:
-            self._ethernet_interfaces.invalidate(force)
-        if self._bios is not None:
-            self._bios.invalidate(force)
-        if self._simple_storage is not None:
-            self._simple_storage.invalidate(force)
-        if self._storage is not None:
-            self._storage.invalidate(force)
+        super(System, self)._do_refresh(force=force)
+        utils.cache_clear(self, force)
 
 
 class SystemCollection(base.ResourceCollectionBase):

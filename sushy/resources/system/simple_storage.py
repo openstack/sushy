@@ -58,28 +58,22 @@ class SimpleStorage(base.ResourceBase):
 class SimpleStorageCollection(base.ResourceCollectionBase):
     """Represents a collection of simple storage associated with system."""
 
-    _disks_sizes_bytes = None
-
     @property
     def _resource_type(self):
         return SimpleStorage
 
     @property
+    @utils.cache_it
     def disks_sizes_bytes(self):
         """Sizes of each Disk in bytes in SimpleStorage collection resource.
 
         Returns the list of cached values until it (or its parent resource)
         is refreshed.
         """
-        if self._disks_sizes_bytes is None:
-            self._disks_sizes_bytes = sorted(
-                device.capacity_bytes
-                for simpl_stor in self.get_members()
-                for device in simpl_stor.devices
-                if device.status.state == res_cons.STATE_ENABLED
-            )
-
-        return self._disks_sizes_bytes
+        return sorted(device.capacity_bytes
+                      for simpl_stor in self.get_members()
+                      for device in simpl_stor.devices
+                      if device.status.state == res_cons.STATE_ENABLED)
 
     @property
     def max_size_bytes(self):
@@ -90,8 +84,6 @@ class SimpleStorageCollection(base.ResourceCollectionBase):
         """
         return utils.max_safe(self.disks_sizes_bytes)
 
-    def _do_refresh(self, force=False):
-        super(SimpleStorageCollection, self)._do_refresh(force)
-        # Note(deray): undefine the attribute here for fresh creation in
-        # subsequent calls to it's exposed property.
-        self._disks_sizes_bytes = None
+    def _do_refresh(self, force):
+        super(SimpleStorageCollection, self)._do_refresh(force=force)
+        utils.cache_clear(self, force)

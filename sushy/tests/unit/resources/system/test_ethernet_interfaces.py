@@ -93,7 +93,6 @@ class EthernetInterfaceCollectionTestCase(base.TestCase):
         self.assertEqual(1, len(members))
 
     def test_summary(self):
-        self.assertIsNone(self.sys_eth_col._summary)
         self.conn.get.return_value.json.reset_mock()
         with open('sushy/tests/unit/json_samples/'
                   'ethernet_interfaces.json') as f:

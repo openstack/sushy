@@ -18,6 +18,7 @@ import logging
 from sushy import exceptions
 from sushy.resources import base
 from sushy.resources.sessionservice import session
+from sushy import utils
 
 LOG = logging.getLogger(__name__)
 
@@ -35,8 +36,6 @@ class SessionService(base.ResourceBase):
 
     service_enabled = base.Field('ServiceEnabled')
     """Tells us if session service is enabled"""
-
-    _sessions = None  # ref to SessionCollection instance
 
     session_timeout = base.Field('SessionTimeout')
     """The session service timeout"""
@@ -66,29 +65,26 @@ class SessionService(base.ResourceBase):
         return sessions_col.get('@odata.id')
 
     @property
+    @utils.cache_it
     def sessions(self):
         """Property to provide reference to the `SessionCollection` instance
 
         It is calculated once when the first time it is queried. On refresh,
         this property gets reset.
         """
-        if self._sessions is None:
-            self._sessions = session.SessionCollection(
-                self._conn, self._get_sessions_collection_path(),
-                redfish_version=self.redfish_version)
+        return session.SessionCollection(
+            self._conn, self._get_sessions_collection_path(),
+            redfish_version=self.redfish_version)
 
-        self._sessions.refresh(force=False)
-        return self._sessions
-
-    def _do_refresh(self, force=False):
+    def _do_refresh(self, force):
         """Do custom resource specific refresh activities
 
         On refresh, all sub-resources are marked as stale, i.e.
         greedy-refresh not done for them unless forced by ``force``
         argument.
         """
-        if self._sessions is not None:
-            self._sessions.invalidate(force)
+        super(SessionService, self)._do_refresh(force=force)
+        utils.cache_clear(self, force)
 
     def close_session(self, session_uri):
         """This function is for closing a session based on its id.

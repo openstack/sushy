@@ -358,8 +358,6 @@ class ResourceCollectionBase(ResourceBase):
                                adapter=utils.get_members_identities)
     """A tuple with the members identities"""
 
-    _members = None  # caching variable
-
     def __init__(self, connector, path, redfish_version=None):
         """A class representing the base of any Redfish resource collection
 
@@ -395,24 +393,20 @@ class ResourceCollectionBase(ResourceBase):
         return self._resource_type(self._conn, identity,
                                    redfish_version=self.redfish_version)
 
+    @utils.cache_it
     def get_members(self):
         """Return a list of ``_resource_type`` objects present in collection
 
         :returns: A list of ``_resource_type`` objects
         """
-        if self._members is None:
-            self._members = [self.get_member(id_)
-                             for id_ in self.members_identities]
+        return [self.get_member(id_) for id_ in self.members_identities]
 
-        for m in self._members:
-            m.refresh(force=False)
-        return self._members
-
-    def _do_refresh(self, force=False):
+    def _do_refresh(self, force):
         """Do refresh related activities.
 
-        Undefine the `_members` attribute here for fresh evaluation in
-        subsequent calls to `get_members()` method. Other similar activities
+        Invalidate / Undefine the cache attributes here for fresh evaluation
+        in subsequent calls to `get_members()` method. Other similar activities
         can also follow in future, if needed.
         """
-        self._members = None
+        super(ResourceCollectionBase, self)._do_refresh(force=force)
+        utils.cache_clear(self, force)
