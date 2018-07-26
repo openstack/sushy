@@ -11,7 +11,8 @@
 #    under the License.
 
 # Values comes from the Redfish System json-schema 1.0.0:
-# http://redfish.dmtf.org/schemas/v1/Resource.json
+# http://redfish.dmtf.org/schemas/v1/Resource.json or
+# https://redfish.dmtf.org/schemas/v1/MessageRegistry.v1_1_1.json
 
 # Health related constants.
 HEALTH_OK = 'ok'
@@ -30,3 +31,12 @@ STATE_UNAVAILABLEOFFLINE = 'unavailable offline'
 STATE_DEFERRING = 'deferring'
 STATE_QUIESCED = 'quiesced'
 STATE_UPDATING = 'updating'
+
+# Message Registry message parameter type related constants.
+PARAMTYPE_STRING = 'string'
+PARAMTYPE_NUMBER = 'number'
+
+# Severity related constants
+SEVERITY_OK = 'ok'
+SEVERITY_WARNING = 'warning'
+SEVERITY_CRITICAL = 'critical'
