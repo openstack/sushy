@@ -187,6 +187,39 @@ class ListField(Field):
         return instances
 
 
+class DictionaryField(Field):
+    """Base class for fields consisting of dictionary of several sub-fields."""
+
+    def __init__(self, *args, **kwargs):
+        super(DictionaryField, self).__init__(*args, **kwargs)
+        self._subfields = dict(_collect_fields(self))
+
+    def _load(self, body, resource, nested_in=None):
+        """Load the dictionary.
+
+        :param body: parent JSON body.
+        :param resource: parent resource.
+        :param nested_in: parent resource name (for error reporting only).
+        :returns: a new dictionary object containing subfields.
+        """
+        nested_in = (nested_in or []) + self._path
+        values = super(DictionaryField, self)._load(body, resource)
+        if values is None:
+            return None
+
+        instances = {}
+        for key, value in values.items():
+            instance_value = copy.copy(self)
+            for attr, field in self._subfields.items():
+                # Hide the Field object behind the real value
+                setattr(instance_value, attr, field._load(value,
+                                                          resource,
+                                                          nested_in))
+            instances[key] = instance_value
+
+        return instances
+
+
 class MappedField(Field):
     """Field taking real value from a mapping."""
 

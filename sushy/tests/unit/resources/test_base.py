@@ -165,7 +165,11 @@ TEST_JSON = {
             'String': 'a fourth string',
             'Integer': 2
         }
-    ]
+    ],
+    'Dictionary': {
+        'key1': {'property_a': 'value1', 'property_b': 'value2'},
+        'key2': {'property_a': 'value3', 'property_b': 'value4'}
+    }
 }
 
 
@@ -187,11 +191,17 @@ class TestListField(resource_base.ListField):
     integer = resource_base.Field('Integer', adapter=int)
 
 
+class TestDictionaryField(resource_base.DictionaryField):
+    property_a = resource_base.Field('property_a')
+    property_b = resource_base.Field('property_b')
+
+
 class ComplexResource(resource_base.ResourceBase):
     string = resource_base.Field('String', required=True)
     integer = resource_base.Field('Integer', adapter=int)
     nested = NestedTestField('Nested')
     field_list = TestListField('ListField')
+    dictionary = TestDictionaryField('Dictionary')
     non_existing_nested = NestedTestField('NonExistingNested')
     non_existing_mapped = resource_base.MappedField('NonExistingMapped',
                                                     MAPPING)
@@ -217,6 +227,11 @@ class FieldTestCase(base.TestCase):
         self.assertEqual('a third string',
                          self.test_resource.field_list[0].string)
         self.assertEqual(2, self.test_resource.field_list[1].integer)
+        self.assertEqual(2, len(self.test_resource.dictionary))
+        self.assertEqual('value1',
+                         self.test_resource.dictionary['key1'].property_a)
+        self.assertEqual('value4',
+                         self.test_resource.dictionary['key2'].property_b)
         self.assertIsNone(self.test_resource.non_existing_nested)
         self.assertIsNone(self.test_resource.non_existing_mapped)
 
