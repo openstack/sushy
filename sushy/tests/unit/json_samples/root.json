@@ -30,6 +30,9 @@
             "@odata.id": "/redfish/v1/SessionService/Sessions"
         }
     },
+    "Registries": {
+        "@odata.id": "/redfish/v1/Registries"
+    },
     "Oem": {},
     "@odata.context": "/redfish/v1/$metadata#ServiceRoot",
     "@odata.id": "/redfish/v1/",

@@ -1,0 +1,12 @@
+{
+    "@odata.type": "#MessageRegistryFileCollection.MessageRegistryFileCollection",
+    "Name": "Message Registry Test Collection",
+    "Members@odata.count": 1,
+    "Members": [
+        {
+            "@odata.id": "/redfish/v1/Registries/Test"
+        }
+    ],
+    "@odata.context": "/redfish/v1/$metadata#MessageRegistryFileCollection.MessageRegistryFileCollection",
+    "@odata.id": "/redfish/v1/Registries"
+}

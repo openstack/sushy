@@ -22,6 +22,7 @@ from sushy import connector
 from sushy import exceptions
 from sushy import main
 from sushy.resources.manager import manager
+from sushy.resources.registry import message_registry_file
 from sushy.resources.sessionservice import session
 from sushy.resources.sessionservice import sessionservice
 from sushy.resources.system import system
@@ -119,6 +120,16 @@ class MainTestCase(base.TestCase):
             self.root._conn, 'asdf',
             redfish_version=self.root.redfish_version)
 
+    @mock.patch.object(message_registry_file,
+                       'MessageRegistryFileCollection',
+                       autospec=True)
+    def test__get_registry_collection(
+        self, MessageRegistryFileCollection_mock):
+        self.root._get_registry_collection()
+        MessageRegistryFileCollection_mock.assert_called_once_with(
+            self.root._conn, '/redfish/v1/Registries',
+            redfish_version=self.root.redfish_version)
+
 
 class BareMinimumMainTestCase(base.TestCase):
 
@@ -145,3 +156,6 @@ class BareMinimumMainTestCase(base.TestCase):
         self.assertRaisesRegex(
             exceptions.MissingAttributeError,
             'SessionService/@odata.id', self.root.get_session_service)
+
+    def test__get_registry_collection_when_registries_attr_absent(self):
+        self.assertIsNone(self.root._get_registry_collection())
