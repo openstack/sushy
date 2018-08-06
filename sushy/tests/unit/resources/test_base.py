@@ -14,13 +14,15 @@
 #    under the License.
 
 import copy
-
+import io
 import mock
+
 from six.moves import http_client
 
 from sushy import exceptions
 from sushy.resources import base as resource_base
 from sushy.tests.unit import base
+import zipfile
 
 
 class BaseResource(resource_base.ResourceBase):
@@ -58,6 +60,47 @@ class ResourceBaseTestCase(base.TestCase):
     def test_invalidate_force_refresh(self):
         self.base_resource.invalidate(force_refresh=True)
         self.conn.get.assert_called_once_with(path='/Foo')
+
+    def test_refresh_archive(self):
+        mock_response = mock.Mock(
+            headers={'content-type': 'application/zip'})
+        with open('sushy/tests/unit/json_samples/TestRegistry.zip', 'rb') as f:
+            mock_response.content = f.read()
+        self.conn.get.return_value = mock_response
+
+        resource = BaseResource(connector=self.conn,
+                                path='/Foo',
+                                redfish_version='1.0.2',
+                                reader=resource_base.
+                                JsonArchiveReader('Test.2.0.json'))
+
+        self.assertIsNotNone(resource._json)
+        self.assertEqual('Test.2.0.0', resource._json['Id'])
+
+    @mock.patch.object(resource_base, 'LOG', autospec=True)
+    def test_refresh_archive_not_implemented(self, mock_log):
+        mock_response = mock.Mock(
+            headers={'content-type': 'application/gzip'})
+        self.conn.get.return_value = mock_response
+        BaseResource(connector=self.conn,
+                     path='/Foo',
+                     redfish_version='1.0.2',
+                     reader=resource_base.JsonArchiveReader('Test.2.0.json'))
+        mock_log.error.assert_called_once()
+
+    @mock.patch.object(io, 'BytesIO', autospec=True)
+    def test_refresh_archive_badzip_error(self, mock_io):
+        mock_response = mock.Mock(
+            headers={'content-type': 'application/zip'})
+        mock_io.side_effect = zipfile.BadZipfile('Something wrong')
+        self.conn.get.return_value = mock_response
+
+        self.assertRaises(exceptions.SushyError,
+                          BaseResource, connector=self.conn,
+                          path='/Foo',
+                          redfish_version='1.0.2',
+                          reader=resource_base.
+                          JsonArchiveReader('Test.2.0.json'))
 
 
 class TestResource(resource_base.ResourceBase):
