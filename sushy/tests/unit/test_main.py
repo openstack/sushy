@@ -14,7 +14,6 @@
 #    under the License.
 
 import json
-
 import mock
 
 from sushy import auth
@@ -171,6 +170,13 @@ class MainTestCase(base.TestCase):
         mock_comp_ser.assert_called_once_with(
             self.root._conn, '/redfish/v1/CompositionService',
             redfish_version=self.root.redfish_version)
+
+    def test__get_standard_message_registry_collection(self):
+        registries = self.root._get_standard_message_registry_collection()
+
+        self.assertEqual(5, len(registries))
+        self.assertTrue([r.identity for r in registries
+                        if r.identity == 'Base.1.3.0'])
 
 
 class BareMinimumMainTestCase(base.TestCase):

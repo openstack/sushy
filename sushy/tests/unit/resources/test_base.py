@@ -134,6 +134,13 @@ class ResourceBaseTestCase(base.TestCase):
             self.assertTrue(oem_vendor in ('Contoso', 'EID_412_ASB_123'))
         self.assertEqual('base_resource2', self.base_resource2.resource_name)
 
+    def test_refresh_local(self):
+        resource = BaseResource(None, 'json_samples/message_registry.json',
+                                reader=resource_base.
+                                JsonPackagedFileReader('sushy.tests.unit'))
+        self.assertIsNotNone(resource._json)
+        self.assertEqual('Test.1.1.1', resource._json['Id'])
+
 
 class TestResource(resource_base.ResourceBase):
     """A concrete Test Resource to test against"""
