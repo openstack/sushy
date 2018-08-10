@@ -178,6 +178,43 @@ class MainTestCase(base.TestCase):
         self.assertTrue([r.identity for r in registries
                         if r.identity == 'Base.1.3.0'])
 
+    @mock.patch('sushy.Sushy._get_standard_message_registry_collection',
+                autospec=True)
+    @mock.patch('sushy.Sushy._get_registry_collection', autospec=True)
+    def test__get_message_registries(self, mock_col, mock_st_col):
+        mock_msg_reg1 = mock.Mock()
+        mock_msg_reg1.registry_prefix = 'RegistryA'
+        mock_msg_reg1.registry_version = '2.0.0'
+        mock_msg_reg1.language = 'en'
+        mock_st_col.return_value = [mock_msg_reg1]
+
+        mock_msg_reg2 = mock.Mock()
+        mock_msg_reg2.registry_prefix = 'RegistryB'
+        mock_msg_reg2.registry_version = '1.0.0'
+        mock_msg_reg_file = mock.Mock()
+        mock_msg_reg_file.registry = 'RegistryB.1.0'
+        mock_msg_reg_file.get_message_registry.return_value = mock_msg_reg2
+        mock_col.return_value.get_members.return_value = [mock_msg_reg_file]
+
+        registries = self.root._get_message_registries()
+        self.assertEqual({'RegistryA.2.0': mock_msg_reg1,
+                          'RegistryB.1.0': mock_msg_reg2}, registries)
+
+    @mock.patch('sushy.Sushy._get_standard_message_registry_collection',
+                autospec=True)
+    @mock.patch('sushy.Sushy._get_registry_collection', autospec=True)
+    def test__get_message_registries_provided_empty(self, mock_col,
+                                                    mock_st_col):
+        mock_msg_reg1 = mock.Mock()
+        mock_msg_reg1.registry_prefix = 'RegistryA'
+        mock_msg_reg1.registry_version = '2.0.0'
+        mock_msg_reg1.language = 'en'
+        mock_st_col.return_value = [mock_msg_reg1]
+        mock_col.return_value = None
+
+        registries = self.root._get_message_registries()
+        self.assertEqual({'RegistryA.2.0': mock_msg_reg1}, registries)
+
 
 class BareMinimumMainTestCase(base.TestCase):
 

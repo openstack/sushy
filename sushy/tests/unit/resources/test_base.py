@@ -15,6 +15,7 @@
 
 import copy
 import io
+import json
 import mock
 
 from six.moves import http_client
@@ -138,6 +139,18 @@ class ResourceBaseTestCase(base.TestCase):
         resource = BaseResource(None, 'json_samples/message_registry.json',
                                 reader=resource_base.
                                 JsonPackagedFileReader('sushy.tests.unit'))
+        self.assertIsNotNone(resource._json)
+        self.assertEqual('Test.1.1.1', resource._json['Id'])
+
+    def test_refresh_public(self):
+        mock_connector = mock.Mock()
+        with open('sushy/tests/unit/json_samples/message_registry.json') as f:
+            mock_connector.get.return_value.json.return_value = json.load(f)
+        resource = BaseResource(mock_connector, 'https://example.com/'
+                                'message_registry.json',
+                                reader=resource_base.JsonPublicFileReader())
+        mock_connector.get.assert_called_once_with('https://example.com/'
+                                                   'message_registry.json')
         self.assertIsNotNone(resource._json)
         self.assertEqual('Test.1.1.1', resource._json['Id'])
 
