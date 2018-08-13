@@ -87,9 +87,6 @@ class SettingsField(base.CompositeField):
         :param connector: A Connector instance
         :param value: Value representing JSON whose structure is specific
             to each resource and the caller must format it correctly
-        :param etag: Optional ETag of resource version to update. If
-            this ETag is provided and it does not match on server, then
-            the new values will not be committed
         """
 
         connector.patch(self.resource_uri, data=value)
