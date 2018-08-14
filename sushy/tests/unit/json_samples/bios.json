@@ -20,9 +20,12 @@
         "ETag": "9234ac83b9700123cc32",
         "Messages": [
             {
-                "MessageId": "Base.1.0.SettingsFailed",
+                "MessageId": "Test.1.0.Failed",
                 "RelatedProperties": [
                     "#/Attributes/ProcTurboMode"
+                ],
+                "MessageArgs": [
+                    "arg1"
                 ]
             }
         ],

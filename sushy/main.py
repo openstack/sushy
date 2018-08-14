@@ -180,7 +180,8 @@ class Sushy(base.ResourceBase):
         :returns: The System object
         """
         return system.System(self._conn, identity,
-                             redfish_version=self.redfish_version)
+                             redfish_version=self.redfish_version,
+                             registries=self._get_message_registries())
 
     def get_chassis_collection(self):
         """Get the ChassisCollection object

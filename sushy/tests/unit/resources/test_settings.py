@@ -17,6 +17,7 @@ import json
 import mock
 
 from sushy.resources import constants as res_cons
+from sushy.resources.registry import message_registry
 from sushy.resources import settings
 from sushy.tests.unit import base
 
@@ -30,6 +31,14 @@ class SettingsFieldTestCase(base.TestCase):
 
         self.settings = settings.SettingsField()
 
+        conn = mock.Mock()
+        with open('sushy/tests/unit/json_samples/message_registry.json') as f:
+            conn.get.return_value.json.return_value = json.load(f)
+        registry = message_registry.MessageRegistry(
+            conn, '/redfish/v1/Registries/Test',
+            redfish_version='1.0.2')
+        self.registries = {'Test.1.0': registry}
+
     @mock.patch.object(settings, 'LOG', autospec=True)
     def test__load(self, mock_LOG):
         instance = self.settings._load(self.json, mock.Mock())
@@ -40,9 +49,9 @@ class SettingsFieldTestCase(base.TestCase):
                          instance.time)
         self.assertEqual('/redfish/v1/Systems/437XR1138R2/BIOS/Settings',
                          instance._settings_object_idref.resource_uri)
-        self.assertEqual('Base.1.0.SettingsFailed',
+        self.assertEqual('Test.1.0.Failed',
                          instance.messages[0].message_id)
-        self.assertEqual('Settings update failed due to invalid value',
+        self.assertEqual('Settings %1 update failed due to invalid value',
                          instance.messages[0].message)
         self.assertEqual(res_cons.SEVERITY_CRITICAL,
                          instance.messages[0].severity)
@@ -67,3 +76,33 @@ class SettingsFieldTestCase(base.TestCase):
         conn.patch.assert_called_once_with(
             '/redfish/v1/Systems/437XR1138R2/BIOS/Settings',
             data={'Attributes': {'key': 'value'}})
+
+    def test_get_status_failure(self):
+        instance = self.settings._load(self.json, mock.Mock())
+
+        status = instance.get_status(self.registries)
+        self.assertEqual(status.status,
+                         settings.UPDATE_FAILURE)
+        self.assertEqual(status.messages[0].severity,
+                         res_cons.SEVERITY_CRITICAL)
+        self.assertEqual(status.messages[0].message,
+                         'The property arg1 broke everything.')
+
+    def test_get_status_success(self):
+        instance = self.settings._load(self.json, mock.Mock())
+        instance.messages[0].message_id = 'Test.1.0.Success'
+        instance.messages[0].severity = res_cons.SEVERITY_OK
+        status = instance.get_status(self.registries)
+        self.assertEqual(status.status,
+                         settings.UPDATE_SUCCESS)
+        self.assertEqual(status.messages[0].severity, res_cons.SEVERITY_OK)
+        self.assertEqual(status.messages[0].message,
+                         'Everything done successfully.')
+
+    def test_get_status_noupdates(self):
+        instance = self.settings._load(self.json, mock.Mock())
+        instance.time = None
+        status = instance.get_status(self.registries)
+        self.assertEqual(status.status,
+                         settings.NO_UPDATES)
+        self.assertIsNone(status.messages)

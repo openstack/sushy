@@ -135,15 +135,19 @@ class System(base.ResourceBase):
 
     _actions = ActionsField('Actions', required=True)
 
-    def __init__(self, connector, identity, redfish_version=None):
+    def __init__(self, connector, identity, redfish_version=None,
+                 registries=None):
         """A class representing a ComputerSystem
 
         :param connector: A Connector instance
         :param identity: The identity of the System resource
         :param redfish_version: The version of RedFish. Used to construct
             the object according to schema of the given version.
+        :param registries: Dict of registries to be used in any resource
+            that needs registries to parse messages
         """
         super(System, self).__init__(connector, identity, redfish_version)
+        self._registries = registries
 
     def _get_reset_action_element(self):
         reset_action = self._actions.reset
@@ -315,7 +319,8 @@ class System(base.ResourceBase):
         return bios.Bios(
             self._conn,
             utils.get_sub_resource_path_by(self, 'Bios'),
-            redfish_version=self.redfish_version)
+            redfish_version=self.redfish_version,
+            registries=self._registries)
 
     @property
     @utils.cache_it
