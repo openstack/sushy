@@ -9,7 +9,15 @@
       - openstack/sushy
     vars:
       devstack_localrc:
+        USE_PYTHON3: True
         IRONIC_DEPLOY_DRIVER: redfish
         IRONIC_ENABLED_HARDWARE_TYPES: redfish
         IRONIC_DEFAULT_RESCUE_INTERFACE: ""
         EBTABLES_RACE_FIX: True
+
+- job:
+    name: sushy-tempest-ironic-partition-redfish-src-python2
+    parent: sushy-tempest-ironic-partition-redfish-src
+    vars:
+      devstack_localrc:
+        USE_PYTHON3: False

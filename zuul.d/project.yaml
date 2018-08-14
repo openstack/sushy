@@ -11,6 +11,8 @@
     check:
       jobs:
         - sushy-tempest-ironic-partition-redfish-src
+        - sushy-tempest-ironic-partition-redfish-src-python2
     gate:
       jobs:
         - sushy-tempest-ironic-partition-redfish-src
+        - sushy-tempest-ironic-partition-redfish-src-python2
