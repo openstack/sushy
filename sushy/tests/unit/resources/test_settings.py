@@ -16,6 +16,7 @@
 import json
 import mock
 
+from sushy.resources import constants as res_cons
 from sushy.resources import settings
 from sushy.tests.unit import base
 
@@ -42,7 +43,7 @@ class SettingsFieldTestCase(base.TestCase):
                          instance.messages[0].message_id)
         self.assertEqual('Settings update failed due to invalid value',
                          instance.messages[0].message)
-        self.assertEqual('High',
+        self.assertEqual(res_cons.SEVERITY_CRITICAL,
                          instance.messages[0].severity)
         self.assertEqual('Fix the value and try again',
                          instance.messages[0].resolution)

@@ -16,6 +16,7 @@
 
 from sushy.resources import base
 from sushy.resources import common
+from sushy.resources import mappings as res_maps
 
 
 class MessageListField(base.ListField):
@@ -29,7 +30,8 @@ class MessageListField(base.ListField):
     message = base.Field('Message')
     """Human readable message, if provided"""
 
-    severity = base.Field('Severity')
+    severity = base.MappedField('Severity',
+                                res_maps.SEVERITY_VALUE_MAP)
     """Severity of the error"""
 
     resolution = base.Field('Resolution')
