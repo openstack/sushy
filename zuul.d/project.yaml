@@ -1,7 +1,15 @@
 - project:
+    templates:
+      - openstack-python-jobs
+      - openstack-python35-jobs
+      - check-requirements
+      - publish-openstack-sphinx-docs
+      - release-notes-jobs
     check:
       jobs:
         - sushy-tempest-dsvm-ironic-ipa-partition-redfish-src
+        - openstack-tox-cover
     gate:
       jobs:
         - sushy-tempest-dsvm-ironic-ipa-partition-redfish-src
+        - openstack-tox-cover
