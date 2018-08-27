@@ -155,5 +155,6 @@ class ProcessorCollection(base.ResourceCollectionBase):
         greedy-refresh not done for them unless forced by ``force``
         argument.
         """
+        super(ProcessorCollection, self)._do_refresh(force)
         # Reset summary attribute
         self._summary = None

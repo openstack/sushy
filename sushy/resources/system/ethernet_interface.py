@@ -83,4 +83,5 @@ class EthernetInterfaceCollection(base.ResourceCollectionBase):
         greedy-refresh not done for them unless forced by ``force``
         argument.
         """
+        super(EthernetInterfaceCollection, self)._do_refresh(force)
         self._summary = None
