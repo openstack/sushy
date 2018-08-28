@@ -209,6 +209,45 @@ Creating and using a sushy manager object
   # Refresh the manager object (with all its sub-resources)
   mgr_inst.refresh(force=True)
 
+
+  # Using Virtual Media
+
+  # Instantiate a VirtualMediaCollection object
+  virtmedia_col = mgr_inst.virtual_media
+
+  # Print the ID of the VirtualMedia available in the collection
+  print(virtmedia_col.members_identities)
+
+  # Get a list of VirtualMedia objects available in the collection
+  virtmedia_insts = virtmedia_col.get_members()
+
+  # Instantiate a VirtualMedia object
+  virtmedia_inst = virtmedia_col.get_member(
+      virtmedia_col.members_identities[0])
+
+
+  # Print out some of the VirtualMedia properties
+  print(virtmedia_inst.name,
+        virtmedia_inst.media_types)
+
+  # Insert virtual media (invalidates virtmedia_inst contents)
+  virtmedia_inst.insert_media('https://www.dmtf.org/freeImages/Sardine.img')
+
+  # Refresh the resource to load actual contents
+  virtmedia_inst.refresh()
+
+  # Print out some of the VirtualMedia properties
+  print(virtmedia_inst.image,
+        virtmedia_inst.image_path,
+        virtmedia_inst.inserted,
+        virtmedia_inst.write_protected)
+
+  # ... Boot the system off the virtual media...
+
+  # Eject virtual media (invalidates virtmedia_inst contents)
+  virtmedia_inst.eject_media()
+
+
 -------------------------------------------------
 Creating and using a sushy session service object
 -------------------------------------------------

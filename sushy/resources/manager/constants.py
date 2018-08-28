@@ -76,3 +76,17 @@ COMMAND_SHELL_IPMI = 'command shell ipmi'
 
 COMMAND_SHELL_OEM = 'command shell oem'
 """Command Shell connection using an OEM-specific protocol"""
+
+# Virtual Media Type constants
+
+VIRTUAL_MEDIA_CD = 'cd'
+VIRTUAL_MEDIA_DVD = 'dvd'
+VIRTUAL_MEDIA_FLOPPY = 'floppy'
+VIRTUAL_MEDIA_USBSTICK = 'usb'
+
+# Connected Via constants
+
+CONNECTED_VIA_APPLET = 'applet'
+CONNECTED_VIA_NOT_CONNECTED = 'not_connected'
+CONNECTED_VIA_OEM = 'oem'
+CONNECTED_VIA_URI = 'uri'
