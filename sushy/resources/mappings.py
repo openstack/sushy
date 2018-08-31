@@ -34,3 +34,14 @@ HEALTH_VALUE_MAP = {
 
 HEALTH_VALUE_MAP_REV = (
     utils.revert_dictionary(HEALTH_VALUE_MAP))
+
+PARAMTYPE_MAP = {
+    'string': res_cons.PARAMTYPE_STRING,
+    'number': res_cons.PARAMTYPE_NUMBER
+}
+
+SEVERITY_VALUE_MAP = {
+    'OK': res_cons.SEVERITY_OK,
+    'Warning': res_cons.SEVERITY_WARNING,
+    'Critical': res_cons.SEVERITY_CRITICAL
+}
