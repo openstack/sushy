@@ -16,6 +16,7 @@ import mock
 
 from sushy.resources.system.storage import drive
 from sushy.resources.system.storage import storage
+from sushy.resources.system.storage import volume
 from sushy.tests.unit import base
 
 
@@ -23,6 +24,13 @@ STORAGE_DRIVE_FILE_NAMES = [
     'sushy/tests/unit/json_samples/drive.json',
     'sushy/tests/unit/json_samples/drive2.json',
     'sushy/tests/unit/json_samples/drive3.json'
+]
+
+STORAGE_VOLUME_FILE_NAMES = [
+    'sushy/tests/unit/json_samples/volume_collection.json',
+    'sushy/tests/unit/json_samples/volume.json',
+    'sushy/tests/unit/json_samples/volume2.json',
+    'sushy/tests/unit/json_samples/volume3.json'
 ]
 
 
@@ -59,6 +67,58 @@ class StorageTestCase(base.TestCase):
         self.assertIsInstance(actual_drive, drive.Drive)
         self.assertTrue(self.conn.get.return_value.json.called)
 
+    @mock.patch.object(drive, 'Drive', autospec=True)
+    def test_drives(self, Drive_mock):
+        # | WHEN |
+        all_drives = self.storage.drives
+        # | THEN |
+        calls = [
+            mock.call(self.storage._conn,
+                      '/redfish/v1/Systems/437XR1138R2/Storage/1/Drives/35D38F11ACEF7BD3',  # noqa
+                      redfish_version=self.storage.redfish_version),
+            mock.call(self.storage._conn,
+                      '/redfish/v1/Systems/437XR1138R2/Storage/1/Drives/3F5A8C54207B7233',  # noqa
+                      redfish_version=self.storage.redfish_version),
+            mock.call(self.storage._conn,
+                      '/redfish/v1/Systems/437XR1138R2/Storage/1/Drives/32ADF365C6C1B7BD',  # noqa
+                      redfish_version=self.storage.redfish_version),
+            mock.call(self.storage._conn,
+                      '/redfish/v1/Systems/437XR1138R2/Storage/1/Drives/3D58ECBC375FD9F2',  # noqa
+                      redfish_version=self.storage.redfish_version)
+        ]
+        Drive_mock.assert_has_calls(calls)
+        self.assertIsInstance(all_drives, list)
+        self.assertEqual(4, len(all_drives))
+        self.assertIsInstance(all_drives[0], drive.Drive.__class__)
+
+        # returning cached value
+        Drive_mock.reset_mock()
+        # | WHEN |
+        all_drives = self.storage.drives
+        # | THEN |
+        self.assertFalse(Drive_mock.called)
+        self.assertIsInstance(all_drives, list)
+        self.assertEqual(4, len(all_drives))
+        self.assertIsInstance(all_drives[0], drive.Drive.__class__)
+
+    def test_drives_after_refresh(self):
+        self.storage.refresh()
+        self.assertIsNone(self.storage._drives)
+        self.conn.get.return_value.json.reset_mock()
+
+        successive_return_values = []
+        # repeating the 3rd one to provide mock data for 4th iteration.
+        for fname in STORAGE_DRIVE_FILE_NAMES + [STORAGE_DRIVE_FILE_NAMES[-1]]:
+            with open(fname) as f:
+                successive_return_values.append(json.load(f))
+        self.conn.get.return_value.json.side_effect = successive_return_values
+
+        all_drives = self.storage.drives
+        self.assertIsInstance(all_drives, list)
+        self.assertEqual(4, len(all_drives))
+        for drv in all_drives:
+            self.assertIsInstance(drv, drive.Drive)
+
     def test_drives_max_size_bytes(self):
         self.assertIsNone(self.storage._drives_max_size_bytes)
         self.conn.get.return_value.json.reset_mock()
@@ -66,7 +126,7 @@ class StorageTestCase(base.TestCase):
         successive_return_values = []
         # repeating the 3rd one to provide mock data for 4th iteration.
         for fname in STORAGE_DRIVE_FILE_NAMES + [STORAGE_DRIVE_FILE_NAMES[-1]]:
-            with open(fname, 'r') as f:
+            with open(fname) as f:
                 successive_return_values.append(json.load(f))
         self.conn.get.return_value.json.side_effect = successive_return_values
 
@@ -85,8 +145,173 @@ class StorageTestCase(base.TestCase):
         successive_return_values = []
         # repeating the 3rd one to provide mock data for 4th iteration.
         for fname in STORAGE_DRIVE_FILE_NAMES + [STORAGE_DRIVE_FILE_NAMES[-1]]:
-            with open(fname, 'r') as f:
+            with open(fname) as f:
                 successive_return_values.append(json.load(f))
         self.conn.get.return_value.json.side_effect = successive_return_values
 
         self.assertEqual(899527000000, self.storage.drives_max_size_bytes)
+
+    def test_volumes(self):
+        # check for the underneath variable value
+        self.assertIsNone(self.storage._volumes)
+        # | GIVEN |
+        self.conn.get.return_value.json.reset_mock()
+        with open('sushy/tests/unit/json_samples/volume_collection.json') as f:
+            self.conn.get.return_value.json.return_value = json.load(f)
+        # | WHEN |
+        actual_volumes = self.storage.volumes
+        # | THEN |
+        self.assertIsInstance(actual_volumes,
+                              volume.VolumeCollection)
+        self.conn.get.return_value.json.assert_called_once_with()
+
+    def test_volumes_cached(self):
+        # | GIVEN |
+        self.conn.get.return_value.json.reset_mock()
+        with open('sushy/tests/unit/json_samples/volume_collection.json') as f:
+            self.conn.get.return_value.json.return_value = json.load(f)
+        # invoke it once
+        actual_volumes = self.storage.volumes
+        self.conn.get.return_value.json.reset_mock()
+        # | WHEN & THEN |
+        # tests for same object on invoking subsequently
+        self.assertIs(actual_volumes,
+                      self.storage.volumes)
+        self.conn.get.return_value.json.assert_not_called()
+
+    def test_volumes_on_refresh(self):
+        # | GIVEN |
+        with open('sushy/tests/unit/json_samples/volume_collection.json') as f:
+            self.conn.get.return_value.json.return_value = json.load(f)
+        # | WHEN & THEN |
+        self.assertIsInstance(self.storage.volumes,
+                              volume.VolumeCollection)
+
+        # On refreshing the system instance...
+        with open('sushy/tests/unit/json_samples/storage.json') as f:
+            self.conn.get.return_value.json.return_value = json.load(f)
+
+        self.storage.invalidate()
+        self.storage.refresh(force=False)
+
+        # | WHEN & THEN |
+        self.assertIsNotNone(self.storage._volumes)
+        self.assertTrue(self.storage._volumes._is_stale)
+
+        # | GIVEN |
+        with open('sushy/tests/unit/json_samples/volume_collection.json') as f:
+            self.conn.get.return_value.json.return_value = json.load(f)
+        # | WHEN & THEN |
+        self.assertIsInstance(self.storage.volumes,
+                              volume.VolumeCollection)
+        self.assertFalse(self.storage._volumes._is_stale)
+
+
+class StorageCollectionTestCase(base.TestCase):
+
+    def setUp(self):
+        super(StorageCollectionTestCase, self).setUp()
+        self.conn = mock.Mock()
+        with open('sushy/tests/unit/json_samples/'
+                  'storage_collection.json') as f:
+            self.conn.get.return_value.json.return_value = json.load(f)
+        self.stor_col = storage.StorageCollection(
+            self.conn, '/redfish/v1/Systems/437XR1138R2/Storage',
+            redfish_version='1.0.2')
+
+    def test__parse_attributes(self):
+        self.stor_col._parse_attributes()
+        self.assertEqual((
+            '/redfish/v1/Systems/437XR1138R2/Storage/1',),
+            self.stor_col.members_identities)
+
+    @mock.patch.object(storage, 'Storage', autospec=True)
+    def test_get_member(self, Storage_mock):
+        self.stor_col.get_member(
+            '/redfish/v1/Systems/437XR1138R2/Storage/1')
+        Storage_mock.assert_called_once_with(
+            self.stor_col._conn,
+            '/redfish/v1/Systems/437XR1138R2/Storage/1',
+            redfish_version=self.stor_col.redfish_version)
+
+    @mock.patch.object(storage, 'Storage', autospec=True)
+    def test_get_members(self, Storage_mock):
+        members = self.stor_col.get_members()
+        Storage_mock.assert_called_once_with(
+            self.stor_col._conn,
+            '/redfish/v1/Systems/437XR1138R2/Storage/1',
+            redfish_version=self.stor_col.redfish_version)
+        self.assertIsInstance(members, list)
+        self.assertEqual(1, len(members))
+
+    def test_max_drive_size_bytes(self):
+        self.assertIsNone(self.stor_col._max_drive_size_bytes)
+        self.conn.get.return_value.json.reset_mock()
+
+        successive_return_values = []
+        with open('sushy/tests/unit/json_samples/storage.json') as f:
+            successive_return_values.append(json.load(f))
+        # repeating the 3rd one to provide mock data for 4th iteration.
+        for fname in STORAGE_DRIVE_FILE_NAMES + [STORAGE_DRIVE_FILE_NAMES[-1]]:
+            with open(fname) as f:
+                successive_return_values.append(json.load(f))
+        self.conn.get.return_value.json.side_effect = successive_return_values
+
+        self.assertEqual(899527000000, self.stor_col.max_drive_size_bytes)
+
+        # for any subsequent fetching it gets it from the cached value
+        self.conn.get.return_value.json.reset_mock()
+        self.assertEqual(899527000000, self.stor_col.max_drive_size_bytes)
+        self.conn.get.return_value.json.assert_not_called()
+
+    def test_max_drive_size_bytes_after_refresh(self):
+        self.stor_col.refresh(force=False)
+        self.assertIsNone(self.stor_col._max_drive_size_bytes)
+        self.conn.get.return_value.json.reset_mock()
+
+        successive_return_values = []
+        with open('sushy/tests/unit/json_samples/storage.json') as f:
+            successive_return_values.append(json.load(f))
+        # repeating the 3rd one to provide mock data for 4th iteration.
+        for fname in STORAGE_DRIVE_FILE_NAMES + [STORAGE_DRIVE_FILE_NAMES[-1]]:
+            with open(fname) as f:
+                successive_return_values.append(json.load(f))
+        self.conn.get.return_value.json.side_effect = successive_return_values
+
+        self.assertEqual(899527000000, self.stor_col.max_drive_size_bytes)
+
+    def test_max_volume_size_bytes(self):
+        self.assertIsNone(self.stor_col._max_volume_size_bytes)
+        self.conn.get.return_value.json.reset_mock()
+
+        successive_return_values = []
+        with open('sushy/tests/unit/json_samples/storage.json') as f:
+            successive_return_values.append(json.load(f))
+        # repeating the 3rd one to provide mock data for 4th iteration.
+        for fname in STORAGE_VOLUME_FILE_NAMES:
+            with open(fname) as f:
+                successive_return_values.append(json.load(f))
+        self.conn.get.return_value.json.side_effect = successive_return_values
+
+        self.assertEqual(1073741824000, self.stor_col.max_volume_size_bytes)
+
+        # for any subsequent fetching it gets it from the cached value
+        self.conn.get.return_value.json.reset_mock()
+        self.assertEqual(1073741824000, self.stor_col.max_volume_size_bytes)
+        self.conn.get.return_value.json.assert_not_called()
+
+    def test_max_volume_size_bytes_after_refresh(self):
+        self.stor_col.refresh(force=False)
+        self.assertIsNone(self.stor_col._max_volume_size_bytes)
+        self.conn.get.return_value.json.reset_mock()
+
+        successive_return_values = []
+        with open('sushy/tests/unit/json_samples/storage.json') as f:
+            successive_return_values.append(json.load(f))
+        # repeating the 3rd one to provide mock data for 4th iteration.
+        for fname in STORAGE_VOLUME_FILE_NAMES:
+            with open(fname) as f:
+                successive_return_values.append(json.load(f))
+        self.conn.get.return_value.json.side_effect = successive_return_values
+
+        self.assertEqual(1073741824000, self.stor_col.max_volume_size_bytes)
