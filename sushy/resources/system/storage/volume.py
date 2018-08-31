@@ -53,5 +53,6 @@ class VolumeCollection(base.ResourceCollectionBase):
         return self._max_size_bytes
 
     def _do_refresh(self, force=False):
+        super(VolumeCollection, self)._do_refresh(force)
         # invalidate the attribute
         self._max_size_bytes = None

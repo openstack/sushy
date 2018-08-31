@@ -129,10 +129,9 @@ class ResourceCollectionBaseTestCase(base.TestCase):
                           self.test_resource_collection.get_member, '2')
         self.conn.get.assert_called_once_with(path='Fakes/2')
 
-    def test_get_members(self):
+    def _validate_get_members_result(self, member_ids):
         # | GIVEN |
         # setting some valid member paths
-        member_ids = ('1', '2')
         self.test_resource_collection.members_identities = member_ids
         # | WHEN |
         result = self.test_resource_collection.get_members()
@@ -142,6 +141,26 @@ class ResourceCollectionBaseTestCase(base.TestCase):
             self.assertIsInstance(val, TestResource)
             self.assertTrue(val.identity in member_ids)
             self.assertEqual('1.0.x', val.redfish_version)
+
+        return result
+
+    def test_get_members(self):
+        self._validate_get_members_result(('1', '2'))
+
+    def test_get_members_on_refresh(self):
+        self._validate_get_members_result(('1', '2'))
+
+        # Now emulating the resource invalidate and refresh action!
+        self.test_resource_collection.invalidate()
+        self.assertTrue(self.test_resource_collection._is_stale)
+        self.test_resource_collection.refresh(force=False)
+
+        self._validate_get_members_result(('3', '4'))
+        self.assertFalse(self.test_resource_collection._is_stale)
+
+    def test_get_members_caching(self):
+        result = self._validate_get_members_result(('1', '2'))
+        self.assertIs(result, self.test_resource_collection.get_members())
 
 
 TEST_JSON = {

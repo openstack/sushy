@@ -81,6 +81,7 @@ class SimpleStorageCollection(base.ResourceCollectionBase):
         return self._max_size_bytes
 
     def _do_refresh(self, force=False):
+        super(SimpleStorageCollection, self)._do_refresh(force)
         # Note(deray): undefine the attribute here for fresh creation in
         # subsequent calls to it's exposed property.
         self._max_size_bytes = None
