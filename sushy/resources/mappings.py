@@ -35,7 +35,7 @@ HEALTH_VALUE_MAP = {
 HEALTH_VALUE_MAP_REV = (
     utils.revert_dictionary(HEALTH_VALUE_MAP))
 
-PARAMTYPE_MAP = {
+PARAMTYPE_VALUE_MAP = {
     'string': res_cons.PARAMTYPE_STRING,
     'number': res_cons.PARAMTYPE_NUMBER
 }

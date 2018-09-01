@@ -37,7 +37,8 @@ class MessageDictionaryField(base.DictionaryField):
 
     param_types = base.Field('ParamTypes',
                              adapter=lambda x:
-                                 [res_maps.PARAMTYPE_MAP[v] for v in x])
+                                 [res_maps.PARAMTYPE_VALUE_MAP[v]
+                                  for v in x])
     """Mapped MessageArg types, in order, for the message"""
 
     resolution = base.Field('Resolution', required=True)

@@ -18,7 +18,7 @@ import json
 import mock
 
 from sushy.resources import constants as res_cons
-from sushy.resources.registry import messageregistry
+from sushy.resources.registry import message_registry
 from sushy.tests.unit import base
 
 
@@ -30,7 +30,7 @@ class MessageRegistryTestCase(base.TestCase):
         with open('sushy/tests/unit/json_samples/message_registry.json') as f:
             self.conn.get.return_value.json.return_value = json.load(f)
 
-        self.registry = messageregistry.MessageRegistry(
+        self.registry = message_registry.MessageRegistry(
             self.conn, '/redfish/v1/Registries/Test',
             redfish_version='1.0.2')
 
