@@ -45,11 +45,15 @@ class VirtualMedia(base.ResourceBase):
     write_protected = base.Field('WriteProtected')
     """Indicates the media is write protected"""
 
-    media_types = base.MappedField('MediaTypes', mgr_maps.MEDIA_TYPE_MAP)
-    """This is the media types supported as virtual media"""
+    media_types = base.Field(
+        'MediaTypes', adapter=(
+            lambda x: [mgr_maps.MEDIA_TYPE_VALUE_MAP[v] for v in x
+                       if v in mgr_maps.MEDIA_TYPE_VALUE_MAP]),
+        default=[])
+    """List of supported media types as virtual media"""
 
     connected_via = base.MappedField('ConnectedVia',
-                                     mgr_maps.CONNECTED_VIA_MAP)
+                                     mgr_maps.CONNECTED_VIA_VALUE_MAP)
     """Current virtual media connection methods
 
     Applet: Connected to a client application

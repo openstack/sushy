@@ -77,7 +77,7 @@ COMMAND_SHELL_IPMI = 'command shell ipmi'
 COMMAND_SHELL_OEM = 'command shell oem'
 """Command Shell connection using an OEM-specific protocol"""
 
-# Virtual Media Type constants
+# Supported Virtual Media Type constants
 
 VIRTUAL_MEDIA_CD = 'cd'
 VIRTUAL_MEDIA_DVD = 'dvd'

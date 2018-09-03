@@ -229,7 +229,8 @@ class ManagerTestCase(base.TestCase):
                               virtual_media.VirtualMediaCollection)
         self.assertEqual(actual_virtual_media.name, 'Virtual Media Services')
 
-        member = actual_virtual_media.get_member('Floppy1')
+        member = actual_virtual_media.get_member(
+            '/redfish/v1/Managers/BMC/VirtualMedia/Floppy1')
 
         self.assertEqual(member.image_name, "Sardine2.1.43.35.6a")
         self.assertTrue(member.inserted)
