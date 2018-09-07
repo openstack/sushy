@@ -42,7 +42,7 @@ class Storage(base.ResourceBase):
                                    adapter=utils.get_members_identities)
     """A tuple with the drive identities"""
 
-    _drives_max_size_bytes = None
+    _drives_sizes_bytes = None
     _drives = None
     _volumes = None  # reference to VolumeCollection instance
 
@@ -73,12 +73,21 @@ class Storage(base.ResourceBase):
         return self._drives
 
     @property
+    def drives_sizes_bytes(self):
+        """Sizes of all Drives in bytes in Storage resource.
+
+        Returns the list of cached values until it (or its parent resource)
+        is refreshed.
+        """
+        if self._drives_sizes_bytes is None:
+            self._drives_sizes_bytes = sorted(
+                drv.capacity_bytes for drv in self.drives)
+        return self._drives_sizes_bytes
+
+    @property
     def drives_max_size_bytes(self):
         """Max size available in bytes among all Drives of this collection."""
-        if self._drives_max_size_bytes is None:
-            self._drives_max_size_bytes = (
-                utils.max_safe(drv.capacity_bytes for drv in self.drives))
-        return self._drives_max_size_bytes
+        return utils.max_safe(self.drives_sizes_bytes)
 
     @property
     def volumes(self):
@@ -101,7 +110,7 @@ class Storage(base.ResourceBase):
         """Do resource specific refresh activities."""
         # Note(deray): undefine the attribute here for fresh evaluation in
         # subsequent calls to it's exposed property.
-        self._drives_max_size_bytes = None
+        self._drives_sizes_bytes = None
         self._drives = None
         # invalidate the nested resource
         if self._volumes is not None:
@@ -111,34 +120,66 @@ class Storage(base.ResourceBase):
 class StorageCollection(base.ResourceCollectionBase):
     """This class represents the collection of Storage resources"""
 
-    _max_drive_size_bytes = None
-    _max_volume_size_bytes = None
+    _drives_sizes_bytes = None
+    _volumes_sizes_bytes = None
 
     @property
     def _resource_type(self):
         return Storage
 
     @property
+    def drives_sizes_bytes(self):
+        """Sizes of each Drive in bytes in Storage collection resource.
+
+        Returns the list of cached values until it (or its parent resource)
+        is refreshed.
+        """
+        if self._drives_sizes_bytes is None:
+            self._drives_sizes_bytes = sorted(
+                drive_size
+                for storage_ in self.get_members()
+                for drive_size in storage_.drives_sizes_bytes
+            )
+
+        return self._drives_sizes_bytes
+
+    @property
     def max_drive_size_bytes(self):
-        """Max size available (in bytes) among all device resources."""
-        if self._max_drive_size_bytes is None:
-            self._max_drive_size_bytes = max(
-                storage_.drives_max_size_bytes
-                for storage_ in self.get_members())
-        return self._max_drive_size_bytes
+        """Max size available (in bytes) among all Drive resources.
+
+        Returns the cached value until it (or its parent resource) is
+        refreshed.
+        """
+        return utils.max_safe(self.drives_sizes_bytes)
+
+    @property
+    def volumes_sizes_bytes(self):
+        """Sizes of each Volume in bytes in Storage collection resource.
+
+        Returns the list of cached values until it (or its parent resource)
+        is refreshed.
+        """
+        if self._volumes_sizes_bytes is None:
+            self._volumes_sizes_bytes = sorted(
+                volume_size
+                for storage_ in self.get_members()
+                for volume_size in storage_.volumes.volumes_sizes_bytes)
+
+        return self._volumes_sizes_bytes
 
     @property
     def max_volume_size_bytes(self):
-        """Max size available (in bytes) among all Volumes under this."""
-        if self._max_volume_size_bytes is None:
-            self._max_volume_size_bytes = max(
-                storage_.volumes.max_size_bytes
-                for storage_ in self.get_members())
-        return self._max_volume_size_bytes
+        """Max size available (in bytes) among all Volume resources.
+
+        Returns the cached value until it (or its parent resource) is
+        refreshed.
+        """
+        return utils.max_safe(self.volumes_sizes_bytes)
 
     def _do_refresh(self, force=False):
         """Do resource specific refresh activities"""
+        super(StorageCollection, self)._do_refresh(force)
         # Note(deray): undefine the attributes here for fresh evaluation in
         # subsequent calls to their exposed properties.
-        self._max_drive_size_bytes = None
-        self._max_volume_size_bytes = None
+        self._drives_sizes_bytes = None
+        self._volumes_sizes_bytes = None

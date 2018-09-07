@@ -58,30 +58,40 @@ class SimpleStorage(base.ResourceBase):
 class SimpleStorageCollection(base.ResourceCollectionBase):
     """Represents a collection of simple storage associated with system."""
 
-    _max_size_bytes = None
+    _disks_sizes_bytes = None
 
     @property
     def _resource_type(self):
         return SimpleStorage
 
     @property
-    def max_size_bytes(self):
-        """Max size available (in bytes) among all enabled device resources.
+    def disks_sizes_bytes(self):
+        """Sizes of each Disk in bytes in SimpleStorage collection resource.
 
-        It returns the cached value until it (or its parent resource) is
+        Returns the list of cached values until it (or its parent resource)
+        is refreshed.
+        """
+        if self._disks_sizes_bytes is None:
+            self._disks_sizes_bytes = sorted(
+                device.capacity_bytes
+                for simpl_stor in self.get_members()
+                for device in simpl_stor.devices
+                if device.status.state == res_cons.STATE_ENABLED
+            )
+
+        return self._disks_sizes_bytes
+
+    @property
+    def max_size_bytes(self):
+        """Max size available (in bytes) among all enabled Disk resources.
+
+        Returns the cached value until it (or its parent resource) is
         refreshed.
         """
-        if self._max_size_bytes is None:
-            self._max_size_bytes = (
-                utils.max_safe(device.capacity_bytes
-                               for simpl_stor in self.get_members()
-                               for device in simpl_stor.devices
-                               if (device.status.state ==
-                                   res_cons.STATE_ENABLED)))
-        return self._max_size_bytes
+        return utils.max_safe(self.disks_sizes_bytes)
 
     def _do_refresh(self, force=False):
         super(SimpleStorageCollection, self)._do_refresh(force)
         # Note(deray): undefine the attribute here for fresh creation in
         # subsequent calls to it's exposed property.
-        self._max_size_bytes = None
+        self._disks_sizes_bytes = None
