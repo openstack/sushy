@@ -23,6 +23,8 @@ from sushy.resources.system import constants as sys_cons
 from sushy.resources.system import ethernet_interface
 from sushy.resources.system import mappings as sys_maps
 from sushy.resources.system import processor
+from sushy.resources.system import simple_storage as sys_simple_storage
+from sushy.resources.system.storage import storage as sys_storage
 from sushy import utils
 
 
@@ -119,13 +121,22 @@ class System(base.ResourceBase):
     memory_summary = MemorySummaryField('MemorySummary')
     """The summary info of memory of the system in general detail"""
 
-    _processors = None  # ref to ProcessorCollection instance
-
     _actions = ActionsField('Actions', required=True)
 
+    # reference to ProcessorCollection instance
+    _processors = None
+
+    # reference to EthernetInterfaceCollection instance
     _ethernet_interfaces = None
 
+    # reference to BIOS instance
     _bios = None
+
+    # reference to SimpleStorageCollection instance
+    _simple_storage = None
+
+    # reference to StorageCollection instance
+    _storage = None
 
     def __init__(self, connector, identity, redfish_version=None):
         """A class representing a ComputerSystem
@@ -303,6 +314,56 @@ class System(base.ResourceBase):
         self._bios.refresh(force=False)
         return self._bios
 
+    @property
+    def simple_storage(self):
+        """A collection of simple storage associated with system.
+
+        This returns a reference to `SimpleStorageCollection` instance.
+        SimpleStorage represents the properties of a storage controller and its
+        directly-attached devices.
+
+        It is set once when the first time it is queried. On refresh,
+        this property is marked as stale (greedy-refresh not done).
+        Here the actual refresh of the sub-resource happens, if stale.
+
+        :raises: MissingAttributeError if 'SimpleStorage/@odata.id' field
+            is missing.
+        :returns: `SimpleStorageCollection` instance
+        """
+        if self._simple_storage is None:
+            self._simple_storage = sys_simple_storage.SimpleStorageCollection(
+                self._conn,
+                utils.get_sub_resource_path_by(self, "SimpleStorage"),
+                redfish_version=self.redfish_version)
+
+        self._simple_storage.refresh(force=False)
+        return self._simple_storage
+
+    @property
+    def storage(self):
+        """A collection of storage subsystems associated with system.
+
+        This returns a reference to `StorageCollection` instance.
+        A storage subsystem represents a set of storage controllers (physical
+        or virtual) and the resources such as drives and volumes that can be
+        accessed from that subsystem.
+
+        It is set once when the first time it is queried. On refresh,
+        this property is marked as stale (greedy-refresh not done).
+        Here the actual refresh of the sub-resource happens, if stale.
+
+        :raises: MissingAttributeError if 'Storage/@odata.id' field
+            is missing.
+        :returns: `StorageCollection` instance
+        """
+        if self._storage is None:
+            self._storage = sys_storage.StorageCollection(
+                self._conn, utils.get_sub_resource_path_by(self, "Storage"),
+                redfish_version=self.redfish_version)
+
+        self._storage.refresh(force=False)
+        return self._storage
+
     def _do_refresh(self, force=False):
         """Do custom resource specific refresh activities
 
@@ -316,6 +377,10 @@ class System(base.ResourceBase):
             self._ethernet_interfaces.invalidate(force)
         if self._bios is not None:
             self._bios.invalidate(force)
+        if self._simple_storage is not None:
+            self._simple_storage.invalidate(force)
+        if self._storage is not None:
+            self._storage.invalidate(force)
 
 
 class SystemCollection(base.ResourceCollectionBase):
