@@ -2,7 +2,10 @@
     "@odata.type": "#VirtualMedia.v1_1_0.VirtualMedia",
     "Id": "Floppy1",
     "Name": "Virtual Removable Media",
-    "MediaTypes": "Floppy",
+    "MediaTypes": [
+        "Floppy",
+        "USBStick"
+    ],
     "Actions": {
                 "#VirtualMedia.EjectMedia": {
                     "target": "/redfish/v1/Managers/BMC/VirtualMedia/Floppy1/Actions/VirtualMedia.EjectMedia",

@@ -16,6 +16,7 @@ import json
 
 import mock
 
+import sushy
 from sushy import exceptions
 from sushy.resources.manager import virtual_media
 from sushy.tests.unit import base
@@ -42,8 +43,10 @@ class VirtualMediaTestCase(base.TestCase):
                          self.sys_virtual_media.image)
         self.assertEqual('Sardine2.1.43.35.6a',
                          self.sys_virtual_media.image_name)
-        self.assertEqual('uri', self.sys_virtual_media.connected_via)
-        self.assertEqual('floppy',
+        self.assertEqual(sushy.CONNECTED_VIA_URI,
+                         self.sys_virtual_media.connected_via)
+        self.assertEqual([sushy.VIRTUAL_MEDIA_FLOPPY,
+                          sushy.VIRTUAL_MEDIA_USBSTICK],
                          self.sys_virtual_media.media_types)
         self.assertEqual(True, self.sys_virtual_media.inserted)
         self.assertEqual(False, self.sys_virtual_media.write_protected)
