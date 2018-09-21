@@ -37,22 +37,38 @@ class Volume(base.ResourceBase):
 class VolumeCollection(base.ResourceCollectionBase):
     """This class represents the Storage Volume collection"""
 
-    _max_size_bytes = None
+    _volumes_sizes_bytes = None
 
     @property
     def _resource_type(self):
         return Volume
 
     @property
-    def max_size_bytes(self):
-        """Max size available in bytes among all Volumes of this collection."""
-        if self._max_size_bytes is None:
-            self._max_size_bytes = (
-                utils.max_safe([vol.capacity_bytes
-                                for vol in self.get_members()]))
-        return self._max_size_bytes
+    def volumes_sizes_bytes(self):
+        """Sizes of all Volumes in bytes in VolumeCollection resource.
+
+        Returns the list of cached values until it (or its parent resource)
+        is refreshed.
+        """
+        if self._volumes_sizes_bytes is None:
+            self._volumes_sizes_bytes = sorted(
+                vol.capacity_bytes
+                for vol in self.get_members())
+        return self._volumes_sizes_bytes
+
+    @property
+    def max_volume_size_bytes(self):
+        """Max size available (in bytes) among all Volume resources.
+
+        Returns the cached value until it (or its parent resource) is
+        refreshed.
+        """
+        return utils.max_safe(self.volumes_sizes_bytes)
+
+    # NOTE(etingof): for backward compatibility
+    max_size_bytes = max_volume_size_bytes
 
     def _do_refresh(self, force=False):
         super(VolumeCollection, self)._do_refresh(force)
         # invalidate the attribute
-        self._max_size_bytes = None
+        self._volumes_sizes_bytes = None

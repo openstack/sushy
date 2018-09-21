@@ -86,7 +86,7 @@ class VolumeCollectionTestCase(base.TestCase):
         self.assertEqual(3, len(members))
 
     def test_max_size_bytes(self):
-        self.assertIsNone(self.stor_vol_col._max_size_bytes)
+        self.assertIsNone(self.stor_vol_col._volumes_sizes_bytes)
         self.conn.get.return_value.json.reset_mock()
 
         successive_return_values = []
@@ -107,7 +107,7 @@ class VolumeCollectionTestCase(base.TestCase):
 
     def test_max_size_bytes_after_refresh(self):
         self.stor_vol_col.refresh()
-        self.assertIsNone(self.stor_vol_col._max_size_bytes)
+        self.assertIsNone(self.stor_vol_col._volumes_sizes_bytes)
         self.conn.get.return_value.json.reset_mock()
 
         successive_return_values = []
