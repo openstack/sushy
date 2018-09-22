@@ -1,18 +1,16 @@
 - project:
     templates:
+      - check-requirements
+      - openstack-cover-jobs
+      - openstack-lower-constraints-jobs
       - openstack-python-jobs
       - openstack-python35-jobs
       - openstack-python36-jobs
-      - check-requirements
       - publish-openstack-docs-pti
       - release-notes-jobs-python3
     check:
       jobs:
         - sushy-tempest-dsvm-ironic-ipa-partition-redfish-src
-        - openstack-tox-lower-constraints
-        - openstack-tox-cover
     gate:
       jobs:
         - sushy-tempest-dsvm-ironic-ipa-partition-redfish-src
-        - openstack-tox-lower-constraints
-        - openstack-tox-cover
