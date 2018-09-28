@@ -37,6 +37,9 @@ class Sushy(base.ResourceBase):
     uuid = base.Field('UUID')
     """The Redfish root service UUID"""
 
+    product = base.Field('Product')
+    """The product associated with this Redfish service"""
+
     _systems_path = base.Field(['Systems', '@odata.id'])
     """SystemCollection path"""
 

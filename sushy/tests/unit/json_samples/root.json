@@ -4,6 +4,7 @@
     "Name": "Root Service",
     "RedfishVersion": "1.0.2",
     "UUID": "92384634-2938-2342-8820-489239905423",
+    "Product": "Product",
     "Systems": {
         "@odata.id": "/redfish/v1/Systems"
     },
