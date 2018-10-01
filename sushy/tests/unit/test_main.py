@@ -54,6 +54,7 @@ class MainTestCase(base.TestCase):
         self.assertEqual('1.0.2', self.root.redfish_version)
         self.assertEqual('92384634-2938-2342-8820-489239905423',
                          self.root.uuid)
+        self.assertEqual('Product', self.root.product)
         self.assertEqual('/redfish/v1/Systems', self.root._systems_path)
         self.assertEqual('/redfish/v1/Managers', self.root._managers_path)
         self.assertEqual('/redfish/v1/SessionService',
