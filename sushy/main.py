@@ -26,6 +26,24 @@ from sushy.resources.system import system
 LOG = logging.getLogger(__name__)
 
 
+class ProtocolFeaturesSupportedField(base.CompositeField):
+
+    excerpt_query = base.Field('ExcerptQuery')
+    """The excerpt query parameter is supported"""
+
+    expand_query = base.Field('ExpandQuery')
+    """The expand query parameter is supported"""
+
+    filter_query = base.Field('FilterQuery')
+    """The filter query parameter is supported"""
+
+    only_member_query = base.Field('OnlyMemberQuery')
+    """The only query parameter is supported"""
+
+    select_query = base.Field('SelectQuery')
+    """The select query parameter is supported"""
+
+
 class Sushy(base.ResourceBase):
 
     identity = base.Field('Id', required=True)
@@ -39,6 +57,10 @@ class Sushy(base.ResourceBase):
 
     product = base.Field('Product')
     """The product associated with this Redfish service"""
+
+    protocol_features_supported = ProtocolFeaturesSupportedField(
+        'ProtocolFeaturesSupported')
+    """The information about protocol features supported by the service"""
 
     _systems_path = base.Field(['Systems', '@odata.id'])
     """SystemCollection path"""
