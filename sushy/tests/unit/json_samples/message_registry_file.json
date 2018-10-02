@@ -1,0 +1,18 @@
+{
+    "@odata.type": "#MessageRegistryFile.v1_1_0.MessageRegistryFile",
+    "Id": "Test",
+    "Name": "Test Message Registry File",
+    "Description": "Message Registry file for testing",
+    "Languages": ["en"],
+    "Registry": "Test.1.0",
+    "Location": [
+        {"Language": "default",
+         "Uri": "/redfish/v1/Registries/Test/Test.1.0.json",
+         "ArchiveUri": "/redfish/v1/Registries/Archive.zip",
+         "ArchiveFile": "Test.1.0.json",
+         "PublicationUri": "https://example.com/Registries/Test.1.0.json"
+        }
+    ],
+    "@odata.context": "/redfish/v1/$metadata#MessageRegistryFile.MessageRegistryFile",
+    "@odata.id": "/redfish/v1/Registries/Test"
+}

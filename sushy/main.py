@@ -19,6 +19,7 @@ from sushy import connector as sushy_connector
 from sushy import exceptions
 from sushy.resources import base
 from sushy.resources.manager import manager
+from sushy.resources.registry import message_registry_file
 from sushy.resources.sessionservice import session
 from sushy.resources.sessionservice import sessionservice
 from sushy.resources.system import system
@@ -48,6 +49,9 @@ class Sushy(base.ResourceBase):
 
     _session_service_path = base.Field(['SessionService', '@odata.id'])
     """SessionService path"""
+
+    _registries_path = base.Field(['Registries', '@odata.id'])
+    """Registries path"""
 
     def __init__(self, base_url, username=None, password=None,
                  root_prefix='/redfish/v1/', verify=True,
@@ -161,3 +165,18 @@ class Sushy(base.ResourceBase):
         """
         return session.Session(self._conn, identity,
                                redfish_version=self.redfish_version)
+
+    def _get_registry_collection(self):
+        """Get MessageRegistryFileCollection object
+
+        This resource is optional and can be empty.
+
+        :returns: MessageRegistryFileCollection object
+            or None if Registries not provided
+        """
+
+        if self._registries_path:
+            return message_registry_file.MessageRegistryFileCollection(
+                self._conn,
+                self._registries_path,
+                redfish_version=self.redfish_version)
