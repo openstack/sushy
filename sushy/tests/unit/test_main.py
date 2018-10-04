@@ -56,6 +56,12 @@ class MainTestCase(base.TestCase):
         self.assertEqual('92384634-2938-2342-8820-489239905423',
                          self.root.uuid)
         self.assertEqual('Product', self.root.product)
+        self.assertTrue(self.root.protocol_features_supported.excerpt_query)
+        self.assertFalse(self.root.protocol_features_supported.expand_query)
+        self.assertTrue(self.root.protocol_features_supported.filter_query)
+        self.assertTrue(
+            self.root.protocol_features_supported.only_member_query)
+        self.assertFalse(self.root.protocol_features_supported.select_query)
         self.assertEqual('/redfish/v1/Systems', self.root._systems_path)
         self.assertEqual('/redfish/v1/Managers', self.root._managers_path)
         self.assertEqual('/redfish/v1/SessionService',
