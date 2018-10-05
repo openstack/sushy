@@ -45,3 +45,33 @@ SEVERITY_VALUE_MAP = {
     'Warning': res_cons.SEVERITY_WARNING,
     'Critical': res_cons.SEVERITY_CRITICAL
 }
+
+INDICATOR_LED_VALUE_MAP = {
+    'Lit': res_cons.INDICATOR_LED_LIT,
+    'Blinking': res_cons.INDICATOR_LED_BLINKING,
+    'Off': res_cons.INDICATOR_LED_OFF,
+    'Unknown': res_cons.INDICATOR_LED_UNKNOWN,
+}
+
+POWER_STATE_VALUE_MAP = {
+    'On': res_cons.POWER_STATE_ON,
+    'Off': res_cons.POWER_STATE_OFF,
+    'PoweringOn': res_cons.POWER_STATE_POWERING_ON,
+    'PoweringOff': res_cons.POWER_STATE_POWERING_OFF,
+}
+
+POWER_STATE_MAP_REV = utils.revert_dictionary(POWER_STATE_VALUE_MAP)
+
+RESET_TYPE_VALUE_MAP = {
+    'On': res_cons.RESET_TYPE_ON,
+    'ForceOff': res_cons.RESET_TYPE_FORCE_OFF,
+    'GracefulShutdown': res_cons.RESET_TYPE_GRACEFUL_SHUTDOWN,
+    'GracefulRestart': res_cons.RESET_TYPE_GRACEFUL_RESTART,
+    'ForceRestart': res_cons.RESET_TYPE_FORCE_RESTART,
+    'Nmi': res_cons.RESET_TYPE_NMI,
+    'ForceOn': res_cons.RESET_TYPE_FORCE_ON,
+    'PushPowerButton': res_cons.RESET_TYPE_PUSH_POWER_BUTTON,
+    'PowerCycle': res_cons.RESET_TYPE_POWER_CYCLE,
+}
+
+RESET_TYPE_VALUE_MAP_REV = utils.revert_dictionary(RESET_TYPE_VALUE_MAP)

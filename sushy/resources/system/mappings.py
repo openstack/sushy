@@ -30,22 +30,6 @@ RESET_SYSTEM_VALUE_MAP = {
 
 RESET_SYSTEM_VALUE_MAP_REV = utils.revert_dictionary(RESET_SYSTEM_VALUE_MAP)
 
-SYSTEM_POWER_STATE_MAP = {
-    'On': sys_cons.SYSTEM_POWER_STATE_ON,
-    'Off': sys_cons.SYSTEM_POWER_STATE_OFF,
-    'PoweringOn': sys_cons.SYSTEM_POWER_STATE_POWERING_ON,
-    'PoweringOff': sys_cons.SYSTEM_POWER_STATE_POWERING_OFF,
-}
-
-SYSTEM_POWER_STATE_MAP_REV = utils.revert_dictionary(SYSTEM_POWER_STATE_MAP)
-
-SYSTEM_INDICATOR_LED_MAP = {
-    'Lit': sys_cons.SYSTEM_INDICATOR_LED_LIT,
-    'Blinking': sys_cons.SYSTEM_INDICATOR_LED_BLINKING,
-    'Off': sys_cons.SYSTEM_INDICATOR_LED_OFF,
-    'Unknown': sys_cons.SYSTEM_INDICATOR_LED_UNKNOWN,
-}
-
 BOOT_SOURCE_TARGET_MAP = {
     'None': sys_cons.BOOT_SOURCE_TARGET_NONE,
     'Pxe': sys_cons.BOOT_SOURCE_TARGET_PXE,

@@ -13,10 +13,15 @@
 # Values comes from the Redfish System json-schema 1.0.0:
 # http://redfish.dmtf.org/schemas/v1/Manager.v1_0_0.json#/definitions/Manager  # noqa
 
+from sushy.resources import constants as res_cons
+
 # Manager Reset action constants
 
-RESET_MANAGER_GRACEFUL_RESTART = 'graceful restart'
-RESET_MANAGER_FORCE_RESTART = 'force restart'
+RESET_MANAGER_GRACEFUL_RESTART = res_cons.RESET_TYPE_GRACEFUL_RESTART
+"""Perform a graceful shutdown followed by a restart of the system"""
+
+RESET_MANAGER_FORCE_RESTART = res_cons.RESET_TYPE_FORCE_RESTART
+"""Perform an immediate (non-graceful) shutdown, followed by a restart"""
 
 # Manager Type constants
 

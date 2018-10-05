@@ -1,0 +1,98 @@
+{
+    "@odata.type": "#Chassis.v1_8_0.Chassis",
+    "Id": "Blade1",
+    "Name": "Blade",
+    "Description": "Test description",
+    "ChassisType": "Blade",
+    "AssetTag": "45Z-2381",
+    "Manufacturer": "Contoso",
+    "Model": "SX1000",
+    "SKU": "6914260",
+    "SerialNumber": "529QB9450R6",
+    "PartNumber": "166480-S23",
+    "UUID": "FFFFFFFF-FFFF-FFFF-FFFF-FFFFFFFFFFFF",
+    "PowerState": "On",
+    "IndicatorLED": "Off",
+    "Status": {
+        "State": "Enabled",
+        "Health": "OK"
+    },
+    "HeightMm": 44.45,
+    "WidthMm": 431.8,
+    "DepthMm": 711,
+    "WeightKg": 15.31,
+    "Location": {
+        "PartLocation": {
+            "ServiceLabel": "Blade 1",
+            "LocationType": "Slot",
+            "LocationOrdinalValue": 0,
+            "Reference": "Front",
+            "Orientation": "LeftToRight"
+        }
+    },
+    "PhysicalSecurity": {
+        "IntrusionSensor": "Normal",
+        "IntrusionSensorNumber": 123,
+        "IntrusionSensorReArm": "Manual"
+    },
+    "Thermal": {
+        "@odata.id": "/redfish/v1/Chassis/Blade1/Thermal"
+    },
+    "Links": {
+        "ComputerSystems": [
+            {
+                "@odata.id": "/redfish/v1/Systems/529QB9450R6"
+            }
+        ],
+        "ManagedBy": [
+            {
+                "@odata.id": "/redfish/v1/Managers/Blade1BMC"
+            }
+        ],
+        "ContainedBy": {
+            "@odata.id": "/redfish/v1/Chassis/MultiBladeEncl"
+        },
+        "CooledBy": [
+            {
+                "@odata.id": "/redfish/v1/Chassis/MultiBladeEncl/Thermal#/Fans/0"
+            },
+            {
+                "@odata.id": "/redfish/v1/Chassis/MultiBladeEncl/Thermal#/Fans/1"
+            },
+            {
+                "@odata.id": "/redfish/v1/Chassis/MultiBladeEncl/Thermal#/Fans/2"
+            },
+            {
+                "@odata.id": "/redfish/v1/Chassis/MultiBladeEncl/Thermal#/Fans/3"
+            }
+        ],
+        "PoweredBy": [
+            {
+                "@odata.id": "/redfish/v1/Chassis/MultiBladeEncl/Power#/PowerSupplies/0"
+            },
+            {
+                "@odata.id": "/redfish/v1/Chassis/MultiBladeEncl/Power#/PowerSupplies/1"
+            }
+        ]
+    },
+    "Actions": {
+        "#Chassis.Reset": {
+            "target": "/redfish/v1/Chassis/Blade1/Actions/Chassis.Reset",
+            "ResetType@Redfish.AllowableValues": [
+                "ForceRestart",
+                "GracefulRestart",
+                "On",
+                "ForceOff",
+                "GracefulShutdown",
+                "Nmi",
+                "ForceOn",
+                "PushPowerButton",
+                "PowerCycle"
+            ]
+        },
+        "Oem": {}
+    },
+    "@odata.context": "/redfish/v1/$metadata#Chassis.Chassis",
+    "@odata.id": "/redfish/v1/Chassis/Blade1",
+    "@Redfish.Copyright": "Copyright 2014-2017 Distributed Management Task Force, Inc. (DMTF). For the full DMTF copyright policy, see http://www.dmtf.org/about/policies/copyright."
+}

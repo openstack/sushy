@@ -18,6 +18,7 @@ import logging
 from sushy import exceptions
 from sushy.resources import base
 from sushy.resources import common
+from sushy.resources import mappings as res_maps
 from sushy.resources.system import bios
 from sushy.resources.system import constants as sys_cons
 from sushy.resources.system import ethernet_interface
@@ -86,7 +87,7 @@ class System(base.ResourceBase):
     """The system identity string"""
 
     indicator_led = base.MappedField('IndicatorLED',
-                                     sys_maps.SYSTEM_INDICATOR_LED_MAP)
+                                     res_maps.INDICATOR_LED_VALUE_MAP)
     """Whether the indicator LED is lit or off"""
 
     manufacturer = base.Field('Manufacturer')
@@ -99,7 +100,7 @@ class System(base.ResourceBase):
     """The system part number"""
 
     power_state = base.MappedField('PowerState',
-                                   sys_maps.SYSTEM_POWER_STATE_MAP)
+                                   res_maps.POWER_STATE_VALUE_MAP)
     """The system power state"""
 
     serial_number = base.Field('SerialNumber')

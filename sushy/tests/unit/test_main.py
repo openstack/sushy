@@ -21,6 +21,7 @@ from sushy import auth
 from sushy import connector
 from sushy import exceptions
 from sushy import main
+from sushy.resources.chassis import chassis
 from sushy.resources.manager import manager
 from sushy.resources.registry import message_registry_file
 from sushy.resources.sessionservice import session
@@ -97,6 +98,20 @@ class MainTestCase(base.TestCase):
         self.root.get_system('fake-system-id')
         mock_system.assert_called_once_with(
             self.root._conn, 'fake-system-id',
+            redfish_version=self.root.redfish_version)
+
+    @mock.patch.object(chassis, 'Chassis', autospec=True)
+    def test_get_chassis(self, mock_chassis):
+        self.root.get_chassis('fake-chassis-id')
+        mock_chassis.assert_called_once_with(
+            self.root._conn, 'fake-chassis-id',
+            redfish_version=self.root.redfish_version)
+
+    @mock.patch.object(chassis, 'ChassisCollection', autospec=True)
+    def test_get_chassis_collection(self, chassis_collection_mock):
+        self.root.get_chassis_collection()
+        chassis_collection_mock.assert_called_once_with(
+            self.root._conn, '/redfish/v1/Chassis',
             redfish_version=self.root.redfish_version)
 
     @mock.patch.object(manager, 'ManagerCollection', autospec=True)
