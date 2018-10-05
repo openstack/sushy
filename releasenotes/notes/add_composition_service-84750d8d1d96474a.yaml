@@ -1,0 +1,8 @@
+---
+features:
+  - |
+    Adds support for the CompositionService resource to the library.
+
+    The `CompositionService` is the top level resource for all things
+    related to Composability. If a Redfish service supports Composability,
+    the Service Root resource will contain the `CompositionService` property.

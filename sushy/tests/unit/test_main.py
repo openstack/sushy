@@ -22,6 +22,7 @@ from sushy import connector
 from sushy import exceptions
 from sushy import main
 from sushy.resources.chassis import chassis
+from sushy.resources.compositionservice import compositionservice
 from sushy.resources.manager import manager
 from sushy.resources.registry import message_registry_file
 from sushy.resources.sessionservice import session
@@ -69,6 +70,8 @@ class MainTestCase(base.TestCase):
         self.assertEqual('/redfish/v1/Chassis', self.root._chassis_path)
         self.assertEqual('/redfish/v1/SessionService',
                          self.root._session_service_path)
+        self.assertEqual('/redfish/v1/CompositionService',
+                         self.root._composition_service_path)
 
     @mock.patch.object(connector, 'Connector', autospec=True)
     def test__init_throws_exception(self, mock_Connector):
@@ -161,6 +164,14 @@ class MainTestCase(base.TestCase):
             self.root._conn, '/redfish/v1/Registries',
             redfish_version=self.root.redfish_version)
 
+    @mock.patch.object(
+        compositionservice, 'CompositionService', autospec=True)
+    def test_get_composition_service(self, mock_comp_ser):
+        self.root.get_composition_service()
+        mock_comp_ser.assert_called_once_with(
+            self.root._conn, '/redfish/v1/CompositionService',
+            redfish_version=self.root.redfish_version)
+
 
 class BareMinimumMainTestCase(base.TestCase):
 
@@ -197,6 +208,12 @@ class BareMinimumMainTestCase(base.TestCase):
         self.assertRaisesRegex(
             exceptions.MissingAttributeError,
             'UpdateService/@odata.id', self.root.get_update_service)
+
+    def test_get_composition_service_when_compositionservice_attr_absent(
+        self):
+        self.assertRaisesRegex(
+            exceptions.MissingAttributeError,
+            'CompositionService/@odata.id', self.root.get_composition_service)
 
     def test__get_registry_collection_when_registries_attr_absent(self):
         self.assertIsNone(self.root._get_registry_collection())
