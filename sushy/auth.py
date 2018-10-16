@@ -69,6 +69,12 @@ class AuthBase(object):
     def can_refresh_session(self):
         """Method to assert if session based refresh can be done."""
 
+    def close(self):
+        """Shutdown Redfish authentication object
+
+        Undoes whatever should be undone to cancel authenticated session.
+        """
+
     def __enter__(self):
         """Allow object to be called with the 'with' statement."""
         return self
