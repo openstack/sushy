@@ -63,6 +63,13 @@ class BasicAuthTestCase(base.TestCase):
     def test_can_refresh_session(self):
         self.assertFalse(self.base_auth.can_refresh_session())
 
+    @mock.patch.object(auth.BasicAuth, 'close', autospec=True)
+    def test_context_manager(self, auth_close):
+        with auth.BasicAuth(self.username, self.password) as base_auth:
+            self.assertEqual(self.username, base_auth._username)
+            self.assertEqual(self.password, base_auth._password)
+        auth_close.assert_called_once_with(base_auth)
+
 
 class SessionAuthTestCase(base.TestCase):
 
@@ -192,6 +199,13 @@ class SessionAuthTestCase(base.TestCase):
         self.assertTrue(mock_LOG.warning.called)
         self.assertIsNone(self.sess_auth.get_session_resource_id())
         self.assertIsNone(self.sess_auth.get_session_key())
+
+    @mock.patch.object(auth.SessionAuth, 'close', autospec=True)
+    def test_context_manager(self, auth_close):
+        with auth.SessionAuth(self.username, self.password) as session_auth:
+            self.assertEqual(self.username, session_auth._username)
+            self.assertEqual(self.password, session_auth._password)
+        auth_close.assert_called_once_with(session_auth)
 
 
 class SessionOrBasicAuthTestCase(base.TestCase):
@@ -331,3 +345,11 @@ class SessionOrBasicAuthTestCase(base.TestCase):
         self.conn.delete.assert_called_once_with(self.sess_uri)
         self.assertIsNone(self.sess_basic_auth.get_session_resource_id())
         self.assertIsNone(self.sess_basic_auth.get_session_key())
+
+    @mock.patch.object(auth.SessionOrBasicAuth, 'close', autospec=True)
+    def test_context_manager(self, auth_close):
+        with auth.SessionOrBasicAuth(
+                self.username, self.password) as session_or_base_auth:
+            self.assertEqual(self.username, session_or_base_auth._username)
+            self.assertEqual(self.password, session_or_base_auth._password)
+        auth_close.assert_called_once_with(session_or_base_auth)
