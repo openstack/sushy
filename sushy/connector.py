@@ -13,7 +13,6 @@
 #    License for the specific language governing permissions and limitations
 #    under the License.
 
-import json
 import logging
 
 import requests
@@ -55,7 +54,8 @@ class Connector(object):
         """Close this connector and the associated HTTP session."""
         self._session.close()
 
-    def _op(self, method, path='', data=None, headers=None):
+    def _op(self, method, path='', data=None, headers=None,
+            **extra_session_req_kwargs):
         """Generic RESTful request handler.
 
         :param method: The HTTP method to be used, e.g: GET, POST,
@@ -63,29 +63,24 @@ class Connector(object):
         :param path: The sub-URI path to the resource.
         :param data: Optional JSON data.
         :param headers: Optional dictionary of headers.
+        :param extra_session_req_kwargs: Optional keyword argument to pass
+         requests library arguments which would pass on to requests session
+         object.
         :returns: The response object from the requests library.
         :raises: ConnectionError
         :raises: HTTPError
         """
-        json_data = None
-        if headers is None:
-            headers = {}
-
-        if data is not None:
-            json_data = json.dumps(data)
-            headers['Content-Type'] = 'application/json'
-
         url = parse.urljoin(self._url, path)
         # TODO(lucasagomes): We should mask the data to remove sensitive
         # information
-        LOG.debug('HTTP request: %(method)s %(url)s; '
-                  'headers: %(headers)s; body: %(data)s',
+        LOG.debug('HTTP request: %(method)s %(url)s; headers: %(headers)s; '
+                  'body: %(data)s; session arguments: %(session)s;',
                   {'method': method, 'url': url, 'headers': headers,
-                   'data': json_data})
+                   'data': data, 'session': extra_session_req_kwargs})
         try:
-            response = self._session.request(method, url,
-                                             data=json_data,
-                                             headers=headers)
+            response = self._session.request(method, url, json=data,
+                                             headers=headers,
+                                             **extra_session_req_kwargs)
         except requests.ConnectionError as e:
             raise exceptions.ConnectionError(url=url, error=e)
         # If we received an AccessError, and we
@@ -99,9 +94,9 @@ class Connector(object):
                 self._auth.refresh_session()
                 LOG.debug("Authentication refreshed successfully, "
                           "retrying the call.")
-                response = self._session.request(method, url,
-                                                 data=json_data,
-                                                 headers=headers)
+                response = self._session.request(method, url, json=data,
+                                                 headers=headers,
+                                                 **extra_session_req_kwargs)
             else:
                 raise
 
@@ -112,65 +107,90 @@ class Connector(object):
 
         return response
 
-    def get(self, path='', data=None, headers=None):
+    def get(self, path='', data=None, headers=None,
+            **extra_session_req_kwargs):
         """HTTP GET method.
 
         :param path: Optional sub-URI path to the resource.
         :param data: Optional JSON data.
         :param headers: Optional dictionary of headers.
+        :param extra_session_req_kwargs: Optional keyword argument to pass
+         requests library arguments which would pass on to requests session
+         object.
         :returns: The response object from the requests library.
         :raises: ConnectionError
         :raises: HTTPError
         """
-        return self._op('GET', path, data, headers)
+        return self._op('GET', path, data=data, headers=headers,
+                        **extra_session_req_kwargs)
 
-    def post(self, path='', data=None, headers=None):
+    def post(self, path='', data=None, headers=None,
+             **extra_session_req_kwargs):
         """HTTP POST method.
 
         :param path: Optional sub-URI path to the resource.
         :param data: Optional JSON data.
         :param headers: Optional dictionary of headers.
+        :param extra_session_req_kwargs: Optional keyword argument to pass
+         requests library arguments which would pass on to requests session
+         object.
         :returns: The response object from the requests library.
         :raises: ConnectionError
         :raises: HTTPError
         """
-        return self._op('POST', path, data, headers)
+        return self._op('POST', path, data=data, headers=headers,
+                        **extra_session_req_kwargs)
 
-    def patch(self, path='', data=None, headers=None):
+    def patch(self, path='', data=None, headers=None,
+              **extra_session_req_kwargs):
         """HTTP PATCH method.
 
         :param path: Optional sub-URI path to the resource.
         :param data: Optional JSON data.
         :param headers: Optional dictionary of headers.
+        :param extra_session_req_kwargs: Optional keyword argument to pass
+         requests library arguments which would pass on to requests session
+         object.
         :returns: The response object from the requests library.
         :raises: ConnectionError
         :raises: HTTPError
         """
-        return self._op('PATCH', path, data, headers)
+        return self._op('PATCH', path, data=data, headers=headers,
+                        **extra_session_req_kwargs)
 
-    def put(self, path='', data=None, headers=None):
+    def put(self, path='', data=None, headers=None,
+            **extra_session_req_kwargs):
         """HTTP PUT method.
 
         :param path: Optional sub-URI path to the resource.
         :param data: Optional JSON data.
         :param headers: Optional dictionary of headers.
+        :param extra_session_req_kwargs: Optional keyword argument to pass
+         requests library arguments which would pass on to requests session
+         object.
         :returns: The response object from the requests library.
         :raises: ConnectionError
         :raises: HTTPError
         """
-        return self._op('PUT', path, data, headers)
+        return self._op('PUT', path, data=data, headers=headers,
+                        **extra_session_req_kwargs)
 
-    def delete(self, path='', data=None, headers=None):
+    def delete(self, path='', data=None, headers=None,
+               **extra_session_req_kwargs):
         """HTTP DELETE method.
 
         :param path: Optional sub-URI path to the resource.
         :param data: Optional JSON data.
         :param headers: Optional dictionary of headers.
+        :param extra_session_req_kwargs: Optional keyword argument to pass
+         requests library arguments which would pass on to requests session
+         object.
         :returns: The response object from the requests library.
         :raises: ConnectionError
         :raises: HTTPError
         """
-        return self._op('DELETE', path, data, headers)
+        return self._op('DELETE', path, data=data, headers=headers,
+                        **extra_session_req_kwargs)
 
     def __enter__(self):
         return self

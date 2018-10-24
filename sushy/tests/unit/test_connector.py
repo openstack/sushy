@@ -48,35 +48,35 @@ class ConnectorMethodsTestCase(base.TestCase):
         self.conn.get(path='fake/path', data=self.data.copy(),
                       headers=self.headers.copy())
         mock__op.assert_called_once_with(mock.ANY, 'GET', 'fake/path',
-                                         self.data, self.headers)
+                                         data=self.data, headers=self.headers)
 
     @mock.patch.object(connector.Connector, '_op', autospec=True)
     def test_post(self, mock__op):
         self.conn.post(path='fake/path', data=self.data.copy(),
                        headers=self.headers.copy())
         mock__op.assert_called_once_with(mock.ANY, 'POST', 'fake/path',
-                                         self.data, self.headers)
+                                         data=self.data, headers=self.headers)
 
     @mock.patch.object(connector.Connector, '_op', autospec=True)
     def test_patch(self, mock__op):
         self.conn.patch(path='fake/path', data=self.data.copy(),
                         headers=self.headers.copy())
         mock__op.assert_called_once_with(mock.ANY, 'PATCH', 'fake/path',
-                                         self.data, self.headers)
+                                         data=self.data, headers=self.headers)
 
     @mock.patch.object(connector.Connector, '_op', autospec=True)
     def test_put(self, mock__op):
         self.conn.put(path='fake/path', data=self.data.copy(),
                       headers=self.headers.copy())
         mock__op.assert_called_once_with(mock.ANY, 'PUT', 'fake/path',
-                                         self.data, self.headers)
+                                         data=self.data, headers=self.headers)
 
     @mock.patch.object(connector.Connector, '_op', autospec=True)
     def test_delete(self, mock__op):
         self.conn.delete(path='fake/path', data=self.data.copy(),
                          headers=self.headers.copy())
         mock__op.assert_called_once_with(mock.ANY, 'DELETE', 'fake/path',
-                                         self.data, self.headers)
+                                         data=self.data, headers=self.headers)
 
     def test_set_auth(self):
         mock_auth = mock.MagicMock()
@@ -119,59 +119,52 @@ class ConnectorOpTestCase(base.TestCase):
         self.request.return_value.status_code = http_client.OK
 
     def test_ok_get(self):
-        expected_headers = self.headers.copy()
-
         self.conn._op('GET', path='fake/path', headers=self.headers)
         self.request.assert_called_once_with(
             'GET', 'http://foo.bar:1234/fake/path',
-            data=None, headers=expected_headers)
+            headers=self.headers, json=None)
+
+    def test_ok_get_url_redirect_false(self):
+        self.conn._op('GET', path='fake/path', headers=self.headers,
+                      allow_redirects=False)
+        self.request.assert_called_once_with(
+            'GET', 'http://foo.bar:1234/fake/path',
+            headers=self.headers, json=None, allow_redirects=False)
 
     def test_ok_post(self):
-        expected_headers = self.headers.copy()
-        expected_headers['Content-Type'] = 'application/json'
-
         self.conn._op('POST', path='fake/path', data=self.data.copy(),
                       headers=self.headers)
         self.request.assert_called_once_with(
             'POST', 'http://foo.bar:1234/fake/path',
-            data=json.dumps(self.data), headers=expected_headers)
+            json=self.data, headers=self.headers)
 
     def test_ok_put(self):
-        expected_headers = self.headers.copy()
-        expected_headers['Content-Type'] = 'application/json'
-
         self.conn._op('PUT', path='fake/path', data=self.data.copy(),
                       headers=self.headers)
         self.request.assert_called_once_with(
             'PUT', 'http://foo.bar:1234/fake/path',
-            data=json.dumps(self.data), headers=expected_headers)
+            json=self.data, headers=self.headers)
 
     def test_ok_delete(self):
-        expected_headers = self.headers.copy()
-
         self.conn._op('DELETE', path='fake/path', headers=self.headers.copy())
         self.request.assert_called_once_with(
             'DELETE', 'http://foo.bar:1234/fake/path',
-            data=None, headers=expected_headers)
+            headers=self.headers, json=None)
 
     def test_ok_post_with_session(self):
         self.conn._session.headers = {}
         self.conn._session.headers['X-Auth-Token'] = 'asdf1234'
         expected_headers = self.headers.copy()
-        expected_headers['Content-Type'] = 'application/json'
-
-        self.conn._op('POST', path='fake/path', data=self.data,
-                      headers=self.headers)
+        self.conn._op('POST', path='fake/path', headers=self.headers,
+                      data=self.data)
         self.request.assert_called_once_with(
             'POST', 'http://foo.bar:1234/fake/path',
-            data=json.dumps(self.data), headers=expected_headers)
+            json=self.data, headers=expected_headers)
         self.assertEqual(self.conn._session.headers,
                          {'X-Auth-Token': 'asdf1234'})
 
     def test_timed_out_session_unable_to_create_session(self):
         self.conn._auth.can_refresh_session.return_value = False
-        expected_headers = self.headers.copy()
-        expected_headers['Content-Type'] = 'application/json'
         self.conn._session = self.session
         self.request = self.session.request
         self.request.return_value.status_code = http_client.FORBIDDEN
@@ -190,8 +183,6 @@ class ConnectorOpTestCase(base.TestCase):
         self.session = mock.Mock(spec=requests.Session)
         self.conn._session = self.session
         self.request = self.session.request
-        first_expected_headers = self.headers.copy()
-        first_expected_headers['Content-Type'] = 'application/json'
         first_response = mock.Mock()
         first_response.status_code = http_client.FORBIDDEN
         second_response = mock.Mock()
