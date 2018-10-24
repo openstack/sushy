@@ -97,7 +97,6 @@ class SimpleStorageCollectionTestCase(base.TestCase):
                          self.simpl_stor_col.disks_sizes_bytes)
 
     def test_max_size_bytes(self):
-        self.assertIsNone(self.simpl_stor_col._disks_sizes_bytes)
         self.conn.get.return_value.json.reset_mock()
 
         with open('sushy/tests/unit/json_samples/'
@@ -113,7 +112,6 @@ class SimpleStorageCollectionTestCase(base.TestCase):
 
     def test_max_size_bytes_after_refresh(self):
         self.simpl_stor_col.refresh()
-        self.assertIsNone(self.simpl_stor_col._disks_sizes_bytes)
         self.conn.get.return_value.json.reset_mock()
 
         with open('sushy/tests/unit/json_samples/'

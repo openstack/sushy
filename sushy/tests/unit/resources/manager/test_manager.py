@@ -54,7 +54,6 @@ class ManagerTestCase(base.TestCase):
         self.assertEqual(sushy.MANAGER_TYPE_BMC, self.manager.manager_type)
         self.assertEqual('58893887-8974-2487-2389-841168418919',
                          self.manager.uuid)
-        self.assertIsNone(self.manager._virtual_media)
 
     def test_get_supported_graphical_console_types(self):
         # | GIVEN |
@@ -243,8 +242,8 @@ class ManagerTestCase(base.TestCase):
             self.conn.get.return_value.json.return_value = json.load(f)
 
         # | WHEN & THEN |
-        self.assertIsInstance(self.manager.virtual_media,
-                              virtual_media.VirtualMediaCollection)
+        vrt_media = self.manager.virtual_media
+        self.assertIsInstance(vrt_media, virtual_media.VirtualMediaCollection)
 
         # On refreshing the manager instance...
         with open('sushy/tests/unit/json_samples/manager.json', 'r') as f:
@@ -254,8 +253,7 @@ class ManagerTestCase(base.TestCase):
         self.manager.refresh(force=False)
 
         # | WHEN & THEN |
-        self.assertIsNotNone(self.manager._virtual_media)
-        self.assertTrue(self.manager._virtual_media._is_stale)
+        self.assertTrue(vrt_media._is_stale)
 
         # | GIVEN |
         with open('sushy/tests/unit/json_samples/'
@@ -265,7 +263,7 @@ class ManagerTestCase(base.TestCase):
         # | WHEN & THEN |
         self.assertIsInstance(self.manager.virtual_media,
                               virtual_media.VirtualMediaCollection)
-        self.assertFalse(self.manager._virtual_media._is_stale)
+        self.assertFalse(vrt_media._is_stale)
 
 
 class ManagerCollectionTestCase(base.TestCase):

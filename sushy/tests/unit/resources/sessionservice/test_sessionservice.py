@@ -53,7 +53,6 @@ class SessionServiceTestCase(base.TestCase):
         self.assertEqual('Session Service', self.sess_serv_inst.name)
         self.assertEqual(30, self.sess_serv_inst.session_timeout)
         self.assertEqual(exp_path, self.sess_serv_inst.path)
-        self.assertIsNone(self.sess_serv_inst._sessions)
 
     def test__parse_attributes_missing_timeout(self):
         self.sess_serv_inst.json.pop('SessionTimeout')
@@ -134,8 +133,6 @@ class SessionServiceTestCase(base.TestCase):
         self.conn.get.return_value.json.side_effect = successive_return_values
 
     def test_sessions(self):
-        # check for the underneath variable value
-        self.assertIsNone(self.sess_serv_inst._sessions)
         # | GIVEN |
         self._setUp_sessions()
         # | WHEN |
@@ -166,8 +163,7 @@ class SessionServiceTestCase(base.TestCase):
         self.sess_serv_inst.refresh(force=True)
 
         # | WHEN & THEN |
-        self.assertIsNotNone(self.sess_serv_inst._sessions)
-        self.assertFalse(self.sess_serv_inst._sessions._is_stale)
+        self.assertFalse(self.sess_serv_inst.sessions._is_stale)
 
     def test_close_session(self):
         self.sess_serv_inst.close_session('session/identity')

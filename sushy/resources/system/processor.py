@@ -18,6 +18,7 @@ import logging
 from sushy.resources import base
 from sushy.resources import common
 from sushy.resources.system import mappings as sys_maps
+from sushy import utils
 
 # Representation of Summary of Processor information
 ProcessorSummary = collections.namedtuple('ProcessorSummary',
@@ -104,10 +105,8 @@ class ProcessorCollection(base.ResourceCollectionBase):
     def _resource_type(self):
         return Processor
 
-    _summary = None
-    """The summary of processors of the system in general detail"""
-
     @property
+    @utils.cache_it
     def summary(self):
         """Property to provide ProcessorSummary info
 
@@ -117,25 +116,21 @@ class ProcessorCollection(base.ResourceCollectionBase):
         :returns: A namedtuple containing the ``count`` of processors
             in regards to logical CPUs, and their ``architecture``.
         """
-        if self._summary is None:
-            count, architecture = 0, None
-            for proc in self.get_members():
-                # Note(deray): It attempts to detect the number of CPU cores.
-                # It returns the number of logical CPUs.
-                if proc.total_threads is not None:
-                    count += proc.total_threads
+        count, architecture = 0, None
+        for proc in self.get_members():
+            # Note(deray): It attempts to detect the number of CPU cores.
+            # It returns the number of logical CPUs.
+            if proc.total_threads is not None:
+                count += proc.total_threads
 
-                # Note(deray): Bail out of checking the architecture info
-                # if you have already got hold of any one of the processors'
-                # architecture information.
-                if (architecture is None
-                        and proc.processor_architecture is not None):
-                    architecture = proc.processor_architecture
+            # Note(deray): Bail out of checking the architecture info
+            # if you have already got hold of any one of the processors'
+            # architecture information.
+            if (architecture is None
+                    and proc.processor_architecture is not None):
+                architecture = proc.processor_architecture
 
-            self._summary = ProcessorSummary(count=count,
-                                             architecture=architecture)
-
-        return self._summary
+        return ProcessorSummary(count=count, architecture=architecture)
 
     def __init__(self, connector, path, redfish_version=None):
         """A class representing a ProcessorCollection
@@ -155,6 +150,5 @@ class ProcessorCollection(base.ResourceCollectionBase):
         greedy-refresh not done for them unless forced by ``force``
         argument.
         """
-        super(ProcessorCollection, self)._do_refresh(force)
-        # Reset summary attribute
-        self._summary = None
+        super(ProcessorCollection, self)._do_refresh(force=force)
+        utils.cache_clear(self, force)

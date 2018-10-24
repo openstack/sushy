@@ -66,13 +66,20 @@ class BiosTestCase(base.TestCase):
             data={'Attributes': {'ProcTurboMode': 'Disabled'}})
 
     def test_set_attribute_on_refresh(self):
+        self.conn.get.reset_mock()
         # make it to instantiate pending attributes
         self.sys_bios.pending_attributes
+        self.assertTrue(self.conn.get.called)
+
+        self.conn.get.reset_mock()
+
+        self.sys_bios.pending_attributes
+        self.assertFalse(self.conn.get.called)
+
         self.sys_bios.set_attribute('ProcTurboMode', 'Disabled')
-        self.assertTrue(self.sys_bios._pending_settings_resource._is_stale)
         # make it to refresh pending attributes on next retrieval
         self.sys_bios.pending_attributes
-        self.assertFalse(self.sys_bios._pending_settings_resource._is_stale)
+        self.assertTrue(self.conn.get.called)
 
     def test_set_attributes(self):
         self.sys_bios.set_attributes({'ProcTurboMode': 'Disabled',
@@ -83,14 +90,21 @@ class BiosTestCase(base.TestCase):
                                  'UsbControl': 'UsbDisabled'}})
 
     def test_set_attributes_on_refresh(self):
+        self.conn.get.reset_mock()
         # make it to instantiate pending attributes
         self.sys_bios.pending_attributes
+        self.assertTrue(self.conn.get.called)
+
+        self.conn.get.reset_mock()
+
+        self.sys_bios.pending_attributes
+        self.assertFalse(self.conn.get.called)
+
         self.sys_bios.set_attributes({'ProcTurboMode': 'Disabled',
                                       'UsbControl': 'UsbDisabled'})
-        self.assertTrue(self.sys_bios._pending_settings_resource._is_stale)
         # make it to refresh pending attributes on next retrieval
         self.sys_bios.pending_attributes
-        self.assertFalse(self.sys_bios._pending_settings_resource._is_stale)
+        self.assertTrue(self.conn.get.called)
 
     def test__get_reset_bios_action_element(self):
         value = self.sys_bios._get_reset_bios_action_element()

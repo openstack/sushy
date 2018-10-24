@@ -103,7 +103,6 @@ class StorageTestCase(base.TestCase):
 
     def test_drives_after_refresh(self):
         self.storage.refresh()
-        self.assertIsNone(self.storage._drives)
         self.conn.get.return_value.json.reset_mock()
 
         successive_return_values = []
@@ -120,7 +119,6 @@ class StorageTestCase(base.TestCase):
             self.assertIsInstance(drv, drive.Drive)
 
     def test_drives_max_size_bytes(self):
-        self.assertIsNone(self.storage._drives_sizes_bytes)
         self.conn.get.return_value.json.reset_mock()
 
         successive_return_values = []
@@ -139,7 +137,6 @@ class StorageTestCase(base.TestCase):
 
     def test_drives_max_size_bytes_after_refresh(self):
         self.storage.refresh()
-        self.assertIsNone(self.storage._drives_sizes_bytes)
         self.conn.get.return_value.json.reset_mock()
 
         successive_return_values = []
@@ -152,8 +149,6 @@ class StorageTestCase(base.TestCase):
         self.assertEqual(899527000000, self.storage.drives_max_size_bytes)
 
     def test_volumes(self):
-        # check for the underneath variable value
-        self.assertIsNone(self.storage._volumes)
         # | GIVEN |
         self.conn.get.return_value.json.reset_mock()
         with open('sushy/tests/unit/json_samples/volume_collection.json') as f:
@@ -184,8 +179,8 @@ class StorageTestCase(base.TestCase):
         with open('sushy/tests/unit/json_samples/volume_collection.json') as f:
             self.conn.get.return_value.json.return_value = json.load(f)
         # | WHEN & THEN |
-        self.assertIsInstance(self.storage.volumes,
-                              volume.VolumeCollection)
+        vols = self.storage.volumes
+        self.assertIsInstance(vols, volume.VolumeCollection)
 
         # On refreshing the system instance...
         with open('sushy/tests/unit/json_samples/storage.json') as f:
@@ -195,8 +190,7 @@ class StorageTestCase(base.TestCase):
         self.storage.refresh(force=False)
 
         # | WHEN & THEN |
-        self.assertIsNotNone(self.storage._volumes)
-        self.assertTrue(self.storage._volumes._is_stale)
+        self.assertTrue(vols._is_stale)
 
         # | GIVEN |
         with open('sushy/tests/unit/json_samples/volume_collection.json') as f:
@@ -204,7 +198,6 @@ class StorageTestCase(base.TestCase):
         # | WHEN & THEN |
         self.assertIsInstance(self.storage.volumes,
                               volume.VolumeCollection)
-        self.assertFalse(self.storage._volumes._is_stale)
 
 
 class StorageCollectionTestCase(base.TestCase):
@@ -260,7 +253,6 @@ class StorageCollectionTestCase(base.TestCase):
                           899527000000], self.stor_col.drives_sizes_bytes)
 
     def test_max_drive_size_bytes(self):
-        self.assertIsNone(self.stor_col._drives_sizes_bytes)
         self.conn.get.return_value.json.reset_mock()
 
         successive_return_values = []
@@ -281,7 +273,6 @@ class StorageCollectionTestCase(base.TestCase):
 
     def test_max_drive_size_bytes_after_refresh(self):
         self.stor_col.refresh(force=False)
-        self.assertIsNone(self.stor_col._drives_sizes_bytes)
         self.conn.get.return_value.json.reset_mock()
 
         successive_return_values = []
@@ -311,7 +302,6 @@ class StorageCollectionTestCase(base.TestCase):
                          self.stor_col.volumes_sizes_bytes)
 
     def test_max_volume_size_bytes(self):
-        self.assertIsNone(self.stor_col._volumes_sizes_bytes)
         self.conn.get.return_value.json.reset_mock()
 
         successive_return_values = []
@@ -332,7 +322,6 @@ class StorageCollectionTestCase(base.TestCase):
 
     def test_max_volume_size_bytes_after_refresh(self):
         self.stor_col.refresh(force=False)
-        self.assertIsNone(self.stor_col._volumes_sizes_bytes)
         self.conn.get.return_value.json.reset_mock()
 
         successive_return_values = []

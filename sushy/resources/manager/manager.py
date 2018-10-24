@@ -77,8 +77,6 @@ class Manager(base.ResourceBase):
 
     _actions = ActionsField('Actions', required=True)
 
-    _virtual_media = None
-
     def __init__(self, connector, identity, redfish_version=None):
         """A class representing a Manager
 
@@ -89,9 +87,9 @@ class Manager(base.ResourceBase):
         """
         super(Manager, self).__init__(connector, identity, redfish_version)
 
-    def _do_refresh(self, force=False):
-        if self._virtual_media is not None:
-            self._virtual_media.invalidate(force)
+    def _do_refresh(self, force):
+        super(Manager, self)._do_refresh(force=force)
+        utils.cache_clear(self, force)
 
     def get_supported_graphical_console_types(self):
         """Get the supported values for Graphical Console connection types.
@@ -188,15 +186,11 @@ class Manager(base.ResourceBase):
         LOG.info('The Manager %s is being reset', self.identity)
 
     @property
+    @utils.cache_it
     def virtual_media(self):
-        if self._virtual_media is None:
-            self._virtual_media = virtual_media.VirtualMediaCollection(
-                self._conn,
-                utils.get_sub_resource_path_by(self, 'VirtualMedia'),
-                redfish_version=self.redfish_version)
-
-        self._virtual_media.refresh(force=False)
-        return self._virtual_media
+        return virtual_media.VirtualMediaCollection(
+            self._conn, utils.get_sub_resource_path_by(self, 'VirtualMedia'),
+            redfish_version=self.redfish_version)
 
 
 class ManagerCollection(base.ResourceCollectionBase):

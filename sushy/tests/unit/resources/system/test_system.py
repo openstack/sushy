@@ -21,7 +21,6 @@ import sushy
 from sushy import exceptions
 from sushy.resources import constants as res_cons
 from sushy.resources.system import bios
-from sushy.resources.system import ethernet_interface
 from sushy.resources.system import mappings as sys_map
 from sushy.resources.system import processor
 from sushy.resources.system import simple_storage
@@ -68,9 +67,6 @@ class SystemTestCase(base.TestCase):
                          self.sys_inst.power_state)
         self.assertEqual(96, self.sys_inst.memory_summary.size_gib)
         self.assertEqual("OK", self.sys_inst.memory_summary.health)
-        self.assertIsNone(self.sys_inst._processors)
-        self.assertIsNone(self.sys_inst._ethernet_interfaces)
-        self.assertIsNone(self.sys_inst._bios)
 
     def test__parse_attributes_missing_actions(self):
         self.sys_inst.json.pop('Actions')
@@ -270,8 +266,6 @@ class SystemTestCase(base.TestCase):
         self.assertIsNone(self.sys_inst.memory_summary)
 
     def test_processors(self):
-        # check for the underneath variable value
-        self.assertIsNone(self.sys_inst._processors)
         # | GIVEN |
         self.conn.get.return_value.json.reset_mock()
         with open('sushy/tests/unit/json_samples/'
@@ -308,10 +302,6 @@ class SystemTestCase(base.TestCase):
         self.sys_inst.invalidate()
         self.sys_inst.refresh(force=False)
 
-        # | WHEN & THEN |
-        self.assertIsNotNone(self.sys_inst._processors)
-        self.assertTrue(self.sys_inst._processors._is_stale)
-
         # | GIVEN |
         with open('sushy/tests/unit/json_samples/'
                   'processor_collection.json') as f:
@@ -319,7 +309,6 @@ class SystemTestCase(base.TestCase):
         # | WHEN & THEN |
         self.assertIsInstance(self.sys_inst.processors,
                               processor.ProcessorCollection)
-        self.assertFalse(self.sys_inst._processors._is_stale)
 
     def _setUp_processor_summary(self):
         self.conn.get.return_value.json.reset_mock()
@@ -374,13 +363,10 @@ class SystemTestCase(base.TestCase):
         self.conn.get.return_value.json.side_effect = [eth_coll_return_value,
                                                        eth_return_value]
 
-        self.assertIsNone(self.sys_inst._ethernet_interfaces)
         actual_macs = self.sys_inst.ethernet_interfaces.summary
         expected_macs = (
             {'12:44:6A:3B:04:11': res_cons.STATE_ENABLED})
         self.assertEqual(expected_macs, actual_macs)
-        self.assertIsInstance(self.sys_inst._ethernet_interfaces,
-                              ethernet_interface.EthernetInterfaceCollection)
 
     def test_bios(self):
         self.conn.get.return_value.json.reset_mock()
@@ -389,7 +375,6 @@ class SystemTestCase(base.TestCase):
             bios_return_value = json.load(f)
         self.conn.get.return_value.json.side_effect = [bios_return_value]
 
-        self.assertIsNone(self.sys_inst._bios)
         self.assertIsInstance(self.sys_inst.bios, bios.Bios)
         self.assertEqual('BIOS Configuration Current Settings',
                          self.sys_inst.bios.name)
@@ -401,8 +386,6 @@ class SystemTestCase(base.TestCase):
             self.sys_inst.simple_storage
 
     def test_simple_storage(self):
-        # check for the underneath variable value
-        self.assertIsNone(self.sys_inst._simple_storage)
         # | GIVEN |
         self.conn.get.return_value.json.reset_mock()
         with open('sushy/tests/unit/json_samples/'
@@ -439,10 +422,6 @@ class SystemTestCase(base.TestCase):
         self.sys_inst.invalidate()
         self.sys_inst.refresh(force=False)
 
-        # | WHEN & THEN |
-        self.assertIsNotNone(self.sys_inst._simple_storage)
-        self.assertTrue(self.sys_inst._simple_storage._is_stale)
-
         # | GIVEN |
         with open('sushy/tests/unit/json_samples/'
                   'simple_storage_collection.json') as f:
@@ -450,7 +429,6 @@ class SystemTestCase(base.TestCase):
         # | WHEN & THEN |
         self.assertIsInstance(self.sys_inst.simple_storage,
                               simple_storage.SimpleStorageCollection)
-        self.assertFalse(self.sys_inst._simple_storage._is_stale)
 
     def test_storage_for_missing_attr(self):
         self.sys_inst.json.pop('Storage')
@@ -459,8 +437,6 @@ class SystemTestCase(base.TestCase):
             self.sys_inst.storage
 
     def test_storage(self):
-        # check for the underneath variable value
-        self.assertIsNone(self.sys_inst._storage)
         # | GIVEN |
         self.conn.get.return_value.json.reset_mock()
         with open('sushy/tests/unit/json_samples/'
@@ -495,18 +471,12 @@ class SystemTestCase(base.TestCase):
         self.sys_inst.invalidate()
         self.sys_inst.refresh(force=False)
 
-        # | WHEN & THEN |
-        self.assertIsNotNone(self.sys_inst._storage)
-        self.assertTrue(self.sys_inst._storage._is_stale)
-
         # | GIVEN |
         with open('sushy/tests/unit/json_samples/'
                   'storage_collection.json') as f:
             self.conn.get.return_value.json.return_value = json.load(f)
         # | WHEN & THEN |
-        self.assertIsInstance(self.sys_inst.storage,
-                              storage.StorageCollection)
-        self.assertFalse(self.sys_inst._storage._is_stale)
+        self.assertIsInstance(self.sys_inst.storage, storage.StorageCollection)
 
 
 class SystemCollectionTestCase(base.TestCase):

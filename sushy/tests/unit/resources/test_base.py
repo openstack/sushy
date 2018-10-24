@@ -141,6 +141,7 @@ class ResourceCollectionBaseTestCase(base.TestCase):
             self.assertIsInstance(val, TestResource)
             self.assertTrue(val.identity in member_ids)
             self.assertEqual('1.0.x', val.redfish_version)
+            self.assertFalse(val._is_stale)
 
         return result
 
@@ -148,15 +149,33 @@ class ResourceCollectionBaseTestCase(base.TestCase):
         self._validate_get_members_result(('1', '2'))
 
     def test_get_members_on_refresh(self):
-        self._validate_get_members_result(('1', '2'))
+        all_members = self._validate_get_members_result(('1', '2'))
 
-        # Now emulating the resource invalidate and refresh action!
+        # Call resource invalidate
         self.test_resource_collection.invalidate()
         self.assertTrue(self.test_resource_collection._is_stale)
+        #  Now invoke refresh action on resource. This can be viewed as
+        # "light refresh" which involves only the resource's fresh retrieval
+        # and not its nested resources (these are only marked as stale).
         self.test_resource_collection.refresh(force=False)
-
-        self._validate_get_members_result(('3', '4'))
+        # resource itself is fresh
         self.assertFalse(self.test_resource_collection._is_stale)
+        # members are marked as stale
+        for m in all_members:
+            self.assertTrue(m._is_stale)
+
+        self._validate_get_members_result(('1', '2'))
+        # members are also now freshly retrieved
+        for m in all_members:
+            self.assertFalse(m._is_stale)
+
+        # Again invalidate and do a forced refresh on resource
+        self.test_resource_collection.invalidate(force_refresh=True)
+        # Now, even the members are also freshly retrieved. This can be viewed
+        # as "cascading refresh" which involves not only the resource's fresh
+        # retrieval but also its nested resources.
+        for m in all_members:
+            self.assertFalse(m._is_stale)
 
     def test_get_members_caching(self):
         result = self._validate_get_members_result(('1', '2'))

@@ -18,6 +18,7 @@ import json
 import mock
 
 from sushy import exceptions
+from sushy.resources import base as resource_base
 from sushy.resources.system import system
 from sushy.tests.unit import base
 from sushy import utils
@@ -96,3 +97,112 @@ class UtilsTestCase(base.TestCase):
         self.assertEqual(821, utils.max_safe([15, 300, 270, None, 821, None]))
         self.assertEqual(0, utils.max_safe([]))
         self.assertIsNone(utils.max_safe([], default=None))
+
+
+class NestedResource(resource_base.ResourceBase):
+
+    def _parse_attributes(self):
+        pass
+
+
+class BaseResource(resource_base.ResourceBase):
+
+    def _parse_attributes(self):
+        pass
+
+    def _do_some_crunch_work_to_get_a(self):
+        return 'a'
+
+    @utils.cache_it
+    def get_a(self):
+        return self._do_some_crunch_work_to_get_a()
+
+    def _do_some_crunch_work_to_get_b(self):
+        return 'b'
+
+    @utils.cache_it
+    def get_b(self):
+        return self._do_some_crunch_work_to_get_b()
+
+    @property
+    @utils.cache_it
+    def nested_resource(self):
+        return NestedResource(
+            self._conn, "path/to/nested_resource",
+            redfish_version=self.redfish_version)
+
+    @property
+    @utils.cache_it
+    def few_nested_resources(self):
+        return [NestedResource(self._conn, "/nested_res1",
+                               redfish_version=self.redfish_version),
+                NestedResource(self._conn, "/nested_res2",
+                               redfish_version=self.redfish_version)]
+
+    def _do_refresh(self, force):
+        utils.cache_clear(self, force)
+
+
+class CacheTestCase(base.TestCase):
+
+    def setUp(self):
+        super(CacheTestCase, self).setUp()
+        self.conn = mock.Mock()
+        self.res = BaseResource(connector=self.conn, path='/Foo',
+                                redfish_version='1.0.2')
+
+    def test_cache_nested_resource_retrieval(self):
+        nested_res = self.res.nested_resource
+        few_nested_res = self.res.few_nested_resources
+
+        self.assertIsInstance(nested_res, NestedResource)
+        self.assertIs(nested_res, self.res.nested_resource)
+        self.assertIsInstance(few_nested_res, list)
+        for n_res in few_nested_res:
+            self.assertIsInstance(n_res, NestedResource)
+        self.assertIs(few_nested_res, self.res.few_nested_resources)
+
+        self.res.invalidate()
+        self.res.refresh(force=False)
+
+        self.assertIsNotNone(self.res._cache_nested_resource)
+        self.assertTrue(self.res._cache_nested_resource._is_stale)
+        self.assertIsNotNone(self.res._cache_few_nested_resources)
+        for n_res in self.res._cache_few_nested_resources:
+            self.assertTrue(n_res._is_stale)
+
+        self.assertIsInstance(self.res.nested_resource, NestedResource)
+        self.assertFalse(self.res._cache_nested_resource._is_stale)
+        self.assertIsInstance(self.res.few_nested_resources, list)
+        for n_res in self.res._cache_few_nested_resources:
+            self.assertFalse(n_res._is_stale)
+
+    def test_cache_non_resource_retrieval(self):
+        with mock.patch.object(
+                self.res, '_do_some_crunch_work_to_get_a',
+                wraps=self.res._do_some_crunch_work_to_get_a,
+                autospec=True) as do_work_to_get_a_spy:
+            result = self.res.get_a()
+            self.assertTrue(do_work_to_get_a_spy.called)
+
+            do_work_to_get_a_spy.reset_mock()
+            # verify subsequent invocation
+            self.assertEqual(result, self.res.get_a())
+            self.assertFalse(do_work_to_get_a_spy.called)
+
+    def test_cache_clear_only_selected_attr(self):
+        self.res.nested_resource
+        self.res.get_a()
+        self.res.get_b()
+
+        utils.cache_clear(self.res, False, only_these=['get_a'])
+
+        # cache cleared (set to None)
+        self.assertIsNone(self.res._cache_get_a)
+        # cache retained
+        self.assertEqual('b', self.res._cache_get_b)
+        self.assertFalse(self.res._cache_nested_resource._is_stale)
+
+    def test_cache_clear_failure(self):
+        self.assertRaises(
+            TypeError, utils.cache_clear, self.res, False, only_these=10)

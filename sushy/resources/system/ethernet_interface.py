@@ -18,6 +18,7 @@ import logging
 from sushy.resources import base
 from sushy.resources import common
 from sushy.resources import constants as res_cons
+from sushy import utils
 
 LOG = logging.getLogger(__name__)
 
@@ -49,13 +50,12 @@ class EthernetInterface(base.ResourceBase):
 
 class EthernetInterfaceCollection(base.ResourceCollectionBase):
 
-    _summary = None
-
     @property
     def _resource_type(self):
         return EthernetInterface
 
     @property
+    @utils.cache_it
     def summary(self):
         """Summary of MAC addresses and interfaces state
 
@@ -67,14 +67,12 @@ class EthernetInterfaceCollection(base.ResourceCollectionBase):
             {'aa:bb:cc:dd:ee:ff': sushy.STATE_ENABLED,
             'aa:bb:aa:aa:aa:aa': sushy.STATE_DISABLED}
         """
-        if self._summary is None:
-            mac_dict = {}
-            for eth in self.get_members():
-                if eth.mac_address is not None and eth.status is not None:
-                    if eth.status.health == res_cons.HEALTH_OK:
-                        mac_dict[eth.mac_address] = eth.status.state
-            self._summary = mac_dict
-        return self._summary
+        mac_dict = {}
+        for eth in self.get_members():
+            if eth.mac_address is not None and eth.status is not None:
+                if eth.status.health == res_cons.HEALTH_OK:
+                    mac_dict[eth.mac_address] = eth.status.state
+        return mac_dict
 
     def _do_refresh(self, force=False):
         """Do custom resource specific refresh activities
@@ -84,4 +82,4 @@ class EthernetInterfaceCollection(base.ResourceCollectionBase):
         argument.
         """
         super(EthernetInterfaceCollection, self)._do_refresh(force)
-        self._summary = None
+        utils.cache_clear(self, force)

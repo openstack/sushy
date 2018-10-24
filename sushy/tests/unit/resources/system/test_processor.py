@@ -127,8 +127,6 @@ class ProcessorCollectionTestCase(base.TestCase):
         self.conn.get.return_value.json.side_effect = successive_return_values
 
     def test_summary(self):
-        # check for the underneath variable value
-        self.assertIsNone(self.sys_processor_col._summary)
         # | GIVEN |
         self._setUp_processor_summary()
         # | WHEN |
@@ -161,10 +159,8 @@ class ProcessorCollectionTestCase(base.TestCase):
         with open('sushy/tests/unit/json_samples/'
                   'processor_collection.json') as f:
             self.conn.get.return_value.json.return_value = json.load(f)
-        self.sys_processor_col.refresh(force=True)
-
-        # | WHEN & THEN |
-        self.assertIsNone(self.sys_processor_col._summary)
+        self.sys_processor_col.invalidate()
+        self.sys_processor_col.refresh(force=False)
 
         # | GIVEN |
         self._setUp_processor_summary()
