@@ -83,7 +83,3 @@ class SimpleStorageCollection(base.ResourceCollectionBase):
         refreshed.
         """
         return utils.max_safe(self.disks_sizes_bytes)
-
-    def _do_refresh(self, force):
-        super(SimpleStorageCollection, self)._do_refresh(force=force)
-        utils.cache_clear(self, force)

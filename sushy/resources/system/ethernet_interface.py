@@ -73,13 +73,3 @@ class EthernetInterfaceCollection(base.ResourceCollectionBase):
                 if eth.status.health == res_cons.HEALTH_OK:
                     mac_dict[eth.mac_address] = eth.status.state
         return mac_dict
-
-    def _do_refresh(self, force=False):
-        """Do custom resource specific refresh activities
-
-        On refresh, all sub-resources are marked as stale, i.e.
-        greedy-refresh not done for them unless forced by ``force``
-        argument.
-        """
-        super(EthernetInterfaceCollection, self)._do_refresh(force)
-        utils.cache_clear(self, force)

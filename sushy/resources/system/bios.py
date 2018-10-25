@@ -147,13 +147,3 @@ class Bios(base.ResourceBase):
                                           'OldPassword': old_password,
                                           'PasswordName': password_name})
         LOG.info('BIOS password %s is being changed', self.identity)
-
-    def _do_refresh(self, force=False):
-        """Do custom resource specific refresh activities
-
-        On refresh, all sub-resources are marked as stale, i.e.
-        greedy-refresh not done for them unless forced by ``force``
-        argument.
-        """
-        super(Bios, self)._do_refresh(force=force)
-        utils.cache_clear(self, force)

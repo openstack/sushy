@@ -76,16 +76,6 @@ class SessionService(base.ResourceBase):
             self._conn, self._get_sessions_collection_path(),
             redfish_version=self.redfish_version)
 
-    def _do_refresh(self, force):
-        """Do custom resource specific refresh activities
-
-        On refresh, all sub-resources are marked as stale, i.e.
-        greedy-refresh not done for them unless forced by ``force``
-        argument.
-        """
-        super(SessionService, self)._do_refresh(force=force)
-        utils.cache_clear(self, force)
-
     def close_session(self, session_uri):
         """This function is for closing a session based on its id.
 

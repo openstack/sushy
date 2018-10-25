@@ -62,7 +62,3 @@ class VolumeCollection(base.ResourceCollectionBase):
 
     # NOTE(etingof): for backward compatibility
     max_size_bytes = max_volume_size_bytes
-
-    def _do_refresh(self, force):
-        super(VolumeCollection, self)._do_refresh(force=force)
-        utils.cache_clear(self, force)

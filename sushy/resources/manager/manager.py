@@ -87,10 +87,6 @@ class Manager(base.ResourceBase):
         """
         super(Manager, self).__init__(connector, identity, redfish_version)
 
-    def _do_refresh(self, force):
-        super(Manager, self)._do_refresh(force=force)
-        utils.cache_clear(self, force)
-
     def get_supported_graphical_console_types(self):
         """Get the supported values for Graphical Console connection types.
 

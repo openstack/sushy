@@ -142,13 +142,3 @@ class ProcessorCollection(base.ResourceCollectionBase):
         """
         super(ProcessorCollection, self).__init__(connector, path,
                                                   redfish_version)
-
-    def _do_refresh(self, force=False):
-        """Do custom resource specific refresh activities
-
-        On refresh, all sub-resources are marked as stale, i.e.
-        greedy-refresh not done for them unless forced by ``force``
-        argument.
-        """
-        super(ProcessorCollection, self)._do_refresh(force=force)
-        utils.cache_clear(self, force)

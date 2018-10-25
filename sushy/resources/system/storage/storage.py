@@ -95,13 +95,6 @@ class Storage(base.ResourceBase):
             self._conn, utils.get_sub_resource_path_by(self, 'Volumes'),
             redfish_version=self.redfish_version)
 
-    def _do_refresh(self, force):
-        """Do resource specific refresh activities."""
-        # Note(deray): invalidate / undefine the attributes here for fresh
-        # evaluation in subsequent calls to it's exposed property.
-        super(Storage, self)._do_refresh(force=force)
-        utils.cache_clear(self, force)
-
 
 class StorageCollection(base.ResourceCollectionBase):
     """This class represents the collection of Storage resources"""
@@ -149,8 +142,3 @@ class StorageCollection(base.ResourceCollectionBase):
         refreshed.
         """
         return utils.max_safe(self.volumes_sizes_bytes)
-
-    def _do_refresh(self, force):
-        """Do resource specific refresh activities"""
-        super(StorageCollection, self)._do_refresh(force=force)
-        utils.cache_clear(self, force)

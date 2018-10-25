@@ -139,9 +139,6 @@ class BaseResource(resource_base.ResourceBase):
                 NestedResource(self._conn, "/nested_res2",
                                redfish_version=self.redfish_version)]
 
-    def _do_refresh(self, force):
-        utils.cache_clear(self, force)
-
 
 class CacheTestCase(base.TestCase):
 

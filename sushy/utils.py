@@ -163,7 +163,7 @@ def cache_it(res_accessor_method):
         def _do_refresh(self, force):
           cache_clear(self, force)
 
-    If the returned value is a Sushy resource instance or an Iterable whose
+    If the returned value is a Sushy resource instance or a sequence whose
     element is of type Sushy resource it handles the case of calling the
     ``refresh()`` method of that resource. This is done to avoid unnecessary
     recreation of a new resource instance which got already created at the
@@ -215,7 +215,7 @@ def cache_it(res_accessor_method):
 
         if isinstance(cache_attr_val, base.ResourceBase):
             cache_attr_val.refresh(force=False)
-        elif isinstance(cache_attr_val, collections.Iterable):
+        elif isinstance(cache_attr_val, collections.Sequence):
             for elem in cache_attr_val:
                 if isinstance(elem, base.ResourceBase):
                     elem.refresh(force=False)
@@ -237,15 +237,15 @@ def cache_clear(res_selfie, force_refresh, only_these=None):
 
     :param res_selfie: the resource instance.
     :param force_refresh: force_refresh argument of ``invalidate()`` method.
-    :param only_these: expects an Iterable of specific method names
+    :param only_these: expects a sequence of specific method names
         for which the cached value/s need to be cleared only. When None, all
         the cached values are cleared.
     """
     cache_attr_names = setdefaultattr(
         res_selfie, CACHE_ATTR_NAMES_VAR_NAME, set())
     if only_these is not None:
-        if not isinstance(only_these, collections.Iterable):
-            raise TypeError("'only_these' must be Iterable.")
+        if not isinstance(only_these, collections.Sequence):
+            raise TypeError("'only_these' must be a sequence.")
 
         cache_attr_names = cache_attr_names.intersection(
             '_cache_' + attr for attr in only_these)
@@ -257,7 +257,7 @@ def cache_clear(res_selfie, force_refresh, only_these=None):
 
         if isinstance(cache_attr_val, base.ResourceBase):
             cache_attr_val.invalidate(force_refresh)
-        elif isinstance(cache_attr_val, collections.Iterable):
+        elif isinstance(cache_attr_val, collections.Sequence):
             for elem in cache_attr_val:
                 if isinstance(elem, base.ResourceBase):
                     elem.invalidate(force_refresh)

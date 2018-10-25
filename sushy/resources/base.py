@@ -316,12 +316,20 @@ class ResourceBase(object):
         resource specific refresh operations to be performed. This is a
         primitive method in the paradigm of Template design pattern.
 
+        As for the base implementation of this method the approach taken is:
+        On refresh, all sub-resources are marked as stale. That means
+        invalidate (or undefine) the exposed attributes for nested resources
+        for fresh evaluation in subsequent calls to those exposed attributes.
+        In other words greedy-refresh is not done for them, unless forced by
+        ``force`` argument.
+
         :param force: should force refresh the resource and its sub-resources,
             if set to True.
         :raises: ResourceNotFoundError
         :raises: ConnectionError
         :raises: HTTPError
         """
+        utils.cache_clear(self, force_refresh=force)
 
     def invalidate(self, force_refresh=False):
         """Mark the resource as stale, prompting refresh() before getting used.
@@ -400,13 +408,3 @@ class ResourceCollectionBase(ResourceBase):
         :returns: A list of ``_resource_type`` objects
         """
         return [self.get_member(id_) for id_ in self.members_identities]
-
-    def _do_refresh(self, force):
-        """Do refresh related activities.
-
-        Invalidate / Undefine the cache attributes here for fresh evaluation
-        in subsequent calls to `get_members()` method. Other similar activities
-        can also follow in future, if needed.
-        """
-        super(ResourceCollectionBase, self)._do_refresh(force=force)
-        utils.cache_clear(self, force)
