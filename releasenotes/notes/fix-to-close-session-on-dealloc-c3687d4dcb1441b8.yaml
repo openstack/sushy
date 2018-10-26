@@ -1,0 +1,6 @@
+---
+fixes:
+  - |
+    Tries to terminate authenticated Redfish session at BMC Session Service on
+    the event of ``Sushy`` object deallocation. This should reduce the chance
+    of authenticated sessions pool exhaustion at some BMCs.
