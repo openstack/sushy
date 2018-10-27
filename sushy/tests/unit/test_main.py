@@ -27,6 +27,7 @@ from sushy.resources.registry import message_registry_file
 from sushy.resources.sessionservice import session
 from sushy.resources.sessionservice import sessionservice
 from sushy.resources.system import system
+from sushy.resources.updateservice import updateservice
 from sushy.tests.unit import base
 
 
@@ -142,6 +143,13 @@ class MainTestCase(base.TestCase):
             self.root._conn, 'asdf',
             redfish_version=self.root.redfish_version)
 
+    @mock.patch.object(updateservice, 'UpdateService', autospec=True)
+    def test_get_update_service(self, mock_upd_serv):
+        self.root.get_update_service()
+        mock_upd_serv.assert_called_once_with(
+            self.root._conn, '/redfish/v1/UpdateService',
+            redfish_version=self.root.redfish_version)
+
     @mock.patch.object(message_registry_file,
                        'MessageRegistryFileCollection',
                        autospec=True)
@@ -178,6 +186,11 @@ class BareMinimumMainTestCase(base.TestCase):
         self.assertRaisesRegex(
             exceptions.MissingAttributeError,
             'SessionService/@odata.id', self.root.get_session_service)
+
+    def test_get_update_service_when_updateservice_attr_absent(self):
+        self.assertRaisesRegex(
+            exceptions.MissingAttributeError,
+            'UpdateService/@odata.id', self.root.get_update_service)
 
     def test__get_registry_collection_when_registries_attr_absent(self):
         self.assertIsNone(self.root._get_registry_collection())

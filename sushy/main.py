@@ -24,6 +24,7 @@ from sushy.resources.registry import message_registry_file
 from sushy.resources.sessionservice import session
 from sushy.resources.sessionservice import sessionservice
 from sushy.resources.system import system
+from sushy.resources.updateservice import updateservice
 
 LOG = logging.getLogger(__name__)
 
@@ -78,6 +79,9 @@ class Sushy(base.ResourceBase):
 
     _registries_path = base.Field(['Registries', '@odata.id'])
     """Registries path"""
+
+    _update_service_path = base.Field(['UpdateService', '@odata.id'])
+    """UpdateService path"""
 
     def __init__(self, base_url, username=None, password=None,
                  root_prefix='/redfish/v1/', verify=True,
@@ -225,6 +229,19 @@ class Sushy(base.ResourceBase):
         """
         return session.Session(self._conn, identity,
                                redfish_version=self.redfish_version)
+
+    def get_update_service(self):
+        """Get the UpdateService object
+
+        :returns: The UpdateService object
+        """
+        if not self._update_service_path:
+            raise exceptions.MissingAttributeError(
+                attribute='UpdateService/@odata.id', resource=self._path)
+
+        return updateservice.UpdateService(
+            self._conn, self._update_service_path,
+            redfish_version=self.redfish_version)
 
     def _get_registry_collection(self):
         """Get MessageRegistryFileCollection object
