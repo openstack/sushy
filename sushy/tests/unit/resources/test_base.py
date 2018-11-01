@@ -64,7 +64,7 @@ class TestResource(resource_base.ResourceBase):
     """A concrete Test Resource to test against"""
 
     def __init__(self, connector, identity, redfish_version=None):
-        """Ctor of TestResouce
+        """Ctor of TestResource
 
         :param connector: A Connector instance
         :param identity: The id of the Resource
