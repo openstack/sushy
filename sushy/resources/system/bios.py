@@ -69,7 +69,7 @@ class Bios(base.ResourceBase):
     def pending_attributes(self):
         """Pending BIOS attributes
 
-        BIOS attributes that have been comitted to the system,
+        BIOS attributes that have been committed to the system,
         but for them to take effect system restart is necessary
         """
         return self._pending_settings_resource.attributes
