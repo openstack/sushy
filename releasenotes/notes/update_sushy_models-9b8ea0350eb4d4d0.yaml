@@ -1,0 +1,7 @@
+features:
+  - |
+    Unifies sushy models by Redfish schema bundle.
+
+    These changes introduce and update currently implemented
+    sushy models to comply with the most recent schema bundle[1].
+    [1]https://www.dmtf.org/documents/redfish-spmf/redfish-schema-bundle-20181

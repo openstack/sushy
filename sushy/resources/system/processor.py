@@ -12,9 +12,13 @@
 #    License for the specific language governing permissions and limitations
 #    under the License.
 
+# This is referred from Redfish standard schema.
+# https://redfish.dmtf.org/schemas/Processor.v1_3_0.json
+
 import collections
 import logging
 
+from sushy import exceptions
 from sushy.resources import base
 from sushy.resources import common
 from sushy.resources.system import mappings as sys_maps
@@ -55,16 +59,16 @@ class Processor(base.ResourceBase):
     socket = base.Field('Socket')
     """The socket or location of the processor"""
 
-    # TODO(deray): Create mappings for the processor_type
-    processor_type = base.Field('ProcessorType')
+    processor_type = base.MappedField(
+        'ProcessorType', sys_maps.PROCESSOR_TYPE_VALUE_MAP)
     """The type of processor"""
 
     processor_architecture = base.MappedField(
         'ProcessorArchitecture', sys_maps.PROCESSOR_ARCH_VALUE_MAP)
     """The architecture of the processor"""
 
-    # TODO(deray): Create mappings for the instruction_set
-    instruction_set = base.Field('InstructionSet')
+    instruction_set = base.MappedField(
+        'InstructionSet', sys_maps.PROCESSOR_INSTRUCTIONSET_VALUE_MAP)
     """The instruction set of the processor"""
 
     manufacturer = base.Field('Manufacturer')
@@ -97,6 +101,26 @@ class Processor(base.ResourceBase):
             the object according to schema of the given version.
         """
         super(Processor, self).__init__(connector, identity, redfish_version)
+
+    def _get_processor_collection_path(self):
+        """Helper function to find the ProcessorCollection path"""
+        pro_col = self.json.get('ProcessorCollection')
+        if not pro_col:
+            raise exceptions.MissingAttributeError(
+                attribute='ProcessorCollection', resource=self._path)
+        return pro_col.get('@odata.id')
+
+    @property
+    @utils.cache_it
+    def sub_processors(self):
+        """A reference to
+
+        the collection of Sub-Processors associated with
+        this system, such as cores or threads that are part of a processor.
+        """
+        return ProcessorCollection(
+            self.conn, self._get_processor_collection_path,
+            redfish_version=self.redfish_version)
 
 
 class ProcessorCollection(base.ResourceCollectionBase):

@@ -1,5 +1,5 @@
 {
-    "@odata.type": "#ServiceRoot.v1_0_2.ServiceRoot",
+    "@odata.type": "#ServiceRoot.v1_3_1.ServiceRoot",
     "Id": "RootService",
     "Name": "Root Service",
     "RedfishVersion": "1.0.2",

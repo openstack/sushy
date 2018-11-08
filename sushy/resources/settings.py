@@ -11,7 +11,7 @@
 # under the License.
 
 # This is referred from Redfish standard schema.
-# http://redfish.dmtf.org/schemas/v1/Settings.v1_0_0.json
+# https://redfish.dmtf.org/schemas/Settings.v1_2_0.json
 
 
 from sushy.resources import base
@@ -48,6 +48,38 @@ class MessageListField(base.ListField):
     """
 
 
+class MaintenanceWindowField(base.CompositeField):
+
+    maintenance_window_duration_in_seconds = base.Field(
+        'MaintenanceWindowDurationInSeconds',
+        required=True)
+    """The expiry time of maintenance window in seconds"""
+
+    maintenance_window_start_time = base.Field(
+        'MaintenanceWindowStartTime',
+        required=True)
+    """The start time of a maintenance window"""
+
+
+class OperationApplyTimeSupportField(base.CompositeField):
+
+    maintenance_window_duration_in_seconds = base.Field(
+        'MaintenanceWindowDurationInSeconds')
+    """The expiry time of maintenance window in seconds"""
+
+    maintenance_window_resource = base.Field(
+        'MaintenanceWindowResource')
+    """The location of the maintenance window settings"""
+
+    maintenance_window_start_time = base.Field(
+        'MaintenanceWindowStartTime')
+    """The start time of a maintenance window"""
+
+    supported_values = base.Field('SupportedValues', required=True)
+    """The client is allowed request when performing a create, delete, or
+    action operation"""
+
+
 class SettingsField(base.CompositeField):
     """The settings of a resource
 
@@ -76,9 +108,18 @@ class SettingsField(base.CompositeField):
     to change this resource
     """
 
+    _maintenance_window = MaintenanceWindowField('MaintenanceWindow')
+    """Indicates if a given resource has a maintenance window assignment
+    for applying settings or operations"""
+
     messages = MessageListField("Messages")
     """Represents the results of the last time the values of the Settings
     resource were applied to the server"""
+
+    _operation_apply_time_support = OperationApplyTimeSupportField(
+        'OperationApplyTimeSupport')
+    """Indicates if a client is allowed to request for a specific apply
+    time of a create, delete, or action operation of a given resource"""
 
     def commit(self, connector, value):
         """Commits new settings values

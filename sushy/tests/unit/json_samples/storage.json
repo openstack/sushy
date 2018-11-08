@@ -1,5 +1,5 @@
 {
-    "@odata.type": "#Storage.v1_3_0.Storage",
+    "@odata.type": "#Storage.v1_4_0.Storage",
     "Id": "1",
     "Name": "Local Storage Controller",
     "Description": "Integrated RAID Controller",

@@ -1,5 +1,5 @@
 {
-    "@odata.type": "#Drive.v1_2_0.Drive",
+    "@odata.type": "#Drive.v1_4_0.Drive",
     "Id": "32ADF365C6C1B7BD",
     "Name": "Drive Sample",
     "IndicatorLED": "Lit",

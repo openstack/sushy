@@ -10,6 +10,7 @@
 # License for the specific language governing permissions and limitations
 # under the License.
 
+# This is referred from Redfish standard schema.
 # https://redfish.dmtf.org/schemas/v1/MessageRegistryFileCollection.json
 # https://redfish.dmtf.org/schemas/v1/MessageRegistryFile.v1_1_0.json
 

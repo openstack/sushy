@@ -1,5 +1,5 @@
 {
-    "@odata.type": "#Bios.v1_0_0.Bios",
+    "@odata.type": "#Bios.v1_0_3.Bios",
     "Id": "Settings",
     "Name": "BIOS Configuration Pending Settings",
     "AttributeRegistry": "BiosAttributeRegistryP89.v1_0_0",

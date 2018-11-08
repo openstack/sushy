@@ -1,5 +1,5 @@
 {
-    "@odata.type": "#Processor.v1_0_2.Processor",
+    "@odata.type": "#Processor.v1_3_0.Processor",
     "Id": "CPU1",
     "Socket": "CPU 1",
     "ProcessorType": "CPU",

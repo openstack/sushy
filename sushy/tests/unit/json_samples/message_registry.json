@@ -1,11 +1,11 @@
 {
-    "@odata.type": "#MessageRegistry.v1_0_0.MessageRegistry",
-    "Id": "Test.1.0.0",
+    "@odata.type": "#MessageRegistry.v1_1_1.MessageRegistry",
+    "Id": "Test.1.1.1",
     "Name": "Test Message Registry",
     "Language": "en",
     "Description": "This registry defines messages for sushy testing",
     "RegistryPrefix": "Test",
-    "RegistryVersion":  "1.0.0",
+    "RegistryVersion":  "1.1.1",
     "OwningEntity": "sushy",
     "Messages": {
         "Success": {

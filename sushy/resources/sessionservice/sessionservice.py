@@ -13,6 +13,9 @@
 #    License for the specific language governing permissions and limitations
 #    under the License.
 
+# This is referred from Redfish standard schema.
+# https://redfish.dmtf.org/schemas/SessionService.v1_1_3.json
+
 import logging
 
 from sushy import exceptions

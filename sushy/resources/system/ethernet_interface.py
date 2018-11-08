@@ -11,7 +11,7 @@
 #    under the License.
 
 # This is referred from Redfish standard schema.
-# http://redfish.dmtf.org/schemas/EthernetInterface.v1_3_0.json
+# https://redfish.dmtf.org/schemas/EthernetInterface.v1_4_0.json
 
 import logging
 

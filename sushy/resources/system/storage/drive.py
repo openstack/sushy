@@ -11,7 +11,7 @@
 #    under the License.
 
 # This is referred from Redfish standard schema.
-# http://redfish.dmtf.org/schemas/v1/Drive.v1_3_0.json
+# http://redfish.dmtf.org/schemas/v1/Drive.v1_4_0.json
 
 import logging
 

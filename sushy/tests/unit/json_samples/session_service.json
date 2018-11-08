@@ -1,5 +1,5 @@
 {
-      "@odata.type": "#SessionService.v1_0_2.SessionService",
+      "@odata.type": "#SessionService.v1_1_3.SessionService",
       "Id": "SessionService",
       "Name": "Session Service",
       "Description": "Session Service",

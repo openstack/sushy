@@ -36,13 +36,13 @@ class MessageRegistryTestCase(base.TestCase):
 
     def test__parse_attributes(self):
         self.registry._parse_attributes()
-        self.assertEqual('Test.1.0.0', self.registry.identity)
+        self.assertEqual('Test.1.1.1', self.registry.identity)
         self.assertEqual('Test Message Registry', self.registry.name)
         self.assertEqual('en', self.registry.language)
         self.assertEqual('This registry defines messages for sushy testing',
                          self.registry.description)
         self.assertEqual('Test', self.registry.registry_prefix)
-        self.assertEqual('1.0.0', self.registry.registry_version)
+        self.assertEqual('1.1.1', self.registry.registry_version)
         self.assertEqual('sushy', self.registry.owning_entity)
         self.assertEqual(3, len(self.registry.messages))
         self.assertEqual('Everything OK',

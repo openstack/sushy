@@ -53,6 +53,24 @@ class SettingsFieldTestCase(base.TestCase):
                          instance.messages[0]._related_properties[0])
         self.assertEqual('/redfish/v1/Systems/437XR1138R2/BIOS/Settings',
                          instance._settings_object_idref.resource_uri)
+        self.assertEqual(
+            1,
+            instance.
+            _maintenance_window.maintenance_window_duration_in_seconds)
+        self.assertEqual(
+            '2016-03-07T14:44.30-05:05',
+            instance._maintenance_window.maintenance_window_start_time)
+        self.assertEqual(
+            1,
+            instance._operation_apply_time_support.
+            maintenance_window_duration_in_seconds)
+        self.assertEqual(
+            '2016-03-07T14:44.30-05:10',
+            instance._operation_apply_time_support.
+            maintenance_window_start_time)
+        self.assertIn(
+            'Immediate',
+            instance._operation_apply_time_support.supported_values)
 
     def test_commit(self):
         conn = mock.Mock()
