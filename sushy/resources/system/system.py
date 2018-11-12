@@ -74,7 +74,7 @@ class System(base.ResourceBase):
     """The system BIOS version"""
 
     boot = BootField('Boot', required=True)
-    """A dictionary containg the current boot device, frequency and mode"""
+    """A dictionary containing the current boot device, frequency and mode"""
 
     description = base.Field('Description')
     """The system description"""

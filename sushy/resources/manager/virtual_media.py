@@ -63,7 +63,7 @@ class VirtualMedia(base.ResourceBase):
     """
 
     _actions = ActionsField('Actions')
-    """Insert/eject action fot virtual media"""
+    """Insert/eject action for virtual media"""
 
     def _get_insert_media_element(self):
         insert_media = self._actions.insert_media

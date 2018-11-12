@@ -10,7 +10,7 @@ by issuing just enough requests to it (BMCs are very flaky).
 Therefore, the scope of the library has been limited to what is supported
 by the `OpenStack Ironic <https://wiki.openstack.org/wiki/Ironic>`_
 project. As the project grows and more features from `Redfish`_ are
-needed we can expand Sushy to fullfil those requirements.
+needed we can expand Sushy to fulfill those requirements.
 
 * Free software: Apache license
 * Documentation: https://docs.openstack.org/sushy/latest/
