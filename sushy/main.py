@@ -110,9 +110,20 @@ class Sushy(base.ResourceBase):
         super(Sushy, self).__init__(
             connector or sushy_connector.Connector(base_url, verify=verify),
             path=self._root_prefix)
+        self._base_url = base_url
         self._auth = auth
         self._auth.set_context(self, self._conn)
         self._auth.authenticate()
+
+    def __del__(self):
+        if self._auth:
+            try:
+                self._auth.close()
+
+            except Exception as ex:
+                LOG.warning('Ignoring error while closing Redfish session '
+                            'with %s: %s', self._base_url, ex)
+            self._auth = None
 
     def _parse_attributes(self):
         super(Sushy, self)._parse_attributes()
