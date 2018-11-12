@@ -73,7 +73,7 @@ class Processor(base.ResourceBase):
     model = base.Field('Model')
     """The product model number of this device"""
 
-    max_speed_mhz = base.Field('MaxSpeedMHz', adapter=int)
+    max_speed_mhz = base.Field('MaxSpeedMHz', adapter=utils.int_or_none)
     """The maximum clock speed of the processor in MHz."""
 
     processor_id = ProcessorIdField('ProcessorId')
@@ -82,10 +82,10 @@ class Processor(base.ResourceBase):
     status = common.StatusField('Status')
     """The processor status"""
 
-    total_cores = base.Field('TotalCores', adapter=int)
+    total_cores = base.Field('TotalCores', adapter=utils.int_or_none)
     """The total number of cores contained in this processor"""
 
-    total_threads = base.Field('TotalThreads', adapter=int)
+    total_threads = base.Field('TotalThreads', adapter=utils.int_or_none)
     """The total number of execution threads supported by this processor"""
 
     def __init__(self, connector, identity, redfish_version=None):
