@@ -45,7 +45,7 @@ After the download, extract the files somewhere in the file-system::
 
   unzip DSP2043_1.0.0.zip -d <output-path>
 
-Now run ``sushy-static``  pointing to those files. For example to serve
+Now run ``sushy-static`` pointing to those files. For example to serve
 the ``DSP2043-server`` mockup files, run::
 
   sushy-static --mockup-files <output-path>/DSP2043-server
