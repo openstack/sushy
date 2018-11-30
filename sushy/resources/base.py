@@ -16,7 +16,10 @@
 import abc
 import collections
 import copy
+import io
+import json
 import logging
+import zipfile
 
 import six
 
@@ -245,12 +248,68 @@ class MappedField(Field):
 
 
 @six.add_metaclass(abc.ABCMeta)
+class AbstractJsonReader(object):
+
+    def set_connection(self, connector, path):
+        """Sets mandatory connection parameters
+
+        :param connector: A Connector instance
+        :param path: path of the resource
+        """
+        self._conn = connector
+        self._path = path
+
+    @abc.abstractmethod
+    def get_json(self):
+        """Based on data source get data and parse to JSON"""
+
+
+class JsonFileReader(AbstractJsonReader):
+    """Gets the data from JSON file given by path"""
+
+    def get_json(self):
+        """Gets JSON file from URI directly"""
+        return self._conn.get(path=self._path).json()
+
+
+class JsonArchiveReader(AbstractJsonReader):
+    """Gets the data from JSON file in archive"""
+
+    def __init__(self, archive_file):
+        """Initializes the reader
+
+        :param archive_file: file name of JSON file in archive
+        """
+        self._archive_file = archive_file
+
+    def get_json(self):
+        """Gets JSON file from archive. Currently supporting ZIP only"""
+
+        data = self._conn.get(path=self._path)
+        if data.headers.get('content-type') == 'application/zip':
+            try:
+                archive = zipfile.ZipFile(io.BytesIO(data.content))
+                return json.loads(archive.read(self._archive_file)
+                                  .decode(encoding='utf-8'))
+            except (zipfile.BadZipfile, ValueError) as e:
+                raise exceptions.ArchiveParsingError(
+                    path=self._path, error=e)
+        else:
+            LOG.error('Support for %(type)s not implemented',
+                      {'type': data.headers['content-type']})
+
+
+@six.add_metaclass(abc.ABCMeta)
 class ResourceBase(object):
 
     redfish_version = None
     """The Redfish version"""
 
-    def __init__(self, connector, path='', redfish_version=None):
+    def __init__(self,
+                 connector,
+                 path='',
+                 redfish_version=None,
+                 reader=JsonFileReader()):
         """A class representing the base of any Redfish resource
 
         Invokes the ``refresh()`` method of resource for the first
@@ -259,6 +318,8 @@ class ResourceBase(object):
         :param path: sub-URI path to the resource.
         :param redfish_version: The version of Redfish. Used to construct
             the object according to schema of the given version.
+        :param reader: Reader to use to fetch JSON data. Defaults to
+            JsonFileReader
         """
         self._conn = connector
         self._path = path
@@ -268,6 +329,9 @@ class ResourceBase(object):
         # Starting off with True and eventually gets set to False when
         # attribute values are fetched.
         self._is_stale = True
+
+        reader.set_connection(connector, path)
+        self._reader = reader
 
         self.refresh()
 
@@ -299,7 +363,8 @@ class ResourceBase(object):
         if not self._is_stale and not force:
             return
 
-        self._json = self._conn.get(path=self._path).json()
+        self._json = self._reader.get_json()
+
         LOG.debug('Received representation of %(type)s %(path)s: %(json)s',
                   {'type': self.__class__.__name__,
                    'path': self._path, 'json': self._json})

@@ -57,6 +57,10 @@ class InvalidParameterValueError(SushyError):
                'Valid values are: %(valid_values)s')
 
 
+class ArchiveParsingError(SushyError):
+    message = 'Failed parsing archive "%(path)s": %(error)s'
+
+
 class HTTPError(SushyError):
     """Basic exception for HTTP errors"""
 
