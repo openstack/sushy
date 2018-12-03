@@ -1,0 +1,6 @@
+---
+features:
+  - |
+    Establishes ComputerSystem->Managers and Manager->ComputerSystems
+    references at sushy data abstraction level what make it possible to
+    look up Manager(s) responsible for a ComputerSystem and vice versa.

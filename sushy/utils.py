@@ -66,13 +66,17 @@ def int_or_none(x):
     return int(x)
 
 
-def get_sub_resource_path_by(resource, subresource_name):
+def get_sub_resource_path_by(resource, subresource_name, is_collection=False):
     """Helper function to find the subresource path
 
     :param resource: ResourceBase instance on which the name
         gets queried upon.
     :param subresource_name: name of the resource field to
         fetch the '@odata.id' from.
+    :param is_collection: if `True`, expect a list of resources to
+        fetch the '@odata.id' from.
+    :returns: Resource path (if `is_collection` is `False`) or
+        a list of resource paths (if `is_collection` is `True`).
     """
     if not subresource_name:
         raise ValueError('"subresource_name" cannot be empty')
@@ -88,12 +92,24 @@ def get_sub_resource_path_by(resource, subresource_name):
         raise exceptions.MissingAttributeError(
             attribute='/'.join(subresource_name), resource=resource.path)
 
-    if '@odata.id' not in body:
-        raise exceptions.MissingAttributeError(
-            attribute='/'.join(subresource_name) + '/@odata.id',
-            resource=resource.path)
+    elements = []
 
-    return body['@odata.id']
+    try:
+        if is_collection:
+            for element in body:
+                elements.append(element['@odata.id'])
+            return elements
+
+        else:
+            return body['@odata.id']
+
+    except (TypeError, KeyError):
+        attribute = '/'.join(subresource_name)
+        if is_collection:
+            attribute += '[%s]' % len(elements)
+        attribute += '/@odata.id'
+        raise exceptions.MissingAttributeError(
+            attribute=attribute, resource=resource.path)
 
 
 def max_safe(iterable, default=0):
