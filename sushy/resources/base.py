@@ -264,8 +264,8 @@ class AbstractJsonReader(object):
         """Based on data source get data and parse to JSON"""
 
 
-class JsonFileReader(AbstractJsonReader):
-    """Gets the data from JSON file given by path"""
+class JsonDataReader(AbstractJsonReader):
+    """Gets the data from HTTP response given by path"""
 
     def get_json(self):
         """Gets JSON file from URI directly"""
@@ -309,7 +309,7 @@ class ResourceBase(object):
                  connector,
                  path='',
                  redfish_version=None,
-                 reader=JsonFileReader()):
+                 reader=JsonDataReader()):
         """A class representing the base of any Redfish resource
 
         Invokes the ``refresh()`` method of resource for the first
@@ -319,7 +319,7 @@ class ResourceBase(object):
         :param redfish_version: The version of Redfish. Used to construct
             the object according to schema of the given version.
         :param reader: Reader to use to fetch JSON data. Defaults to
-            JsonFileReader
+            JsonDataReader
         """
         self._conn = connector
         self._path = path
