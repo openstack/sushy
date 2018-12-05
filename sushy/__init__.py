@@ -20,6 +20,7 @@ from sushy.main import Sushy
 from sushy.resources.constants import *  # noqa
 from sushy.resources.system.constants import *  # noqa
 from sushy.resources.manager.constants import *  # noqa
+from sushy.resources.chassis.constants import *  # noqa
 
 __all__ = ('Sushy',)
 __version__ = pbr.version.VersionInfo(

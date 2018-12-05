@@ -40,3 +40,64 @@ PARAMTYPE_NUMBER = 'number'
 SEVERITY_OK = 'ok'
 SEVERITY_WARNING = 'warning'
 SEVERITY_CRITICAL = 'critical'
+
+# Indicator LED Constants
+
+INDICATOR_LED_LIT = 'indicator led lit'
+"""The Indicator LED is lit"""
+
+INDICATOR_LED_BLINKING = 'indicator led blinking'
+"""The Indicator LED is blinking"""
+
+INDICATOR_LED_OFF = 'indicator led off'
+"""The Indicator LED is off"""
+
+INDICATOR_LED_UNKNOWN = 'indicator led unknown'
+"""The state of the Indicator LED cannot be determine"""
+
+# System' PowerState constants
+
+POWER_STATE_ON = 'on'
+"""The resource is powered on"""
+
+POWER_STATE_OFF = 'off'
+"""The resource is powered off, although some components may continue to
+   have AUX power such as management controller"""
+
+POWER_STATE_POWERING_ON = 'powering on'
+"""A temporary state between Off and On. This temporary state can
+   be very short"""
+
+POWER_STATE_POWERING_OFF = 'powering off'
+"""A temporary state between On and Off. The power off action can take
+   time while the OS is in the shutdown process"""
+
+# Reset action constants
+
+RESET_TYPE_ON = 'on'
+"""Turn the unit on"""
+
+RESET_TYPE_FORCE_ON = 'force on'
+"""Turn the unit on immediately"""
+
+RESET_TYPE_FORCE_OFF = 'force off'
+"""Turn the unit off immediately (non-graceful shutdown)"""
+
+RESET_TYPE_GRACEFUL_SHUTDOWN = 'graceful shutdown'
+"""Perform a graceful shutdown and power off"""
+
+RESET_TYPE_GRACEFUL_RESTART = 'graceful restart'
+"""Perform a graceful shutdown followed by a restart of the system"""
+
+RESET_TYPE_FORCE_RESTART = 'force restart'
+"""Perform an immediate (non-graceful) shutdown, followed by a restart"""
+
+RESET_TYPE_NMI = 'nmi'
+"""Generate a Diagnostic Interrupt (usually an NMI on x86 systems) to cease
+normal operations, perform diagnostic actions and typically halt the system"""
+
+RESET_TYPE_PUSH_POWER_BUTTON = 'push power button'
+"""Simulate the pressing of the physical power button on this unit"""
+
+RESET_TYPE_POWER_CYCLE = 'power cycle'
+"""Perform a power cycle of the unit"""

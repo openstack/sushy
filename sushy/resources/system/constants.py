@@ -16,46 +16,48 @@
 # Values comes from the Redfish System json-schema 1.0.0:
 # http://redfish.dmtf.org/schemas/v1/ComputerSystem.v1_0_0.json#/definitions/ComputerSystem  # noqa
 
+from sushy.resources import constants as res_cons
+
 # Reset action constants
 
-RESET_ON = 'on'
-RESET_FORCE_OFF = 'force off'
-RESET_GRACEFUL_SHUTDOWN = 'graceful shutdown'
-RESET_GRACEFUL_RESTART = 'graceful restart'
-RESET_FORCE_RESTART = 'force restart'
-RESET_NMI = 'nmi'
-RESET_FORCE_ON = 'force on'
-RESET_PUSH_POWER_BUTTON = 'push power button'
+RESET_ON = res_cons.RESET_TYPE_ON
+RESET_FORCE_OFF = res_cons.RESET_TYPE_FORCE_OFF
+RESET_GRACEFUL_SHUTDOWN = res_cons.RESET_TYPE_GRACEFUL_SHUTDOWN
+RESET_GRACEFUL_RESTART = res_cons.RESET_TYPE_GRACEFUL_RESTART
+RESET_FORCE_RESTART = res_cons.RESET_TYPE_FORCE_RESTART
+RESET_NMI = res_cons.RESET_TYPE_NMI
+RESET_FORCE_ON = res_cons.RESET_TYPE_FORCE_ON
+RESET_PUSH_POWER_BUTTON = res_cons.RESET_TYPE_PUSH_POWER_BUTTON
 
 # System' PowerState constants
 
-SYSTEM_POWER_STATE_ON = 'on'
+SYSTEM_POWER_STATE_ON = res_cons.POWER_STATE_ON
 """The system is powered on"""
 
-SYSTEM_POWER_STATE_OFF = 'off'
+SYSTEM_POWER_STATE_OFF = res_cons.POWER_STATE_OFF
 """The system is powered off, although some components may continue to
    have AUX power such as management controller"""
 
-SYSTEM_POWER_STATE_POWERING_ON = 'powering on'
+SYSTEM_POWER_STATE_POWERING_ON = res_cons.POWER_STATE_POWERING_ON
 """A temporary state between Off and On. This temporary state can
    be very short"""
 
-SYSTEM_POWER_STATE_POWERING_OFF = 'powering off'
+SYSTEM_POWER_STATE_POWERING_OFF = res_cons.POWER_STATE_POWERING_OFF
 """A temporary state between On and Off. The power off action can take
    time while the OS is in the shutdown process"""
 
 # Indicator LED Constants
 
-SYSTEM_INDICATOR_LED_LIT = 'Lit'
+SYSTEM_INDICATOR_LED_LIT = res_cons.INDICATOR_LED_LIT
 """The Indicator LED is lit"""
 
-SYSTEM_INDICATOR_LED_BLINKING = 'Blinking'
+SYSTEM_INDICATOR_LED_BLINKING = res_cons.INDICATOR_LED_BLINKING
 """The Indicator LED is blinking"""
 
-SYSTEM_INDICATOR_LED_OFF = 'Off'
+SYSTEM_INDICATOR_LED_OFF = res_cons.INDICATOR_LED_OFF
 """The Indicator LED is off"""
 
-SYSTEM_INDICATOR_LED_UNKNOWN = 'Unknown'
+SYSTEM_INDICATOR_LED_UNKNOWN = res_cons.INDICATOR_LED_UNKNOWN
 """The state of the Indicator LED cannot be determine"""
 
 # Boot source target constants

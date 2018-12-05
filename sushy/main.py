@@ -18,6 +18,7 @@ from sushy import auth as sushy_auth
 from sushy import connector as sushy_connector
 from sushy import exceptions
 from sushy.resources import base
+from sushy.resources.chassis import chassis
 from sushy.resources.manager import manager
 from sushy.resources.registry import message_registry_file
 from sushy.resources.sessionservice import session
@@ -68,6 +69,9 @@ class Sushy(base.ResourceBase):
 
     _managers_path = base.Field(['Managers', '@odata.id'])
     """ManagerCollection path"""
+
+    _chassis_path = base.Field(['Chassis', '@odata.id'])
+    """ChassisCollection path"""
 
     _session_service_path = base.Field(['SessionService', '@odata.id'])
     """SessionService path"""
@@ -151,6 +155,29 @@ class Sushy(base.ResourceBase):
         """
         return system.System(self._conn, identity,
                              redfish_version=self.redfish_version)
+
+    def get_chassis_collection(self):
+        """Get the ChassisCollection object
+
+        :raises: MissingAttributeError, if the collection attribute is
+            not found
+        :returns: a ChassisCollection object
+        """
+        if not self._chassis_path:
+            raise exceptions.MissingAttributeError(
+                attribute='Chassis/@odata.id', resource=self._path)
+
+        return chassis.ChassisCollection(self._conn, self._chassis_path,
+                                         redfish_version=self.redfish_version)
+
+    def get_chassis(self, identity):
+        """Given the identity return a Chassis object
+
+        :param identity: The identity of the Chassis resource
+        :returns: The Chassis object
+        """
+        return chassis.Chassis(self._conn, identity,
+                               redfish_version=self.redfish_version)
 
     def get_manager_collection(self):
         """Get the ManagerCollection object
