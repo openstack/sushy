@@ -19,6 +19,7 @@ import mock
 
 import sushy
 from sushy import exceptions
+from sushy.resources.chassis import chassis
 from sushy.resources import constants as res_cons
 from sushy.resources.manager import manager
 from sushy.resources.system import bios
@@ -490,6 +491,18 @@ class SystemTestCase(base.TestCase):
         self.assertIsInstance(actual_managers[0], manager.Manager)
         self.assertEqual(
             '/redfish/v1/Managers/BMC', actual_managers[0].path)
+
+    def test_chassis(self):
+        # | GIVEN |
+        with open('sushy/tests/unit/json_samples/'
+                  'chassis.json') as f:
+            self.conn.get.return_value.json.return_value = json.load(f)
+
+        # | WHEN & THEN |
+        actual_chassis = self.sys_inst.chassis
+        self.assertIsInstance(actual_chassis[0], chassis.Chassis)
+        self.assertEqual(
+            '/redfish/v1/Chassis/1U', actual_chassis[0].path)
 
 
 class SystemCollectionTestCase(base.TestCase):

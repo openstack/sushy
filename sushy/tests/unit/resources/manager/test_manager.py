@@ -16,6 +16,7 @@ import mock
 
 import sushy
 from sushy import exceptions
+from sushy.resources.chassis import chassis
 from sushy.resources.manager import manager
 from sushy.resources.manager import virtual_media
 from sushy.resources.system import system
@@ -278,6 +279,18 @@ class ManagerTestCase(base.TestCase):
         self.assertIsInstance(actual_systems[0], system.System)
         self.assertEqual(
             '/redfish/v1/Systems/437XR1138R2', actual_systems[0].path)
+
+    def test_chassis(self):
+        # | GIVEN |
+        with open('sushy/tests/unit/json_samples/'
+                  'chassis.json') as f:
+            self.conn.get.return_value.json.return_value = json.load(f)
+
+        # | WHEN & THEN |
+        actual_chassis = self.manager.chassis
+        self.assertIsInstance(actual_chassis[0], chassis.Chassis)
+        self.assertEqual(
+            '/redfish/v1/Chassis/1U', actual_chassis[0].path)
 
 
 class ManagerCollectionTestCase(base.TestCase):

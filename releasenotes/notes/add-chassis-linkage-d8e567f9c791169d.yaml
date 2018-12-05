@@ -1,0 +1,7 @@
+---
+features:
+  - |
+    Establishes linkage between Chassis and ComputerSystem/Managers
+    resources as references at sushy data abstraction level. That
+    makes it possible to look up Chassis by Manager/ComputerSystem or
+    any other way around.
