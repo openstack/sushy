@@ -1,5 +1,5 @@
 {
-    "@odata.type": "#MessageRegistryFile.v1_1_0.MessageRegistryFile",
+    "@odata.type": "#MessageRegistryFile.v1_1_1.MessageRegistryFile",
     "Id": "Test",
     "Name": "Test Message Registry File",
     "Description": "Message Registry file for testing",

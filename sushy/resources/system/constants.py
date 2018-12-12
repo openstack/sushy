@@ -13,7 +13,7 @@
 #    License for the specific language governing permissions and limitations
 #    under the License.
 
-# Values comes from the Redfish System json-schema 1.0.0:
+# Values come from the Redfish System json-schema 1.0.0:
 # http://redfish.dmtf.org/schemas/v1/ComputerSystem.v1_0_0.json#/definitions/ComputerSystem  # noqa
 
 from sushy.resources import constants as res_cons
@@ -114,8 +114,8 @@ BOOT_SOURCE_ENABLED_CONTINUOUS = 'continuous'
 BOOT_SOURCE_ENABLED_DISABLED = 'disabled'
 
 # Processor related constants
-# Values comes from the Redfish Processor json-schema 1.0.0:
-# http://redfish.dmtf.org/schemas/v1/Processor.v1_0_0.json
+# Values comes from the Redfish Processor json-schema 1.3.0:
+# http://redfish.dmtf.org/schemas/v1/Processor.v1_3_0.json
 
 # Processor Architecture constants
 
@@ -124,3 +124,25 @@ PROCESSOR_ARCH_IA_64 = 'Intel Itanium'
 PROCESSOR_ARCH_ARM = 'ARM'
 PROCESSOR_ARCH_MIPS = 'MIPS'
 PROCESSOR_ARCH_OEM = 'OEM-defined'
+
+# Processor type constants
+
+PROCESSOR_TYPE_ACCELERATOR = 'An Accelerator'
+PROCESSOR_TYPE_CPU = 'A Central Processing Unit'
+PROCESSOR_TYPE_CORE = 'A Core in a Processor'
+PROCESSOR_TYPE_DSP = 'A Digital Signal Processor'
+PROCESSOR_TYPE_FPGA = 'A Field Programmable Gate Array'
+PROCESSOR_TYPE_GPU = 'A Graphics Processing Unit'
+PROCESSOR_TYPE_OEM = 'An OEM-defined Processing Unit'
+PROCESSOR_TYPE_THREAD = 'A Thread in a Processor'
+
+# Processor InstructionSet constants
+
+PROCESSOR_INSTRUCTIONSET_ARM_A32 = 'ARM 32-bit'
+PROCESSOR_INSTRUCTIONSET_ARM_A64 = 'ARM 64-bit'
+PROCESSOR_INSTRUCTIONSET_IA_64 = 'Intel IA-64'
+PROCESSOR_INSTRUCTIONSET_MIPS32 = 'MIPS 32-bit'
+PROCESSOR_INSTRUCTIONSET_MIPS64 = 'MIPS 64-bit'
+PROCESSOR_INSTRUCTIONSET_OEM = 'OEM-defined'
+PROCESSOR_INSTRUCTIONSET_x86 = 'x86 32-bit'
+PROCESSOR_INSTRUCTIONSET_x86_64 = 'x86 64-bit'

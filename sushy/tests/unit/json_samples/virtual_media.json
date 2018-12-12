@@ -1,5 +1,5 @@
 {
-    "@odata.type": "#VirtualMedia.v1_1_0.VirtualMedia",
+    "@odata.type": "#VirtualMedia.v1_2_0.VirtualMedia",
     "Id": "Floppy1",
     "Name": "Virtual Removable Media",
     "MediaTypes": [

@@ -38,6 +38,7 @@ class ManagerTestCase(base.TestCase):
         # | THEN |
         self.assertEqual('1.0.2', self.manager.redfish_version)
         self.assertEqual('1.00', self.manager.firmware_version)
+        self.assertFalse(self.manager.auto_dst_enabled)
         self.assertEqual(True, self.manager.graphical_console.service_enabled)
         self.assertEqual(
             2, self.manager.graphical_console.max_concurrent_sessions)

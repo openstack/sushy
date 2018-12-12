@@ -39,10 +39,14 @@ class ProcessorTestCase(base.TestCase):
         self.assertEqual('1.0.2', self.sys_processor.redfish_version)
         self.assertEqual('CPU1', self.sys_processor.identity)
         self.assertEqual('CPU 1', self.sys_processor.socket)
-        self.assertEqual('CPU', self.sys_processor.processor_type)
+        self.assertEqual(
+            sushy.PROCESSOR_TYPE_CPU,
+            self.sys_processor.processor_type)
         self.assertEqual(sushy.PROCESSOR_ARCH_x86,
                          self.sys_processor.processor_architecture)
-        self.assertEqual('x86-64', self.sys_processor.instruction_set)
+        self.assertEqual(
+            sushy.PROCESSOR_INSTRUCTIONSET_x86_64,
+            self.sys_processor.instruction_set)
         self.assertEqual('Intel(R) Corporation',
                          self.sys_processor.manufacturer)
         self.assertEqual('Multi-Core Intel(R) Xeon(R) processor 7xxx Series',

@@ -1,5 +1,5 @@
 {
-    "@odata.type": "#Manager.v1_1_0.Manager",
+    "@odata.type": "#Manager.v1_4_0.Manager",
     "Id": "BMC",
     "Name": "Manager",
     "ManagerType": "BMC",
@@ -9,6 +9,7 @@
     "Model": "Joo Janta 200",
     "DateTime": "2015-03-13T04:14:33+06:00",
     "DateTimeLocalOffset": "+06:00",
+    "AutoDSTEnabled": false,
     "Status": {
         "State": "Enabled",
         "Health": "OK"

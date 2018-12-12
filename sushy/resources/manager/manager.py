@@ -10,6 +10,9 @@
 # License for the specific language governing permissions and limitations
 # under the License.
 
+# This is referred from Redfish standard schema.
+# https://redfish.dmtf.org/schemas/Manager.v1_4_0.json
+
 import logging
 
 from sushy import exceptions
@@ -37,6 +40,10 @@ class RemoteAccessField(base.CompositeField):
 
 
 class Manager(base.ResourceBase):
+
+    auto_dst_enabled = base.Field('AutoDSTEnabled')
+    """Indicates whether the manager is configured for automatic DST
+        adjustment"""
 
     firmware_version = base.Field('FirmwareVersion')
     """The manager firmware version"""

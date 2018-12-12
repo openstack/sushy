@@ -1,5 +1,5 @@
 {
-      "@odata.type": "#Session.v1_0_2.Session",
+      "@odata.type": "#Session.v1_1_0.Session",
       "Id": "1234567890ABCDEF",
       "Name": "User Session",
       "Description": "Manager User Session",
