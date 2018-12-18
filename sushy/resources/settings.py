@@ -13,6 +13,7 @@
 # This is referred from Redfish standard schema.
 # https://redfish.dmtf.org/schemas/Settings.v1_2_0.json
 
+from dateutil import parser
 
 from sushy.resources import base
 from sushy.resources import common
@@ -57,7 +58,8 @@ class MaintenanceWindowField(base.CompositeField):
 
     maintenance_window_start_time = base.Field(
         'MaintenanceWindowStartTime',
-        required=True)
+        required=True,
+        adapter=parser.parse)
     """The start time of a maintenance window"""
 
 
@@ -72,7 +74,8 @@ class OperationApplyTimeSupportField(base.CompositeField):
     """The location of the maintenance window settings"""
 
     maintenance_window_start_time = base.Field(
-        'MaintenanceWindowStartTime')
+        'MaintenanceWindowStartTime',
+        adapter=parser.parse)
     """The start time of a maintenance window"""
 
     supported_values = base.Field('SupportedValues', required=True)
