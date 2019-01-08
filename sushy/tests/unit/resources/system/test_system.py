@@ -20,6 +20,7 @@ import mock
 import sushy
 from sushy import exceptions
 from sushy.resources import constants as res_cons
+from sushy.resources.manager import manager
 from sushy.resources.system import bios
 from sushy.resources.system import mappings as sys_map
 from sushy.resources.system import processor
@@ -477,6 +478,18 @@ class SystemTestCase(base.TestCase):
             self.conn.get.return_value.json.return_value = json.load(f)
         # | WHEN & THEN |
         self.assertIsInstance(self.sys_inst.storage, storage.StorageCollection)
+
+    def test_managers(self):
+        # | GIVEN |
+        with open('sushy/tests/unit/json_samples/'
+                  'manager.json') as f:
+            self.conn.get.return_value.json.return_value = json.load(f)
+
+        # | WHEN & THEN |
+        actual_managers = self.sys_inst.managers
+        self.assertIsInstance(actual_managers[0], manager.Manager)
+        self.assertEqual(
+            '/redfish/v1/Managers/BMC', actual_managers[0].path)
 
 
 class SystemCollectionTestCase(base.TestCase):

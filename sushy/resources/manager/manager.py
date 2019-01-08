@@ -195,6 +195,25 @@ class Manager(base.ResourceBase):
             self._conn, utils.get_sub_resource_path_by(self, 'VirtualMedia'),
             redfish_version=self.redfish_version)
 
+    @property
+    @utils.cache_it
+    def systems(self):
+        """A list of systems managed by this manager.
+
+        Returns a list of `System` objects representing systems being
+        managed by this manager.
+
+        :raises: MissingAttributeError if '@odata.id' field is missing.
+        :returns: A list of `System` instances
+        """
+        paths = utils.get_sub_resource_path_by(
+            self, ["Links", "ManagerForServers"], is_collection=True)
+
+        from sushy.resources.system import system
+        return [system.System(self._conn, path,
+                              redfish_version=self.redfish_version)
+                for path in paths]
+
 
 class ManagerCollection(base.ResourceCollectionBase):
 

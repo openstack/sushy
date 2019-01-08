@@ -18,6 +18,7 @@ import sushy
 from sushy import exceptions
 from sushy.resources.manager import manager
 from sushy.resources.manager import virtual_media
+from sushy.resources.system import system
 from sushy.tests.unit import base
 
 
@@ -265,6 +266,18 @@ class ManagerTestCase(base.TestCase):
         self.assertIsInstance(self.manager.virtual_media,
                               virtual_media.VirtualMediaCollection)
         self.assertFalse(vrt_media._is_stale)
+
+    def test_systems(self):
+        # | GIVEN |
+        with open('sushy/tests/unit/json_samples/'
+                  'system.json') as f:
+            self.conn.get.return_value.json.return_value = json.load(f)
+
+        # | WHEN & THEN |
+        actual_systems = self.manager.systems
+        self.assertIsInstance(actual_systems[0], system.System)
+        self.assertEqual(
+            '/redfish/v1/Systems/437XR1138R2', actual_systems[0].path)
 
 
 class ManagerCollectionTestCase(base.TestCase):

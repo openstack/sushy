@@ -69,6 +69,14 @@ class UtilsTestCase(base.TestCase):
                                                subresource_path)
         self.assertEqual(expected_result, value)
 
+    def test_get_sub_resource_path_by_collection(self):
+        subresource_path = ["Links", "ManagedBy"]
+        expected_result = ['/redfish/v1/Managers/BMC']
+        value = utils.get_sub_resource_path_by(self.sys_inst,
+                                               subresource_path,
+                                               is_collection=True)
+        self.assertEqual(expected_result, value)
+
     def test_get_sub_resource_path_by_fails(self):
         subresource_path = ['Links', 'Chassis']
         expected_result = 'attribute Links/Chassis/@odata.id is missing'

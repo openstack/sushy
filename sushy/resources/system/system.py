@@ -21,6 +21,7 @@ import logging
 from sushy import exceptions
 from sushy.resources import base
 from sushy.resources import common
+from sushy.resources.manager import manager
 from sushy.resources import mappings as res_maps
 from sushy.resources.system import bios
 from sushy.resources.system import constants as sys_cons
@@ -335,6 +336,24 @@ class System(base.ResourceBase):
         return sys_storage.StorageCollection(
             self._conn, utils.get_sub_resource_path_by(self, "Storage"),
             redfish_version=self.redfish_version)
+
+    @property
+    @utils.cache_it
+    def managers(self):
+        """A list of managers for this system.
+
+        Returns a list of `Manager` objects representing the managers
+        that manage this system.
+
+        :raises: MissingAttributeError if '@odata.id' field is missing.
+        :returns: A list of `Manager` instances
+        """
+        paths = utils.get_sub_resource_path_by(
+            self, ["Links", "ManagedBy"], is_collection=True)
+
+        return [manager.Manager(self._conn, path,
+                                redfish_version=self.redfish_version)
+                for path in paths]
 
 
 class SystemCollection(base.ResourceCollectionBase):
