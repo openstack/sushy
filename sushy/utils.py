@@ -100,8 +100,7 @@ def get_sub_resource_path_by(resource, subresource_name, is_collection=False):
                 elements.append(element['@odata.id'])
             return elements
 
-        else:
-            return body['@odata.id']
+        return body['@odata.id']
 
     except (TypeError, KeyError):
         attribute = '/'.join(subresource_name)
