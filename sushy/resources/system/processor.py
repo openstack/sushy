@@ -113,11 +113,7 @@ class Processor(base.ResourceBase):
     @property
     @utils.cache_it
     def sub_processors(self):
-        """A reference to
-
-        the collection of Sub-Processors associated with
-        this system, such as cores or threads that are part of a processor.
-        """
+        """A reference to the collection of Sub-Processors"""
         return ProcessorCollection(
             self.conn, self._get_processor_collection_path,
             redfish_version=self.redfish_version)
