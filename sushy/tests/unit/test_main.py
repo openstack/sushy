@@ -65,6 +65,7 @@ class MainTestCase(base.TestCase):
         self.assertFalse(self.root.protocol_features_supported.select_query)
         self.assertEqual('/redfish/v1/Systems', self.root._systems_path)
         self.assertEqual('/redfish/v1/Managers', self.root._managers_path)
+        self.assertEqual('/redfish/v1/Chassis', self.root._chassis_path)
         self.assertEqual('/redfish/v1/SessionService',
                          self.root._session_service_path)
 
@@ -173,6 +174,11 @@ class BareMinimumMainTestCase(base.TestCase):
         self.assertRaisesRegex(
             exceptions.MissingAttributeError,
             'Managers/@odata.id', self.root.get_manager_collection)
+
+    def test_get_chassis_collection_when_chassis_attr_absent(self):
+        self.assertRaisesRegex(
+            exceptions.MissingAttributeError,
+            'Chassis/@odata.id', self.root.get_chassis_collection)
 
     def test_get_session_service_when_sessionservice_attr_absent(self):
         self.assertRaisesRegex(
