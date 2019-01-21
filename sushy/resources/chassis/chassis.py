@@ -17,7 +17,9 @@ from sushy import exceptions
 from sushy.resources import base
 from sushy.resources.chassis import mappings as cha_maps
 from sushy.resources import common
+from sushy.resources.manager import manager
 from sushy.resources import mappings as res_maps
+from sushy import utils
 
 import logging
 
@@ -193,6 +195,43 @@ class Chassis(base.ResourceBase):
         LOG.debug('Resetting the Chassis %s ...', self.identity)
         self._conn.post(target_uri, data={'ResetType': value})
         LOG.info('The Chassis %s is being reset', self.identity)
+
+    @property
+    @utils.cache_it
+    def managers(self):
+        """A list of managers for this chassis.
+
+        Returns a list of `Manager` objects representing the managers
+        that manage this chassis.
+
+        :raises: MissingAttributeError if '@odata.id' field is missing.
+        :returns: A list of `Manager` instances
+        """
+        paths = utils.get_sub_resource_path_by(
+            self, ["Links", "ManagedBy"], is_collection=True)
+
+        return [manager.Manager(self._conn, path,
+                                redfish_version=self.redfish_version)
+                for path in paths]
+
+    @property
+    @utils.cache_it
+    def systems(self):
+        """A list of systems residing in this chassis.
+
+        Returns a list of `System` objects representing systems being
+        mounted in this chassis/cabinet.
+
+        :raises: MissingAttributeError if '@odata.id' field is missing.
+        :returns: A list of `System` instances
+        """
+        paths = utils.get_sub_resource_path_by(
+            self, ["Links", "ComputerSystems"], is_collection=True)
+
+        from sushy.resources.system import system
+        return [system.System(self._conn, path,
+                              redfish_version=self.redfish_version)
+                for path in paths]
 
 
 class ChassisCollection(base.ResourceCollectionBase):

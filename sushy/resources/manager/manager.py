@@ -214,6 +214,25 @@ class Manager(base.ResourceBase):
                               redfish_version=self.redfish_version)
                 for path in paths]
 
+    @property
+    @utils.cache_it
+    def chassis(self):
+        """A list of chassis managed by this manager.
+
+        Returns a list of `Chassis` objects representing the chassis
+        or cabinets managed by this manager.
+
+        :raises: MissingAttributeError if '@odata.id' field is missing.
+        :returns: A list of `Chassis` instances
+        """
+        paths = utils.get_sub_resource_path_by(
+            self, ["Links", "ManagerForChassis"], is_collection=True)
+
+        from sushy.resources.chassis import chassis
+        return [chassis.Chassis(self._conn, path,
+                                redfish_version=self.redfish_version)
+                for path in paths]
+
 
 class ManagerCollection(base.ResourceCollectionBase):
 

@@ -20,6 +20,7 @@ import logging
 
 from sushy import exceptions
 from sushy.resources import base
+from sushy.resources.chassis import chassis
 from sushy.resources import common
 from sushy.resources.manager import manager
 from sushy.resources import mappings as res_maps
@@ -245,10 +246,6 @@ class System(base.ResourceBase):
         #                    Probably we should call refresh() as well.
         self._conn.patch(self.path, data=data)
 
-    # TODO(lucasagomes): All system have a Manager and Chassis object,
-    # include a get_manager() and get_chassis() once we have an abstraction
-    # for those resources.
-
     def _get_processor_collection_path(self):
         """Helper function to find the ProcessorCollection path"""
         return utils.get_sub_resource_path_by(self, 'Processors')
@@ -352,6 +349,24 @@ class System(base.ResourceBase):
             self, ["Links", "ManagedBy"], is_collection=True)
 
         return [manager.Manager(self._conn, path,
+                                redfish_version=self.redfish_version)
+                for path in paths]
+
+    @property
+    @utils.cache_it
+    def chassis(self):
+        """A list of chassis where this system resides.
+
+        Returns a list of `Chassis` objects representing the chassis
+        or cabinets where this system is mounted.
+
+        :raises: MissingAttributeError if '@odata.id' field is missing.
+        :returns: A list of `Chassis` instances
+        """
+        paths = utils.get_sub_resource_path_by(
+            self, ["Links", "Chassis"], is_collection=True)
+
+        return [chassis.Chassis(self._conn, path,
                                 redfish_version=self.redfish_version)
                 for path in paths]
 

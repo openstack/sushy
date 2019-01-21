@@ -19,6 +19,8 @@ import mock
 import sushy
 from sushy import exceptions
 from sushy.resources.chassis import chassis
+from sushy.resources.manager import manager
+from sushy.resources.system import system
 from sushy.tests.unit import base
 
 
@@ -117,6 +119,30 @@ class ChassisTestCase(base.TestCase):
     def test_reset_chassis_with_invalid_value(self):
         self.assertRaises(exceptions.InvalidParameterValueError,
                           self.chassis.reset_chassis, 'invalid-value')
+
+    def test_managers(self):
+        # | GIVEN |
+        with open('sushy/tests/unit/json_samples/'
+                  'manager.json') as f:
+            self.conn.get.return_value.json.return_value = json.load(f)
+
+        # | WHEN & THEN |
+        actual_managers = self.chassis.managers
+        self.assertIsInstance(actual_managers[0], manager.Manager)
+        self.assertEqual(
+            '/redfish/v1/Managers/Blade1BMC', actual_managers[0].path)
+
+    def test_systems(self):
+        # | GIVEN |
+        with open('sushy/tests/unit/json_samples/'
+                  'system.json') as f:
+            self.conn.get.return_value.json.return_value = json.load(f)
+
+        # | WHEN & THEN |
+        actual_systems = self.chassis.systems
+        self.assertIsInstance(actual_systems[0], system.System)
+        self.assertEqual(
+            '/redfish/v1/Systems/529QB9450R6', actual_systems[0].path)
 
 
 class ChassisCollectionTestCase(base.TestCase):
