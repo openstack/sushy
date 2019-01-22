@@ -56,21 +56,21 @@ class SettingsFieldTestCase(base.TestCase):
         self.assertEqual(
             1,
             instance.
-            _maintenance_window.maintenance_window_duration_in_seconds)
+            maintenance_window.maintenance_window_duration_in_seconds)
         self.assertEqual(
             '2016-03-07T14:44.30-05:05',
-            instance._maintenance_window.maintenance_window_start_time)
+            instance.maintenance_window.maintenance_window_start_time)
         self.assertEqual(
             1,
-            instance._operation_apply_time_support.
+            instance.operation_apply_time_support.
             maintenance_window_duration_in_seconds)
         self.assertEqual(
             '2016-03-07T14:44.30-05:10',
-            instance._operation_apply_time_support.
+            instance.operation_apply_time_support.
             maintenance_window_start_time)
         self.assertIn(
             'Immediate',
-            instance._operation_apply_time_support.supported_values)
+            instance.operation_apply_time_support.supported_values)
 
     def test_commit(self):
         conn = mock.Mock()

@@ -108,7 +108,7 @@ class SettingsField(base.CompositeField):
     to change this resource
     """
 
-    _maintenance_window = MaintenanceWindowField('MaintenanceWindow')
+    maintenance_window = MaintenanceWindowField('MaintenanceWindow')
     """Indicates if a given resource has a maintenance window assignment
     for applying settings or operations"""
 
@@ -116,7 +116,7 @@ class SettingsField(base.CompositeField):
     """Represents the results of the last time the values of the Settings
     resource were applied to the server"""
 
-    _operation_apply_time_support = OperationApplyTimeSupportField(
+    operation_apply_time_support = OperationApplyTimeSupportField(
         'OperationApplyTimeSupport')
     """Indicates if a client is allowed to request for a specific apply
     time of a create, delete, or action operation of a given resource"""
