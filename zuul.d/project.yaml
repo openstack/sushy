@@ -10,7 +10,7 @@
       - release-notes-jobs-python3
     check:
       jobs:
-        - sushy-tempest-ironic-ipa-partition-redfish-src
+        - sushy-tempest-ironic-partition-redfish-src
     gate:
       jobs:
-        - sushy-tempest-ironic-ipa-partition-redfish-src
+        - sushy-tempest-ironic-partition-redfish-src
