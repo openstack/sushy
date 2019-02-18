@@ -1,0 +1,5 @@
+---
+features:
+  - |
+    Adds support for the UpdateService resource to the library.
+    `UpdateService` is responsible for managing firmware updates.

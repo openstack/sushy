@@ -27,6 +27,9 @@
     "SessionService": {
         "@odata.id": "/redfish/v1/SessionService"
     },
+    "UpdateService": {
+        "@odata.id": "/redfish/v1/UpdateService"
+    },
     "AccountService": {
         "@odata.id": "/redfish/v1/AccountService"
     },
