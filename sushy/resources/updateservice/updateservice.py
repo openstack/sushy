@@ -115,7 +115,7 @@ class UpdateService(base.ResourceBase):
                    simple_update_action.transfer_protocol if v in
                    up_maps.TRANSFER_PROTOCOL_TYPE_VALUE_MAP)
 
-    def simple_update(self, image_uri, targets, transfer_protocol):
+    def simple_update(self, image_uri, targets, transfer_protocol='HTTP'):
         """Simple Update is used to update software components"""
         transfer_protocol = transfer_protocol
 
