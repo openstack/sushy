@@ -13,6 +13,8 @@
 # This is referred from Redfish standard schema.
 # https://redfish.dmtf.org/schemas/VirtualMedia.v1_2_0.json
 
+from six.moves import http_client
+
 from sushy import exceptions
 from sushy.resources import base
 from sushy.resources import common
@@ -98,9 +100,14 @@ class VirtualMedia(base.ResourceBase):
         After ejecting media inserted will be False and image_name will be
         empty.
         """
-
-        target_uri = self._get_eject_media_element().target_uri
-        self._conn.post(target_uri)
+        try:
+            target_uri = self._get_eject_media_element().target_uri
+            self._conn.post(target_uri)
+        except exceptions.HTTPError as response:
+            # Some vendors like HPE iLO has this kind of implementation.
+            # It needs to pass an empty dict.
+            if response.status_code == http_client.UNSUPPORTED_MEDIA_TYPE:
+                self._conn.post(target_uri, data={})
         self.invalidate()
 
 
