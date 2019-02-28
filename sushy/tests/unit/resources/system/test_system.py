@@ -22,6 +22,7 @@ from sushy import exceptions
 from sushy.resources.chassis import chassis
 from sushy.resources import constants as res_cons
 from sushy.resources.manager import manager
+from sushy.resources.oem import fake
 from sushy.resources.system import bios
 from sushy.resources.system import mappings as sys_map
 from sushy.resources.system import processor
@@ -69,6 +70,8 @@ class SystemTestCase(base.TestCase):
                          self.sys_inst.power_state)
         self.assertEqual(96, self.sys_inst.memory_summary.size_gib)
         self.assertEqual("OK", self.sys_inst.memory_summary.health)
+        for oem_vendor in self.sys_inst.oem_vendors:
+            self.assertIn(oem_vendor, ('Contoso', 'Chipwise'))
 
     def test__parse_attributes_missing_actions(self):
         self.sys_inst.json.pop('Actions')
@@ -503,6 +506,15 @@ class SystemTestCase(base.TestCase):
         self.assertIsInstance(actual_chassis[0], chassis.Chassis)
         self.assertEqual(
             '/redfish/v1/Chassis/1U', actual_chassis[0].path)
+
+    def test_get_oem_extension(self):
+        # | WHEN |
+        contoso_system_extn_inst = self.sys_inst.get_oem_extension('Contoso')
+        # | THEN |
+        self.assertIsInstance(contoso_system_extn_inst,
+                              fake.FakeOEMSystemExtension)
+        self.assertIs(self.sys_inst, contoso_system_extn_inst.core_resource)
+        self.assertEqual('Contoso', contoso_system_extn_inst.oem_property_name)
 
 
 class SystemCollectionTestCase(base.TestCase):

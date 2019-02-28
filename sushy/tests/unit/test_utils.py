@@ -106,6 +106,26 @@ class UtilsTestCase(base.TestCase):
         self.assertEqual(0, utils.max_safe([]))
         self.assertIsNone(utils.max_safe([], default=None))
 
+    def test_camelcase_to_underscore_joined(self):
+        input_vs_expected = [
+            ('GarbageCollection', 'garbage_collection'),
+            ('DD', 'dd'),
+            ('rr', 'rr'),
+            ('AABbbC', 'aa_bbb_c'),
+            ('AABbbCCCDd', 'aa_bbb_ccc_dd'),
+            ('Manager', 'manager'),
+            ('EthernetInterfaceCollection', 'ethernet_interface_collection'),
+            (' ', ' '),
+        ]
+        for inp, exp in input_vs_expected:
+            self.assertEqual(exp, utils.camelcase_to_underscore_joined(inp))
+
+    def test_camelcase_to_underscore_joined_fails_with_empty_string(self):
+        self.assertRaisesRegex(
+            ValueError,
+            '"camelcase_str" cannot be empty',
+            utils.camelcase_to_underscore_joined, '')
+
 
 class NestedResource(resource_base.ResourceBase):
 
