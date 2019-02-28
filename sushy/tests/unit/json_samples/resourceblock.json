@@ -1,0 +1,48 @@
+{
+    "@odata.context": "/redfish/v1/$metadata#ResourceBlock.ResourceBlock",
+    "@odata.type": "#ResourceBlock.v1_3_0.ResourceBlock",
+    "@odata.id": "/redfish/v1/CompositionService/ResourceBlocks/DriveBlock3",
+    "Id": "DriveBlock3",
+    "Name": "Drive Block 3",
+    "Description": "ResourceBlock1",
+    "ResourceBlockType": "Storage",
+    "Status": {
+        "State": "Enabled",
+        "Health": "OK"
+    },
+    "CompositionStatus": {
+        "Reserved": false,
+        "CompositionState": "Composed",
+        "MaxCompositions": 1,
+        "NumberOfCompositions": 0,
+        "SharingCapable": true,
+        "SharingEnabled": false
+    },
+    "Processors": [],
+    "Memory": [],
+    "Storage": [
+    {
+    "@odata.id": "/redfish/v1/CompositionService/ResourceBlocks/DriveBlock3/Storage/Block3NVMe"
+    }
+    ],
+    "Links": {
+        "ComputerSystems": [
+            {
+                "@odata.id": "/redfish/v1/Systems/ComposedSystem"
+            }
+        ],
+        "Chassis": [
+            {
+                "@odata.id": "/redfish/v1/Chassis/ComposableModule3"
+            }
+        ],
+        "Zones": [
+            {
+                "@odata.id": "/redfish/v1/CompositionService/ResourceZones/1"
+            },
+            {
+                "@odata.id": "/redfish/v1/CompositionService/ResourceZones/2"
+            }
+        ]
+    }
+}

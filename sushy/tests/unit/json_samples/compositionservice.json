@@ -1,0 +1,21 @@
+{
+    "@odata.context": "/redfish/v1/$metadata#CompositionService.CompositionService",
+    "@odata.type": "#CompositionService.v1_1_0.CompositionService",
+    "@odata.id": "/redfish/v1/CompositionService",
+    "AllowOverprovisioning": false,
+    "AllowZoneAffinity": true,
+    "Description": "CompositionService1",
+    "Id": "CompositionService",
+    "Name": "Composition Service",
+    "Status": {
+        "State": "Enabled",
+        "Health": "OK"
+    },
+    "ServiceEnabled": true,
+    "ResourceBlocks": {
+        "@odata.id": "/redfish/v1/CompositionService/ResourceBlocks"
+    },
+    "ResourceZones": {
+        "@odata.id": "/redfish/v1/CompositionService/ResourceZones"
+    }
+}

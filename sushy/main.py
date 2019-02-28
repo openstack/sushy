@@ -19,6 +19,7 @@ from sushy import connector as sushy_connector
 from sushy import exceptions
 from sushy.resources import base
 from sushy.resources.chassis import chassis
+from sushy.resources.compositionservice import compositionservice
 from sushy.resources.manager import manager
 from sushy.resources.registry import message_registry_file
 from sushy.resources.sessionservice import session
@@ -64,6 +65,10 @@ class Sushy(base.ResourceBase):
     protocol_features_supported = ProtocolFeaturesSupportedField(
         'ProtocolFeaturesSupported')
     """The information about protocol features supported by the service"""
+
+    _composition_service_path = base.Field(
+        ['CompositionService', '@odata.id'])
+    """CompositionService path"""
 
     _systems_path = base.Field(['Systems', '@odata.id'])
     """SystemCollection path"""
@@ -257,3 +262,18 @@ class Sushy(base.ResourceBase):
                 self._conn,
                 self._registries_path,
                 redfish_version=self.redfish_version)
+
+    def get_composition_service(self):
+        """Get the CompositionService object
+
+        :raises: MissingAttributeError, if the composition service
+            attribute is not found
+        :returns: The CompositionService object
+        """
+        if not self._composition_service_path:
+            raise exceptions.MissingAttributeError(
+                attribute='CompositionService/@odata.id',
+                resource=self._path)
+        return compositionservice.CompositionService(
+            self._conn, self._composition_service_path,
+            redfish_version=self.redfish_version)

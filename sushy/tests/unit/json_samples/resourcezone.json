@@ -1,0 +1,50 @@
+{
+    "@odata.context": "/redfish/v1/$metadata#Zone.Zone",
+    "@odata.type": "#Zone.v1_2_1.Zone",
+    "@odata.id": "/redfish/v1/CompositionService/ResourceZones/1",
+    "Id": "1",
+    "Name": "Resource Zone 1",
+    "Description": "ResourceZone1",
+    "Status": {
+        "State": "Enabled",
+        "Health": "OK"
+    },
+    "Links": {
+        "ResourceBlocks": [
+            {
+                "@odata.id": "/redfish/v1/CompositionService/ResourceBlocks/ComputeBlock1"
+            },
+            {
+                "@odata.id": "/redfish/v1/CompositionService/ResourceBlocks/DriveBlock3"
+            },
+            {
+                "@odata.id": "/redfish/v1/CompositionService/ResourceBlocks/DriveBlock4"
+            },
+            {
+            "@odata.id": "/redfish/v1/CompositionService/ResourceBlocks/DriveBlock5"
+            },
+            {
+                "@odata.id": "/redfish/v1/CompositionService/ResourceBlocks/DriveBlock6"
+            },
+            {
+                "@odata.id": "/redfish/v1/CompositionService/ResourceBlocks/DriveBlock7"
+            }
+        ]
+    },
+    "@Redfish.CollectionCapabilities": {
+        "@odata.type": "#CollectionCapabilities.v1_0_0.CollectionCapabilities",
+        "Capabilities": [
+            {
+                "CapabilitiesObject": {
+                    "@odata.id": "/redfish/v1/Systems/Capabilities"
+            },
+            "UseCase": "ComputerSystemComposition",
+                "Links": {
+                    "TargetCollection": {
+                        "@odata.id": "/redfish/v1/Systems"
+                    }
+                }
+            }
+        ]
+    }
+}
