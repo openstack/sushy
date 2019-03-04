@@ -101,3 +101,15 @@ PROCESSOR_INSTRUCTIONSET_VALUE_MAP = {
 
 PROCESSOR_INSTRUCTIONSET_VALUE_MAP_REV = (
     utils.revert_dictionary(PROCESSOR_INSTRUCTIONSET_VALUE_MAP))
+
+SYSTEM_TYPE_VALUE_MAP = {
+    'Physical': sys_cons.SYSTEM_TYPE_PHYSICAL,
+    'Virtual': sys_cons.SYSTEM_TYPE_VIRTUAL,
+    'OS': sys_cons.SYSTEM_TYPE_OS,
+    'PhysicallyPartitioned': sys_cons.SYSTEM_TYPE_PHYSICALLY_PARTITIONED,
+    'VirtuallyPartitioned': sys_cons.SYSTEM_TYPE_VIRTUALLY_PARTITIONED,
+    'Composed': sys_cons.SYSTEM_TYPE_COMPOSED
+}
+
+SYSTEM_TYPE_VALUE_MAP_REV = (
+    utils.revert_dictionary(SYSTEM_TYPE_VALUE_MAP))

@@ -117,8 +117,8 @@ class System(base.ResourceBase):
     status = common.StatusField('Status')
     """The system status"""
 
-    # TODO(lucasagomes): Create mappings for the system_type
-    system_type = base.Field('SystemType')
+    system_type = base.MappedField('SystemType',
+                                   sys_maps.SYSTEM_TYPE_VALUE_MAP)
     """The system type"""
 
     uuid = base.Field('UUID')

@@ -146,3 +146,18 @@ PROCESSOR_INSTRUCTIONSET_MIPS64 = 'MIPS 64-bit'
 PROCESSOR_INSTRUCTIONSET_OEM = 'OEM-defined'
 PROCESSOR_INSTRUCTIONSET_x86 = 'x86 32-bit'
 PROCESSOR_INSTRUCTIONSET_x86_64 = 'x86 64-bit'
+
+# System type constants
+
+SYSTEM_TYPE_PHYSICAL = "Physical"
+"""A physical computer system"""
+SYSTEM_TYPE_VIRTUAL = "Virtual"
+"""A virtual machine instance"""
+SYSTEM_TYPE_OS = "OS"
+"""An operating system instance"""
+SYSTEM_TYPE_PHYSICALLY_PARTITIONED = "PhysicallyPartitioned"
+"""A hardware-based partition of a computer system"""
+SYSTEM_TYPE_VIRTUALLY_PARTITIONED = "VirtuallyPartitioned"
+"""A virtual or software-based partition of a computer system"""
+SYSTEM_TYPE_COMPOSED = "Composed"
+"""A computer system created by binding resource blocks together"""

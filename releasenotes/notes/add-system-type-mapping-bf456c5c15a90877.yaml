@@ -1,0 +1,5 @@
+---
+features:
+  - |
+    Adds mappings and constants for possible values of System Type in System
+    resource. This represents the type of the computer system.
