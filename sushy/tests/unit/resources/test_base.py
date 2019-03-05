@@ -129,6 +129,15 @@ class ResourceBaseTestCase(base.TestCase):
                           reader=resource_base.
                           JsonArchiveReader('Test.2.0.json'))
 
+    def test_init_default_reader(self):
+        resource_a = BaseResource(connector=self.conn)
+        resource_b = BaseResource(connector=self.conn)
+
+        self.assertIsInstance(resource_a._reader, resource_base.JsonDataReader)
+        self.assertIsInstance(resource_b._reader, resource_base.JsonDataReader)
+
+        self.assertIsNot(resource_a._reader, resource_b._reader)
+
     def test__parse_attributes(self):
         for oem_vendor in self.base_resource2.oem_vendors:
             self.assertTrue(oem_vendor in ('Contoso', 'EID_412_ASB_123'))

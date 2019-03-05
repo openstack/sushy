@@ -313,7 +313,7 @@ class ResourceBase(object):
                  connector,
                  path='',
                  redfish_version=None,
-                 reader=JsonDataReader()):
+                 reader=None):
         """A class representing the base of any Redfish resource
 
         Invokes the ``refresh()`` method of resource for the first
@@ -322,8 +322,7 @@ class ResourceBase(object):
         :param path: sub-URI path to the resource.
         :param redfish_version: The version of Redfish. Used to construct
             the object according to schema of the given version.
-        :param reader: Reader to use to fetch JSON data. Defaults to
-            JsonDataReader
+        :param reader: Reader to use to fetch JSON data.
         """
         self._conn = connector
         self._path = path
@@ -334,6 +333,8 @@ class ResourceBase(object):
         # attribute values are fetched.
         self._is_stale = True
 
+        if reader is None:
+            reader = JsonDataReader()
         reader.set_connection(connector, path)
         self._reader = reader
 
