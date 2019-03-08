@@ -58,12 +58,31 @@ class UpdateServiceTestCase(base.TestCase):
         self.upd_serv.simple_update(
             image_uri='local.server/update.exe',
             targets='/redfish/v1/UpdateService/Actions/SimpleUpdate',
-            transfer_protocol=ups_cons.TRANSFER_PROTOCOL_TYPE_HTTPS)
+            transfer_protocol=ups_cons.UPDATE_PROTOCOL_HTTPS)
         self.upd_serv._conn.post.assert_called_once_with(
             data={
                 'ImageURI': 'local.server/update.exe',
                 'Targets': '/redfish/v1/UpdateService/Actions/SimpleUpdate',
                 'TransferProtocol': 'HTTPS'})
+
+    def test_simple_update_backward_compatible_protocol(self):
+        self.upd_serv.simple_update(
+            image_uri='local.server/update.exe',
+            targets='/redfish/v1/UpdateService/Actions/SimpleUpdate',
+            transfer_protocol='HTTPS')
+        self.upd_serv._conn.post.assert_called_once_with(
+            data={
+                'ImageURI': 'local.server/update.exe',
+                'Targets': '/redfish/v1/UpdateService/Actions/SimpleUpdate',
+                'TransferProtocol': 'HTTPS'})
+
+    def test_simple_update_bad_protocol(self):
+        self.assertRaises(
+            exceptions.InvalidParameterValueError,
+            self.upd_serv.simple_update,
+            image_uri='local.server/update.exe',
+            targets='/redfish/v1/UpdateService/Actions/SimpleUpdate',
+            transfer_protocol='ROYAL')
 
     def test_software_inventory(self):
         # | GIVEN |

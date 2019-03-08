@@ -15,21 +15,19 @@ from sushy import utils
 
 
 TRANSFER_PROTOCOL_TYPE_VALUE_MAP = {
-    'Common Internet File System Protocol':
-    ups_cons.TRANSFER_PROTOCOL_TYPE_CIFS,
-    'File Transfer Protocol': ups_cons.TRANSFER_PROTOCOL_TYPE_FTP,
-    'Secure File Transfer Protocol': ups_cons.TRANSFER_PROTOCOL_TYPE_SFTP,
-    'Hypertext Transfer Protocol': ups_cons.TRANSFER_PROTOCOL_TYPE_HTTP,
-    'HTTP Secure Protocol': ups_cons.TRANSFER_PROTOCOL_TYPE_HTTPS,
-    'Secure File Copy Protocol': ups_cons.TRANSFER_PROTOCOL_TYPE_SCP,
-    'Trivial File Transfer Protocol': ups_cons.TRANSFER_PROTOCOL_TYPE_TFTP,
-    'A protocol defined by the manufacturer':
-    ups_cons.TRANSFER_PROTOCOL_TYPE_OEM,
-    'Network File System Protocol': ups_cons.TRANSFER_PROTOCOL_TYPE_NFS
+    'CIFS': ups_cons.UPDATE_PROTOCOL_CIFS,
+    'FTP': ups_cons.UPDATE_PROTOCOL_FTP,
+    'SFTP': ups_cons.UPDATE_PROTOCOL_SFTP,
+    'HTTP': ups_cons.UPDATE_PROTOCOL_HTTP,
+    'HTTPS': ups_cons.UPDATE_PROTOCOL_HTTPS,
+    'SCP': ups_cons.UPDATE_PROTOCOL_SCP,
+    'TFTP': ups_cons.UPDATE_PROTOCOL_TFTP,
+    'OEM': ups_cons.UPDATE_PROTOCOL_OEM,
+    'NFS': ups_cons.UPDATE_PROTOCOL_NFS,
+    'NSF': ups_cons.UPDATE_PROTOCOL_NFS
 }
 
 TRANSFER_PROTOCOL_TYPE_VALUE_MAP_REV = (
     utils.revert_dictionary(TRANSFER_PROTOCOL_TYPE_VALUE_MAP))
 
-TRANSFER_PROTOCOL_TYPE_VALUE_MAP[
-    'Network File System Protocol'] = ups_cons.TRANSFER_PROTOCOL_TYPE_NFS
+TRANSFER_PROTOCOL_TYPE_VALUE_MAP_REV[ups_cons.UPDATE_PROTOCOL_NFS] = 'NFS'

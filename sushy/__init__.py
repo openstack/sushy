@@ -17,12 +17,13 @@ import logging
 import pbr.version
 
 from sushy.main import Sushy
-from sushy.resources.constants import *  # noqa
-from sushy.resources.system.constants import *  # noqa
-from sushy.resources.manager.constants import *  # noqa
 from sushy.resources.chassis.constants import *  # noqa
+from sushy.resources.constants import *  # noqa
 from sushy.resources.fabric.constants import *  # noqa
+from sushy.resources.manager.constants import *  # noqa
+from sushy.resources.system.constants import *  # noqa
 from sushy.resources.system.storage.constants import *  # noqa
+from sushy.resources.updateservice.constants import *  # noqa
 
 __all__ = ('Sushy',)
 __version__ = pbr.version.VersionInfo(
