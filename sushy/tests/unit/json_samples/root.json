@@ -21,6 +21,9 @@
     "Managers": {
         "@odata.id": "/redfish/v1/Managers"
     },
+    "Fabrics": {
+        "@odata.id": "/redfish/v1/Fabrics"
+    },
     "Tasks": {
         "@odata.id": "/redfish/v1/TaskService"
     },
