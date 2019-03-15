@@ -16,6 +16,7 @@
 import logging
 
 from sushy.resources import base
+from sushy.resources import common
 from sushy import utils
 
 LOG = logging.getLogger(__name__)
@@ -62,3 +63,7 @@ class VolumeCollection(base.ResourceCollectionBase):
 
     # NOTE(etingof): for backward compatibility
     max_size_bytes = max_volume_size_bytes
+
+    operation_apply_time_support = common.OperationApplyTimeSupportField()
+    """Indicates if a client is allowed to request for a specific apply
+    time of a create, delete, or action operation of a given resource"""

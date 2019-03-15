@@ -14,10 +14,14 @@
 # https://redfish.dmtf.org/schemas/Settings.v1_2_0.json
 
 from dateutil import parser
+import logging
 
 from sushy.resources import base
 from sushy.resources import common
 from sushy.resources import mappings as res_maps
+
+
+LOG = logging.getLogger(__name__)
 
 
 class MessageListField(base.ListField):
@@ -63,24 +67,25 @@ class MaintenanceWindowField(base.CompositeField):
     """The start time of a maintenance window"""
 
 
-class OperationApplyTimeSupportField(base.CompositeField):
+class SettingsApplyTimeField(base.CompositeField):
+    def __init__(self):
+        super(SettingsApplyTimeField, self).__init__(
+            path="@Redfish.SettingsApplyTime")
 
-    maintenance_window_duration_in_seconds = base.Field(
-        'MaintenanceWindowDurationInSeconds')
-    """The expiry time of maintenance window in seconds"""
+    apply_time = base.Field('ApplyTime', adapter=str)
+    """When the future configuration should be applied"""
 
-    maintenance_window_resource = base.Field(
-        'MaintenanceWindowResource')
-    """The location of the maintenance window settings"""
+    apply_time_allowable_values = base.Field(
+        'ApplyTime@Redfish.AllowableValues', adapter=list)
+    """The list of allowable ApplyTime values"""
 
-    maintenance_window_start_time = base.Field(
-        'MaintenanceWindowStartTime',
-        adapter=parser.parse)
+    maintenance_window_start_time = base.Field('MaintenanceWindowStartTime',
+                                               adapter=parser.parse)
     """The start time of a maintenance window"""
 
-    supported_values = base.Field('SupportedValues', required=True)
-    """The client is allowed request when performing a create, delete, or
-    action operation"""
+    maintenance_window_duration_in_seconds = base.Field(
+        'MaintenanceWindowDurationInSeconds', adapter=int)
+    """The expiry time of maintenance window in seconds"""
 
 
 class SettingsField(base.CompositeField):
@@ -111,18 +116,34 @@ class SettingsField(base.CompositeField):
     to change this resource
     """
 
-    maintenance_window = MaintenanceWindowField('MaintenanceWindow')
-    """Indicates if a given resource has a maintenance window assignment
-    for applying settings or operations"""
+    @property
+    def maintenance_window(self):
+        """MaintenanceWindow field
+
+        Indicates if a given resource has a maintenance window assignment
+        for applying settings or operations
+        """
+        LOG.warning('The @Redfish.MaintenanceWindow annotation does not '
+                    'appear within @Redfish.Settings. Instead use the '
+                    'maintenance_window property in the target resource '
+                    '(e.g. System resource)')
+        return None
 
     messages = MessageListField("Messages")
     """Represents the results of the last time the values of the Settings
     resource were applied to the server"""
 
-    operation_apply_time_support = OperationApplyTimeSupportField(
-        'OperationApplyTimeSupport')
-    """Indicates if a client is allowed to request for a specific apply
-    time of a create, delete, or action operation of a given resource"""
+    @property
+    def operation_apply_time_support(self):
+        """OperationApplyTimeSupport field
+
+        Indicates if a client is allowed to request for a specific apply
+        time of a create, delete, or action operation of a given resource
+        """
+        LOG.warning('Redfish ApplyTime annotations do not appear within '
+                    '@Redfish.Settings. Instead use the apply_time_settings '
+                    'property in the target resource (e.g. Bios resource)')
+        return None
 
     def commit(self, connector, value):
         """Commits new settings values

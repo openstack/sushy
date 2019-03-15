@@ -14,6 +14,15 @@
             "@odata.id": "/redfish/v1/Systems/437XR1138R2/Storage/1/Volumes/3"
         }
     ],
+    "@Redfish.OperationApplyTimeSupport": {
+        "@odata.type": "#Settings.v1_2_0.OperationApplyTimeSupport",
+        "SupportedValues": [ "Immediate", "OnReset", "AtMaintenanceWindowStart" ],
+        "MaintenanceWindowStartTime": "2017-05-03T23:12:37-05:00",
+        "MaintenanceWindowDurationInSeconds": 600,
+        "MaintenanceWindowResource": {
+            "@odata.id": "/redfish/v1/Systems/437XR1138R2"
+        }
+    },
     "Oem": {},
     "@odata.context": "/redfish/v1/$metadata#VolumeCollection.VolumeCollection",
     "@odata.id": "/redfish/v1/Systems/437XR1138R2/Storage/1/Volumes",

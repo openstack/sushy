@@ -122,13 +122,27 @@
                 "ForceRestart",
                 "Nmi",
                 "ForceOn"
-            ]
+            ],
+            "@Redfish.OperationApplyTimeSupport": {
+                "@odata.type": "#Settings.v1_2_0.OperationApplyTimeSupport",
+                "SupportedValues": [ "Immediate", "AtMaintenanceWindowStart" ],
+                "MaintenanceWindowStartTime": "2017-05-03T23:12:37-05:00",
+                "MaintenanceWindowDurationInSeconds": 600,
+                "MaintenanceWindowResource": {
+                    "@odata.id": "/redfish/v1/Systems/437XR1138R2"
+                }
+            }
         },
         "Oem": {
             "#Contoso.Reset": {
                 "target": "/redfish/v1/Systems/437XR1138R2/Oem/Contoso/Actions/Contoso.Reset"
             }
         }
+    },
+    "@Redfish.MaintenanceWindow": {
+        "@odata.type": "#Settings.v1_2_0.MaintenanceWindow",
+        "MaintenanceWindowDurationInSeconds": 1,
+        "MaintenanceWindowStartTime": "2016-03-07T14:44:30-05:05"
     },
     "@odata.context": "/redfish/v1/$metadata#ComputerSystem.ComputerSystem",
     "@odata.id": "/redfish/v1/Systems/437XR1138R2",

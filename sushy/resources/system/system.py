@@ -24,6 +24,7 @@ from sushy.resources.chassis import chassis
 from sushy.resources import common
 from sushy.resources.manager import manager
 from sushy.resources import mappings as res_maps
+from sushy.resources import settings
 from sushy.resources.system import bios
 from sushy.resources.system import constants as sys_cons
 from sushy.resources.system import ethernet_interface
@@ -126,6 +127,11 @@ class System(base.ResourceBase):
 
     memory_summary = MemorySummaryField('MemorySummary')
     """The summary info of memory of the system in general detail"""
+
+    maintenance_window = settings.MaintenanceWindowField(
+        '@Redfish.MaintenanceWindow')
+    """Indicates if a given resource has a maintenance window assignment
+    for applying settings or operations"""
 
     _actions = ActionsField('Actions', required=True)
 

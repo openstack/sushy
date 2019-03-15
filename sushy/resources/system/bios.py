@@ -57,6 +57,8 @@ class Bios(base.ResourceBase):
 
     _actions = ActionsField('Actions')
 
+    _apply_time_settings = settings.SettingsApplyTimeField()
+
     @property
     @utils.cache_it
     def _pending_settings_resource(self):
@@ -73,6 +75,10 @@ class Bios(base.ResourceBase):
         but for them to take effect system restart is necessary
         """
         return self._pending_settings_resource.attributes
+
+    @property
+    def apply_time_settings(self):
+        return self._pending_settings_resource._apply_time_settings
 
     def set_attribute(self, key, value):
         """Update an attribute

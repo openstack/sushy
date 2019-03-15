@@ -1,0 +1,13 @@
+---
+features:
+  - |
+    Update sushy models to support the Redfish SettingsApplyTime and
+    OperationApplyTimeSupport annotations.
+deprecations:
+  - |
+    The ``operation_apply_time_support`` and ``maintenance_window``
+    properties in the ``SettingsField`` class are deprecated. The
+    ``SettingsField`` class represents the ``@Redfish.Settings``
+    annotation and those properties cannot appear within this
+    annotation. Instead use the ``apply_time_settings`` property
+    in the target resource (e.g. ``Bios`` resource).

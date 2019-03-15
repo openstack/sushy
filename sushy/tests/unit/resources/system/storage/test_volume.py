@@ -11,8 +11,9 @@
 #    under the License.
 
 import json
-
 import mock
+
+from dateutil import parser
 
 from sushy.resources.system.storage import volume
 from sushy.tests.unit import base
@@ -57,6 +58,17 @@ class VolumeCollectionTestCase(base.TestCase):
             '/redfish/v1/Systems/437XR1138R2/Storage/1/Volumes/2',
             '/redfish/v1/Systems/437XR1138R2/Storage/1/Volumes/3'),
             self.stor_vol_col.members_identities)
+
+    def test_operation_apply_time_support(self):
+        support = self.stor_vol_col.operation_apply_time_support
+        self.assertIsNotNone(support)
+        self.assertEqual(600, support.maintenance_window_duration_in_seconds)
+        self.assertEqual(parser.parse('2017-05-03T23:12:37-05:00'),
+                         support.maintenance_window_start_time)
+        self.assertEqual('/redfish/v1/Systems/437XR1138R2',
+                         support._maintenance_window_resource.resource_uri)
+        self.assertEqual(['Immediate', 'OnReset', 'AtMaintenanceWindowStart'],
+                         support.supported_values)
 
     @mock.patch.object(volume, 'Volume', autospec=True)
     def test_get_member(self, Volume_mock):

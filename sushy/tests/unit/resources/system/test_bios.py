@@ -13,8 +13,9 @@
 #    under the License.
 
 import json
-
 import mock
+
+from dateutil import parser
 
 from sushy import exceptions
 from sushy.resources.system import bios
@@ -105,6 +106,19 @@ class BiosTestCase(base.TestCase):
         # make it to refresh pending attributes on next retrieval
         self.sys_bios.pending_attributes
         self.assertTrue(self.conn.get.called)
+
+    def test_apply_time_settings(self):
+        self.conn.get.reset_mock()
+        apply_time_settings = self.sys_bios.apply_time_settings
+        self.assertIsNotNone(apply_time_settings)
+        self.assertEqual('OnReset', apply_time_settings.apply_time)
+        self.assertEqual(['OnReset', 'Immediate', 'AtMaintenanceWindowStart',
+                         'InMaintenanceWindowOnReset'],
+                         apply_time_settings.apply_time_allowable_values)
+        self.assertEqual(parser.parse('2017-05-03T23:12:37-05:00'),
+                         apply_time_settings.maintenance_window_start_time)
+        self.assertEqual(600, apply_time_settings.
+                         maintenance_window_duration_in_seconds)
 
     def test__get_reset_bios_action_element(self):
         value = self.sys_bios._get_reset_bios_action_element()

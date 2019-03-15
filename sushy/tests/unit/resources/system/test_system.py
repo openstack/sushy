@@ -14,8 +14,9 @@
 #    under the License.
 
 import json
-
 import mock
+
+from dateutil import parser
 
 import sushy
 from sushy import exceptions
@@ -71,6 +72,12 @@ class SystemTestCase(base.TestCase):
                          self.sys_inst.power_state)
         self.assertEqual(96, self.sys_inst.memory_summary.size_gib)
         self.assertEqual("OK", self.sys_inst.memory_summary.health)
+        self.assertIsNotNone(self.sys_inst.maintenance_window)
+        self.assertEqual(1, self.sys_inst.maintenance_window
+                         .maintenance_window_duration_in_seconds)
+        self.assertEqual(parser.parse('2016-03-07T14:44:30-05:05'),
+                         self.sys_inst.maintenance_window
+                         .maintenance_window_start_time)
         for oem_vendor in self.sys_inst.oem_vendors:
             self.assertIn(oem_vendor, ('Contoso', 'Chipwise'))
 
@@ -98,6 +105,14 @@ class SystemTestCase(base.TestCase):
         self.sys_inst.json['MemorySummary']['TotalSystemMemoryGiB'] = None
         self.sys_inst._parse_attributes()
         self.assertIsNone(self.sys_inst.memory_summary.size_gib)
+
+    def test__parse_attributes_bad_maintenance_window_time(self):
+        self.sys_inst.json['@Redfish.MaintenanceWindow'][
+            'MaintenanceWindowStartTime'] = 'bad date'
+        self.assertRaisesRegex(
+            exceptions.MalformedAttributeError,
+            '@Redfish.MaintenanceWindow/MaintenanceWindowStartTime',
+            self.sys_inst._parse_attributes)
 
     def test_get__reset_action_element(self):
         value = self.sys_inst._get_reset_action_element()
@@ -149,6 +164,17 @@ class SystemTestCase(base.TestCase):
         self.assertEqual(expected, values)
         self.assertIsInstance(values, set)
         self.assertEqual(1, mock_log.call_count)
+
+    def test_reset_action_operation_apply_time_support(self):
+        support = self.sys_inst._actions.reset.operation_apply_time_support
+        self.assertIsNotNone(support)
+        self.assertEqual(['Immediate', 'AtMaintenanceWindowStart'],
+                         support.supported_values)
+        self.assertEqual(parser.parse('2017-05-03T23:12:37-05:00'),
+                         support.maintenance_window_start_time)
+        self.assertEqual(600, support.maintenance_window_duration_in_seconds)
+        self.assertEqual('/redfish/v1/Systems/437XR1138R2',
+                         support._maintenance_window_resource.resource_uri)
 
     def test_reset_system(self):
         self.sys_inst.reset_system(sushy.RESET_FORCE_OFF)

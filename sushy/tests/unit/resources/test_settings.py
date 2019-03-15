@@ -16,9 +16,6 @@
 import json
 import mock
 
-from dateutil import parser
-
-from sushy import exceptions
 from sushy.resources import constants as res_cons
 from sushy.resources import settings
 from sushy.tests.unit import base
@@ -33,7 +30,8 @@ class SettingsFieldTestCase(base.TestCase):
 
         self.settings = settings.SettingsField()
 
-    def test__load(self):
+    @mock.patch.object(settings, 'LOG', autospec=True)
+    def test__load(self, mock_LOG):
         instance = self.settings._load(self.json, mock.Mock())
 
         self.assertEqual('9234ac83b9700123cc32',
@@ -56,33 +54,11 @@ class SettingsFieldTestCase(base.TestCase):
                          instance.messages[0]._related_properties[0])
         self.assertEqual('/redfish/v1/Systems/437XR1138R2/BIOS/Settings',
                          instance._settings_object_idref.resource_uri)
-        self.assertEqual(
-            1,
-            instance.
-            maintenance_window.maintenance_window_duration_in_seconds)
-        self.assertEqual(
-            parser.parse('2016-03-07T14:44:30-05:05'),
-            instance.maintenance_window.maintenance_window_start_time)
-        self.assertEqual(
-            1,
-            instance.operation_apply_time_support.
-            maintenance_window_duration_in_seconds)
-        self.assertEqual(
-            parser.parse('2016-03-07T14:44:30-05:10'),
-            instance.operation_apply_time_support.
-            maintenance_window_start_time)
-        self.assertIn(
-            'Immediate',
-            instance.operation_apply_time_support.supported_values)
-
-    def test__load_failure(self):
-        self.json[
-            '@Redfish.Settings']['MaintenanceWindow'][
-                'MaintenanceWindowStartTime'] = 'bad date'
-        self.assertRaisesRegex(
-            exceptions.MalformedAttributeError,
-            '@Redfish.Settings/MaintenanceWindow/MaintenanceWindowStartTime',
-            self.settings._load, self.json, mock.Mock())
+        self.assertIsNone(instance.maintenance_window)
+        mock_LOG.warning.assert_called_once()
+        mock_LOG.reset_mock()
+        self.assertIsNone(instance.operation_apply_time_support)
+        mock_LOG.warning.assert_called_once()
 
     def test_commit(self):
         conn = mock.Mock()
