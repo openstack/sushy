@@ -59,7 +59,8 @@ class SystemTestCase(base.TestCase):
         self.assertEqual('224071-J23', self.sys_inst.part_number)
         self.assertEqual('437XR1138R2', self.sys_inst.serial_number)
         self.assertEqual('8675309', self.sys_inst.sku)
-        self.assertEqual('Physical', self.sys_inst.system_type)
+        self.assertEqual(sushy.SYSTEM_TYPE_PHYSICAL,
+                         self.sys_inst.system_type)
         self.assertEqual('38947555-7742-3448-3784-823347823834',
                          self.sys_inst.uuid)
         self.assertEqual(res_cons.STATE_ENABLED, self.sys_inst.status.state)
