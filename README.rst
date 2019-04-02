@@ -13,6 +13,9 @@ project. As the project grows and more features from `Redfish`_ are
 needed we can expand Sushy to fulfill those requirements.
 
 * Free software: Apache license
+* Includes Redfish registry files licensed under
+    Creative Commons Attribution 4.0 License:
+    https://creativecommons.org/licenses/by/4.0/
 * Documentation: https://docs.openstack.org/sushy/latest/
 * Usage: https://docs.openstack.org/sushy/latest/reference/usage.html
 * Source: https://git.openstack.org/cgit/openstack/sushy

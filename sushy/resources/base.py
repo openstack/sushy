@@ -19,6 +19,7 @@ import copy
 import io
 import json
 import logging
+import pkg_resources
 import zipfile
 
 import six
@@ -298,6 +299,24 @@ class JsonArchiveReader(AbstractJsonReader):
         else:
             LOG.error('Support for %(type)s not implemented',
                       {'type': data.headers['content-type']})
+
+
+class JsonPackagedFileReader(AbstractJsonReader):
+    """Gets the data from packaged file given by path"""
+
+    def __init__(self, resource_package_name):
+        """Initializes the reader
+
+        :param resource_package: Python package/module name
+        """
+        self._resource_package_name = resource_package_name
+
+    def get_json(self):
+        """Gets JSON file from packaged file denoted by path"""
+
+        with pkg_resources.resource_stream(self._resource_package_name,
+                                           self._path) as resource:
+            return json.loads(resource.read().decode(encoding='utf-8'))
 
 
 @six.add_metaclass(abc.ABCMeta)
