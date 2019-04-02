@@ -196,6 +196,26 @@ class Chassis(base.ResourceBase):
         self._conn.post(target_uri, data={'ResetType': value})
         LOG.info('The Chassis %s is being reset', self.identity)
 
+    def set_indicator_led(self, state):
+        """Set IndicatorLED to the given state.
+
+        :param state: Desired LED state, lit (INDICATOR_LED_LIT), blinking
+            (INDICATOR_LED_BLINKING), off (INDICATOR_LED_OFF)
+        :raises: InvalidParameterValueError, if any information passed is
+            invalid.
+        """
+        if state not in res_maps.INDICATOR_LED_VALUE_MAP_REV:
+            raise exceptions.InvalidParameterValueError(
+                parameter='state', value=state,
+                valid_values=list(res_maps.INDICATOR_LED_VALUE_MAP_REV))
+
+        data = {
+            'IndicatorLED': res_maps.INDICATOR_LED_VALUE_MAP_REV[state]
+        }
+
+        self._conn.patch(self.path, data=data)
+        self.invalidate()
+
     @property
     @utils.cache_it
     def managers(self):

@@ -1,0 +1,6 @@
+---
+features:
+  - |
+    The ``IndicatorLED`` property of ``System`` and ``Chassis`` resources
+    made settable with the introduction of the ``.set_indicator_led()``
+    method to the respective sushy classes.

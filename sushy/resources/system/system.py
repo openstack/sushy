@@ -246,6 +246,26 @@ class System(base.ResourceBase):
         #                    Probably we should call refresh() as well.
         self._conn.patch(self.path, data=data)
 
+    def set_indicator_led(self, state):
+        """Set IndicatorLED to the given state.
+
+        :param state: Desired LED state, lit (INDICATOR_LED_LIT), blinking
+            (INDICATOR_LED_BLINKING), off (INDICATOR_LED_OFF)
+        :raises: InvalidParameterValueError, if any information passed is
+            invalid.
+        """
+        if state not in res_maps.INDICATOR_LED_VALUE_MAP_REV:
+            raise exceptions.InvalidParameterValueError(
+                parameter='state', value=state,
+                valid_values=list(res_maps.INDICATOR_LED_VALUE_MAP_REV))
+
+        data = {
+            'IndicatorLED': res_maps.INDICATOR_LED_VALUE_MAP_REV[state]
+        }
+
+        self._conn.patch(self.path, data=data)
+        self.invalidate()
+
     def _get_processor_collection_path(self):
         """Helper function to find the ProcessorCollection path"""
         return utils.get_sub_resource_path_by(self, 'Processors')

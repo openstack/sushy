@@ -53,6 +53,8 @@ INDICATOR_LED_VALUE_MAP = {
     'Unknown': res_cons.INDICATOR_LED_UNKNOWN,
 }
 
+INDICATOR_LED_VALUE_MAP_REV = utils.revert_dictionary(INDICATOR_LED_VALUE_MAP)
+
 POWER_STATE_VALUE_MAP = {
     'On': res_cons.POWER_STATE_ON,
     'Off': res_cons.POWER_STATE_OFF,

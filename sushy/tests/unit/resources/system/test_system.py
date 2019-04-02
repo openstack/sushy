@@ -233,6 +233,21 @@ class SystemTestCase(base.TestCase):
                 sushy.BOOT_SOURCE_TARGET_HDD,
                 enabled='invalid-enabled')
 
+    def test_set_indicator_led(self):
+        with mock.patch.object(
+                self.sys_inst, 'invalidate', autospec=True) as invalidate_mock:
+            self.sys_inst.set_indicator_led(sushy.INDICATOR_LED_BLINKING)
+            self.sys_inst._conn.patch.assert_called_once_with(
+                '/redfish/v1/Systems/437XR1138R2',
+                data={'IndicatorLED': 'Blinking'})
+
+            invalidate_mock.assert_called_once_with()
+
+    def test_set_indicator_led_invalid_state(self):
+        self.assertRaises(exceptions.InvalidParameterValueError,
+                          self.sys_inst.set_indicator_led,
+                          'spooky-glowing')
+
     def test__get_processor_collection_path_missing_processors_attr(self):
         self.sys_inst._json.pop('Processors')
         self.assertRaisesRegex(

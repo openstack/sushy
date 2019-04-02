@@ -120,6 +120,21 @@ class ChassisTestCase(base.TestCase):
         self.assertRaises(exceptions.InvalidParameterValueError,
                           self.chassis.reset_chassis, 'invalid-value')
 
+    def test_set_indicator_led(self):
+        with mock.patch.object(
+                self.chassis, 'invalidate', autospec=True) as invalidate_mock:
+            self.chassis.set_indicator_led(sushy.INDICATOR_LED_BLINKING)
+            self.chassis._conn.patch.assert_called_once_with(
+                '/redfish/v1/Chassis/Blade1',
+                data={'IndicatorLED': 'Blinking'})
+
+            invalidate_mock.assert_called_once_with()
+
+    def test_set_indicator_led_invalid_state(self):
+        self.assertRaises(exceptions.InvalidParameterValueError,
+                          self.chassis.set_indicator_led,
+                          'spooky-glowing')
+
     def test_managers(self):
         # | GIVEN |
         with open('sushy/tests/unit/json_samples/'
