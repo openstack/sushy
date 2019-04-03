@@ -14,6 +14,8 @@ import json
 
 import mock
 
+import sushy
+from sushy import exceptions
 from sushy.resources.system.storage import drive
 from sushy.tests.unit import base
 
@@ -37,3 +39,19 @@ class DriveTestCase(base.TestCase):
         self.assertEqual('32ADF365C6C1B7BD', self.stor_drive.identity)
         self.assertEqual('Drive Sample', self.stor_drive.name)
         self.assertEqual(899527000000, self.stor_drive.capacity_bytes)
+
+    def test_set_indicator_led(self):
+        with mock.patch.object(
+                self.stor_drive, 'invalidate',
+                autospec=True) as invalidate_mock:
+            self.stor_drive.set_indicator_led(sushy.INDICATOR_LED_BLINKING)
+            self.stor_drive._conn.patch.assert_called_once_with(
+                '/redfish/v1/Systems/437XR1138/Storage/1/Drives/'
+                '32ADF365C6C1B7BD', data={'IndicatorLED': 'Blinking'})
+
+            invalidate_mock.assert_called_once_with()
+
+    def test_set_indicator_led_invalid_state(self):
+        self.assertRaises(exceptions.InvalidParameterValueError,
+                          self.stor_drive.set_indicator_led,
+                          'spooky-glowing')
