@@ -17,6 +17,7 @@ import logging
 
 from sushy import exceptions
 from sushy.resources import base
+from sushy.resources import common
 from sushy.resources import mappings as res_maps
 from sushy import utils
 
@@ -26,6 +27,9 @@ LOG = logging.getLogger(__name__)
 class Drive(base.ResourceBase):
     """This class represents a disk drive or other physical storage medium."""
 
+    capacity_bytes = base.Field('CapacityBytes', adapter=utils.int_or_none)
+    """The size in bytes of this Drive"""
+
     identity = base.Field('Id', required=True)
     """The Drive identity string"""
 
@@ -33,11 +37,23 @@ class Drive(base.ResourceBase):
                                      res_maps.INDICATOR_LED_VALUE_MAP)
     """Whether the indicator LED is lit or off"""
 
+    manufacturer = base.Field('Manufacturer')
+    """This is the manufacturer of this drive"""
+
+    model = base.Field('Model')
+    """This is the model number for the drive"""
+
     name = base.Field('Name')
     """The name of the resource"""
 
-    capacity_bytes = base.Field('CapacityBytes', adapter=utils.int_or_none)
-    """The size in bytes of this Drive"""
+    part_number = base.Field('PartNumber')
+    """The part number for this drive"""
+
+    serial_number = base.Field('SerialNumber')
+    """The serial number for this drive"""
+
+    status = common.StatusField('Status')
+    """This type describes the status and health of the drive"""
 
     def set_indicator_led(self, state):
         """Set IndicatorLED to the given state.

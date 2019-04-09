@@ -39,6 +39,12 @@ class DriveTestCase(base.TestCase):
         self.assertEqual('32ADF365C6C1B7BD', self.stor_drive.identity)
         self.assertEqual('Drive Sample', self.stor_drive.name)
         self.assertEqual(899527000000, self.stor_drive.capacity_bytes)
+        self.assertEqual('Contoso', self.stor_drive.manufacturer)
+        self.assertEqual('C123', self.stor_drive.model)
+        self.assertEqual('C123-1111', self.stor_drive.part_number)
+        self.assertEqual('1234570', self.stor_drive.serial_number)
+        self.assertEqual(sushy.STATE_ENABLED, self.stor_drive.status.state)
+        self.assertEqual(sushy.HEALTH_OK, self.stor_drive.status.health)
 
     def test_set_indicator_led(self):
         with mock.patch.object(
