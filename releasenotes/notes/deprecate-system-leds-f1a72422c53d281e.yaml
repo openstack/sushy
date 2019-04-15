@@ -1,0 +1,9 @@
+---
+deprecations:
+  - |
+    Deprecates system-specific indicator LEDs as redundant.
+    The ``SYSTEM_INDICATOR_LED_LIT``, ``SYSTEM_INDICATOR_LED_BLINKING``,
+    ``SYSTEM_INDICATOR_LED_OFF`` and ``SYSTEM_INDICATOR_LED_UNKNOWN`` constants
+    should not be used. Generic indicator LED constants should be used instead.
+    Those are ``INDICATOR_LED_LIT``, ``INDICATOR_LED_BLINKING``,
+    ``INDICATOR_LED_OFF`` and ``INDICATOR_LED_UNKNOWN`` respectively.
