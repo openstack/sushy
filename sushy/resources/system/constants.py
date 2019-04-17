@@ -49,16 +49,28 @@ SYSTEM_POWER_STATE_POWERING_OFF = res_cons.POWER_STATE_POWERING_OFF
 # Indicator LED Constants
 
 SYSTEM_INDICATOR_LED_LIT = res_cons.INDICATOR_LED_LIT
-"""The Indicator LED is lit"""
+"""The Indicator LED is lit
+
+Deprecated: Use `sushy.resources.constants.INDICATOR_LED_LIT`.
+"""
 
 SYSTEM_INDICATOR_LED_BLINKING = res_cons.INDICATOR_LED_BLINKING
-"""The Indicator LED is blinking"""
+"""The Indicator LED is blinking
+
+Deprecated: Use `sushy.resources.constants.INDICATOR_LED_BLINKING`.
+"""
 
 SYSTEM_INDICATOR_LED_OFF = res_cons.INDICATOR_LED_OFF
-"""The Indicator LED is off"""
+"""The Indicator LED is off
+
+Deprecated: Use `sushy.resources.constants.INDICATOR_LED_OFF`.
+"""
 
 SYSTEM_INDICATOR_LED_UNKNOWN = res_cons.INDICATOR_LED_UNKNOWN
-"""The state of the Indicator LED cannot be determine"""
+"""The state of the Indicator LED cannot be determine
+
+Deprecated: Use `sushy.resources.constants.INDICATOR_LED_UNKNOWN`.
+"""
 
 # Boot source target constants
 

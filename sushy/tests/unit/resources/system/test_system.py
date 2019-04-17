@@ -53,7 +53,7 @@ class SystemTestCase(base.TestCase):
         self.assertEqual('Web Front End node', self.sys_inst.description)
         self.assertEqual('web483', self.sys_inst.hostname)
         self.assertEqual('437XR1138R2', self.sys_inst.identity)
-        self.assertEqual(sushy.SYSTEM_INDICATOR_LED_OFF,
+        self.assertEqual(sushy.INDICATOR_LED_OFF,
                          self.sys_inst.indicator_led)
         self.assertEqual('Contoso', self.sys_inst.manufacturer)
         self.assertEqual('WebFrontEnd483', self.sys_inst.name)
