@@ -22,6 +22,7 @@ from sushy import exceptions
 from sushy import main
 from sushy.resources.chassis import chassis
 from sushy.resources.compositionservice import compositionservice
+from sushy.resources.fabric import fabric
 from sushy.resources.manager import manager
 from sushy.resources.registry import message_registry_file
 from sushy.resources.sessionservice import session
@@ -67,6 +68,7 @@ class MainTestCase(base.TestCase):
         self.assertEqual('/redfish/v1/Systems', self.root._systems_path)
         self.assertEqual('/redfish/v1/Managers', self.root._managers_path)
         self.assertEqual('/redfish/v1/Chassis', self.root._chassis_path)
+        self.assertEqual('/redfish/v1/Fabrics', self.root._fabrics_path)
         self.assertEqual('/redfish/v1/SessionService',
                          self.root._session_service_path)
         self.assertEqual('/redfish/v1/CompositionService',
@@ -116,6 +118,20 @@ class MainTestCase(base.TestCase):
         self.root.get_chassis_collection()
         chassis_collection_mock.assert_called_once_with(
             self.root._conn, '/redfish/v1/Chassis',
+            redfish_version=self.root.redfish_version)
+
+    @mock.patch.object(fabric, 'Fabric', autospec=True)
+    def test_get_fabric(self, mock_fabric):
+        self.root.get_fabric('fake-fabric-id')
+        mock_fabric.assert_called_once_with(
+            self.root._conn, 'fake-fabric-id',
+            redfish_version=self.root.redfish_version)
+
+    @mock.patch.object(fabric, 'FabricCollection', autospec=True)
+    def test_get_fabric_collection(self, fabric_collection_mock):
+        self.root.get_fabric_collection()
+        fabric_collection_mock.assert_called_once_with(
+            self.root._conn, '/redfish/v1/Fabrics',
             redfish_version=self.root.redfish_version)
 
     @mock.patch.object(manager, 'ManagerCollection', autospec=True)
@@ -204,6 +220,11 @@ class BareMinimumMainTestCase(base.TestCase):
         self.assertRaisesRegex(
             exceptions.MissingAttributeError,
             'Chassis/@odata.id', self.root.get_chassis_collection)
+
+    def test_get_fabric_collection_when_fabrics_attr_absent(self):
+        self.assertRaisesRegex(
+            exceptions.MissingAttributeError,
+            'Fabrics/@odata.id', self.root.get_fabric_collection)
 
     def test_get_session_service_when_sessionservice_attr_absent(self):
         self.assertRaisesRegex(

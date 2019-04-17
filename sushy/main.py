@@ -21,6 +21,7 @@ from sushy import exceptions
 from sushy.resources import base
 from sushy.resources.chassis import chassis
 from sushy.resources.compositionservice import compositionservice
+from sushy.resources.fabric import fabric
 from sushy.resources.manager import manager
 from sushy.resources.registry import message_registry
 from sushy.resources.registry import message_registry_file
@@ -82,6 +83,9 @@ class Sushy(base.ResourceBase):
 
     _chassis_path = base.Field(['Chassis', '@odata.id'])
     """ChassisCollection path"""
+
+    _fabrics_path = base.Field(['Fabrics', '@odata.id'])
+    """FabricCollection path"""
 
     _session_service_path = base.Field(['SessionService', '@odata.id'])
     """SessionService path"""
@@ -191,6 +195,29 @@ class Sushy(base.ResourceBase):
         """
         return chassis.Chassis(self._conn, identity,
                                redfish_version=self.redfish_version)
+
+    def get_fabric_collection(self):
+        """Get the FabricCollection object
+
+        :raises: MissingAttributeError, if the collection attribute is
+            not found
+        :returns: a FabricCollection object
+        """
+        if not self._fabrics_path:
+            raise exceptions.MissingAttributeError(
+                attribute='Fabrics/@odata.id', resource=self._path)
+
+        return fabric.FabricCollection(self._conn, self._fabrics_path,
+                                       redfish_version=self.redfish_version)
+
+    def get_fabric(self, identity):
+        """Given the identity return a Fabric object
+
+        :param identity: The identity of the Fabric resource
+        :returns: The Fabric object
+        """
+        return fabric.Fabric(self._conn, identity,
+                             redfish_version=self.redfish_version)
 
     def get_manager_collection(self):
         """Get the ManagerCollection object

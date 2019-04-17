@@ -1,0 +1,29 @@
+{
+    "@odata.type": "#Fabric.v1_0_3.Fabric",
+    "Id": "SAS",
+    "Name": "SAS Fabric",
+    "FabricType": "SAS",
+    "Description": "A SAS Fabric with redundant switches.",
+    "Status": {
+        "State": "Enabled",
+        "Health": "OK"
+    },
+    "Zones": {
+        "@odata.id": "/redfish/v1/Fabrics/SAS/Zones"
+    },
+    "Endpoints": {
+        "@odata.id": "/redfish/v1/Fabrics/SAS/Endpoints"
+    },
+    "Switches": {
+        "@odata.id": "/redfish/v1/Fabrics/SAS/Switches"
+    },
+    "Links": {
+        "Oem": {}
+    },
+    "Actions": {
+        "Oem": {}
+    },
+    "Oem": {},
+    "@odata.context": "/redfish/v1/$metadata#Fabric.Fabric",
+    "@odata.id": "/redfish/v1/Fabrics/SAS"
+}
