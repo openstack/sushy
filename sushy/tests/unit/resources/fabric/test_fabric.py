@@ -17,6 +17,7 @@ import json
 import mock
 
 import sushy
+from sushy.resources.fabric import endpoint
 from sushy.resources.fabric import fabric
 from sushy.tests.unit import base
 
@@ -41,10 +42,67 @@ class FabricTestCase(base.TestCase):
         self.assertEqual('SAS Fabric', self.fabric.name)
         self.assertEqual('A SAS Fabric with redundant switches.',
                          self.fabric.description)
-        self.assertEqual(sushy.FABRIC_TYPE_SAS,
+        self.assertEqual(sushy.PROTOCOL_TYPE_SAS,
                          self.fabric.fabric_type)
         self.assertEqual(sushy.STATE_ENABLED, self.fabric.status.state)
         self.assertEqual(sushy.HEALTH_OK, self.fabric.status.health)
+
+    def test_endpoints(self):
+        # | GIVEN |
+        with open('sushy/tests/unit/json_samples/'
+                  'endpoint_collection.json') as f:
+            endpoint_collection_return_value = json.load(f)
+
+        with open('sushy/tests/unit/json_samples/'
+                  'endpoint.json') as f:
+            endpoint_return_value = json.load(f)
+
+        self.conn.get.return_value.json.side_effect = [
+            endpoint_collection_return_value, endpoint_return_value]
+
+        # | WHEN |
+        actual_endpoints = self.fabric.endpoints
+
+        # | THEN |
+        self.assertIsInstance(actual_endpoints,
+                              endpoint.EndpointCollection)
+        self.assertEqual(actual_endpoints.name, 'Endpoint Collection')
+
+        member = actual_endpoints.get_member(
+            '/redfish/v1/Fabrics/SAS/Endpoints/Drive1')
+
+        self.assertEqual(member.name, "SAS Drive")
+        self.assertEqual(member.endpoint_protocol, sushy.PROTOCOL_TYPE_SAS)
+
+    def test_endpoints_on_refresh(self):
+        # | GIVEN |
+        with open('sushy/tests/unit/json_samples/'
+                  'endpoint_collection.json') as f:
+            self.conn.get.return_value.json.return_value = json.load(f)
+
+        # | WHEN & THEN |
+        endpts = self.fabric.endpoints
+        self.assertIsInstance(endpts, endpoint.EndpointCollection)
+
+        # On refreshing the fabric instance...
+        with open('sushy/tests/unit/json_samples/fabric.json', 'r') as f:
+            self.conn.get.return_value.json.return_value = json.loads(f.read())
+
+        self.fabric.invalidate()
+        self.fabric.refresh(force=False)
+
+        # | WHEN & THEN |
+        self.assertTrue(endpts._is_stale)
+
+        # | GIVEN |
+        with open('sushy/tests/unit/json_samples/'
+                  'endpoint_collection.json') as f:
+            self.conn.get.return_value.json.return_value = json.load(f)
+
+        # | WHEN & THEN |
+        self.assertIsInstance(self.fabric.endpoints,
+                              endpoint.EndpointCollection)
+        self.assertFalse(endpts._is_stale)
 
 
 class FabricCollectionTestCase(base.TestCase):

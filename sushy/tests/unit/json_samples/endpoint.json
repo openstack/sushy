@@ -1,0 +1,40 @@
+{
+    "@odata.type":"#Endpoint.v1_1_0.Endpoint",
+    "Id":"Drive1",
+    "Name":"SAS Drive",
+    "Description":"The SAS Drive in Enclosure 2 Bay 0",
+    "EndpointProtocol":"SAS",
+    "ConnectedEntities":[
+        {
+            "EntityType":"Drive",
+            "EntityRole":"Target",
+            "Identifiers":[
+                {
+                    "DurableNameFormat":"NAA",
+                    "DurableName":"32ADF365C6C1B7C3"
+                }
+            ],
+            "Oem":{}
+        }
+    ],
+    "Links":
+        {
+            "MutuallyExclusiveEndpoints":[
+                {
+                    "@odata.id":"/redfish/v1/Fabrics/SAS/Endpoints/Enclosure2"
+                }
+            ],
+            "Ports":[
+                {
+                    "@odata.id":"/redfish/v1/Fabrics/SAS/Switches/Switch1/Ports/8"
+                },
+                {
+                    "@odata.id":"/redfish/v1/Fabrics/SAS/Switches/Switch2/Ports/8"
+                }
+            ],
+            "Oem":{}
+        },
+    "Oem":{},
+    "@odata.context":"/redfish/v1/$metadata#Endpoint.Endpoint",
+    "@odata.id":"/redfish/v1/Fabrics/SAS/Endpoints/Drive1"
+}

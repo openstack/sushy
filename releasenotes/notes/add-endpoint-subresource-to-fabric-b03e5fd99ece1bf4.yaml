@@ -1,0 +1,6 @@
+---
+features:
+  - |
+    Exposes the ``endpoint`` sub-resource from the ``fabric`` resource.
+    ``endpoint`` represents the properties of an entity that sends or receives
+    protocol defined messages over a transport.
