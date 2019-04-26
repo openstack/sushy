@@ -1,0 +1,52 @@
+{
+  "@odata.type": "#Thermal.v1_3_0.Thermal",
+  "Id": "Thermal",
+  "Name": "Blade Thermal",
+  "Temperatures": [
+    {
+      "@odata.id": "/redfish/v1/Chassis/Blade1/Thermal#/Temperatures/0",
+      "MemberId": "0",
+      "Name": "CPU Temp",
+      "Status": {
+        "State": "Enabled",
+        "Health": "OK"
+      },
+      "ReadingCelsius": 62,
+      "UpperThresholdNonCritical": 75,
+      "UpperThresholdCritical": 90,
+      "UpperThresholdFatal": 95,
+      "MinReadingRangeTemp": 0,
+      "MaxReadingRangeTemp": 120,
+      "PhysicalContext": "CPU",
+      "RelatedItem": [
+        {
+          "@odata.id": "/redfish/v1/Systems/529QB9450R6/Processors/CPU"
+        }
+      ]
+    }
+  ],
+  "Fans": [
+    {
+      "@odata.id": "/redfish/v1/Chassis/Blade1/Thermal#/Fans/0",
+      "MemberId": "0",
+      "Name": "CPU Fan",
+      "PhysicalContext": "CPU",
+      "Status": {
+        "State": "Enabled",
+        "Health": "OK"
+      },
+      "Reading": 6000,
+      "ReadingUnits": "RPM",
+      "LowerThresholdFatal": 2000,
+      "MinReadingRange": 0,
+      "MaxReadingRange": 10000,
+      "RelatedItem": [
+        {
+          "@odata.id": "/redfish/v1/Systems/529QB9450R6/Processors/CPU"
+        }
+      ]
+    }
+  ],
+  "@odata.context": "/redfish/v1/$metadata#Thermal.Thermal",
+  "@odata.id": "/redfish/v1/Chassis/Blade1/Thermal"
+}
