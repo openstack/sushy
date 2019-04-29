@@ -18,7 +18,7 @@ needed we can expand Sushy to fulfill those requirements.
     https://creativecommons.org/licenses/by/4.0/
 * Documentation: https://docs.openstack.org/sushy/latest/
 * Usage: https://docs.openstack.org/sushy/latest/reference/usage.html
-* Source: https://git.openstack.org/cgit/openstack/sushy
+* Source: https://opendev.org/openstack/sushy
 * Bugs: https://storyboard.openstack.org/#!/project/960
 
 .. _Redfish: http://www.dmtf.org/standards/redfish

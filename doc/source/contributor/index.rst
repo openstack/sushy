@@ -97,4 +97,4 @@ pointing to the certificate file when instantiating Sushy, for example:
   s = sushy.Sushy('https://localhost:8000', verify='cert.pem', username='foo', password='bar')
 
 .. _SSL: https://en.wikipedia.org/wiki/Secure_Sockets_Layer
-.. _sushy-tools: https://git.openstack.org/cgit/openstack/sushy-tools
+.. _sushy-tools: https://opendev.org/openstack/sushy-tools
