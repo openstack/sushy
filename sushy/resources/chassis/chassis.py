@@ -16,6 +16,8 @@
 from sushy import exceptions
 from sushy.resources import base
 from sushy.resources.chassis import mappings as cha_maps
+from sushy.resources.chassis.power import power
+from sushy.resources.chassis.thermal import thermal
 from sushy.resources import common
 from sushy.resources.manager import manager
 from sushy.resources import mappings as res_maps
@@ -252,6 +254,34 @@ class Chassis(base.ResourceBase):
         return [system.System(self._conn, path,
                               redfish_version=self.redfish_version)
                 for path in paths]
+
+    @property
+    @utils.cache_it
+    def power(self):
+        """Property to reference `Power` instance
+
+        It is set once when the first time it is queried. On refresh,
+        this property is marked as stale (greedy-refresh not done).
+        Here the actual refresh of the sub-resource happens, if stale.
+        """
+        return power.Power(
+            self._conn,
+            utils.get_sub_resource_path_by(self, 'Power'),
+            redfish_version=self.redfish_version)
+
+    @property
+    @utils.cache_it
+    def thermal(self):
+        """Property to reference `Thermal` instance
+
+        It is set once when the first time it is queried. On refresh,
+        this property is marked as stale (greedy-refresh not done).
+        Here the actual refresh of the sub-resource happens, if stale.
+        """
+        return thermal.Thermal(
+            self._conn,
+            utils.get_sub_resource_path_by(self, 'Thermal'),
+            redfish_version=self.redfish_version)
 
 
 class ChassisCollection(base.ResourceCollectionBase):
