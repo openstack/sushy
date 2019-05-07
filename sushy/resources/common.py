@@ -56,6 +56,11 @@ class ResetActionField(ActionField):
                                 adapter=list)
 
 
+class InitializeActionField(ActionField):
+    allowed_values = base.Field('InitializeType@Redfish.AllowableValues',
+                                adapter=list)
+
+
 class StatusField(base.CompositeField):
     """This Field describes the status of a resource and its children.
 
@@ -69,3 +74,13 @@ class StatusField(base.CompositeField):
 
     state = base.MappedField('State', res_maps.STATE_VALUE_MAP)
     """Indicates the known state of the resource, such as if it is enabled."""
+
+
+class IdentifiersListField(base.ListField):
+    """This type describes any additional identifiers for a resource."""
+
+    durable_name = base.Field('DurableName')
+    """This indicates the world wide, persistent name of the resource."""
+
+    durable_name_format = base.Field('DurableNameFormat')
+    """This represents the format of the DurableName property."""

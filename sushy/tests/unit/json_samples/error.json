@@ -29,6 +29,13 @@
                 ],
                 "Severity": "Warning",
                 "Resolution": "Remove the property from the request body and resubmit the request if the operation failed"
+            },
+            {
+                "@odata.type": "/redfish/v1/$metadata#Message.1.0.0.Message",
+                "MessageId": "Base.1.0.MalformedJSON",
+                "Message": "The request body submitted was malformed JSON and could not be parsed by the receiving service.",
+                "Severity": "Critical",
+                "Resolution": "Ensure that the request body is valid JSON and resubmit the request."
             }
         ]
     }

@@ -27,8 +27,14 @@ LOG = logging.getLogger(__name__)
 class Drive(base.ResourceBase):
     """This class represents a disk drive or other physical storage medium."""
 
+    block_size_bytes = base.Field('BlockSizeBytes', adapter=utils.int_or_none)
+    """The size of the smallest addressable unit of this drive in bytes"""
+
     capacity_bytes = base.Field('CapacityBytes', adapter=utils.int_or_none)
     """The size in bytes of this Drive"""
+
+    identifiers = common.IdentifiersListField('Identifiers', default=[])
+    """The Durable names for the drive"""
 
     identity = base.Field('Id', required=True)
     """The Drive identity string"""
@@ -40,6 +46,9 @@ class Drive(base.ResourceBase):
     manufacturer = base.Field('Manufacturer')
     """This is the manufacturer of this drive"""
 
+    media_type = base.Field('MediaType')
+    """The type of media contained in this drive"""
+
     model = base.Field('Model')
     """This is the model number for the drive"""
 
@@ -48,6 +57,9 @@ class Drive(base.ResourceBase):
 
     part_number = base.Field('PartNumber')
     """The part number for this drive"""
+
+    protocol = base.Field('Protocol')
+    """Protocol this drive is using to communicate to the storage controller"""
 
     serial_number = base.Field('SerialNumber')
     """The serial number for this drive"""

@@ -89,7 +89,7 @@ class VirtualMediaTestCase(base.TestCase):
         target_uri = ("/redfish/v1/Managers/BMC/VirtualMedia/Floppy1/Actions"
                       "/VirtualMedia.EjectMedia")
         self.conn.post.side_effect = [exceptions.HTTPError(
-            method='POST', url=target_uri, response=mock.Mock(
+            method='POST', url=target_uri, response=mock.MagicMock(
                 status_code=http_client.UNSUPPORTED_MEDIA_TYPE)), '200']
         self.sys_virtual_media.eject_media()
         post_calls = [
