@@ -14,6 +14,7 @@
 #    under the License.
 import logging
 import pkg_resources
+import requests
 
 from sushy import auth as sushy_auth
 from sushy import connector as sushy_connector
@@ -98,7 +99,9 @@ class Sushy(base.ResourceBase):
 
     def __init__(self, base_url, username=None, password=None,
                  root_prefix='/redfish/v1/', verify=True,
-                 auth=None, connector=None):
+                 auth=None, connector=None,
+                 public_connector=None,
+                 language='en'):
         """A class representing a RootService
 
         :param base_url: The base URL to the Redfish controller. It
@@ -117,6 +120,10 @@ class Sushy(base.ResourceBase):
             the certificates in the directory. Defaults to True.
         :param auth: An authentication mechanism to utilize.
         :param connector: A user-defined connector object. Defaults to None.
+        :param public_connector: A user-defined connector to use for requests
+            on the Internet, e.g., for Message Registries. Defaults to None.
+        :param language: RFC 5646 language code for Message Registries.
+            Defaults to 'en'.
         """
         self._root_prefix = root_prefix
         if (auth is not None and (password is not None or
@@ -135,6 +142,8 @@ class Sushy(base.ResourceBase):
         self._auth = auth
         self._auth.set_context(self, self._conn)
         self._auth.authenticate()
+        self._public_connector = public_connector or requests
+        self._language = language
 
     def __del__(self):
         if self._auth:
@@ -325,3 +334,27 @@ class Sushy(base.ResourceBase):
                 message_registries.append(mes_reg)
 
         return message_registries
+
+    def _get_message_registries(self):
+        """Gets and combines all message registries together
+
+        Fetches all registries if any provided by Redfish service
+        and combines together with packaged standard registries.
+
+        :returns: dict of combined message registries where key is
+        Registry_name.Major_version.Minor_version and value is registry
+        itself.
+        """
+
+        standard = self._get_standard_message_registry_collection()
+        registries = {r.registry_prefix + '.' +
+                      r.registry_version.rsplit('.', 1)[0]: r
+                      for r in standard if r.language == self._language}
+        registry_col = self._get_registry_collection()
+        if registry_col:
+            provided = registry_col.get_members()
+            registries.update({r.registry: r.get_message_registry(
+                               self._language,
+                               self._public_connector) for r in provided})
+
+        return registries

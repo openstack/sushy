@@ -14,8 +14,12 @@
 # https://redfish.dmtf.org/schemas/v1/MessageRegistryFileCollection.json
 # https://redfish.dmtf.org/schemas/v1/MessageRegistryFile.v1_1_0.json
 
+import logging
 
 from sushy.resources import base
+from sushy.resources.registry import message_registry
+
+LOG = logging.getLogger(__name__)
 
 
 class LocationListField(base.ListField):
@@ -66,6 +70,40 @@ class MessageRegistryFile(base.ResourceBase):
 
     location = LocationListField('Location', required=True)
     """List of locations of Registry files for each supported language"""
+
+    def get_message_registry(self, language, public_connector):
+        """Load message registry file depending on its source
+
+        Will try to find a registry based on provided language, if not found
+        then will use a registry that has 'default' language.
+
+        :param language: RFC 5646 language code for registry files
+        :param public_connector: connector to use when downloading registry
+            from the Internet
+        """
+
+        location = next((l for l in self.location if l.language == language),
+                        [d for d in self.location if d.language == 'default']
+                        [0])
+
+        if location.uri:
+            return message_registry.MessageRegistry(
+                self._conn, path=location.uri,
+                redfish_version=self.redfish_version)
+        elif location.archive_uri:
+            return message_registry.MessageRegistry(
+                self._conn, path=location.archive_uri,
+                redfish_version=self.redfish_version,
+                reader=base.JsonArchiveReader(location.archive_file))
+        elif location.publication_uri:
+            return message_registry.MessageRegistry(
+                public_connector,
+                path=location.publication_uri,
+                redfish_version=self.redfish_version,
+                reader=base.JsonPublicFileReader())
+        else:
+            LOG.warning('No location defined for language %(language)s',
+                        {'language': language})
 
 
 class MessageRegistryFileCollection(base.ResourceCollectionBase):

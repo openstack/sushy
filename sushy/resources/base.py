@@ -274,6 +274,14 @@ class JsonDataReader(AbstractJsonReader):
         return self._conn.get(path=self._path).json()
 
 
+class JsonPublicFileReader(AbstractJsonReader):
+    """Loads the data from the Internet"""
+
+    def get_json(self):
+        """Get JSON file from full URI"""
+        return self._conn.get(self._path).json()
+
+
 class JsonArchiveReader(AbstractJsonReader):
     """Gets the data from JSON file in archive"""
 

@@ -79,3 +79,29 @@ class MessageRegistry(base.ResourceBase):
 
     messages = MessageDictionaryField('Messages')
     """List of messages in this registry"""
+
+
+def parse_message(message_registries, message_field):
+    """Using message registries parse the message and substitute any parms
+
+    :param message_registries: dict of Message Registries
+    :param message_field: settings.MessageListField to parse
+
+    :returns: parsed settings.MessageListField with missing attributes filled
+    """
+
+    registry, msg_key = message_field.message_id.rsplit('.', 1)
+
+    reg_msg = message_registries[registry].messages[msg_key]
+
+    msg = reg_msg.message
+    for i in range(1, reg_msg.number_of_args + 1):
+        msg = msg.replace('%%%i' % i, str(message_field.message_args[i - 1]))
+
+    message_field.message = msg
+    if not message_field.severity:
+        message_field.severity = reg_msg.severity
+    if not message_field.resolution:
+        message_field.resolution = reg_msg.resolution
+
+    return message_field
