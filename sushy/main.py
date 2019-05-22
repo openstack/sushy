@@ -328,6 +328,7 @@ class Sushy(base.ResourceBase):
         resource_package_name = __name__
         for json_file in pkg_resources.resource_listdir(
             resource_package_name, STANDARD_REGISTRY_PATH):
+                # Not using path.join according to pkg_resources docs
                 mes_reg = message_registry.MessageRegistry(
                     None, STANDARD_REGISTRY_PATH + json_file,
                     reader=base.JsonPackagedFileReader(resource_package_name))
