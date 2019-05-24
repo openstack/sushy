@@ -191,8 +191,7 @@ class MainTestCase(base.TestCase):
         registries = self.root._get_standard_message_registry_collection()
 
         self.assertEqual(5, len(registries))
-        self.assertTrue([r.identity for r in registries
-                        if r.identity == 'Base.1.3.0'])
+        self.assertIn('Base.1.3.0', {r.identity for r in registries})
 
     @mock.patch('sushy.Sushy._get_standard_message_registry_collection',
                 autospec=True)
