@@ -18,6 +18,8 @@ import mock
 from dateutil import parser
 
 from sushy import exceptions
+from sushy.resources.registry import message_registry
+from sushy.resources import settings
 from sushy.resources.system import bios
 from sushy.tests.unit import base
 
@@ -37,8 +39,16 @@ class BiosTestCase(base.TestCase):
             bios_settings_json,
             bios_settings_json]
 
+        conn = mock.Mock()
+        with open('sushy/tests/unit/json_samples/message_registry.json') as f:
+            conn.get.return_value.json.return_value = json.load(f)
+            registry = message_registry.MessageRegistry(
+                conn, '/redfish/v1/Registries/Test',
+                redfish_version='1.0.2')
+
         self.sys_bios = bios.Bios(
             self.conn, '/redfish/v1/Systems/437XR1138R2/BIOS',
+            registries={'Test.1.0': registry},
             redfish_version='1.0.2')
 
     def test__parse_attributes(self):
@@ -59,6 +69,8 @@ class BiosTestCase(base.TestCase):
                          self.sys_bios._settings._etag)
         self.assertEqual('(404) 555-1212',
                          self.sys_bios.pending_attributes['AdminPhone'])
+        self.assertEqual(settings.UPDATE_FAILURE,
+                         self.sys_bios.update_status.status)
 
     def test_set_attribute(self):
         self.sys_bios.set_attribute('ProcTurboMode', 'Disabled')

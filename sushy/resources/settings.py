@@ -18,7 +18,44 @@ import logging
 
 from sushy.resources import base
 from sushy.resources import common
+from sushy.resources import constants as res_cons
 from sushy.resources import mappings as res_maps
+from sushy.resources.registry import message_registry
+
+# Settings update statuses
+
+UPDATE_UNKNOWN = 0
+"""Update status unknown"""
+
+UPDATE_SUCCESS = 1
+"""Update was successful"""
+
+UPDATE_FAILURE = 2
+"""Update encountered errors"""
+
+UPDATE_PENDING = 3
+"""Update waiting for being applied"""
+
+NO_UPDATES = 4
+"""No updates made"""
+
+
+class SettingsUpdate(object):
+    """Contains Settings update status and details of the update"""
+
+    def __init__(self, status, messages):
+        self._status = status
+        self._messages = messages
+
+    @property
+    def status(self):
+        """The status of the update"""
+        return self._status
+
+    @property
+    def messages(self):
+        """List of :class:`.MessageListField` with messages from the update"""
+        return self._messages
 
 
 LOG = logging.getLogger(__name__)
@@ -161,3 +198,29 @@ class SettingsField(base.CompositeField):
     @property
     def resource_uri(self):
         return self._settings_object_idref.resource_uri
+
+    def get_status(self, registries):
+        """Determines the status of last update based
+
+        Uses message id-s and severity to determine the status.
+
+        :param registries: registries to use to parse message
+        :returns: :class:`.SettingsUpdate` object containing status
+            and any messages
+        """
+
+        if not self.time:
+            return SettingsUpdate(NO_UPDATES, None)
+
+        parsed_msgs = []
+        for m in self.messages:
+            parsed_msgs.append(
+                message_registry.parse_message(registries, m))
+        any_errors = any(m for m in parsed_msgs
+                         if not m.severity == res_cons.SEVERITY_OK)
+
+        if any_errors:
+            status = UPDATE_FAILURE
+        else:
+            status = UPDATE_SUCCESS
+        return SettingsUpdate(status, parsed_msgs)

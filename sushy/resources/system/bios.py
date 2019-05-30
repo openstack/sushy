@@ -31,6 +31,17 @@ class ActionsField(base.CompositeField):
 
 class Bios(base.ResourceBase):
 
+    def __init__(self, connector, path, registries, *args, **kwargs):
+        super(Bios, self).__init__(connector, path, *args, **kwargs)
+        self._registries = registries
+        """A class representing a Bios
+
+        :param connector: A Connector instance
+        :param path: Sub-URI path to the Bios resource
+        :param registries: Dict of message registries to be used when
+            parsing messages of attribute update status
+        """
+
     identity = base.Field('Id', required=True)
     """The Bios resource identity string"""
 
@@ -65,6 +76,7 @@ class Bios(base.ResourceBase):
         """Pending BIOS settings resource"""
         return Bios(
             self._conn, self._settings.resource_uri,
+            registries=None,
             redfish_version=self.redfish_version)
 
     @property
@@ -153,3 +165,12 @@ class Bios(base.ResourceBase):
                                           'OldPassword': old_password,
                                           'PasswordName': password_name})
         LOG.info('BIOS password %s is being changed', self.identity)
+
+    @property
+    def update_status(self):
+        """Status of the last attribute update
+
+        :returns: :class:`sushy.resources.settings.SettingsUpdate` object
+            containing status and any messages
+        """
+        return self._settings.get_status(self._registries)

@@ -1,0 +1,5 @@
+---
+features:
+  - |
+    ``Bios`` resource introduces ``update_status`` property that exposes
+    the status and any errors of last BIOS attribute update.

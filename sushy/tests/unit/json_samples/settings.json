@@ -3,8 +3,8 @@
             "@odata.type": "#Settings.v1_2_0.Settings",
             "ETag": "9234ac83b9700123cc32",
             "Messages": [{
-                "MessageId": "Base.1.0.SettingsFailed",
-                "Message": "Settings update failed due to invalid value",
+                "MessageId": "Test.1.0.Failed",
+                "Message": "Settings %1 update failed due to invalid value",
                 "Severity": "Critical",
                 "Resolution": "Fix the value and try again",
                 "MessageArgs": [

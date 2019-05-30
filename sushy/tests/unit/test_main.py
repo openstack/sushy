@@ -100,11 +100,16 @@ class MainTestCase(base.TestCase):
             redfish_version=self.root.redfish_version)
 
     @mock.patch.object(system, 'System', autospec=True)
-    def test_get_system(self, mock_system):
+    @mock.patch('sushy.Sushy._get_message_registries', autospec=True)
+    def test_get_system(self, mock_registries, mock_system):
+        mock_registry = mock.Mock()
+        mock_registries.return_value = [mock_registry]
+        self.root._standard_message_registries_path = None
         self.root.get_system('fake-system-id')
         mock_system.assert_called_once_with(
             self.root._conn, 'fake-system-id',
-            redfish_version=self.root.redfish_version)
+            redfish_version=self.root.redfish_version,
+            registries=[mock_registry])
 
     @mock.patch.object(chassis, 'Chassis', autospec=True)
     def test_get_chassis(self, mock_chassis):
