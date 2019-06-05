@@ -14,6 +14,14 @@
 #    under the License.
 
 import collections
+
+# (rpittau) this allows usage of collection ABC abstract classes in both
+# Python 2.7 and Python 3.8+
+try:
+    collectionsAbc = collections.abc
+except AttributeError:
+    collectionsAbc = collections
+
 import logging
 import threading
 
@@ -231,7 +239,7 @@ def cache_it(res_accessor_method):
 
         if isinstance(cache_attr_val, base.ResourceBase):
             cache_attr_val.refresh(force=False)
-        elif isinstance(cache_attr_val, collections.Sequence):
+        elif isinstance(cache_attr_val, collectionsAbc.Sequence):
             for elem in cache_attr_val:
                 if isinstance(elem, base.ResourceBase):
                     elem.refresh(force=False)
@@ -260,7 +268,7 @@ def cache_clear(res_selfie, force_refresh, only_these=None):
     cache_attr_names = setdefaultattr(
         res_selfie, CACHE_ATTR_NAMES_VAR_NAME, set())
     if only_these is not None:
-        if not isinstance(only_these, collections.Sequence):
+        if not isinstance(only_these, collectionsAbc.Sequence):
             raise TypeError("'only_these' must be a sequence.")
 
         cache_attr_names = cache_attr_names.intersection(
@@ -273,7 +281,7 @@ def cache_clear(res_selfie, force_refresh, only_these=None):
 
         if isinstance(cache_attr_val, base.ResourceBase):
             cache_attr_val.invalidate(force_refresh)
-        elif isinstance(cache_attr_val, collections.Sequence):
+        elif isinstance(cache_attr_val, collectionsAbc.Sequence):
             for elem in cache_attr_val:
                 if isinstance(elem, base.ResourceBase):
                     elem.invalidate(force_refresh)

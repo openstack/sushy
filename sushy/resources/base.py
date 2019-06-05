@@ -15,6 +15,14 @@
 
 import abc
 import collections
+
+# (rpittau) this allows usage of collection ABC abstract classes in both
+# Python 2.7 and Python 3.8+
+try:
+    collectionsAbc = collections.abc
+except AttributeError:
+    collectionsAbc = collections
+
 import copy
 import io
 import json
@@ -112,7 +120,7 @@ def _collect_fields(resource):
 
 
 @six.add_metaclass(abc.ABCMeta)
-class CompositeField(collections.Mapping, Field):
+class CompositeField(collectionsAbc.Mapping, Field):
     """Base class for fields consisting of several sub-fields."""
 
     def __init__(self, *args, **kwargs):
@@ -144,6 +152,7 @@ class CompositeField(collections.Mapping, Field):
 
     # Satisfy the mapping interface, see
     # https://docs.python.org/2/library/collections.html#collections.Mapping.
+    # https://docs.python.org/3/library/collections.abc.html#collections.abc.Mapping
 
     def __getitem__(self, key):
         if key in self._subfields:
@@ -241,7 +250,7 @@ class MappedField(Field):
             Only has effect when the field is not required. This value is not
             matched against the mapping.
         """
-        if not isinstance(mapping, collections.Mapping):
+        if not isinstance(mapping, collectionsAbc.Mapping):
             raise TypeError("The mapping argument must be a mapping")
 
         super(MappedField, self).__init__(
