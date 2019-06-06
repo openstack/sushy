@@ -1,0 +1,5 @@
+---
+fixes:
+  - |
+    Improve interoperability by including the recommended OData-Version
+    header in outgoing Redfish requests.
