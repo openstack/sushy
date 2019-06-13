@@ -71,6 +71,9 @@ class Connector(object):
         :raises: HTTPError
         """
         url = parse.urljoin(self._url, path)
+        headers = headers or {}
+        if not any(k.lower() == 'odata-version' for k in headers):
+            headers['OData-Version'] = '4.0'
         # TODO(lucasagomes): We should mask the data to remove sensitive
         # information
         LOG.debug('HTTP request: %(method)s %(url)s; headers: %(headers)s; '

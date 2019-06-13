@@ -146,15 +146,18 @@ class ConnectorOpTestCase(base.TestCase):
             json=self.data, headers=self.headers)
 
     def test_ok_delete(self):
+        expected_headers = self.headers.copy()
+        expected_headers['OData-Version'] = '4.0'
         self.conn._op('DELETE', path='fake/path', headers=self.headers.copy())
         self.request.assert_called_once_with(
             'DELETE', 'http://foo.bar:1234/fake/path',
-            headers=self.headers, json=None)
+            headers=expected_headers, json=None)
 
     def test_ok_post_with_session(self):
         self.conn._session.headers = {}
         self.conn._session.headers['X-Auth-Token'] = 'asdf1234'
         expected_headers = self.headers.copy()
+        expected_headers['OData-Version'] = '4.0'
         self.conn._op('POST', path='fake/path', headers=self.headers,
                       data=self.data)
         self.request.assert_called_once_with(
@@ -162,6 +165,34 @@ class ConnectorOpTestCase(base.TestCase):
             json=self.data, headers=expected_headers)
         self.assertEqual(self.conn._session.headers,
                          {'X-Auth-Token': 'asdf1234'})
+
+    def test_odata_version_header_redfish(self):
+        path = '/redfish/v1/path'
+        headers = dict(self.headers)
+        expected_headers = dict(self.headers)
+        expected_headers['OData-Version'] = '4.0'
+        self.request.reset_mock()
+        self.conn._op('GET', path=path, headers=headers)
+        self.request.assert_called_once_with(
+            'GET', 'http://foo.bar:1234' + path,
+            headers=expected_headers, json=None)
+
+    def test_odata_version_header_redfish_no_headers(self):
+        path = '/redfish/v1/bar'
+        expected_headers = {'OData-Version': '4.0'}
+        self.conn._op('GET', path=path)
+        self.request.assert_called_once_with(
+            'GET', 'http://foo.bar:1234' + path,
+            headers=expected_headers, json=None)
+
+    def test_odata_version_header_redfish_existing_header(self):
+        path = '/redfish/v1/foo'
+        headers = {'OData-Version': '3.0'}
+        expected_headers = dict(headers)
+        self.conn._op('GET', path=path, headers=headers)
+        self.request.assert_called_once_with(
+            'GET', 'http://foo.bar:1234' + path,
+            headers=expected_headers, json=None)
 
     def test_timed_out_session_unable_to_create_session(self):
         self.conn._auth.can_refresh_session.return_value = False
