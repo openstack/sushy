@@ -51,6 +51,9 @@ class StorageTestCase(base.TestCase):
         self.assertEqual('1.0.2', self.storage.redfish_version)
         self.assertEqual('1', self.storage.identity)
         self.assertEqual('Local Storage Controller', self.storage.name)
+        self.assertEqual('ok', self.storage.status.health)
+        self.assertEqual('ok', self.storage.status.health_rollup)
+        self.assertEqual('enabled', self.storage.status.state)
         self.assertEqual(
             ('/redfish/v1/Systems/437XR1138R2/Storage/1/Drives/35D38F11ACEF7BD3',  # noqa
              '/redfish/v1/Systems/437XR1138R2/Storage/1/Drives/3F5A8C54207B7233',  # noqa
@@ -100,6 +103,25 @@ class StorageTestCase(base.TestCase):
         self.assertIsInstance(all_drives, list)
         self.assertEqual(4, len(all_drives))
         self.assertIsInstance(all_drives[0], drive.Drive.__class__)
+
+    def test_storage_controllers(self):
+        controllers = self.storage.storage_controllers
+        self.assertIsInstance(controllers, list)
+        self.assertEqual(1, len(controllers))
+        controller = controllers[0]
+        self.assertEqual('0', controller.member_id)
+        self.assertEqual('Contoso Integrated RAID', controller.name)
+        self.assertEqual('ok', controller.status.health)
+        self.assertEqual('enabled', controller.status.state)
+        identifiers = controller.identifiers
+        self.assertIsInstance(identifiers, list)
+        self.assertEqual(1, len(identifiers))
+        identifier = identifiers[0]
+        self.assertEqual('NAA', identifier.durable_name_format)
+        self.assertEqual('345C59DBD970859C', identifier.durable_name)
+        self.assertEqual(12, controller.speed_gbps)
+        self.assertEqual(["PCIe"], controller.controller_protocols)
+        self.assertEqual(["SAS", "SATA"], controller.device_protocols)
 
     def test_drives_after_refresh(self):
         self.storage.refresh()

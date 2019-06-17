@@ -27,7 +27,7 @@ class SessionServiceTestCase(base.TestCase):
 
     def setUp(self):
         super(SessionServiceTestCase, self).setUp()
-        self.conn = mock.Mock()
+        self.conn = mock.MagicMock()
         with open('sushy/tests/unit/json_samples/session_service.json') as f:
             self.conn.get.return_value.json.return_value = json.load(f)
 

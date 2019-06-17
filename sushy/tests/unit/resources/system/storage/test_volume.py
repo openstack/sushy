@@ -15,6 +15,8 @@ import mock
 
 from dateutil import parser
 
+from sushy import exceptions
+from sushy.resources.system.storage import constants as store_cons
 from sushy.resources.system.storage import volume
 from sushy.tests.unit import base
 
@@ -37,6 +39,41 @@ class VolumeTestCase(base.TestCase):
         self.assertEqual('1', self.stor_volume.identity)
         self.assertEqual('Virtual Disk 1', self.stor_volume.name)
         self.assertEqual(899527000000, self.stor_volume.capacity_bytes)
+        self.assertEqual(store_cons.VOLUME_TYPE_MIRRORED,
+                         self.stor_volume.volume_type)
+        self.assertFalse(self.stor_volume.encrypted)
+        identifiers = self.stor_volume.identifiers
+        self.assertIsInstance(identifiers, list)
+        self.assertEqual(1, len(identifiers))
+        identifier = identifiers[0]
+        self.assertEqual('UUID', identifier.durable_name_format)
+        self.assertEqual('38f1818b-111e-463a-aa19-fa54f792e468',
+                         identifier.durable_name)
+        self.assertIsNone(self.stor_volume.block_size_bytes)
+
+    def test_initialize_volume(self):
+        target_uri = '/redfish/v1/Systems/3/Storage/RAIDIntegrated/' \
+                     'Volumes/1/Actions/Volume.Initialize'
+        self.stor_volume.initialize_volume('fast')
+        self.stor_volume._conn.post.assert_called_once_with(
+            target_uri, data={'InitializeType': 'Fast'})
+
+    def test_initialize_volume_bad_value(self):
+        self.assertRaisesRegex(
+            exceptions.InvalidParameterValueError,
+            'The parameter.*lazy.*invalid',
+            self.stor_volume.initialize_volume, 'lazy')
+
+    def test_delete_volume(self):
+        self.stor_volume.delete_volume()
+        self.stor_volume._conn.delete.assert_called_once_with(
+            self.stor_volume._path, data=None)
+
+    def test_delete_volume_with_payload(self):
+        payload = {'@Redfish.OperationApplyTime': 'OnReset'}
+        self.stor_volume.delete_volume(payload=payload)
+        self.stor_volume._conn.delete.assert_called_once_with(
+            self.stor_volume._path, data=payload)
 
 
 class VolumeCollectionTestCase(base.TestCase):
@@ -50,6 +87,7 @@ class VolumeCollectionTestCase(base.TestCase):
         self.stor_vol_col = volume.VolumeCollection(
             self.conn, '/redfish/v1/Systems/437XR1138R2/Storage/1/Volumes',
             redfish_version='1.0.2')
+        self.stor_vol_col.refresh = mock.Mock()
 
     def test__parse_attributes(self):
         self.stor_vol_col._parse_attributes()
@@ -130,3 +168,26 @@ class VolumeCollectionTestCase(base.TestCase):
         self.conn.get.return_value.json.side_effect = successive_return_values
 
         self.assertEqual(1073741824000, self.stor_vol_col.max_size_bytes)
+
+    def test_create_volume(self):
+        payload = {
+            'Name': 'My Volume 4',
+            'VolumeType': 'Mirrored',
+            'CapacityBytes': 107374182400
+        }
+        with open('sushy/tests/unit/json_samples/volume4.json') as f:
+            self.conn.get.return_value.json.return_value = json.load(f)
+        self.conn.post.return_value.status_code = 201
+        self.conn.post.return_value.headers.return_value = {
+            'Location': '/redfish/v1/Systems/437XR1138R2/Storage/1/Volumes/4'
+        }
+        new_vol = self.stor_vol_col.create_volume(payload)
+        self.stor_vol_col._conn.post.assert_called_once_with(
+            '/redfish/v1/Systems/437XR1138R2/Storage/1/Volumes',
+            data=payload)
+        self.stor_vol_col.refresh.assert_called_once()
+        self.assertIsNotNone(new_vol)
+        self.assertEqual('4', new_vol.identity)
+        self.assertEqual('My Volume 4', new_vol.name)
+        self.assertEqual(107374182400, new_vol.capacity_bytes)
+        self.assertEqual(store_cons.VOLUME_TYPE_MIRRORED, new_vol.volume_type)

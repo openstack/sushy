@@ -214,9 +214,9 @@ class ConnectorOpTestCase(base.TestCase):
         self.session = mock.Mock(spec=requests.Session)
         self.conn._session = self.session
         self.request = self.session.request
-        first_response = mock.Mock()
+        first_response = mock.MagicMock()
         first_response.status_code = http_client.FORBIDDEN
-        second_response = mock.Mock()
+        second_response = mock.MagicMock()
         second_response.status_code = http_client.OK
         second_response.json = {'Test': 'Testing'}
         self.request.side_effect = [first_response, second_response]
@@ -247,12 +247,12 @@ class ConnectorOpTestCase(base.TestCase):
             self.request.return_value.json.return_value = json.load(f)
 
         with self.assertRaisesRegex(exceptions.BadRequestError,
-                                    'A general error has occurred') as cm:
+                                    'body submitted was malformed JSON') as cm:
             self.conn._op('GET', 'http://foo.bar')
         exc = cm.exception
         self.assertEqual(http_client.BAD_REQUEST, exc.status_code)
         self.assertIsNotNone(exc.body)
-        self.assertIn('A general error has occurred', exc.detail)
+        self.assertIn('body submitted was malformed JSON', exc.detail)
 
     def test_not_found_error(self):
         self.request.return_value.status_code = http_client.NOT_FOUND

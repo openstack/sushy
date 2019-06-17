@@ -16,12 +16,40 @@
 import logging
 
 from sushy.resources import base
+from sushy.resources import common
 from sushy.resources.system.storage import drive
 from sushy.resources.system.storage import volume
 from sushy import utils
 
 
 LOG = logging.getLogger(__name__)
+
+
+class StorageControllersListField(base.ListField):
+    """The set of storage controllers represented by this resource."""
+
+    member_id = base.Field('MemberId', required=True)
+    """Uniquely identifies the member within the collection."""
+
+    name = base.Field('Name', required=True)
+    """The name of the storage controller"""
+
+    status = common.StatusField('Status')
+    """Describes the status and health of the resource and its children."""
+
+    identifiers = common.IdentifiersListField('Identifiers', default=[])
+    """The Durable names for the storage controller."""
+
+    speed_gbps = base.Field('SpeedGbps')
+    """The maximum speed of the storage controller's device interface."""
+
+    controller_protocols = base.Field('SupportedControllerProtocols',
+                                      adapter=list)
+    """The protocols by which this storage controller can be communicated to"""
+
+    device_protocols = base.Field('SupportedDeviceProtocols',
+                                  adapter=list)
+    """The protocols which the controller can use tocommunicate with devices"""
 
 
 class Storage(base.ResourceBase):
@@ -42,10 +70,13 @@ class Storage(base.ResourceBase):
                                    adapter=utils.get_members_identities)
     """A tuple with the drive identities"""
 
+    status = common.StatusField('Status')
+    """Describes the status and health of the resource and its children."""
+
     def get_drive(self, drive_identity):
         """Given the drive identity return a ``Drive`` object
 
-        :param identity: The identity of the ``Drive``
+        :param drive_identity: The identity of the ``Drive``
         :returns: The ``Drive`` object
         :raises: ResourceNotFoundError
         """
@@ -94,6 +125,10 @@ class Storage(base.ResourceBase):
         return volume.VolumeCollection(
             self._conn, utils.get_sub_resource_path_by(self, 'Volumes'),
             redfish_version=self.redfish_version)
+
+    storage_controllers = StorageControllersListField('StorageControllers',
+                                                      default=[])
+    """The storage devices associated with this resource."""
 
 
 class StorageCollection(base.ResourceCollectionBase):

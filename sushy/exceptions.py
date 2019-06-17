@@ -97,10 +97,12 @@ class HTTPError(SushyError):
                          self.status_code})
             error = 'unknown error'
         else:
-            # TODO(dtantsur): parse @Message.ExtendedInfo
             self.body = body.get('error', {})
             self.code = self.body.get('code', 'Base.1.0.GeneralError')
             self.detail = self.body.get('message')
+            ext_info = self.body.get('@Message.ExtendedInfo', [{}])
+            index = self._get_most_severe_msg_index(ext_info)
+            self.detail = ext_info[index].get('Message', self.detail)
             error = '%s: %s' % (self.code, self.detail or 'unknown error')
 
         kwargs = {'method': method, 'url': url, 'code': self.status_code,
@@ -108,6 +110,15 @@ class HTTPError(SushyError):
         LOG.debug('HTTP response for %(method)s %(url)s: '
                   'status code: %(code)s, error: %(error)s', kwargs)
         super(HTTPError, self).__init__(**kwargs)
+
+    @staticmethod
+    def _get_most_severe_msg_index(extended_info):
+        if len(extended_info) > 0:
+            for sev in ['Critical', 'Warning']:
+                for i, m in enumerate(extended_info):
+                    if m.get('Severity') == sev:
+                        return i
+        return 0
 
 
 class BadRequestError(HTTPError):

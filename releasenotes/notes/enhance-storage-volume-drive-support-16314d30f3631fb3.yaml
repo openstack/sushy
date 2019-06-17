@@ -1,0 +1,5 @@
+---
+features:
+  - |
+    Update the Storage, Volume, and Drive models to support RAID
+    configuration management.
