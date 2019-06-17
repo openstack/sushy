@@ -82,7 +82,7 @@ class Manager(base.ResourceBase):
     uuid = base.Field('UUID')
     """The manager UUID"""
 
-    _actions = ActionsField('Actions', required=True)
+    _actions = ActionsField('Actions')
 
     def __init__(self, connector, identity, redfish_version=None):
         """A class representing a Manager

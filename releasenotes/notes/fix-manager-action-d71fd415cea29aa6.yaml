@@ -1,0 +1,7 @@
+---
+fixes:
+  - |
+    Makes ``Manager->Actions`` field optional as Redfish Manager schema
+    defines it. Otherwise sushy fails hard at parsing response from a
+    Redfish agent that does not include ``Actions`` field in its document
+    tree.
