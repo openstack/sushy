@@ -116,7 +116,49 @@ class MessageRegistryFileTestCase(base.TestCase):
         mock_msg_reg.assert_not_called()
         self.assertIsNone(registry)
         mock_log.warning.assert_called_with(
-            'No location defined for language %(language)s',
+            'No message registry found for %(language)s or default',
+            {'language': 'en'})
+
+    @mock.patch('sushy.resources.registry.message_registry.MessageRegistry',
+                autospec=True)
+    def test_get_message_registry_non_default_lang(self, mock_msg_reg):
+        mock_msg_reg_rv = mock.Mock()
+        mock_msg_reg.return_value = mock_msg_reg_rv
+        self.reg_file.location[0].language = 'en'
+
+        registry = self.reg_file.get_message_registry('en', None)
+        mock_msg_reg.assert_called_once_with(
+            self.conn, path='/redfish/v1/Registries/Test/Test.1.0.json',
+            redfish_version=self.reg_file.redfish_version)
+        self.assertEqual(mock_msg_reg_rv, registry)
+
+    @mock.patch('sushy.resources.registry.message_registry.MessageRegistry',
+                autospec=True)
+    def test_get_message_registry_strangely_cased_lang(self, mock_msg_reg):
+        mock_msg_reg_rv = mock.Mock()
+        mock_msg_reg.return_value = mock_msg_reg_rv
+        self.reg_file.location[0].language = 'En'
+
+        registry = self.reg_file.get_message_registry('en', None)
+        mock_msg_reg.assert_called_once_with(
+            self.conn, path='/redfish/v1/Registries/Test/Test.1.0.json',
+            redfish_version=self.reg_file.redfish_version)
+        self.assertEqual(mock_msg_reg_rv, registry)
+
+    @mock.patch('sushy.resources.registry.message_registry.MessageRegistry',
+                autospec=True)
+    @mock.patch('sushy.resources.registry.message_registry_file.LOG',
+                autospec=True)
+    def test_get_message_registry_missing_lang(self, mock_log, mock_msg_reg):
+        mock_msg_reg_rv = mock.Mock()
+        mock_msg_reg.return_value = mock_msg_reg_rv
+        self.reg_file.location[0].language = 'cz'
+
+        registry = self.reg_file.get_message_registry('en', None)
+        mock_msg_reg.assert_not_called()
+        self.assertIsNone(registry)
+        mock_log.warning.assert_called_with(
+            'No message registry found for %(language)s or default',
             {'language': 'en'})
 
 
