@@ -15,7 +15,9 @@
 
 from sushy.resources import base
 from sushy.resources import common
+from sushy.resources.fabric import endpoint as fab_endpoint
 from sushy.resources.fabric import mappings as fab_maps
+from sushy import utils
 
 import logging
 
@@ -38,14 +40,14 @@ class Fabric(base.ResourceBase):
     description = base.Field('Description')
     """The fabric description"""
 
-    max_zones = base.Field('MaxZones')
+    max_zones = base.Field('MaxZones', adapter=utils.int_or_none)
     """The maximum number of zones the switch can currently configure"""
 
     status = common.StatusField('Status')
     """The fabric status"""
 
     fabric_type = base.MappedField('FabricType',
-                                   fab_maps.FABRIC_TYPE_VALUE_MAP)
+                                   fab_maps.PROTOCOL_TYPE_VALUE_MAP)
     """The protocol being sent over this fabric"""
 
     def __init__(self, connector, identity, redfish_version=None):
@@ -57,6 +59,13 @@ class Fabric(base.ResourceBase):
             the object according to schema of the given version.
         """
         super(Fabric, self).__init__(connector, identity, redfish_version)
+
+    @property
+    @utils.cache_it
+    def endpoints(self):
+        return fab_endpoint.EndpointCollection(
+            self._conn, utils.get_sub_resource_path_by(self, 'Endpoints'),
+            redfish_version=self.redfish_version)
 
 
 class FabricCollection(base.ResourceCollectionBase):
