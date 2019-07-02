@@ -16,35 +16,6 @@
 from sushy.resources.fabric import constants as fab_cons
 from sushy import utils
 
-PROTOCOL_TYPE_VALUE_MAP = {
-    'AHCI': fab_cons.PROTOCOL_TYPE_AHCI,
-    'FC': fab_cons.PROTOCOL_TYPE_FC,
-    'FCP': fab_cons.PROTOCOL_TYPE_FCP,
-    'FCoE': fab_cons.PROTOCOL_TYPE_FCoE,
-    'FICON': fab_cons.PROTOCOL_TYPE_FICON,
-    'FTP': fab_cons.PROTOCOL_TYPE_FTP,
-    'HTTP': fab_cons.PROTOCOL_TYPE_HTTP,
-    'HTTPS': fab_cons.PROTOCOL_TYPE_HTTPS,
-    'I2C': fab_cons.PROTOCOL_TYPE_I2C,
-    'NFSv3': fab_cons.PROTOCOL_TYPE_NFSv3,
-    'NFSv4': fab_cons.PROTOCOL_TYPE_NFSv4,
-    'NVMe': fab_cons.PROTOCOL_TYPE_NVMe,
-    'NVMeOverFabrics': fab_cons.PROTOCOL_TYPE_NVMeOverFabrics,
-    'OEM': fab_cons.PROTOCOL_TYPE_OEM,
-    'PCIe': fab_cons.PROTOCOL_TYPE_PCIe,
-    'RoCE': fab_cons.PROTOCOL_TYPE_RoCE,
-    'RoCEv2': fab_cons.PROTOCOL_TYPE_RoCEv2,
-    'SAS': fab_cons.PROTOCOL_TYPE_SAS,
-    'SATA': fab_cons.PROTOCOL_TYPE_SATA,
-    'SFTP': fab_cons.PROTOCOL_TYPE_SFTP,
-    'SMB': fab_cons.PROTOCOL_TYPE_SMB,
-    'UHCI': fab_cons.PROTOCOL_TYPE_UHCI,
-    'USB': fab_cons.PROTOCOL_TYPE_USB,
-    'iSCSI': fab_cons.PROTOCOL_TYPE_iSCSI,
-    'iWARP': fab_cons.PROTOCOL_TYPE_iWARP,
-}
-
-
 ADDRESS_ORIGIN_IPv4_VALUE_MAP = {
     'BOOTP': fab_cons.ADDRESS_ORIGIN_IPv4_BOOTP,
     'DHCP': fab_cons.ADDRESS_ORIGIN_IPv4_DHCP,
@@ -66,17 +37,6 @@ ADDRESS_STATE_VALUE_MAP = {
     'Failed': fab_cons.ADDRESS_STATE_FAILED,
     'Preferred': fab_cons.ADDRESS_STATE_PREFERRED,
     'Tentative': fab_cons.ADDRESS_STATE_TENTATIVE,
-}
-
-
-DUR_NAME_FORMAT_VALUE_MAP = {
-    'EUI': fab_cons.DURABLE_NAME_FORMAT_EUI,
-    'FC_WWN': fab_cons.DURABLE_NAME_FORMAT_FC_WWN,
-    'NAA': fab_cons.DURABLE_NAME_FORMAT_NAA,
-    'NQN': fab_cons.DURABLE_NAME_FORMAT_NQN,
-    'NSID': fab_cons.DURABLE_NAME_FORMAT_NSID,
-    'UUID': fab_cons.DURABLE_NAME_FORMAT_UUID,
-    'iQN': fab_cons.DURABLE_NAME_FORMAT_iQN,
 }
 
 

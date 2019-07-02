@@ -44,13 +44,14 @@ class DriveTestCase(base.TestCase):
         self.assertIsInstance(identifiers, list)
         self.assertEqual(1, len(identifiers))
         identifier = identifiers[0]
-        self.assertEqual('NAA', identifier.durable_name_format)
+        self.assertEqual(sushy.DURABLE_NAME_FORMAT_NAA,
+                         identifier.durable_name_format)
         self.assertEqual('32ADF365C6C1B7BD', identifier.durable_name)
         self.assertEqual('Contoso', self.stor_drive.manufacturer)
         self.assertEqual('HDD', self.stor_drive.media_type)
         self.assertEqual('C123', self.stor_drive.model)
         self.assertEqual('C123-1111', self.stor_drive.part_number)
-        self.assertEqual('SAS', self.stor_drive.protocol)
+        self.assertEqual(sushy.PROTOCOL_TYPE_SAS, self.stor_drive.protocol)
         self.assertEqual('1234570', self.stor_drive.serial_number)
         self.assertEqual(sushy.STATE_ENABLED, self.stor_drive.status.state)
         self.assertEqual(sushy.HEALTH_OK, self.stor_drive.status.health)

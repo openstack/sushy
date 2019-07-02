@@ -13,34 +13,6 @@
 # Values come from the Redfish Fabric json-schema 1.0.4:
 # http://redfish.dmtf.org/schemas/v1/Fabric.v1_0_4.json#/definitions/Fabric
 
-# Protocol type constants
-
-PROTOCOL_TYPE_AHCI = 'Advanced Host Controller Interface'
-PROTOCOL_TYPE_FC = 'Fibre Channel'
-PROTOCOL_TYPE_FCP = 'Fibre Channel Protocol for SCSI'
-PROTOCOL_TYPE_FCoE = 'Fibre Channel over Ethernet'
-PROTOCOL_TYPE_FICON = 'FIbre CONnection (FICON)'
-PROTOCOL_TYPE_FTP = 'File Transfer Protocol'
-PROTOCOL_TYPE_HTTP = 'Hypertext Transport Protocol'
-PROTOCOL_TYPE_HTTPS = 'Secure Hypertext Transport Protocol'
-PROTOCOL_TYPE_I2C = 'Inter-Integrated Circuit Bus'
-PROTOCOL_TYPE_NFSv3 = 'Network File System version 3'
-PROTOCOL_TYPE_NFSv4 = 'Network File System version 4'
-PROTOCOL_TYPE_NVMe = 'Non-Volatile Memory Express'
-PROTOCOL_TYPE_NVMeOverFabrics = 'NVMe over Fabrics'
-PROTOCOL_TYPE_OEM = 'OEM specific'
-PROTOCOL_TYPE_PCIe = 'PCI Express'
-PROTOCOL_TYPE_RoCE = 'RDMA over Converged Ethernet Protocol'
-PROTOCOL_TYPE_RoCEv2 = 'RDMA over Converged Ethernet Protocol Version 2'
-PROTOCOL_TYPE_SAS = 'Serial Attached SCSI'
-PROTOCOL_TYPE_SATA = 'Serial AT Attachment'
-PROTOCOL_TYPE_SFTP = 'Secure File Transfer Protocol'
-PROTOCOL_TYPE_SMB = 'Server Message Block (CIFS Common Internet File System)'
-PROTOCOL_TYPE_UHCI = 'Universal Host Controller Interface'
-PROTOCOL_TYPE_USB = 'Universal Serial Bus'
-PROTOCOL_TYPE_iSCSI = 'Internet SCSI'
-PROTOCOL_TYPE_iWARP = 'Internet Wide Area Remote Direct Memory Access Protocol'
-
 # Address origin IPv4 constants
 
 ADDRESS_ORIGIN_IPv4_BOOTP = 'Address is provided by a BOOTP service'
@@ -69,16 +41,6 @@ defined in RFC 4862."""
 ADDRESS_STATE_TENTATIVE = 'Tentative'
 """This address is currently undergoing Duplicate Address Detection testing as
 defined in RFC 4862 section 5.4."""
-
-# Durable name format constants
-
-DURABLE_NAME_FORMAT_EUI = 'IEEE-defined 64-bit Extended Unique Identifier'
-DURABLE_NAME_FORMAT_FC_WWN = 'Fibre Channel World Wide Name'
-DURABLE_NAME_FORMAT_NAA = 'Name Address Authority Format'
-DURABLE_NAME_FORMAT_NQN = 'NVMe Qualified Name'
-DURABLE_NAME_FORMAT_NSID = 'NVM Namespace Identifier'
-DURABLE_NAME_FORMAT_UUID = 'Universally Unique Identifier'
-DURABLE_NAME_FORMAT_iQN = 'iSCSI Qualified Name'
 
 # Entity role constants
 

@@ -82,5 +82,6 @@ class IdentifiersListField(base.ListField):
     durable_name = base.Field('DurableName')
     """This indicates the world wide, persistent name of the resource."""
 
-    durable_name_format = base.Field('DurableNameFormat')
+    durable_name_format = base.MappedField('DurableNameFormat',
+                                           res_maps.DUR_NAME_FORMAT_VALUE_MAP)
     """This represents the format of the DurableName property."""

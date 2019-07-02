@@ -58,7 +58,7 @@ class Drive(base.ResourceBase):
     part_number = base.Field('PartNumber')
     """The part number for this drive"""
 
-    protocol = base.Field('Protocol')
+    protocol = base.MappedField('Protocol', res_maps.PROTOCOL_TYPE_VALUE_MAP)
     """Protocol this drive is using to communicate to the storage controller"""
 
     serial_number = base.Field('SerialNumber')

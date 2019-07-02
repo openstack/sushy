@@ -14,6 +14,7 @@ import json
 
 import mock
 
+import sushy
 from sushy.resources.system.storage import drive
 from sushy.resources.system.storage import storage
 from sushy.resources.system.storage import volume
@@ -117,7 +118,8 @@ class StorageTestCase(base.TestCase):
         self.assertIsInstance(identifiers, list)
         self.assertEqual(1, len(identifiers))
         identifier = identifiers[0]
-        self.assertEqual('NAA', identifier.durable_name_format)
+        self.assertEqual(sushy.DURABLE_NAME_FORMAT_NAA,
+                         identifier.durable_name_format)
         self.assertEqual('345C59DBD970859C', identifier.durable_name)
         self.assertEqual(12, controller.speed_gbps)
         self.assertEqual(["PCIe"], controller.controller_protocols)

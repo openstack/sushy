@@ -15,8 +15,8 @@ import mock
 
 from dateutil import parser
 
+import sushy
 from sushy import exceptions
-from sushy.resources.system.storage import constants as store_cons
 from sushy.resources.system.storage import volume
 from sushy.tests.unit import base
 
@@ -39,14 +39,15 @@ class VolumeTestCase(base.TestCase):
         self.assertEqual('1', self.stor_volume.identity)
         self.assertEqual('Virtual Disk 1', self.stor_volume.name)
         self.assertEqual(899527000000, self.stor_volume.capacity_bytes)
-        self.assertEqual(store_cons.VOLUME_TYPE_MIRRORED,
+        self.assertEqual(sushy.VOLUME_TYPE_MIRRORED,
                          self.stor_volume.volume_type)
         self.assertFalse(self.stor_volume.encrypted)
         identifiers = self.stor_volume.identifiers
         self.assertIsInstance(identifiers, list)
         self.assertEqual(1, len(identifiers))
         identifier = identifiers[0]
-        self.assertEqual('UUID', identifier.durable_name_format)
+        self.assertEqual(sushy.DURABLE_NAME_FORMAT_UUID,
+                         identifier.durable_name_format)
         self.assertEqual('38f1818b-111e-463a-aa19-fa54f792e468',
                          identifier.durable_name)
         self.assertIsNone(self.stor_volume.block_size_bytes)
@@ -190,4 +191,4 @@ class VolumeCollectionTestCase(base.TestCase):
         self.assertEqual('4', new_vol.identity)
         self.assertEqual('My Volume 4', new_vol.name)
         self.assertEqual(107374182400, new_vol.capacity_bytes)
-        self.assertEqual(store_cons.VOLUME_TYPE_MIRRORED, new_vol.volume_type)
+        self.assertEqual(sushy.VOLUME_TYPE_MIRRORED, new_vol.volume_type)

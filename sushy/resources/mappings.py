@@ -77,3 +77,41 @@ RESET_TYPE_VALUE_MAP = {
 }
 
 RESET_TYPE_VALUE_MAP_REV = utils.revert_dictionary(RESET_TYPE_VALUE_MAP)
+
+PROTOCOL_TYPE_VALUE_MAP = {
+    'AHCI': res_cons.PROTOCOL_TYPE_AHCI,
+    'FC': res_cons.PROTOCOL_TYPE_FC,
+    'FCP': res_cons.PROTOCOL_TYPE_FCP,
+    'FCoE': res_cons.PROTOCOL_TYPE_FCoE,
+    'FICON': res_cons.PROTOCOL_TYPE_FICON,
+    'FTP': res_cons.PROTOCOL_TYPE_FTP,
+    'HTTP': res_cons.PROTOCOL_TYPE_HTTP,
+    'HTTPS': res_cons.PROTOCOL_TYPE_HTTPS,
+    'I2C': res_cons.PROTOCOL_TYPE_I2C,
+    'NFSv3': res_cons.PROTOCOL_TYPE_NFSv3,
+    'NFSv4': res_cons.PROTOCOL_TYPE_NFSv4,
+    'NVMe': res_cons.PROTOCOL_TYPE_NVMe,
+    'NVMeOverFabrics': res_cons.PROTOCOL_TYPE_NVMeOverFabrics,
+    'OEM': res_cons.PROTOCOL_TYPE_OEM,
+    'PCIe': res_cons.PROTOCOL_TYPE_PCIe,
+    'RoCE': res_cons.PROTOCOL_TYPE_RoCE,
+    'RoCEv2': res_cons.PROTOCOL_TYPE_RoCEv2,
+    'SAS': res_cons.PROTOCOL_TYPE_SAS,
+    'SATA': res_cons.PROTOCOL_TYPE_SATA,
+    'SFTP': res_cons.PROTOCOL_TYPE_SFTP,
+    'SMB': res_cons.PROTOCOL_TYPE_SMB,
+    'UHCI': res_cons.PROTOCOL_TYPE_UHCI,
+    'USB': res_cons.PROTOCOL_TYPE_USB,
+    'iSCSI': res_cons.PROTOCOL_TYPE_iSCSI,
+    'iWARP': res_cons.PROTOCOL_TYPE_iWARP,
+}
+
+DUR_NAME_FORMAT_VALUE_MAP = {
+    'EUI': res_cons.DURABLE_NAME_FORMAT_EUI,
+    'FC_WWN': res_cons.DURABLE_NAME_FORMAT_FC_WWN,
+    'NAA': res_cons.DURABLE_NAME_FORMAT_NAA,
+    'NQN': res_cons.DURABLE_NAME_FORMAT_NQN,
+    'NSID': res_cons.DURABLE_NAME_FORMAT_NSID,
+    'UUID': res_cons.DURABLE_NAME_FORMAT_UUID,
+    'iQN': res_cons.DURABLE_NAME_FORMAT_iQN,
+}

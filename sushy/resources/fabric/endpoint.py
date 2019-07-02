@@ -18,6 +18,7 @@ import logging
 from sushy.resources import base
 from sushy.resources import common
 from sushy.resources.fabric import mappings as fab_maps
+from sushy.resources import mappings as res_maps
 from sushy import utils
 
 LOG = logging.getLogger(__name__)
@@ -68,7 +69,7 @@ class IPTransportDetailsListField(base.ListField):
     """The UDP or TCP port number used by the Endpoint."""
 
     transport_protocol = base.MappedField('TransportProtocol',
-                                          fab_maps.PROTOCOL_TYPE_VALUE_MAP)
+                                          res_maps.PROTOCOL_TYPE_VALUE_MAP)
     """The protocol used by the connection entity."""
 
     ipv4_address = IPv4AddressField('IPv4Address')
@@ -93,16 +94,6 @@ class PciIdField(base.CompositeField):
     """The Vendor ID of this PCIe function."""
 
 
-class IdentifierListField(base.ListField):
-
-    durable_name = base.Field('DurableName')
-    """This indicates the world wide, persistent name of the entity."""
-
-    durable_name_format = base.MappedField('DurableNameFormat',
-                                           fab_maps.DUR_NAME_FORMAT_VALUE_MAP)
-    """This represents the format of the DurableName property."""
-
-
 class ConnectedEntitiesListField(base.ListField):
     """All the entities connected to this endpoint."""
 
@@ -117,7 +108,7 @@ class ConnectedEntitiesListField(base.ListField):
     entity_pci_id = PciIdField('EntityPciId')
     """The PCI ID of the connected entity."""
 
-    identifiers = IdentifierListField('Identifiers')
+    identifiers = common.IdentifiersListField('Identifiers', default=[])
     """Identifiers for the remote entity."""
 
     entity_role = base.MappedField('EntityRole',
@@ -155,7 +146,7 @@ class Endpoint(base.ResourceBase):
     """
 
     endpoint_protocol = base.MappedField('EndpointProtocol',
-                                         fab_maps.PROTOCOL_TYPE_VALUE_MAP)
+                                         res_maps.PROTOCOL_TYPE_VALUE_MAP)
     """The protocol supported by this endpoint."""
 
     pci_id = PciIdField('PciId')
