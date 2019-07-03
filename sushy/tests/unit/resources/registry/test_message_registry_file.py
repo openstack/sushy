@@ -53,14 +53,20 @@ class MessageRegistryFileTestCase(base.TestCase):
 
     @mock.patch('sushy.resources.registry.message_registry.MessageRegistry',
                 autospec=True)
-    def test_get_message_registry_uri(self, mock_msg_reg):
+    @mock.patch('sushy.resources.base.JsonDataReader', autospec=True)
+    def test_get_message_registry_uri(self, mock_reader, mock_msg_reg):
+        mock_reader_rv = mock.Mock()
+        mock_reader.return_value = mock_reader_rv
+        mock_reader_rv.get_json.return_value = {
+            "@odata.type": "#MessageRegistry.v1_1_1.MessageRegistry",
+        }
         mock_msg_reg_rv = mock.Mock()
         mock_msg_reg.return_value = mock_msg_reg_rv
 
         registry = self.reg_file.get_message_registry('en', None)
         mock_msg_reg.assert_called_once_with(
             self.conn, path='/redfish/v1/Registries/Test/Test.1.0.json',
-            redfish_version=self.reg_file.redfish_version)
+            reader=None, redfish_version=self.reg_file.redfish_version)
         self.assertEqual(mock_msg_reg_rv, registry)
 
     @mock.patch('sushy.resources.registry.message_registry.MessageRegistry',
@@ -70,6 +76,9 @@ class MessageRegistryFileTestCase(base.TestCase):
         mock_reader_rv = mock.Mock()
         mock_reader.return_value = mock_reader_rv
         mock_msg_reg_rv = mock.Mock()
+        mock_reader_rv.get_json.return_value = {
+            "@odata.type": "#MessageRegistry.v1_1_1.MessageRegistry",
+        }
         mock_msg_reg.return_value = mock_msg_reg_rv
         self.reg_file.location[0].uri = None
 
@@ -89,6 +98,9 @@ class MessageRegistryFileTestCase(base.TestCase):
         mock_reader_rv = mock.Mock()
         mock_reader.return_value = mock_reader_rv
         mock_msg_reg_rv = mock.Mock()
+        mock_reader_rv.get_json.return_value = {
+            "@odata.type": "#MessageRegistry.v1_1_1.MessageRegistry",
+        }
         mock_msg_reg.return_value = mock_msg_reg_rv
         self.reg_file.location[0].uri = None
         self.reg_file.location[0].archive_uri = None
@@ -100,6 +112,23 @@ class MessageRegistryFileTestCase(base.TestCase):
             redfish_version=self.reg_file.redfish_version,
             reader=mock_reader_rv)
         self.assertEqual(mock_msg_reg_rv, registry)
+
+    @mock.patch('sushy.resources.registry.message_registry.MessageRegistry',
+                autospec=True)
+    @mock.patch('sushy.resources.base.JsonDataReader', autospec=True)
+    def test_get_message_registry_unknown_type(
+            self, mock_reader, mock_msg_reg):
+        mock_reader_rv = mock.Mock()
+        mock_reader.return_value = mock_reader_rv
+        mock_reader_rv.get_json.return_value = {
+            "@odata.type": "#FishingRegistry.v1_1_1.FishingRegistry",
+        }
+        mock_msg_reg_rv = mock.Mock()
+        mock_msg_reg.return_value = mock_msg_reg_rv
+
+        registry = self.reg_file.get_message_registry('en', None)
+        self.assertFalse(mock_msg_reg.called)
+        self.assertIsNone(registry)
 
     @mock.patch('sushy.resources.registry.message_registry.MessageRegistry',
                 autospec=True)
@@ -119,31 +148,30 @@ class MessageRegistryFileTestCase(base.TestCase):
             'No message registry found for %(language)s or default',
             {'language': 'en'})
 
-    @mock.patch('sushy.resources.registry.message_registry.MessageRegistry',
+    @mock.patch('sushy.resources.registry.message_registry_file.RegistryType',
                 autospec=True)
-    def test_get_message_registry_non_default_lang(self, mock_msg_reg):
-        mock_msg_reg_rv = mock.Mock()
-        mock_msg_reg.return_value = mock_msg_reg_rv
+    def test_get_message_registry_non_default_lang(self, mock_registry_type):
+        mock_fishing_registry = mock_registry_type.return_value
+        mock_fishing_registry._odata_type = 'FishingRegistry'
         self.reg_file.location[0].language = 'en'
-
         registry = self.reg_file.get_message_registry('en', None)
-        mock_msg_reg.assert_called_once_with(
+        mock_registry_type.assert_called_once_with(
             self.conn, path='/redfish/v1/Registries/Test/Test.1.0.json',
-            redfish_version=self.reg_file.redfish_version)
-        self.assertEqual(mock_msg_reg_rv, registry)
+            reader=None, redfish_version=self.reg_file.redfish_version)
+        self.assertIsNone(registry)
 
-    @mock.patch('sushy.resources.registry.message_registry.MessageRegistry',
+    @mock.patch('sushy.resources.registry.message_registry_file.RegistryType',
                 autospec=True)
-    def test_get_message_registry_strangely_cased_lang(self, mock_msg_reg):
-        mock_msg_reg_rv = mock.Mock()
-        mock_msg_reg.return_value = mock_msg_reg_rv
+    def test_get_message_registry_strangely_cased_lang(
+            self, mock_registry_type):
+        mock_fishing_registry = mock_registry_type.return_value
+        mock_fishing_registry._odata_type = 'FishingRegistry'
         self.reg_file.location[0].language = 'En'
-
         registry = self.reg_file.get_message_registry('en', None)
-        mock_msg_reg.assert_called_once_with(
+        mock_registry_type.assert_called_once_with(
             self.conn, path='/redfish/v1/Registries/Test/Test.1.0.json',
-            redfish_version=self.reg_file.redfish_version)
-        self.assertEqual(mock_msg_reg_rv, registry)
+            reader=None, redfish_version=self.reg_file.redfish_version)
+        self.assertIsNone(registry)
 
     @mock.patch('sushy.resources.registry.message_registry.MessageRegistry',
                 autospec=True)

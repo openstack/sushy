@@ -48,6 +48,10 @@ class LocationListField(base.ListField):
     """Location URI of publicly available schema"""
 
 
+class RegistryType(base.ResourceBase):
+    _odata_type = base.Field('@odata.type', required=True)
+
+
 class MessageRegistryFile(base.ResourceBase):
 
     identity = base.Field('Id', required=True)
@@ -74,8 +78,9 @@ class MessageRegistryFile(base.ResourceBase):
     def get_message_registry(self, language, public_connector):
         """Load message registry file depending on its source
 
-        Will try to find a registry based on provided language, if not found
-        then will use a registry that has 'default' language.
+        Will try to find `MessageRegistry` based on `odata.type` property and
+        provided language. If desired language is not found, will pick a
+        registry that has 'default' language.
 
         :param language: RFC 5646 language code for registry files
         :param public_connector: connector to use when downloading registry
@@ -93,23 +98,41 @@ class MessageRegistryFile(base.ResourceBase):
 
         for location in locations:
             if location.uri:
-                return message_registry.MessageRegistry(
-                    self._conn, path=location.uri,
-                    redfish_version=self.redfish_version)
+                args = self._conn,
+                kwargs = {
+                    'path': location.uri,
+                    'reader': None,
+                    'redfish_version': self.redfish_version
+                }
+
             elif location.archive_uri:
-                return message_registry.MessageRegistry(
-                    self._conn, path=location.archive_uri,
-                    redfish_version=self.redfish_version,
-                    reader=base.JsonArchiveReader(location.archive_file))
+                args = self._conn,
+                kwargs = {
+                    'path': location.archive_uri,
+                    'reader': base.JsonArchiveReader(location.archive_file),
+                    'redfish_version': self.redfish_version
+                }
+
             elif location.publication_uri:
-                return message_registry.MessageRegistry(
-                    public_connector,
-                    path=location.publication_uri,
-                    redfish_version=self.redfish_version,
-                    reader=base.JsonPublicFileReader())
+                args = public_connector,
+                kwargs = {
+                    'path': location.publication_uri,
+                    'reader': base.JsonPublicFileReader(),
+                    'redfish_version': self.redfish_version
+                }
+
             else:
                 LOG.warning('Incomplete location for language %(language)s',
                             {'language': language})
+                continue
+
+            registry = RegistryType(*args, **kwargs)
+
+            if registry._odata_type.endswith('MessageRegistry'):
+                return message_registry.MessageRegistry(*args, **kwargs)
+
+            LOG.warning('Ignoring unsupported flavor of registry %(registry)s',
+                        {'registry': registry._odata_type})
 
         LOG.warning('No message registry found for %(language)s or '
                     'default', {'language': language})
