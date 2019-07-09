@@ -78,6 +78,16 @@ class UpdateServiceTestCase(base.TestCase):
                 'Targets': '/redfish/v1/UpdateService/Actions/SimpleUpdate',
                 'TransferProtocol': 'HTTPS'})
 
+    def test_simple_update_without_target(self):
+        self.upd_serv.simple_update(
+            image_uri='local.server/update.exe',
+            transfer_protocol='HTTPS')
+        self.upd_serv._conn.post.assert_called_once_with(
+            '/redfish/v1/UpdateService/Actions/SimpleUpdate',
+            data={
+                'ImageURI': 'local.server/update.exe',
+                'TransferProtocol': 'HTTPS'})
+
     def test_simple_update_bad_protocol(self):
         self.assertRaises(
             exceptions.InvalidParameterValueError,
