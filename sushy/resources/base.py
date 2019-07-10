@@ -96,7 +96,12 @@ class Field(object):
                 return self._default
 
         try:
-            value = self._adapter(body[name])
+            # Get the value based on the name, defaulting to an empty dict
+            value = body.get(name, {})
+            # Check to ensure that value is implemented by OEM
+            if (value is not None and value != {} and
+               str(value).lower() != 'none'):
+                value = self._adapter(value)
         except (UnicodeError, ValueError, TypeError) as exc:
             path = (nested_in or []) + self._path
             raise exceptions.MalformedAttributeError(
