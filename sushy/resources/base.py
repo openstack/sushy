@@ -338,7 +338,8 @@ class JsonDataReader(AbstractJsonReader):
 
     def get_json(self):
         """Gets JSON file from URI directly"""
-        return self._conn.get(path=self._path).json()
+        data = self._conn.get(path=self._path)
+        return data.json() if data.content else {}
 
 
 class JsonPublicFileReader(AbstractJsonReader):

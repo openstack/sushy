@@ -17,8 +17,10 @@ import logging
 from urllib import parse as urlparse
 
 import requests
+import time
 
 from sushy import exceptions
+from sushy.resources.task_monitor import TaskMonitor
 
 LOG = logging.getLogger(__name__)
 
@@ -61,15 +63,17 @@ class Connector(object):
         """Close this connector and the associated HTTP session."""
         self._session.close()
 
-    def _op(self, method, path='', data=None, headers=None,
-            **extra_session_req_kwargs):
+    def _op(self, method, path='', data=None, headers=None, blocking=False,
+            timeout=60, **extra_session_req_kwargs):
         """Generic RESTful request handler.
 
         :param method: The HTTP method to be used, e.g: GET, POST,
             PUT, PATCH, etc...
-        :param path: The sub-URI path to the resource.
+        :param path: The sub-URI or absolute URL path to the resource.
         :param data: Optional JSON data.
         :param headers: Optional dictionary of headers.
+        :param blocking: Whether to block for asynchronous operations.
+        :param timeout: Max time in seconds to wait for blocking async call.
         :param extra_session_req_kwargs: Optional keyword argument to pass
          requests library arguments which would pass on to requests session
          object.
@@ -77,16 +81,19 @@ class Connector(object):
         :raises: ConnectionError
         :raises: HTTPError
         """
-        url = urlparse.urljoin(self._url, path)
+        url = path if urlparse.urlparse(path).netloc else urlparse.urljoin(
+            self._url, path)
         headers = headers or {}
         if not any(k.lower() == 'odata-version' for k in headers):
             headers['OData-Version'] = '4.0'
         # TODO(lucasagomes): We should mask the data to remove sensitive
         # information
         LOG.debug('HTTP request: %(method)s %(url)s; headers: %(headers)s; '
-                  'body: %(data)s; session arguments: %(session)s;',
+                  'body: %(data)s; blocking: %(blocking)s; timeout: '
+                  '%(timeout)s; session arguments: %(session)s;',
                   {'method': method, 'url': url, 'headers': headers,
-                   'data': data, 'session': extra_session_req_kwargs})
+                   'data': data, 'blocking': blocking, 'timeout': timeout,
+                   'session': extra_session_req_kwargs})
         try:
             response = self._session.request(method, url, json=data,
                                              headers=headers,
@@ -110,6 +117,29 @@ class Connector(object):
             else:
                 raise
 
+        if blocking and response.status_code == 202:
+            if not response.headers.get('location'):
+                m = ('HTTP response for %(method)s request to %(url)s '
+                     'returned status 202, but no Location header'
+                     % {'method': method, 'url': url})
+                raise exceptions.ConnectionError(url=url, error=m)
+            timeout_at = time.time() + timeout
+            mon = (TaskMonitor(self, response.headers.get('location'))
+                   .set_retry_after(response.headers.get('retry-after')))
+            while mon.in_progress:
+                LOG.debug('Blocking for in-progress %(method)s call to '
+                          '%(url)s; sleeping for %(sleep)s seconds',
+                          {'method': method, 'url': url,
+                           'sleep': mon.sleep_for})
+                time.sleep(mon.sleep_for)
+                if time.time() >= timeout_at and mon.in_progress:
+                    m = ('Timeout waiting for blocking %(method)s '
+                         'request to %(url)s (timeout = %(timeout)s)'
+                         % {'method': method, 'url': url,
+                            'timeout': timeout})
+                    raise exceptions.ConnectionError(url=url, error=m)
+            response = mon.response
+
         LOG.debug('HTTP response for %(method)s %(url)s: '
                   'status code: %(code)s',
                   {'method': method, 'url': url,
@@ -117,13 +147,15 @@ class Connector(object):
 
         return response
 
-    def get(self, path='', data=None, headers=None,
-            **extra_session_req_kwargs):
+    def get(self, path='', data=None, headers=None, blocking=False,
+            timeout=60, **extra_session_req_kwargs):
         """HTTP GET method.
 
         :param path: Optional sub-URI path to the resource.
         :param data: Optional JSON data.
         :param headers: Optional dictionary of headers.
+        :param blocking: Whether to block for asynchronous operations.
+        :param timeout: Max time in seconds to wait for blocking async call.
         :param extra_session_req_kwargs: Optional keyword argument to pass
          requests library arguments which would pass on to requests session
          object.
@@ -132,15 +164,18 @@ class Connector(object):
         :raises: HTTPError
         """
         return self._op('GET', path, data=data, headers=headers,
+                        blocking=blocking, timeout=timeout,
                         **extra_session_req_kwargs)
 
-    def post(self, path='', data=None, headers=None,
-             **extra_session_req_kwargs):
+    def post(self, path='', data=None, headers=None, blocking=False,
+             timeout=60, **extra_session_req_kwargs):
         """HTTP POST method.
 
         :param path: Optional sub-URI path to the resource.
         :param data: Optional JSON data.
         :param headers: Optional dictionary of headers.
+        :param blocking: Whether to block for asynchronous operations.
+        :param timeout: Max time in seconds to wait for blocking async call.
         :param extra_session_req_kwargs: Optional keyword argument to pass
          requests library arguments which would pass on to requests session
          object.
@@ -149,15 +184,18 @@ class Connector(object):
         :raises: HTTPError
         """
         return self._op('POST', path, data=data, headers=headers,
+                        blocking=blocking, timeout=timeout,
                         **extra_session_req_kwargs)
 
-    def patch(self, path='', data=None, headers=None,
-              **extra_session_req_kwargs):
+    def patch(self, path='', data=None, headers=None, blocking=False,
+              timeout=60, **extra_session_req_kwargs):
         """HTTP PATCH method.
 
         :param path: Optional sub-URI path to the resource.
         :param data: Optional JSON data.
         :param headers: Optional dictionary of headers.
+        :param blocking: Whether to block for asynchronous operations.
+        :param timeout: Max time in seconds to wait for blocking async call.
         :param extra_session_req_kwargs: Optional keyword argument to pass
          requests library arguments which would pass on to requests session
          object.
@@ -166,15 +204,18 @@ class Connector(object):
         :raises: HTTPError
         """
         return self._op('PATCH', path, data=data, headers=headers,
+                        blocking=blocking, timeout=timeout,
                         **extra_session_req_kwargs)
 
-    def put(self, path='', data=None, headers=None,
-            **extra_session_req_kwargs):
+    def put(self, path='', data=None, headers=None, blocking=False,
+            timeout=60, **extra_session_req_kwargs):
         """HTTP PUT method.
 
         :param path: Optional sub-URI path to the resource.
         :param data: Optional JSON data.
         :param headers: Optional dictionary of headers.
+        :param blocking: Whether to block for asynchronous operations.
+        :param timeout: Max time in seconds to wait for blocking async call.
         :param extra_session_req_kwargs: Optional keyword argument to pass
          requests library arguments which would pass on to requests session
          object.
@@ -183,15 +224,18 @@ class Connector(object):
         :raises: HTTPError
         """
         return self._op('PUT', path, data=data, headers=headers,
+                        blocking=blocking, timeout=timeout,
                         **extra_session_req_kwargs)
 
-    def delete(self, path='', data=None, headers=None,
-               **extra_session_req_kwargs):
+    def delete(self, path='', data=None, headers=None, blocking=False,
+               timeout=60, **extra_session_req_kwargs):
         """HTTP DELETE method.
 
         :param path: Optional sub-URI path to the resource.
         :param data: Optional JSON data.
         :param headers: Optional dictionary of headers.
+        :param blocking: Whether to block for asynchronous operations.
+        :param timeout: Max time in seconds to wait for blocking async call.
         :param extra_session_req_kwargs: Optional keyword argument to pass
          requests library arguments which would pass on to requests session
          object.
@@ -200,6 +244,7 @@ class Connector(object):
         :raises: HTTPError
         """
         return self._op('DELETE', path, data=data, headers=headers,
+                        blocking=blocking, timeout=timeout,
                         **extra_session_req_kwargs)
 
     def __enter__(self):
