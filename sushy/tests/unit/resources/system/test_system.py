@@ -582,13 +582,13 @@ class SystemCollectionTestCase(base.TestCase):
         self.sys_col.get_member('/redfish/v1/Systems/437XR1138R2')
         mock_system.assert_called_once_with(
             self.sys_col._conn, '/redfish/v1/Systems/437XR1138R2',
-            redfish_version=self.sys_col.redfish_version)
+            self.sys_col.redfish_version, None)
 
     @mock.patch.object(system, 'System', autospec=True)
     def test_get_members(self, mock_system):
         members = self.sys_col.get_members()
         mock_system.assert_called_once_with(
             self.sys_col._conn, '/redfish/v1/Systems/437XR1138R2',
-            redfish_version=self.sys_col.redfish_version)
+            self.sys_col.redfish_version, None)
         self.assertIsInstance(members, list)
         self.assertEqual(1, len(members))

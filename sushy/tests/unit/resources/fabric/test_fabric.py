@@ -114,23 +114,23 @@ class FabricCollectionTestCase(base.TestCase):
                   'fabric_collection.json') as f:
             self.conn.get.return_value.json.return_value = json.load(f)
         self.fabric = fabric.FabricCollection(
-            self.conn, '/redfish/v1/Fabrics', redfish_version='1.0.3')
+            self.conn, '/redfish/v1/Fabrics', '1.0.3', None)
 
     @mock.patch.object(fabric, 'Fabric', autospec=True)
     def test_get_member(self, fabric_mock):
         self.fabric.get_member('/redfish/v1/Fabrics/SAS1')
         fabric_mock.assert_called_once_with(
             self.fabric._conn, '/redfish/v1/Fabrics/SAS1',
-            redfish_version=self.fabric.redfish_version)
+            self.fabric.redfish_version, None)
 
     @mock.patch.object(fabric, 'Fabric', autospec=True)
     def test_get_members(self, fabric_mock):
         members = self.fabric.get_members()
         calls = [
             mock.call(self.fabric._conn, '/redfish/v1/Fabrics/SAS1',
-                      redfish_version=self.fabric.redfish_version),
+                      self.fabric.redfish_version, None),
             mock.call(self.fabric._conn, '/redfish/v1/Fabrics/SAS2',
-                      redfish_version=self.fabric.redfish_version)
+                      self.fabric.redfish_version, None)
         ]
         fabric_mock.assert_has_calls(calls)
         self.assertIsInstance(members, list)

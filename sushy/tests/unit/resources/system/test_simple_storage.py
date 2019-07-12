@@ -74,7 +74,7 @@ class SimpleStorageCollectionTestCase(base.TestCase):
         SimpleStorage_mock.assert_called_once_with(
             self.simpl_stor_col._conn,
             '/redfish/v1/Systems/437XR1138R2/SimpleStorage/1',
-            redfish_version=self.simpl_stor_col.redfish_version)
+            self.simpl_stor_col.redfish_version, None)
 
     @mock.patch.object(simple_storage, 'SimpleStorage', autospec=True)
     def test_get_members(self, SimpleStorage_mock):
@@ -82,7 +82,7 @@ class SimpleStorageCollectionTestCase(base.TestCase):
         SimpleStorage_mock.assert_called_once_with(
             self.simpl_stor_col._conn,
             '/redfish/v1/Systems/437XR1138R2/SimpleStorage/1',
-            redfish_version=self.simpl_stor_col.redfish_version)
+            self.simpl_stor_col.redfish_version, None)
         self.assertIsInstance(members, list)
         self.assertEqual(1, len(members))
 

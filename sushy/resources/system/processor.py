@@ -92,15 +92,19 @@ class Processor(base.ResourceBase):
     total_threads = base.Field('TotalThreads', adapter=utils.int_or_none)
     """The total number of execution threads supported by this processor"""
 
-    def __init__(self, connector, identity, redfish_version=None):
+    def __init__(self, connector, identity, redfish_version=None,
+                 registries=None):
         """A class representing a Processor
 
         :param connector: A Connector instance
         :param identity: The identity of the processor
         :param redfish_version: The version of RedFish. Used to construct
             the object according to schema of the given version.
+        :param registries: Dict of Redfish Message Registry objects to be
+            used in any resource that needs registries to parse messages
         """
-        super(Processor, self).__init__(connector, identity, redfish_version)
+        super(Processor, self).__init__(
+            connector, identity, redfish_version, registries)
 
     def _get_processor_collection_path(self):
         """Helper function to find the ProcessorCollection path"""
@@ -152,13 +156,15 @@ class ProcessorCollection(base.ResourceCollectionBase):
 
         return ProcessorSummary(count=count, architecture=architecture)
 
-    def __init__(self, connector, path, redfish_version=None):
+    def __init__(self, connector, path, redfish_version=None, registries=None):
         """A class representing a ProcessorCollection
 
         :param connector: A Connector instance
         :param path: The canonical path to the Processor collection resource
         :param redfish_version: The version of RedFish. Used to construct
             the object according to schema of the given version.
+        :param registries: Dict of Redfish Message Registry objects to be
+            used in any resource that needs registries to parse messages
         """
-        super(ProcessorCollection, self).__init__(connector, path,
-                                                  redfish_version)
+        super(ProcessorCollection, self).__init__(
+            connector, path, redfish_version, registries)

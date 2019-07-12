@@ -60,18 +60,19 @@ class UpdateService(base.ResourceBase):
 
     _actions = ActionsField('Actions', required=True)
 
-    def __init__(self, connector, identity, redfish_version=None):
+    def __init__(self, connector, identity, redfish_version=None,
+                 registries=None):
         """A class representing a UpdateService
 
         :param connector: A Connector instance
         :param identity: The identity of the UpdateService resource
         :param redfish_version: The version of RedFish. Used to construct
             the object according to schema of given version
+        :param registries: Dict of Redfish Message Registry objects to be
+            used in any resource that needs registries to parse messages
         """
         super(UpdateService, self).__init__(
-            connector,
-            identity,
-            redfish_version)
+            connector, identity, redfish_version, registries)
 
     def _get_simple_update_element(self):
         simple_update_action = self._actions.simple_update
@@ -155,7 +156,7 @@ class UpdateService(base.ResourceBase):
         """Property to reference SoftwareInventoryCollection instance"""
         return softwareinventory.SoftwareInventoryCollection(
             self._conn, self._get_software_inventory_collection_path,
-            redfish_version=self.redfish_version)
+            redfish_version=self.redfish_version, registries=self.registries)
 
     @property
     @utils.cache_it
@@ -163,4 +164,4 @@ class UpdateService(base.ResourceBase):
         """Property to reference SoftwareInventoryCollection instance"""
         return softwareinventory.SoftwareInventoryCollection(
             self._conn, self._get_software_inventory_collection_path,
-            redfish_version=self.redfish_version)
+            redfish_version=self.redfish_version, registries=self.registries)

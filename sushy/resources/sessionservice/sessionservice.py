@@ -43,17 +43,21 @@ class SessionService(base.ResourceBase):
     session_timeout = base.Field('SessionTimeout')
     """The session service timeout"""
 
-    def __init__(self, connector, identity, redfish_version=None):
+    def __init__(self, connector, identity, redfish_version=None,
+                 registries=None):
         """A class representing a SessionService
 
         :param connector: A Connector instance
         :param identity: The identity of the SessionService resource
         :param redfish_version: The version of RedFish. Used to construct
             the object according to schema of given version.
+        :param registries: Dict of Redfish Message Registry objects to be
+            used in any resource that needs registries to parse messages
         """
         try:
             super(SessionService, self).__init__(
-                connector, identity, redfish_version)
+                connector, identity, redfish_version, registries)
+
         except exceptions.AccessError as ae:
             LOG.warning('Received access error "%(ae)s". '
                         'Unable to refresh SessionService.',
@@ -77,7 +81,7 @@ class SessionService(base.ResourceBase):
         """
         return session.SessionCollection(
             self._conn, self._get_sessions_collection_path(),
-            redfish_version=self.redfish_version)
+            self.redfish_version, self.registries)
 
     def close_session(self, session_uri):
         """This function is for closing a session based on its id.

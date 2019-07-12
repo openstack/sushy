@@ -102,7 +102,7 @@ class ProcessorCollectionTestCase(base.TestCase):
         mock_processor.assert_called_once_with(
             self.sys_processor_col._conn,
             '/redfish/v1/Systems/437XR1138R2/Processors/CPU1',
-            redfish_version=self.sys_processor_col.redfish_version)
+            self.sys_processor_col.redfish_version, None)
 
     @mock.patch.object(processor, 'Processor', autospec=True)
     def test_get_members(self, mock_processor):
@@ -110,10 +110,10 @@ class ProcessorCollectionTestCase(base.TestCase):
         calls = [
             mock.call(self.sys_processor_col._conn,
                       '/redfish/v1/Systems/437XR1138R2/Processors/CPU1',
-                      redfish_version=self.sys_processor_col.redfish_version),
+                      self.sys_processor_col.redfish_version, None),
             mock.call(self.sys_processor_col._conn,
                       '/redfish/v1/Systems/437XR1138R2/Processors/CPU2',
-                      redfish_version=self.sys_processor_col.redfish_version)
+                      self.sys_processor_col.redfish_version, None)
         ]
         mock_processor.assert_has_calls(calls)
         self.assertIsInstance(members, list)

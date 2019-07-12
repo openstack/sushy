@@ -58,18 +58,19 @@ class SoftwareInventory(base.ResourceBase):
     version = base.Field('Version')
     """The version of the software"""
 
-    def __init__(self, connector, identity, redfish_version=None):
+    def __init__(self, connector, identity,
+                 redfish_version=None, registries=None):
         """A class representing a SoftwareInventory
 
         :param connector: A Connector instance
         :param identity: The identity of the SoftwareInventory resources
         :param redfish_version: The version of RedFish. Used to construct
             the object according to schema of given version.
+        :param registries: Dict of Redfish Message Registry objects to be
+            used in any resource that needs registries to parse messages
         """
         super(SoftwareInventory, self).__init__(
-            connector,
-            identity,
-            redfish_version)
+            connector, identity, redfish_version, registries)
 
 
 class SoftwareInventoryCollection(base.ResourceCollectionBase):
@@ -84,13 +85,16 @@ class SoftwareInventoryCollection(base.ResourceCollectionBase):
     def _resource_type(self):
         return SoftwareInventory
 
-    def __init__(self, connector, identity, redfish_version=None):
+    def __init__(self, connector, identity,
+                 redfish_version=None, registries=None):
         """A class representing a SoftwareInventoryCollection
 
         :param connector: A Connector instance
         :param identity: The identity of SoftwareInventory resource
         :param redfish_version: The version of RedFish. Used to construct
             the object according to schema of given version.
+        :param registries: Dict of Redfish Message Registry objects to be
+            used in any resource that needs registries to parse messages
         """
         super(SoftwareInventoryCollection, self).__init__(
-            connector, identity, redfish_version)
+            connector, identity, redfish_version, registries)

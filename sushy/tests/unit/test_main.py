@@ -93,86 +93,89 @@ class MainTestCase(base.TestCase):
         self.assertFalse(mock_Sushy_Connector.called)
 
     @mock.patch.object(system, 'SystemCollection', autospec=True)
-    def test_get_system_collection(self, mock_system_collection):
+    @mock.patch('sushy.Sushy.registries', autospec=True)
+    def test_get_system_collection(
+            self, mock_registries, mock_system_collection):
+        self.root._standard_message_registries_path = None
         self.root.get_system_collection()
         mock_system_collection.assert_called_once_with(
             self.root._conn, '/redfish/v1/Systems',
-            redfish_version=self.root.redfish_version)
+            redfish_version=self.root.redfish_version,
+            registries=mock_registries
+        )
 
     @mock.patch.object(system, 'System', autospec=True)
-    @mock.patch('sushy.Sushy._get_message_registries', autospec=True)
+    @mock.patch('sushy.Sushy.registries', autospec=True)
     def test_get_system(self, mock_registries, mock_system):
-        mock_registry = mock.Mock()
-        mock_registries.return_value = [mock_registry]
         self.root._standard_message_registries_path = None
         self.root.get_system('fake-system-id')
         mock_system.assert_called_once_with(
             self.root._conn, 'fake-system-id',
             redfish_version=self.root.redfish_version,
-            registries=[mock_registry])
+            registries=mock_registries)
 
     @mock.patch.object(chassis, 'Chassis', autospec=True)
     def test_get_chassis(self, mock_chassis):
         self.root.get_chassis('fake-chassis-id')
         mock_chassis.assert_called_once_with(
             self.root._conn, 'fake-chassis-id',
-            redfish_version=self.root.redfish_version)
+            self.root.redfish_version, self.root.registries)
 
     @mock.patch.object(chassis, 'ChassisCollection', autospec=True)
     def test_get_chassis_collection(self, chassis_collection_mock):
         self.root.get_chassis_collection()
         chassis_collection_mock.assert_called_once_with(
             self.root._conn, '/redfish/v1/Chassis',
-            redfish_version=self.root.redfish_version)
+            self.root.redfish_version, self.root.registries)
 
     @mock.patch.object(fabric, 'Fabric', autospec=True)
     def test_get_fabric(self, mock_fabric):
         self.root.get_fabric('fake-fabric-id')
         mock_fabric.assert_called_once_with(
             self.root._conn, 'fake-fabric-id',
-            redfish_version=self.root.redfish_version)
+            self.root.redfish_version, self.root.registries)
 
     @mock.patch.object(fabric, 'FabricCollection', autospec=True)
     def test_get_fabric_collection(self, fabric_collection_mock):
         self.root.get_fabric_collection()
         fabric_collection_mock.assert_called_once_with(
             self.root._conn, '/redfish/v1/Fabrics',
-            redfish_version=self.root.redfish_version)
+            self.root.redfish_version, self.root.registries)
 
     @mock.patch.object(manager, 'ManagerCollection', autospec=True)
     def test_get_manager_collection(self, ManagerCollection_mock):
         self.root.get_manager_collection()
         ManagerCollection_mock.assert_called_once_with(
             self.root._conn, '/redfish/v1/Managers',
-            redfish_version=self.root.redfish_version)
+            self.root.redfish_version, self.root.registries)
 
     @mock.patch.object(manager, 'Manager', autospec=True)
     def test_get_manager(self, Manager_mock):
         self.root.get_manager('fake-manager-id')
         Manager_mock.assert_called_once_with(
             self.root._conn, 'fake-manager-id',
-            redfish_version=self.root.redfish_version)
+            self.root.redfish_version, self.root.registries)
 
     @mock.patch.object(sessionservice, 'SessionService', autospec=True)
     def test_get_sessionservice(self, mock_sess_serv):
         self.root.get_session_service()
         mock_sess_serv.assert_called_once_with(
             self.root._conn, '/redfish/v1/SessionService',
-            redfish_version=self.root.redfish_version)
+            self.root.redfish_version)
 
     @mock.patch.object(session, 'Session', autospec=True)
     def test_get_session(self, mock_sess):
         self.root.get_session('asdf')
         mock_sess.assert_called_once_with(
             self.root._conn, 'asdf',
-            redfish_version=self.root.redfish_version)
+            self.root.redfish_version, self.root.registries)
 
     @mock.patch.object(updateservice, 'UpdateService', autospec=True)
     def test_get_update_service(self, mock_upd_serv):
         self.root.get_update_service()
         mock_upd_serv.assert_called_once_with(
             self.root._conn, '/redfish/v1/UpdateService',
-            redfish_version=self.root.redfish_version)
+            self.root.redfish_version, self.root.registries)
 
     @mock.patch.object(message_registry_file,
                        'MessageRegistryFileCollection',
@@ -182,7 +185,7 @@ class MainTestCase(base.TestCase):
         self.root._get_registry_collection()
         MessageRegistryFileCollection_mock.assert_called_once_with(
             self.root._conn, '/redfish/v1/Registries',
-            redfish_version=self.root.redfish_version)
+            self.root.redfish_version)
 
     @mock.patch.object(
         compositionservice, 'CompositionService', autospec=True)
@@ -190,7 +193,7 @@ class MainTestCase(base.TestCase):
         self.root.get_composition_service()
         mock_comp_ser.assert_called_once_with(
             self.root._conn, '/redfish/v1/CompositionService',
-            redfish_version=self.root.redfish_version)
+            self.root.redfish_version, self.root.registries)
 
     def test__get_standard_message_registry_collection(self):
         registries = self.root._get_standard_message_registry_collection()
@@ -216,15 +219,14 @@ class MainTestCase(base.TestCase):
         mock_msg_reg_file.get_message_registry.return_value = mock_msg_reg2
         mock_col.return_value.get_members.return_value = [mock_msg_reg_file]
 
-        registries = self.root._get_message_registries()
+        registries = self.root.registries
         self.assertEqual({'RegistryA.2.0': mock_msg_reg1,
                           'RegistryB.1.0': mock_msg_reg2}, registries)
 
     @mock.patch('sushy.Sushy._get_standard_message_registry_collection',
                 autospec=True)
     @mock.patch('sushy.Sushy._get_registry_collection', autospec=True)
-    def test__get_message_registries_provided_empty(self, mock_col,
-                                                    mock_st_col):
+    def test_registries_provided_empty(self, mock_col, mock_st_col):
         mock_msg_reg1 = mock.Mock()
         mock_msg_reg1.registry_prefix = 'RegistryA'
         mock_msg_reg1.registry_version = '2.0.0'
@@ -232,7 +234,7 @@ class MainTestCase(base.TestCase):
         mock_st_col.return_value = [mock_msg_reg1]
         mock_col.return_value = None
 
-        registries = self.root._get_message_registries()
+        registries = self.root.registries
         self.assertEqual({'RegistryA.2.0': mock_msg_reg1}, registries)
 
 

@@ -167,16 +167,19 @@ class ResourceBaseTestCase(base.TestCase):
 class TestResource(resource_base.ResourceBase):
     """A concrete Test Resource to test against"""
 
-    def __init__(self, connector, identity, redfish_version=None):
+    def __init__(self, connector, identity, redfish_version=None,
+                 registries=None):
         """Ctor of TestResource
 
         :param connector: A Connector instance
         :param identity: The id of the Resource
         :param redfish_version: The version of RedFish. Used to construct
             the object according to schema of the given version.
+        :param registries: Dict of Redfish Message Registry objects to be
+            used in any resource that needs registries to parse messages.
         """
         super(TestResource, self).__init__(connector, 'Fakes/%s' % identity,
-                                           redfish_version)
+                                           redfish_version, registries)
         self.identity = identity
 
     def _parse_attributes(self):
@@ -190,15 +193,17 @@ class TestResourceCollection(resource_base.ResourceCollectionBase):
     def _resource_type(self):
         return TestResource
 
-    def __init__(self, connector, redfish_version=None):
+    def __init__(self, connector, redfish_version=None, registries=None):
         """Ctor of TestResourceCollection
 
         :param connector: A Connector instance
         :param redfish_version: The version of RedFish. Used to construct
             the object according to schema of the given version.
+        :param registries: Dict of Redfish Message Registry objects to be
+            used in any resource that needs registries to parse messages.
         """
-        super(TestResourceCollection, self).__init__(connector, 'Fakes',
-                                                     redfish_version)
+        super(TestResourceCollection, self).__init__(
+            connector, 'Fakes', redfish_version, registries)
 
 
 class ResourceCollectionBaseTestCase(base.TestCase):
@@ -207,7 +212,7 @@ class ResourceCollectionBaseTestCase(base.TestCase):
         super(ResourceCollectionBaseTestCase, self).setUp()
         self.conn = mock.MagicMock()
         self.test_resource_collection = TestResourceCollection(
-            self.conn, redfish_version='1.0.x')
+            self.conn, redfish_version='1.0.x', registries=None)
         self.conn.reset_mock()
 
     def test_get_member(self):

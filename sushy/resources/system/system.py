@@ -144,10 +144,10 @@ class System(base.ResourceBase):
         :param redfish_version: The version of RedFish. Used to construct
             the object according to schema of the given version.
         :param registries: Dict of registries to be used in any resource
-            that needs registries to parse messages
+            that needs registries to parse messages.
         """
-        super(System, self).__init__(connector, identity, redfish_version)
-        self._registries = registries
+        super(System, self).__init__(
+            connector, identity, redfish_version, registries)
 
     def _get_reset_action_element(self):
         reset_action = self._actions.reset
@@ -291,7 +291,8 @@ class System(base.ResourceBase):
         """
         return processor.ProcessorCollection(
             self._conn, self._get_processor_collection_path(),
-            redfish_version=self.redfish_version)
+            redfish_version=self.redfish_version,
+            registries=self.registries)
 
     @property
     @utils.cache_it
@@ -305,7 +306,8 @@ class System(base.ResourceBase):
         return ethernet_interface.EthernetInterfaceCollection(
             self._conn,
             utils.get_sub_resource_path_by(self, "EthernetInterfaces"),
-            redfish_version=self.redfish_version)
+            redfish_version=self.redfish_version,
+            registries=self.registries)
 
     @property
     @utils.cache_it
@@ -320,7 +322,7 @@ class System(base.ResourceBase):
             self._conn,
             utils.get_sub_resource_path_by(self, 'Bios'),
             redfish_version=self.redfish_version,
-            registries=self._registries)
+            registries=self.registries)
 
     @property
     @utils.cache_it
@@ -341,7 +343,8 @@ class System(base.ResourceBase):
         """
         return sys_simple_storage.SimpleStorageCollection(
             self._conn, utils.get_sub_resource_path_by(self, "SimpleStorage"),
-            redfish_version=self.redfish_version)
+            redfish_version=self.redfish_version,
+            registries=self.registries)
 
     @property
     @utils.cache_it
@@ -363,7 +366,8 @@ class System(base.ResourceBase):
         """
         return sys_storage.StorageCollection(
             self._conn, utils.get_sub_resource_path_by(self, "Storage"),
-            redfish_version=self.redfish_version)
+            redfish_version=self.redfish_version,
+            registries=self.registries)
 
     @property
     @utils.cache_it
@@ -380,7 +384,8 @@ class System(base.ResourceBase):
             self, ["Links", "ManagedBy"], is_collection=True)
 
         return [manager.Manager(self._conn, path,
-                                redfish_version=self.redfish_version)
+                                redfish_version=self.redfish_version,
+                                registries=self.registries)
                 for path in paths]
 
     @property
@@ -398,7 +403,8 @@ class System(base.ResourceBase):
             self, ["Links", "Chassis"], is_collection=True)
 
         return [chassis.Chassis(self._conn, path,
-                                redfish_version=self.redfish_version)
+                                redfish_version=self.redfish_version,
+                                registries=self.registries)
                 for path in paths]
 
 
@@ -408,13 +414,15 @@ class SystemCollection(base.ResourceCollectionBase):
     def _resource_type(self):
         return System
 
-    def __init__(self, connector, path, redfish_version=None):
+    def __init__(self, connector, path, redfish_version=None, registries=None):
         """A class representing a ComputerSystemCollection
 
         :param connector: A Connector instance
         :param path: The canonical path to the System collection resource
         :param redfish_version: The version of RedFish. Used to construct
             the object according to schema of the given version.
+        :param registries: Dict of Redfish Message Registry objects to be
+            used in any resource that needs registries to parse messages
         """
-        super(SystemCollection, self).__init__(connector, path,
-                                               redfish_version)
+        super(SystemCollection, self).__init__(
+            connector, path, redfish_version, registries)

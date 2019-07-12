@@ -50,22 +50,26 @@ class Fabric(base.ResourceBase):
                                    res_maps.PROTOCOL_TYPE_VALUE_MAP)
     """The protocol being sent over this fabric"""
 
-    def __init__(self, connector, identity, redfish_version=None):
+    def __init__(self, connector, identity, redfish_version=None,
+                 registries=None):
         """A class representing a Fabric
 
         :param connector: A Connector instance
         :param identity: The identity of the Fabric resource
         :param redfish_version: The version of RedFish. Used to construct
             the object according to schema of the given version.
+        :param registries: Dict of Redfish Message Registry objects to be
+            used in any resource that needs registries to parse messages
         """
-        super(Fabric, self).__init__(connector, identity, redfish_version)
+        super(Fabric, self).__init__(
+            connector, identity, redfish_version, registries)
 
     @property
     @utils.cache_it
     def endpoints(self):
         return fab_endpoint.EndpointCollection(
             self._conn, utils.get_sub_resource_path_by(self, 'Endpoints'),
-            redfish_version=self.redfish_version)
+            self.redfish_version, self.registries)
 
 
 class FabricCollection(base.ResourceCollectionBase):
@@ -74,13 +78,15 @@ class FabricCollection(base.ResourceCollectionBase):
     def _resource_type(self):
         return Fabric
 
-    def __init__(self, connector, path, redfish_version=None):
+    def __init__(self, connector, path, redfish_version=None, registries=None):
         """A class representing a FabricCollection
 
         :param connector: A Connector instance
         :param path: The canonical path to the Fabric collection resource
         :param redfish_version: The version of RedFish. Used to construct
             the object according to schema of the given version.
+        :param registries: Dict of Redfish Message Registry objects to be
+            used in any resource that needs registries to parse messages
         """
-        super(FabricCollection, self).__init__(connector, path,
-                                               redfish_version)
+        super(FabricCollection, self).__init__(
+            connector, path, redfish_version, registries)

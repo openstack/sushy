@@ -31,9 +31,7 @@ class ActionsField(base.CompositeField):
 
 class Bios(base.ResourceBase):
 
-    def __init__(self, connector, path, registries, *args, **kwargs):
-        super(Bios, self).__init__(connector, path, *args, **kwargs)
-        self._registries = registries
+    def __init__(self, connector, path, redfish_version=None, registries=None):
         """A class representing a Bios
 
         :param connector: A Connector instance
@@ -41,6 +39,8 @@ class Bios(base.ResourceBase):
         :param registries: Dict of message registries to be used when
             parsing messages of attribute update status
         """
+        super(Bios, self).__init__(
+            connector, path, redfish_version, registries)
 
     identity = base.Field('Id', required=True)
     """The Bios resource identity string"""
