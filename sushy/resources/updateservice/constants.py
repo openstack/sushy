@@ -11,16 +11,18 @@
 # under the License.
 
 # Values come from the Redfish UpdateService json-schema.
-# https://redfish.dmtf.org/schemas/UpdateService.v1_2_2.json
+# https://redfish.dmtf.org/schemas/UpdateService.v1_2_2.json#/definitions/TransferProtocolType
+
+from sushy.resources import constants as res_cons
 
 # Transfer Protocol Type constants
 
-TRANSFER_PROTOCOL_TYPE_CIFS = 'CIFS'
-TRANSFER_PROTOCOL_TYPE_FTP = 'FTP'
-TRANSFER_PROTOCOL_TYPE_SFTP = 'SFTP'
-TRANSFER_PROTOCOL_TYPE_HTTP = 'HTTP'
-TRANSFER_PROTOCOL_TYPE_HTTPS = 'HTTPS'
-TRANSFER_PROTOCOL_TYPE_SCP = 'SCP'
-TRANSFER_PROTOCOL_TYPE_TFTP = 'TFTP'
-TRANSFER_PROTOCOL_TYPE_OEM = 'OEM'
-TRANSFER_PROTOCOL_TYPE_NFS = 'NFS'
+UPDATE_PROTOCOL_CIFS = res_cons.PROTOCOL_TYPE_CIFS
+UPDATE_PROTOCOL_FTP = res_cons.PROTOCOL_TYPE_FTP
+UPDATE_PROTOCOL_SFTP = res_cons.PROTOCOL_TYPE_SFTP
+UPDATE_PROTOCOL_HTTP = res_cons.PROTOCOL_TYPE_HTTP
+UPDATE_PROTOCOL_HTTPS = res_cons.PROTOCOL_TYPE_HTTPS
+UPDATE_PROTOCOL_SCP = res_cons.PROTOCOL_TYPE_SCP
+UPDATE_PROTOCOL_TFTP = res_cons.PROTOCOL_TYPE_TFTP
+UPDATE_PROTOCOL_OEM = res_cons.PROTOCOL_TYPE_OEM
+UPDATE_PROTOCOL_NFS = res_cons.PROTOCOL_TYPE_NFS

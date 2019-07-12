@@ -1,0 +1,9 @@
+---
+fixes:
+  - |
+    The ``transfer_protocol`` parameter of the ``UpdateService.simple_update``
+    method should be given one of the newly exposed constants rather than a
+    string literal. This is a breaking change.
+features:
+  - |
+    Exposes ``UpdateService`` constants to ``sushy`` namespace.

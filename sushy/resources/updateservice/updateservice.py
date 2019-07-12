@@ -19,6 +19,7 @@ import logging
 from sushy import exceptions
 from sushy.resources import base
 from sushy.resources import common
+from sushy.resources.updateservice import constants as up_cons
 from sushy.resources.updateservice import mappings as up_maps
 from sushy.resources.updateservice import softwareinventory
 from sushy import utils
@@ -96,7 +97,17 @@ class UpdateService(base.ResourceBase):
                 resource=self._path)
         return simple_update_action
 
-    def get_allowed_transfer_protocol_values(self):
+    def _get_legacy_transfer_protocols(self):
+        """Get the backward-compatible values for transfer protocol.
+
+        :returns: A set of allowed values.
+        """
+        LOG.warning(
+            'Could not figure out the allowed values for the simple '
+            'update action for UpdateService %s', self.identity)
+        return set(up_maps.TRANSFER_PROTOCOL_TYPE_VALUE_MAP)
+
+    def get_allowed_transfer_protocols(self):
         """Get the allowed values for transfer protocol.
 
         :returns: A set of allowed values.
@@ -111,19 +122,29 @@ class UpdateService(base.ResourceBase):
                 'update action for UpdateService %s', self.identity)
             return set(up_maps.TRANSFER_PROTOCOL_TYPE_VALUE_MAP_REV)
 
-        return set(up_maps.TRANSFER_PROTOCOL_TYPE_VALUE_MAP[v] for v in
-                   simple_update_action.transfer_protocol if v in
-                   up_maps.TRANSFER_PROTOCOL_TYPE_VALUE_MAP)
+        return set(simple_update_action.transfer_protocol)
 
-    def simple_update(self, image_uri, targets, transfer_protocol='HTTP'):
+    def simple_update(self, image_uri, targets,
+                      transfer_protocol=up_cons.UPDATE_PROTOCOL_HTTP):
         """Simple Update is used to update software components"""
-        transfer_protocol = transfer_protocol
+        valid_transfer_protocols = self.get_allowed_transfer_protocols()
 
-        valid_transfer_protocols = self.get_allowed_transfer_protocol_values()
-        if transfer_protocol not in valid_transfer_protocols:
-            raise exceptions.InvalidParameterValueError(
-                parameter='transfer_protocol', value=transfer_protocol,
-                valid_values=valid_transfer_protocols)
+        if transfer_protocol in valid_transfer_protocols:
+            transfer_protocol = up_maps.TRANSFER_PROTOCOL_TYPE_VALUE_MAP_REV[
+                transfer_protocol]
+
+        else:
+            legacy_transfer_protocols = self._get_legacy_transfer_protocols()
+
+            if transfer_protocol not in legacy_transfer_protocols:
+                raise exceptions.InvalidParameterValueError(
+                    parameter='transfer_protocol', value=transfer_protocol,
+                    valid_values=valid_transfer_protocols)
+
+            LOG.warning(
+                'Legacy transfer protocol constant %s is being used. '
+                'Consider migrating to any of: %s',
+                ', '.join(up_maps.TRANSFER_PROTOCOL_TYPE_VALUE_MAP_REV))
 
         self._conn.post(data={
             'ImageURI': image_uri,
