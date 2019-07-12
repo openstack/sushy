@@ -57,12 +57,13 @@ class UpdateServiceTestCase(base.TestCase):
     def test_simple_update(self):
         self.upd_serv.simple_update(
             image_uri='local.server/update.exe',
-            targets='/redfish/v1/UpdateService/Actions/SimpleUpdate',
+            targets=['/redfish/v1/UpdateService/FirmwareInventory/BMC'],
             transfer_protocol=ups_cons.UPDATE_PROTOCOL_HTTPS)
         self.upd_serv._conn.post.assert_called_once_with(
+            '/redfish/v1/UpdateService/Actions/SimpleUpdate',
             data={
                 'ImageURI': 'local.server/update.exe',
-                'Targets': '/redfish/v1/UpdateService/Actions/SimpleUpdate',
+                'Targets': ['/redfish/v1/UpdateService/FirmwareInventory/BMC'],
                 'TransferProtocol': 'HTTPS'})
 
     def test_simple_update_backward_compatible_protocol(self):
@@ -71,6 +72,7 @@ class UpdateServiceTestCase(base.TestCase):
             targets='/redfish/v1/UpdateService/Actions/SimpleUpdate',
             transfer_protocol='HTTPS')
         self.upd_serv._conn.post.assert_called_once_with(
+            '/redfish/v1/UpdateService/Actions/SimpleUpdate',
             data={
                 'ImageURI': 'local.server/update.exe',
                 'Targets': '/redfish/v1/UpdateService/Actions/SimpleUpdate',

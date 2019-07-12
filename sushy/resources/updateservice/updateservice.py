@@ -27,25 +27,9 @@ from sushy import utils
 LOG = logging.getLogger(__name__)
 
 
-class SimpleUpdateActionField(common.ActionField):
-
-    image_uri = base.Field('ImageURI')
-    """The URI of the software image to be installed"""
-
-    targets = base.Field('Targets')
-    """The array of URIs indicating where the update image is to be""" + \
-        """applied"""
-
-    transfer_protocol = base.MappedField(
-        'TransferProtocol',
-        up_maps.TRANSFER_PROTOCOL_TYPE_VALUE_MAP)
-    """The network protocol used by the Update Service"""
-
-
 class ActionsField(base.CompositeField):
 
-    simple_update = SimpleUpdateActionField(
-        '#UpdateService.SimpleUpdate')
+    simple_update = common.ActionField('#UpdateService.SimpleUpdate')
 
 
 class UpdateService(base.ResourceBase):
@@ -116,13 +100,13 @@ class UpdateService(base.ResourceBase):
         """
         simple_update_action = self._get_simple_update_element()
 
-        if not simple_update_action.transfer_protocol:
-            LOG.warning(
-                'Could not figure out the allowed values for the simple '
-                'update action for UpdateService %s', self.identity)
+        if not getattr(simple_update_action, 'transfer_protocol', None):
+            LOG.debug(
+                'Server does not constrain allowed transfer protocols for '
+                'simple update action of UpdateService %s', self.identity)
             return set(up_maps.TRANSFER_PROTOCOL_TYPE_VALUE_MAP_REV)
 
-        return set(simple_update_action.transfer_protocol)
+        return {simple_update_action.transfer_protocol}
 
     def simple_update(self, image_uri, targets,
                       transfer_protocol=up_cons.UPDATE_PROTOCOL_HTTP):
@@ -143,10 +127,16 @@ class UpdateService(base.ResourceBase):
 
             LOG.warning(
                 'Legacy transfer protocol constant %s is being used. '
-                'Consider migrating to any of: %s',
+                'Consider migrating to any of: %s', transfer_protocol,
                 ', '.join(up_maps.TRANSFER_PROTOCOL_TYPE_VALUE_MAP_REV))
 
-        self._conn.post(data={
+        target_uri = self._get_simple_update_element().target_uri
+
+        LOG.debug(
+            'Updating software component %s via '
+            '%s ...', image_uri, target_uri)
+
+        self._conn.post(target_uri, data={
             'ImageURI': image_uri,
             'Targets': targets,
             'TransferProtocol': transfer_protocol})
