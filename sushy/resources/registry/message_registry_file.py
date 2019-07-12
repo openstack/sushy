@@ -82,28 +82,37 @@ class MessageRegistryFile(base.ResourceBase):
             from the Internet
         """
 
-        location = next((l for l in self.location if l.language == language),
-                        [d for d in self.location if d.language == 'default']
-                        [0])
+        # NOTE (etingof): as per RFC5646, languages are case-insensitive
+        language = language.lower()
 
-        if location.uri:
-            return message_registry.MessageRegistry(
-                self._conn, path=location.uri,
-                redfish_version=self.redfish_version)
-        elif location.archive_uri:
-            return message_registry.MessageRegistry(
-                self._conn, path=location.archive_uri,
-                redfish_version=self.redfish_version,
-                reader=base.JsonArchiveReader(location.archive_file))
-        elif location.publication_uri:
-            return message_registry.MessageRegistry(
-                public_connector,
-                path=location.publication_uri,
-                redfish_version=self.redfish_version,
-                reader=base.JsonPublicFileReader())
-        else:
-            LOG.warning('No location defined for language %(language)s',
-                        {'language': language})
+        locations = [
+            l for l in self.location if l.language.lower() == language]
+
+        locations += [
+            l for l in self.location if l.language.lower() == 'default']
+
+        for location in locations:
+            if location.uri:
+                return message_registry.MessageRegistry(
+                    self._conn, path=location.uri,
+                    redfish_version=self.redfish_version)
+            elif location.archive_uri:
+                return message_registry.MessageRegistry(
+                    self._conn, path=location.archive_uri,
+                    redfish_version=self.redfish_version,
+                    reader=base.JsonArchiveReader(location.archive_file))
+            elif location.publication_uri:
+                return message_registry.MessageRegistry(
+                    public_connector,
+                    path=location.publication_uri,
+                    redfish_version=self.redfish_version,
+                    reader=base.JsonPublicFileReader())
+            else:
+                LOG.warning('Incomplete location for language %(language)s',
+                            {'language': language})
+
+        LOG.warning('No message registry found for %(language)s or '
+                    'default', {'language': language})
 
 
 class MessageRegistryFileCollection(base.ResourceCollectionBase):
