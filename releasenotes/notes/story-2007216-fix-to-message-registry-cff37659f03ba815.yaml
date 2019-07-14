@@ -1,0 +1,8 @@
+---
+fixes:
+  - |
+    Handles incomplete messages in MessageRegistry that are not having fields
+    like 'Description' and 'Severity'. See story
+    `2007216 <https://storyboard.openstack.org/#!/story/2007216>`_ for more
+    information.
+

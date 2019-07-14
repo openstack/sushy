@@ -35,6 +35,15 @@
                 "number"
             ],
             "Resolution": "Try again"
+        },
+        "MissingThings": {
+            "Message": "Property's %1 value cannot be less than %2.",
+            "NumberOfArgs": 2,
+            "ParamTypes": [
+                "string",
+                "number"
+            ],
+            "Resolution": "Try Later"
         }
     }
 }
