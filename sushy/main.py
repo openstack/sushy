@@ -30,6 +30,7 @@ from sushy.resources.sessionservice import session
 from sushy.resources.sessionservice import sessionservice
 from sushy.resources.system import system
 from sushy.resources.updateservice import updateservice
+from sushy import utils
 
 LOG = logging.getLogger(__name__)
 
@@ -350,6 +351,7 @@ class Sushy(base.ResourceBase):
         return message_registries
 
     @property
+    @utils.cache_it
     def registries(self):
         """Gets and combines all message registries together
 
@@ -360,22 +362,18 @@ class Sushy(base.ResourceBase):
             Registry_name.Major_version.Minor_version and value is registry
             itself.
         """
-        if self._registries is None:
+        standard = self._get_standard_message_registry_collection()
 
-            standard = self._get_standard_message_registry_collection()
+        registries = {r.registry_prefix + '.' +
+                      r.registry_version.rsplit('.', 1)[0]: r
+                      for r in standard if r.language == self._language}
 
-            registries = {r.registry_prefix + '.' +
-                          r.registry_version.rsplit('.', 1)[0]: r
-                          for r in standard if r.language == self._language}
+        registry_col = self._get_registry_collection()
 
-            registry_col = self._get_registry_collection()
+        if registry_col:
+            provided = registry_col.get_members()
+            registries.update({r.registry: r.get_message_registry(
+                               self._language,
+                               self._public_connector) for r in provided})
 
-            if registry_col:
-                provided = registry_col.get_members()
-                registries.update({r.registry: r.get_message_registry(
-                                   self._language,
-                                   self._public_connector) for r in provided})
-
-            self._registries = registries
-
-        return self._registries
+        return registries
