@@ -1,0 +1,5 @@
+---
+features:
+  - |
+    Adds a new field called ``MappedListField`` which supports a list of
+    mapped instances.

@@ -289,7 +289,7 @@ class ResourceCollectionBaseTestCase(base.TestCase):
 TEST_JSON = {
     'String': 'a string',
     'Integer': '42',
-    'List': ['a string', 42],
+    'MappedList': ['raw1', 'raw2', 'raw'],
     'Nested': {
         'String': 'another string',
         'Integer': 0,
@@ -316,7 +316,9 @@ TEST_JSON = {
 
 
 MAPPING = {
-    'raw': 'real'
+    'raw': 'real',
+    'raw1': 'real1',
+    'raw2': 'real2'
 }
 
 
@@ -342,6 +344,7 @@ class ComplexResource(resource_base.ResourceBase):
     string = resource_base.Field('String', required=True)
     integer = resource_base.Field('Integer', adapter=int)
     nested = NestedTestField('Nested')
+    mapped_list = resource_base.MappedListField('MappedList', MAPPING)
     field_list = TestListField('ListField')
     dictionary = TestDictionaryField('Dictionary')
     non_existing_nested = NestedTestField('NonExistingNested')
@@ -366,6 +369,8 @@ class FieldTestCase(base.TestCase):
         self.assertEqual('field value', self.test_resource.nested.nested_field)
         self.assertEqual('real', self.test_resource.nested.mapped)
         self.assertEqual(3.14, self.test_resource.nested.non_existing)
+        self.assertEqual(['real1', 'real2', 'real'],
+                         self.test_resource.mapped_list)
         self.assertEqual('a third string',
                          self.test_resource.field_list[0].string)
         self.assertEqual(2, self.test_resource.field_list[1].integer)
