@@ -16,6 +16,7 @@ import json
 import mock
 
 from dateutil import parser
+from six.moves import http_client
 
 from sushy import exceptions
 from sushy.resources.registry import message_registry
@@ -156,6 +157,30 @@ class BiosTestCase(base.TestCase):
         self.sys_bios.reset_bios()
         self.sys_bios._conn.post.assert_called_once_with(
             '/redfish/v1/Systems/437XR1138R2/BIOS/Actions/Bios.ResetBios')
+
+    def test_reset_bios_handle_http_error_415(self):
+
+        target_uri = (
+            '/redfish/v1/Systems/437XR1138R2/BIOS/Actions/Bios.ResetBios')
+        self.conn.post.side_effect = [exceptions.HTTPError(
+            method='POST', url=target_uri, response=mock.MagicMock(
+                status_code=http_client.UNSUPPORTED_MEDIA_TYPE)), '200']
+        post_calls = [
+            mock.call(target_uri), mock.call(target_uri, data={})]
+        self.sys_bios.reset_bios()
+        self.sys_bios._conn.post.assert_has_calls(post_calls)
+
+    def test_reset_bios_handle_http_error_405(self):
+
+        target_uri = (
+            '/redfish/v1/Systems/437XR1138R2/BIOS/Actions/Bios.ResetBios')
+        self.conn.post.side_effect = exceptions.HTTPError(
+            method='POST', url=target_uri, response=mock.MagicMock(
+                status_code=http_client.METHOD_NOT_ALLOWED))
+        self.assertRaises(
+            exceptions.HTTPError,
+            self.sys_bios.reset_bios)
+        self.sys_bios._conn.post.assert_called_once_with(target_uri)
 
     def test__get_change_password_element(self):
         value = self.sys_bios._get_change_password_element()

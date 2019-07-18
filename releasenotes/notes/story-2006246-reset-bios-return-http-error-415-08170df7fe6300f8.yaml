@@ -1,0 +1,6 @@
+---
+fixes:
+  - |
+    Fixes an issue in performing action ``#Bios.ResetBios`` when BMC expects
+    the POST request with empty body instead of no body. See `story 2006246
+    <https://storyboard.openstack.org/#!/story/2006246>`__ for details.

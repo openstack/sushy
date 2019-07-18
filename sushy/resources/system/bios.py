@@ -14,6 +14,7 @@
 # https://redfish.dmtf.org/schemas/Bios.v1_0_3.json
 
 import logging
+from six.moves import http_client
 
 from sushy import exceptions
 from sushy.resources import base
@@ -152,7 +153,15 @@ class Bios(base.ResourceBase):
         target_uri = self._get_reset_bios_action_element().target_uri
 
         LOG.debug('Resetting BIOS attributes %s ...', self.identity)
-        self._conn.post(target_uri)
+        try:
+            self._conn.post(target_uri)
+        except exceptions.HTTPError as resp:
+            # Send empty payload, if BMC expects body
+            if resp.status_code == http_client.UNSUPPORTED_MEDIA_TYPE:
+                self._conn.post(target_uri, data={})
+            else:
+                raise
+
         LOG.info('BIOS attributes %s is being reset', self.identity)
 
     def change_password(self, new_password, old_password, password_name):
