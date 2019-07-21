@@ -108,7 +108,7 @@ class UpdateService(base.ResourceBase):
 
         return {simple_update_action.transfer_protocol}
 
-    def simple_update(self, image_uri, targets,
+    def simple_update(self, image_uri, targets=None,
                       transfer_protocol=up_cons.UPDATE_PROTOCOL_HTTP):
         """Simple Update is used to update software components"""
         valid_transfer_protocols = self.get_allowed_transfer_protocols()
@@ -136,10 +136,10 @@ class UpdateService(base.ResourceBase):
             'Updating software component %s via '
             '%s ...', image_uri, target_uri)
 
-        self._conn.post(target_uri, data={
-            'ImageURI': image_uri,
-            'Targets': targets,
-            'TransferProtocol': transfer_protocol})
+        data = {'ImageURI': image_uri, 'TransferProtocol': transfer_protocol}
+        if targets:
+            data['Targets'] = targets
+        self._conn.post(target_uri, data=data)
 
     def _get_software_inventory_collection_path(self):
         """Helper function to find the SoftwareInventoryCollections path"""
