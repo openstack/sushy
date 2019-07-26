@@ -65,7 +65,7 @@ class ResourceZoneCollectionTestCase(base.TestCase):
 
         self.res_zone_col = resourcezone.ResourceZoneCollection(
             self.conn, '/redfish/v1/CompositionService/ResourceZones',
-            redfish_version='1.0.2')
+            '1.0.2', None)
 
     def test__parse_attributes(self):
         path = '/redfish/v1/CompositionService/ResourceZones/1'
@@ -80,7 +80,7 @@ class ResourceZoneCollectionTestCase(base.TestCase):
         self.res_zone_col.get_member(path)
         mock_resourcezone.assert_called_once_with(
             self.res_zone_col._conn, path,
-            redfish_version=self.res_zone_col.redfish_version)
+            self.res_zone_col.redfish_version, None)
 
     @mock.patch.object(resourcezone, 'ResourceZone', autospec=True)
     def test_get_members(self, mock_resourcezone):
@@ -88,6 +88,6 @@ class ResourceZoneCollectionTestCase(base.TestCase):
         members = self.res_zone_col.get_members()
         mock_resourcezone.assert_called_once_with(
             self.res_zone_col._conn, path,
-            redfish_version=self.res_zone_col.redfish_version)
+            self.res_zone_col.redfish_version, None)
         self.assertIsInstance(members, list)
         self.assertEqual(1, len(members))

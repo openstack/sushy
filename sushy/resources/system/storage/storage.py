@@ -81,7 +81,8 @@ class Storage(base.ResourceBase):
         :raises: ResourceNotFoundError
         """
         return drive.Drive(self._conn, drive_identity,
-                           redfish_version=self.redfish_version)
+                           redfish_version=self.redfish_version,
+                           registries=self.registries)
 
     @property
     @utils.cache_it

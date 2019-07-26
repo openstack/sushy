@@ -74,18 +74,19 @@ class ResourceBlock(base.ResourceBase):
     status = common.StatusField('Status')
     """The status of resource block"""
 
-    def __init__(self, connector, identity, redfish_version=None):
+    def __init__(self, connector, identity, redfish_version=None,
+                 registries=None):
         """A class representing a ResourceBlock
 
         :param connector: A Connector instance
         :param identity: The identity of the ResourceBlock resource
         :param redfish_version: The version of RedFish. Used to construct
             the object according to schema of given version.
+        :param registries: Dict of Redfish Message Registry objects to be
+            used in any resource that needs registries to parse messages
         """
         super(ResourceBlock, self).__init__(
-            connector,
-            identity,
-            redfish_version)
+            connector, identity, redfish_version, registries)
 
 
 class ResourceBlockCollection(base.ResourceCollectionBase):
@@ -100,13 +101,16 @@ class ResourceBlockCollection(base.ResourceCollectionBase):
     def _resource_type(self):
         return ResourceBlock
 
-    def __init__(self, connector, identity, redfish_version=None):
+    def __init__(self, connector, identity, redfish_version=None,
+                 registries=None):
         """A class representing a ResourceBlockCollection
 
         :param connector: A Connector instance
         :param identity: A identity of the ResourceBlock resource
         :param redfish_version: The version of RedFish. Used to construct
             the object according to schema of given version.
+        :param registries: Dict of Redfish Message Registry objects to be
+            used in any resource that needs registries to parse messages
         """
         super(ResourceBlockCollection, self).__init__(
-            connector, identity, redfish_version)
+            connector, identity, redfish_version, registries)

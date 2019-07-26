@@ -176,22 +176,22 @@ class ChassisCollectionTestCase(base.TestCase):
         self.chassis.get_member('/redfish/v1/Chassis/MultiBladeEncl')
         chassis_mock.assert_called_once_with(
             self.chassis._conn, '/redfish/v1/Chassis/MultiBladeEncl',
-            redfish_version=self.chassis.redfish_version)
+            self.chassis.redfish_version, None)
 
     @mock.patch.object(chassis, 'Chassis', autospec=True)
     def test_get_members(self, chassis_mock):
         members = self.chassis.get_members()
         calls = [
             mock.call(self.chassis._conn, '/redfish/v1/Chassis/MultiBladeEncl',
-                      redfish_version=self.chassis.redfish_version),
+                      self.chassis.redfish_version, None),
             mock.call(self.chassis._conn, '/redfish/v1/Chassis/Blade1',
-                      redfish_version=self.chassis.redfish_version),
+                      self.chassis.redfish_version, None),
             mock.call(self.chassis._conn, '/redfish/v1/Chassis/Blade2',
-                      redfish_version=self.chassis.redfish_version),
+                      self.chassis.redfish_version, None),
             mock.call(self.chassis._conn, '/redfish/v1/Chassis/Blade3',
-                      redfish_version=self.chassis.redfish_version),
+                      self.chassis.redfish_version, None),
             mock.call(self.chassis._conn, '/redfish/v1/Chassis/Blade4',
-                      redfish_version=self.chassis.redfish_version)
+                      self.chassis.redfish_version, None)
         ]
         chassis_mock.assert_has_calls(calls)
         self.assertIsInstance(members, list)

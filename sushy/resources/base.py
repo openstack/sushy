@@ -349,6 +349,7 @@ class ResourceBase(object):
                  connector,
                  path='',
                  redfish_version=None,
+                 registries=None,
                  reader=None):
         """A class representing the base of any Redfish resource
 
@@ -358,12 +359,15 @@ class ResourceBase(object):
         :param path: sub-URI path to the resource.
         :param redfish_version: The version of Redfish. Used to construct
             the object according to schema of the given version.
+        :param registries: Dict of Redfish Message Registry objects to be
+            used in any resource that needs registries to parse messages
         :param reader: Reader to use to fetch JSON data.
         """
         self._conn = connector
         self._path = path
         self._json = None
         self.redfish_version = redfish_version
+        self._registries = registries
         # Note(deray): Indicates if the resource holds stale data or not.
         # Starting off with True and eventually gets set to False when
         # attribute values are fetched.
@@ -477,6 +481,10 @@ class ResourceBase(object):
         return oem.get_resource_extension_by_vendor(
             self.resource_name, vendor, self)
 
+    @property
+    def registries(self):
+        return self._registries
+
 
 @six.add_metaclass(abc.ABCMeta)
 class ResourceCollectionBase(ResourceBase):
@@ -488,7 +496,7 @@ class ResourceCollectionBase(ResourceBase):
                                adapter=utils.get_members_identities)
     """A tuple with the members identities"""
 
-    def __init__(self, connector, path, redfish_version=None):
+    def __init__(self, connector, path, redfish_version=None, registries=None):
         """A class representing the base of any Redfish resource collection
 
         It gets inherited from ``ResourceBase`` and invokes the base class
@@ -497,9 +505,11 @@ class ResourceCollectionBase(ResourceBase):
         :param path: sub-URI path to the resource collection.
         :param redfish_version: The version of Redfish. Used to construct
             the object according to schema of the given version.
+        :param registries: Dict of Redfish Message Registry objects to be
+            used in any resource that needs registries to parse messages.
         """
-        super(ResourceCollectionBase, self).__init__(connector, path,
-                                                     redfish_version)
+        super(ResourceCollectionBase, self).__init__(
+            connector, path, redfish_version, registries)
         LOG.debug('Received %(count)d member(s) for %(type)s %(path)s',
                   {'count': len(self.members_identities),
                    'type': self.__class__.__name__, 'path': self._path})
@@ -520,8 +530,8 @@ class ResourceCollectionBase(ResourceBase):
         :returns: The ``_resource_type`` object
         :raises: ResourceNotFoundError
         """
-        return self._resource_type(self._conn, identity,
-                                   redfish_version=self.redfish_version)
+        return self._resource_type(
+            self._conn, identity, self.redfish_version, self.registries)
 
     @utils.cache_it
     def get_members(self):

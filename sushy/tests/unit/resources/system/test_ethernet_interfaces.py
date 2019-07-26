@@ -77,7 +77,7 @@ class EthernetInterfaceCollectionTestCase(base.TestCase):
             self.sys_eth_col._conn,
             ('/redfish/v1/Systems/437XR1138R2/EthernetInterfaces/'
              '12446A3B0411'),
-            redfish_version=self.sys_eth_col.redfish_version)
+            self.sys_eth_col.redfish_version, None)
 
     @mock.patch.object(ethernet_interface, 'EthernetInterface', autospec=True)
     def test_get_members(self, mock_eth):
@@ -86,7 +86,7 @@ class EthernetInterfaceCollectionTestCase(base.TestCase):
                     "12446A3B0411")
         calls = [
             mock.call(self.sys_eth_col._conn, eth_path,
-                      redfish_version=self.sys_eth_col.redfish_version),
+                      self.sys_eth_col.redfish_version, None),
         ]
         mock_eth.assert_has_calls(calls)
         self.assertIsInstance(members, list)

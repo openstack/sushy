@@ -87,4 +87,4 @@ class SoftwareInventoryCollectionTestCase(base.TestCase):
         self.soft_inv_col.get_member(path)
         mock_softwareinventory.assert_called_once_with(
             self.soft_inv_col._conn, path,
-            redfish_version=self.soft_inv_col.redfish_version)
+            self.soft_inv_col.redfish_version, None)

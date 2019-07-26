@@ -84,15 +84,19 @@ class Manager(base.ResourceBase):
 
     _actions = ActionsField('Actions')
 
-    def __init__(self, connector, identity, redfish_version=None):
+    def __init__(self, connector, identity, redfish_version=None,
+                 registries=None):
         """A class representing a Manager
 
         :param connector: A Connector instance
         :param identity: The identity of the Manager resource
         :param redfish_version: The version of RedFish. Used to construct
             the object according to schema of the given version.
+        :param registries: Dict of Redfish Message Registry objects to be
+            used in any resource that needs registries to parse messages
         """
-        super(Manager, self).__init__(connector, identity, redfish_version)
+        super(Manager, self).__init__(
+            connector, identity, redfish_version, registries)
 
     def get_supported_graphical_console_types(self):
         """Get the supported values for Graphical Console connection types.
@@ -193,7 +197,7 @@ class Manager(base.ResourceBase):
     def virtual_media(self):
         return virtual_media.VirtualMediaCollection(
             self._conn, utils.get_sub_resource_path_by(self, 'VirtualMedia'),
-            redfish_version=self.redfish_version)
+            self.redfish_version, self.registries)
 
     @property
     @utils.cache_it
@@ -211,7 +215,7 @@ class Manager(base.ResourceBase):
 
         from sushy.resources.system import system
         return [system.System(self._conn, path,
-                              redfish_version=self.redfish_version)
+                              self.redfish_version, self.registries)
                 for path in paths]
 
     @property
@@ -230,7 +234,7 @@ class Manager(base.ResourceBase):
 
         from sushy.resources.chassis import chassis
         return [chassis.Chassis(self._conn, path,
-                                redfish_version=self.redfish_version)
+                                self.redfish_version, self.registries)
                 for path in paths]
 
 
@@ -240,13 +244,15 @@ class ManagerCollection(base.ResourceCollectionBase):
     def _resource_type(self):
         return Manager
 
-    def __init__(self, connector, path, redfish_version=None):
+    def __init__(self, connector, path, redfish_version=None, registries=None):
         """A class representing a ManagerCollection
 
         :param connector: A Connector instance
         :param path: The canonical path to the Manager collection resource
         :param redfish_version: The version of RedFish. Used to construct
             the object according to schema of the given version.
+        :param registries: Dict of Redfish Message Registry objects to be
+            used in any resource that needs registries to parse messages
         """
-        super(ManagerCollection, self).__init__(connector, path,
-                                                redfish_version)
+        super(ManagerCollection, self).__init__(
+            connector, path, redfish_version, registries)

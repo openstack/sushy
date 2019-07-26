@@ -50,18 +50,19 @@ class CompositionService(base.ResourceBase):
     service_enabled = base.Field('ServiceEnabled')
     """The status of composition service is enabled"""
 
-    def __init__(self, connector, identity, redfish_version=None):
+    def __init__(self, connector, identity, redfish_version=None,
+                 registries=None):
         """A class representing a CompositionService
 
         :param connector: A connector instance
         :param identity: The identity of the CompositionService resource
         :param redfish_version: The version of RedFish. Used to construct
             the object according to schema of given version
+        :param registries: Dict of Redfish Message Registry objects to be
+            used in any resource that needs registries to parse messages
         """
         super(CompositionService, self).__init__(
-            connector,
-            identity,
-            redfish_version)
+            connector, identity, redfish_version, registries)
 
     def _get_resource_blocks_collection_path(self):
         """Helper function to find the ResourceBlockCollections path"""
@@ -85,7 +86,7 @@ class CompositionService(base.ResourceBase):
         """Property to reference `ResourceBlockCollection` instance"""
         return resourceblock.ResourceBlockCollection(
             self.conn, self._get_resource_blocks_collection_path,
-            redfish_version=self.redfish_version)
+            self.redfish_version, self.registries)
 
     @property
     @utils.cache_it
@@ -93,4 +94,4 @@ class CompositionService(base.ResourceBase):
         """Property to reference `ResourceZoneCollection` instance"""
         return resourcezone.ResourceZoneCollection(
             self.conn, self._get_resource_zones_collection_path,
-            redfish_version=self.redfish_version)
+            self.redfish_version, self.registries)

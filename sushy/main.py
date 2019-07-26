@@ -138,12 +138,12 @@ class Sushy(base.ResourceBase):
         super(Sushy, self).__init__(
             connector or sushy_connector.Connector(base_url, verify=verify),
             path=self._root_prefix)
+        self._public_connector = public_connector or requests
+        self._language = language
         self._base_url = base_url
         self._auth = auth
         self._auth.set_context(self, self._conn)
         self._auth.authenticate()
-        self._public_connector = public_connector or requests
-        self._language = language
 
     def __del__(self):
         if self._auth:
@@ -170,8 +170,10 @@ class Sushy(base.ResourceBase):
             raise exceptions.MissingAttributeError(
                 attribute='Systems/@odata.id', resource=self._path)
 
-        return system.SystemCollection(self._conn, self._systems_path,
-                                       redfish_version=self.redfish_version)
+        return system.SystemCollection(
+            self._conn, self._systems_path,
+            redfish_version=self.redfish_version,
+            registries=self.registries)
 
     def get_system(self, identity):
         """Given the identity return a System object
@@ -181,7 +183,7 @@ class Sushy(base.ResourceBase):
         """
         return system.System(self._conn, identity,
                              redfish_version=self.redfish_version,
-                             registries=self._get_message_registries())
+                             registries=self.registries)
 
     def get_chassis_collection(self):
         """Get the ChassisCollection object
@@ -195,7 +197,8 @@ class Sushy(base.ResourceBase):
                 attribute='Chassis/@odata.id', resource=self._path)
 
         return chassis.ChassisCollection(self._conn, self._chassis_path,
-                                         redfish_version=self.redfish_version)
+                                         redfish_version=self.redfish_version,
+                                         registries=self.registries)
 
     def get_chassis(self, identity):
         """Given the identity return a Chassis object
@@ -204,7 +207,8 @@ class Sushy(base.ResourceBase):
         :returns: The Chassis object
         """
         return chassis.Chassis(self._conn, identity,
-                               redfish_version=self.redfish_version)
+                               redfish_version=self.redfish_version,
+                               registries=self.registries)
 
     def get_fabric_collection(self):
         """Get the FabricCollection object
@@ -218,7 +222,8 @@ class Sushy(base.ResourceBase):
                 attribute='Fabrics/@odata.id', resource=self._path)
 
         return fabric.FabricCollection(self._conn, self._fabrics_path,
-                                       redfish_version=self.redfish_version)
+                                       redfish_version=self.redfish_version,
+                                       registries=self.registries)
 
     def get_fabric(self, identity):
         """Given the identity return a Fabric object
@@ -227,7 +232,8 @@ class Sushy(base.ResourceBase):
         :returns: The Fabric object
         """
         return fabric.Fabric(self._conn, identity,
-                             redfish_version=self.redfish_version)
+                             redfish_version=self.redfish_version,
+                             registries=self.registries)
 
     def get_manager_collection(self):
         """Get the ManagerCollection object
@@ -241,7 +247,8 @@ class Sushy(base.ResourceBase):
                 attribute='Managers/@odata.id', resource=self._path)
 
         return manager.ManagerCollection(self._conn, self._managers_path,
-                                         redfish_version=self.redfish_version)
+                                         redfish_version=self.redfish_version,
+                                         registries=self.registries)
 
     def get_manager(self, identity):
         """Given the identity return a Manager object
@@ -250,7 +257,8 @@ class Sushy(base.ResourceBase):
         :returns: The Manager object
         """
         return manager.Manager(self._conn, identity,
-                               redfish_version=self.redfish_version)
+                               redfish_version=self.redfish_version,
+                               registries=self.registries)
 
     def get_session_service(self):
         """Get the SessionService object
@@ -273,8 +281,9 @@ class Sushy(base.ResourceBase):
         :param identity: The identity of the session resource
         :returns: The Session object
         """
-        return session.Session(self._conn, identity,
-                               redfish_version=self.redfish_version)
+        return session.Session(
+            self._conn, identity,
+            redfish_version=self.redfish_version, registries=self.registries)
 
     def get_update_service(self):
         """Get the UpdateService object
@@ -287,7 +296,8 @@ class Sushy(base.ResourceBase):
 
         return updateservice.UpdateService(
             self._conn, self._update_service_path,
-            redfish_version=self.redfish_version)
+            redfish_version=self.redfish_version,
+            registries=self.registries)
 
     def _get_registry_collection(self):
         """Get MessageRegistryFileCollection object
@@ -315,9 +325,11 @@ class Sushy(base.ResourceBase):
             raise exceptions.MissingAttributeError(
                 attribute='CompositionService/@odata.id',
                 resource=self._path)
+
         return compositionservice.CompositionService(
             self._conn, self._composition_service_path,
-            redfish_version=self.redfish_version)
+            redfish_version=self.redfish_version,
+            registries=self.registries)
 
     def _get_standard_message_registry_collection(self):
         """Load packaged standard message registries
@@ -337,26 +349,33 @@ class Sushy(base.ResourceBase):
 
         return message_registries
 
-    def _get_message_registries(self):
+    @property
+    def registries(self):
         """Gets and combines all message registries together
 
         Fetches all registries if any provided by Redfish service
         and combines together with packaged standard registries.
 
         :returns: dict of combined message registries where key is
-        Registry_name.Major_version.Minor_version and value is registry
-        itself.
+            Registry_name.Major_version.Minor_version and value is registry
+            itself.
         """
+        if self._registries is None:
 
-        standard = self._get_standard_message_registry_collection()
-        registries = {r.registry_prefix + '.' +
-                      r.registry_version.rsplit('.', 1)[0]: r
-                      for r in standard if r.language == self._language}
-        registry_col = self._get_registry_collection()
-        if registry_col:
-            provided = registry_col.get_members()
-            registries.update({r.registry: r.get_message_registry(
-                               self._language,
-                               self._public_connector) for r in provided})
+            standard = self._get_standard_message_registry_collection()
 
-        return registries
+            registries = {r.registry_prefix + '.' +
+                          r.registry_version.rsplit('.', 1)[0]: r
+                          for r in standard if r.language == self._language}
+
+            registry_col = self._get_registry_collection()
+
+            if registry_col:
+                provided = registry_col.get_members()
+                registries.update({r.registry: r.get_message_registry(
+                                   self._language,
+                                   self._public_connector) for r in provided})
+
+            self._registries = registries
+
+        return self._registries

@@ -37,15 +37,19 @@ class Session(base.ResourceBase):
     username = base.Field('UserName')
     """The UserName for the account for this session."""
 
-    def __init__(self, connector, identity, redfish_version=None):
+    def __init__(self, connector, identity, redfish_version=None,
+                 registries=None):
         """A class representing a Session
 
         :param connector: A Connector instance
         :param identity: The identity of the Session resource
         :param redfish_version: The version of RedFish. Used to construct
             the object according to schema of given version.
+        :param registries: Dict of Redfish Message Registry objects to be
+            used in any resource that needs registries to parse messages
         """
-        super(Session, self).__init__(connector, identity, redfish_version)
+        super(Session, self).__init__(
+            connector, identity, redfish_version, registries)
 
     def delete(self):
         """Method for deleting a Session.
@@ -67,13 +71,16 @@ class SessionCollection(base.ResourceCollectionBase):
     def _resource_type(self):
         return Session
 
-    def __init__(self, connector, identity, redfish_version=None):
+    def __init__(self, connector, identity, redfish_version=None,
+                 registries=None):
         """A class representing a SessionCollection
 
         :param connector: A Connector instance
         :param identity: The identity of the Session resource
         :param redfish_version: The version of RedFish. Used to construct
             the object according to schema of given version.
+        :param registries: Dict of Redfish Message Registry objects to be
+            used in any resource that needs registries to parse messages
         """
         super(SessionCollection, self).__init__(
-            connector, identity, redfish_version)
+            connector, identity, redfish_version, registries)
