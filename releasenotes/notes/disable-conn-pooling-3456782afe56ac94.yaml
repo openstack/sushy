@@ -1,0 +1,8 @@
+---
+fixes:
+  - |
+    Disable HTTP connection pooling by asking HTTP server to close our
+    connection right upon use. The rationale is that some BMC observed in
+    the wild seem to close persistent connections abruptly upon eventual
+    re-use failing completely unrelated operation. So in ``sushy`` we
+    just try not to maintain persistent connections with BMC at all.
