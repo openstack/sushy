@@ -31,6 +31,13 @@ class Connector(object):
         self._verify = verify
         self._session = requests.Session()
         self._session.verify = self._verify
+
+        # NOTE(etingof): field studies reveal that some BMCs choke at
+        # long-running persistent HTTP connections (or TCP connections).
+        # By default, we ask HTTP server to shut down HTTP connection we've
+        # just used.
+        self._session.headers['Connection'] = 'close'
+
         if username or password:
             LOG.warning('Passing username and password to Connector is '
                         'deprecated. Authentication is passed through '
