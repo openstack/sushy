@@ -106,7 +106,9 @@ class VirtualMedia(base.ResourceBase):
         except exceptions.HTTPError as response:
             # Some vendors like HPE iLO has this kind of implementation.
             # It needs to pass an empty dict.
-            if response.status_code == http_client.UNSUPPORTED_MEDIA_TYPE:
+            if response.status_code in (
+                    http_client.UNSUPPORTED_MEDIA_TYPE,
+                    http_client.BAD_REQUEST):
                 self._conn.post(target_uri, data={})
         self.invalidate()
 
