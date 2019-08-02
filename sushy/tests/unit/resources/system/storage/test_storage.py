@@ -122,8 +122,10 @@ class StorageTestCase(base.TestCase):
                          identifier.durable_name_format)
         self.assertEqual('345C59DBD970859C', identifier.durable_name)
         self.assertEqual(12, controller.speed_gbps)
-        self.assertEqual(["PCIe"], controller.controller_protocols)
-        self.assertEqual(["SAS", "SATA"], controller.device_protocols)
+        self.assertEqual([sushy.PROTOCOL_TYPE_PCIe],
+                         controller.controller_protocols)
+        self.assertEqual([sushy.PROTOCOL_TYPE_SAS, sushy.PROTOCOL_TYPE_SATA],
+                         controller.device_protocols)
 
     def test_drives_after_refresh(self):
         self.storage.refresh()

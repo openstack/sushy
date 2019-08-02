@@ -258,6 +258,52 @@ class MappedField(Field):
             adapter=mapping.get)
 
 
+class MappedListField(Field):
+    """Field taking a list of values with a mapping for the values
+
+    Given JSON {'field':['xxx', 'yyy']}, a sushy resource definition and
+    mapping {'xxx':'a', 'yyy':'b'}, the sushy object to come out will be like
+    resource.field = ['a', 'b']
+    """
+
+    def __init__(self, field, mapping, required=False, default=None):
+        """Create a mapped list field definition.
+
+        :param field: JSON field to fetch the list of values from.
+        :param mapping: a mapping for the list elements.
+        :param required: whether this field is required. Missing required
+            fields result in MissingAttributeError.
+        :param default: the default value to use when the field is missing.
+            Only has effect when the field is not required.
+        """
+        if not isinstance(mapping, collectionsAbc.Mapping):
+            raise TypeError("The mapping argument must be a mapping")
+
+        self._mapping_adapter = mapping.get
+        super(MappedListField, self).__init__(
+            field, required=required, default=default,
+            adapter=lambda x: x)
+
+    def _load(self, body, resource, nested_in=None):
+        """Load the mapped list.
+
+        :param body: parent JSON body.
+        :param resource: parent resource.
+        :param nested_in: parent resource name (for error reporting only).
+        :returns: a new list object containing the mapped values.
+        """
+        nested_in = (nested_in or []) + self._path
+        values = super(MappedListField, self)._load(body, resource)
+
+        if values is None:
+            return
+
+        instances = [self._mapping_adapter(value) for value in values
+                     if self._mapping_adapter(value) is not None]
+
+        return instances
+
+
 @six.add_metaclass(abc.ABCMeta)
 class AbstractJsonReader(object):
 
