@@ -23,11 +23,15 @@ class ProductionLocationField(oem_base.OEMCompositeField):
     country = base.Field('Country')
 
 
+class ContosoActionsField(oem_base.OEMActionsField):
+    reset = oem_base.OEMActionField('#Contoso.Reset')
+
+
 class FakeOEMSystemExtension(oem_base.OEMExtensionResourceBase):
 
     data_type = oem_base.OEMField('@odata.type')
     production_location = ProductionLocationField('ProductionLocation')
-    reset_action = base.Field(['Actions', 'Oem', '#Contoso.Reset'])
+    _actions = ContosoActionsField('Actions')
 
     def __init__(self, resource, *args, **kwargs):
         """A class representing ComputerSystem OEM extension for Contoso
@@ -38,4 +42,4 @@ class FakeOEMSystemExtension(oem_base.OEMExtensionResourceBase):
             resource, 'Contoso', *args, **kwargs)
 
     def get_reset_system_path(self):
-        return self.reset_action.get('target')
+        return self._actions.reset.target_uri

@@ -16,6 +16,7 @@ import logging
 import six
 
 from sushy.resources import base
+from sushy.resources import common
 
 
 LOG = logging.getLogger(__name__)
@@ -66,6 +67,15 @@ class OEMMappedField(base.MappedField, OEMField):
     """MappedField for OEM fields."""
 
 
+class OEMActionsField(OEMCompositeField):
+    """OEM Actions fields"""
+
+
+@six.add_metaclass(abc.ABCMeta)
+class OEMActionField(common.ActionField, OEMField):
+    """OEM Actions fields."""
+
+
 @six.add_metaclass(abc.ABCMeta)
 class OEMExtensionResourceBase(object):
 
@@ -90,9 +100,21 @@ class OEMExtensionResourceBase(object):
         """Parse the OEM extension attributes of a resource."""
         oem_json_body = (self.core_resource.json.get('Oem').
                          get(self.oem_property_name))
+
+        oem_actions = {
+            'Actions': self.core_resource.json.get(
+                'Actions', {}).get('Oem', {})
+        }
+
         for attr, field in _collect_oem_fields(self):
+            json_body = (oem_actions
+                         if isinstance(field, OEMActionsField)
+                         else oem_json_body)
+
+            value = field._load(json_body, self)
+
             # Hide the Field object behind the real value
-            setattr(self, attr, field._load(oem_json_body, self))
+            setattr(self, attr, value)
 
         for attr, field in _collect_base_fields(self):
             # Hide the Field object behind the real value
