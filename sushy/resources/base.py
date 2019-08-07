@@ -60,8 +60,9 @@ class Field(object):
         if not callable(adapter):
             raise TypeError("Adapter must be callable")
 
-        if isinstance(path, six.string_types):
+        if not isinstance(path, list):
             path = [path]
+
         elif not path:
             raise ValueError('Path cannot be empty')
 
@@ -69,6 +70,17 @@ class Field(object):
         self._required = required
         self._default = default
         self._adapter = adapter
+
+    def _get_item(self, dct, key_or_callable, **context):
+        if not callable(key_or_callable):
+            return dct[key_or_callable]
+
+        for candidate_key in dct:
+            if key_or_callable(
+                    candidate_key, value=dct[candidate_key], **context):
+                return dct[candidate_key]
+
+        raise KeyError(key_or_callable)
 
     def _load(self, body, resource, nested_in=None):
         """Load this field from a JSON object.
@@ -85,7 +97,10 @@ class Field(object):
         for path_item in self._path[:-1]:
             body = body.get(path_item, {})
 
-        if name not in body:
+        try:
+            item = self._get_item(body, name)
+
+        except KeyError:
             if self._required:
                 path = (nested_in or []) + self._path
                 raise exceptions.MissingAttributeError(
@@ -97,11 +112,15 @@ class Field(object):
 
         try:
             # Get the value based on the name, defaulting to an empty dict
-            value = body.get(name, {})
             # Check to ensure that value is implemented by OEM
-            if (value is not None and value != {} and
-               str(value).lower() != 'none'):
-                value = self._adapter(value)
+            # TODO(etingof): we should revisit this logic/code
+            if (item is not None and item != {} and
+               str(item).lower() != 'none'):
+                value = self._adapter(item)
+
+            else:
+                value = item
+
         except (UnicodeError, ValueError, TypeError) as exc:
             path = (nested_in or []) + self._path
             raise exceptions.MalformedAttributeError(

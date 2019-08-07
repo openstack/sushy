@@ -1,0 +1,9 @@
+---
+features:
+  - |
+    Adds the ability to conditionally match sushy fields against received JSON
+    object. The conditional matching is performed by a user-supplied callable
+    which gets the key to consider (along with the value and potentially other
+    details) and should indicate the the caller if the match occurred.
+    The motivation behind this change is to accommodate malformed Redfish
+    resource properties as observed in the OEM wilderness.

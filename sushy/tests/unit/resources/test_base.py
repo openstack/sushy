@@ -441,3 +441,24 @@ class FieldTestCase(base.TestCase):
         # Regular attributes cannot be accessed via mapping
         self.assertRaisesRegex(KeyError, '_load', lambda: field['_load'])
         self.assertRaisesRegex(KeyError, '__init__', lambda: field['__init__'])
+
+
+class PartialKeyResource(resource_base.ResourceBase):
+    string = resource_base.Field(
+        lambda key, **context: key.startswith('Str'))
+    integer = resource_base.Field(
+        lambda key, value, **context: key == 'Integer' and int(value) < 42)
+
+
+class FieldPartialKeyTestCase(base.TestCase):
+    def setUp(self):
+        super(FieldPartialKeyTestCase, self).setUp()
+        self.conn = mock.Mock()
+        self.json = copy.deepcopy(TEST_JSON)
+        self.conn.get.return_value.json.return_value = self.json
+        self.test_resource = PartialKeyResource(
+            self.conn, redfish_version='1.0.x')
+
+    def test_ok(self):
+        self.assertEqual('a string', self.test_resource.string)
+        self.assertIsNone(self.test_resource.integer)
