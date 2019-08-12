@@ -39,9 +39,10 @@ class FakeOEMSystemExtensionTestCase(base.TestCase):
             self.fake_sys_oem_extn.production_location.facility_name))
         self.assertEqual('USA', (
             self.fake_sys_oem_extn.production_location.country))
-        self.assertEqual({
-            "target": ("/redfish/v1/Systems/437XR1138R2/Oem/Contoso/Actions/"
-                       "Contoso.Reset")}, self.fake_sys_oem_extn.reset_action)
+        self.assertEqual(
+            "/redfish/v1/Systems/437XR1138R2/Oem/Contoso/Actions/"
+            "Contoso.Reset",
+            self.fake_sys_oem_extn._actions.reset.target_uri)
 
     def test_get_reset_system_path(self):
         value = self.fake_sys_oem_extn.get_reset_system_path()
