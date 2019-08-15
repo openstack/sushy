@@ -29,7 +29,9 @@ class SessionServiceTestCase(base.TestCase):
         super(SessionServiceTestCase, self).setUp()
         self.conn = mock.MagicMock()
         with open('sushy/tests/unit/json_samples/session_service.json') as f:
-            self.conn.get.return_value.json.return_value = json.load(f)
+            self.json_doc = json.load(f)
+
+        self.conn.get.return_value.json.return_value = self.json_doc
 
         self.sess_serv_inst = sessionservice.SessionService(
             self.conn, '/redfish/v1/SessionService',
@@ -46,7 +48,7 @@ class SessionServiceTestCase(base.TestCase):
         self.assertTrue(mock_LOG.warning.called)
 
     def test__parse_attributes(self):
-        self.sess_serv_inst._parse_attributes()
+        self.sess_serv_inst._parse_attributes(self.json_doc)
         exp_path = '/redfish/v1/SessionService'
         self.assertEqual('1.0.2', self.sess_serv_inst.redfish_version)
         self.assertEqual('SessionService', self.sess_serv_inst.identity)
@@ -58,7 +60,7 @@ class SessionServiceTestCase(base.TestCase):
         self.sess_serv_inst.json.pop('SessionTimeout')
         self.assertRaisesRegex(
             exceptions.MissingAttributeError, 'attribute SessionTimeout',
-            self.sess_serv_inst._parse_attributes())
+            self.sess_serv_inst._parse_attributes(self.json_doc))
 
     def test__get_sessions_collection_path(self):
         self.sess_serv_inst.json.pop('Sessions')

@@ -1,0 +1,11 @@
+---
+upgrade:
+  - |
+    OEM resource class hierarchy has been redesigned to allow for non-terminal
+    sub-resources (e.g. Links) to be handled within OEM resource model. As a
+    consequence, backward compatibility with previously existing OEM extension
+    framework (anything based on ``OEMExtensionResourceBase`` class) is not
+    preserved. User OEM code migration would involve switching from
+    ``OEMExtensionResourceBase`` to ``OEMResourceBase`` (note ``__init__``
+    call signature change) and replacing ``OEMField``-based classes with their
+    generic sushy ``Field`` counterparts.

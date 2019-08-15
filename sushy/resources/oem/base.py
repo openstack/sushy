@@ -10,120 +10,64 @@
 # License for the specific language governing permissions and limitations
 # under the License.
 
-import abc
 import logging
 
-import six
-
 from sushy.resources import base
-from sushy.resources import common
 
 
 LOG = logging.getLogger(__name__)
 
 
-class OEMField(base.Field):
-    """Marker class for OEM specific fields."""
+class OEMResourceBase(base.ResourceBase):
 
+    def __init__(self,
+                 connector,
+                 path='',
+                 redfish_version=None,
+                 registries=None,
+                 reader=None):
+        """Class representing an OEM vendor extension
 
-def _collect_oem_fields(resource):
-    """Collect OEM fields from resource.
-
-    :param resource: OEMExtensionResourceBase instance.
-    :returns: generator of tuples (key, field)
-    """
-    for attr in dir(resource.__class__):
-        field = getattr(resource.__class__, attr)
-        if isinstance(field, OEMField):
-            yield (attr, field)
-
-
-def _collect_base_fields(resource):
-    """Collect base fields from resource.
-
-    :param resource: OEMExtensionResourceBase instance.
-    :returns: generator of tuples (key, field)
-    """
-    for attr in dir(resource.__class__):
-        field = getattr(resource.__class__, attr)
-        if not isinstance(field, OEMField) and isinstance(field, base.Field):
-            yield (attr, field)
-
-
-@six.add_metaclass(abc.ABCMeta)
-class OEMCompositeField(base.CompositeField, OEMField):
-    """CompositeField for OEM fields."""
-
-
-class OEMListField(base.ListField, OEMField):
-    """ListField for OEM fields."""
-
-
-class OEMDictionaryField(base.DictionaryField, OEMField):
-    """DictionaryField for OEM fields."""
-
-
-class OEMMappedField(base.MappedField, OEMField):
-    """MappedField for OEM fields."""
-
-
-class OEMActionsField(OEMCompositeField):
-    """OEM Actions fields"""
-
-
-@six.add_metaclass(abc.ABCMeta)
-class OEMActionField(common.ActionField, OEMField):
-    """OEM Actions fields."""
-
-
-@six.add_metaclass(abc.ABCMeta)
-class OEMExtensionResourceBase(object):
-
-    def __init__(self, resource, oem_property_name, *args, **kwargs):
-        """A class representing the base of any resource OEM extension
-
-        Invokes the ``refresh()`` method for the first time from here
-        (constructor).
-        :param resource: The parent Sushy resource instance
-        :param oem_property_name: the unique OEM identifier string
+        :param connector: A Connector instance
+        :param path: sub-URI path to the resource.
+        :param redfish_version: The version of Redfish. Used to construct
+            the object according to schema of the given version.
+        :param registries: Dict of Redfish Message Registry objects to be
+            used in any resource that needs registries to parse messages
         """
-        if not resource:
-            raise ValueError('"resource" argument cannot be void')
-        if not isinstance(resource, base.ResourceBase):
-            raise TypeError('"resource" argument must be a ResourceBase')
+        self._parent_resource = None
+        self._vendor_id = None
 
-        self.core_resource = resource
-        self.oem_property_name = oem_property_name
-        self.refresh()
+        super(OEMResourceBase, self).__init__(
+            connector, path, redfish_version, registries, reader)
 
-    def _parse_oem_attributes(self):
-        """Parse the OEM extension attributes of a resource."""
-        oem_json_body = (self.core_resource.json.get('Oem').
-                         get(self.oem_property_name))
+    def set_parent_resource(self, parent_resource, vendor_id):
+        self._parent_resource = parent_resource
+        self._vendor_id = vendor_id
+        # NOTE(etingof): this is required to pull OEM subtree
+        self.invalidate(force_refresh=True)
+        return self
 
-        oem_actions = {
-            'Actions': self.core_resource.json.get(
+    def _parse_attributes(self, json_doc):
+        """Parse the attributes of a resource.
+
+        Parsed JSON fields are set to `self` as declared in the class.
+
+        :param json_doc: parsed JSON document in form of Python types
+        """
+        oem_json = json_doc.get(
+            'Oem', {}).get(self._vendor_id, {})
+
+        # NOTE(etingof): temporary copy Actions into Oem subtree for parsing
+        # all fields at once
+
+        oem_json = oem_json.copy()
+
+        oem_actions_json = {
+            'Actions': json_doc.get(
                 'Actions', {}).get('Oem', {})
         }
 
-        for attr, field in _collect_oem_fields(self):
-            json_body = (oem_actions
-                         if isinstance(field, OEMActionsField)
-                         else oem_json_body)
+        oem_json.update(oem_actions_json)
 
-            value = field._load(json_body, self)
-
-            # Hide the Field object behind the real value
-            setattr(self, attr, value)
-
-        for attr, field in _collect_base_fields(self):
-            # Hide the Field object behind the real value
-            setattr(self, attr, field._load(self.core_resource.json, self))
-
-    def refresh(self):
-        """Refresh the attributes of the resource extension.
-
-        Freshly parses the resource OEM attributes via
-        ``_parse_oem_attributes()`` method.
-        """
-        self._parse_oem_attributes()
+        super(OEMResourceBase, self)._parse_attributes(oem_json)

@@ -26,13 +26,16 @@ class EndpointTestCase(base.TestCase):
         self.conn = mock.Mock()
         with open('sushy/tests/unit/json_samples/'
                   'endpoint.json') as f:
-            self.conn.get.return_value.json.return_value = json.load(f)
+            self.json_doc = json.load(f)
+
+        self.conn.get.return_value.json.return_value = self.json_doc
+
         self.fab_endpoint = endpoint.Endpoint(
             self.conn, '/redfish/v1/Fabrics/SAS/Endpoints/Drive1',
             redfish_version='1.0.2')
 
     def test__parse_atrtributes(self):
-        self.fab_endpoint._parse_attributes()
+        self.fab_endpoint._parse_attributes(self.json_doc)
         self.assertEqual('Drive1', self.fab_endpoint.identity)
         self.assertEqual('SAS Drive', self.fab_endpoint.name)
         self.assertEqual(sushy.PROTOCOL_TYPE_SAS,

@@ -39,14 +39,16 @@ class SystemTestCase(base.TestCase):
         super(SystemTestCase, self).setUp()
         self.conn = mock.Mock()
         with open('sushy/tests/unit/json_samples/system.json') as f:
-            self.conn.get.return_value.json.return_value = json.load(f)
+            self.json_doc = json.load(f)
+
+        self.conn.get.return_value.json.return_value = self.json_doc
 
         self.sys_inst = system.System(
             self.conn, '/redfish/v1/Systems/437XR1138R2',
             redfish_version='1.0.2')
 
     def test__parse_attributes(self):
-        self.sys_inst._parse_attributes()
+        self.sys_inst._parse_attributes(self.json_doc)
         self.assertEqual('1.0.2', self.sys_inst.redfish_version)
         self.assertEqual('Chicago-45Z-2381', self.sys_inst.asset_tag)
         self.assertEqual('P79 v1.33 (02/28/2015)', self.sys_inst.bios_version)
@@ -85,13 +87,13 @@ class SystemTestCase(base.TestCase):
         self.sys_inst.json.pop('Actions')
         self.assertRaisesRegex(
             exceptions.MissingAttributeError, 'attribute Actions',
-            self.sys_inst._parse_attributes)
+            self.sys_inst._parse_attributes, self.json_doc)
 
     def test__parse_attributes_missing_boot(self):
         self.sys_inst.json.pop('Boot')
         self.assertRaisesRegex(
             exceptions.MissingAttributeError, 'attribute Boot',
-            self.sys_inst._parse_attributes)
+            self.sys_inst._parse_attributes, self.json_doc)
 
     def test__parse_attributes_missing_reset_target(self):
         self.sys_inst.json['Actions']['#ComputerSystem.Reset'].pop(
@@ -99,11 +101,11 @@ class SystemTestCase(base.TestCase):
         self.assertRaisesRegex(
             exceptions.MissingAttributeError,
             'attribute Actions/#ComputerSystem.Reset/target',
-            self.sys_inst._parse_attributes)
+            self.sys_inst._parse_attributes, self.json_doc)
 
     def test__parse_attributes_null_memory_capacity(self):
         self.sys_inst.json['MemorySummary']['TotalSystemMemoryGiB'] = None
-        self.sys_inst._parse_attributes()
+        self.sys_inst._parse_attributes(self.json_doc)
         self.assertIsNone(self.sys_inst.memory_summary.size_gib)
 
     def test__parse_attributes_bad_maintenance_window_time(self):
@@ -112,7 +114,7 @@ class SystemTestCase(base.TestCase):
         self.assertRaisesRegex(
             exceptions.MalformedAttributeError,
             '@Redfish.MaintenanceWindow/MaintenanceWindowStartTime',
-            self.sys_inst._parse_attributes)
+            self.sys_inst._parse_attributes, self.json_doc)
 
     def test_get__reset_action_element(self):
         value = self.sys_inst._get_reset_action_element()
@@ -284,7 +286,7 @@ class SystemTestCase(base.TestCase):
         # | GIVEN |
         self.sys_inst._json['MemorySummary']['Status'].pop('HealthRollup')
         # | WHEN |
-        self.sys_inst._parse_attributes()
+        self.sys_inst._parse_attributes(self.json_doc)
         # | THEN |
         self.assertEqual(96, self.sys_inst.memory_summary.size_gib)
         self.assertIsNone(self.sys_inst.memory_summary.health)
@@ -292,7 +294,7 @@ class SystemTestCase(base.TestCase):
         # | GIVEN |
         self.sys_inst._json['MemorySummary'].pop('Status')
         # | WHEN |
-        self.sys_inst._parse_attributes()
+        self.sys_inst._parse_attributes(self.json_doc)
         # | THEN |
         self.assertEqual(96, self.sys_inst.memory_summary.size_gib)
         self.assertIsNone(self.sys_inst.memory_summary.health)
@@ -300,7 +302,7 @@ class SystemTestCase(base.TestCase):
         # | GIVEN |
         self.sys_inst._json['MemorySummary'].pop('TotalSystemMemoryGiB')
         # | WHEN |
-        self.sys_inst._parse_attributes()
+        self.sys_inst._parse_attributes(self.json_doc)
         # | THEN |
         self.assertIsNone(self.sys_inst.memory_summary.size_gib)
         self.assertIsNone(self.sys_inst.memory_summary.health)
@@ -308,7 +310,7 @@ class SystemTestCase(base.TestCase):
         # | GIVEN |
         self.sys_inst._json.pop('MemorySummary')
         # | WHEN |
-        self.sys_inst._parse_attributes()
+        self.sys_inst._parse_attributes(self.json_doc)
         # | THEN |
         self.assertIsNone(self.sys_inst.memory_summary)
 
@@ -555,8 +557,8 @@ class SystemTestCase(base.TestCase):
         # | THEN |
         self.assertIsInstance(contoso_system_extn_inst,
                               fake.FakeOEMSystemExtension)
-        self.assertIs(self.sys_inst, contoso_system_extn_inst.core_resource)
-        self.assertEqual('Contoso', contoso_system_extn_inst.oem_property_name)
+        self.assertIs(self.sys_inst, contoso_system_extn_inst._parent_resource)
+        self.assertEqual('Contoso', contoso_system_extn_inst._vendor_id)
 
 
 class SystemCollectionTestCase(base.TestCase):
@@ -566,12 +568,15 @@ class SystemCollectionTestCase(base.TestCase):
         self.conn = mock.Mock()
         with open('sushy/tests/unit/json_samples/'
                   'system_collection.json') as f:
-            self.conn.get.return_value.json.return_value = json.load(f)
+            self.json_doc = json.load(f)
+
+        self.conn.get.return_value.json.return_value = self.json_doc
+
         self.sys_col = system.SystemCollection(
             self.conn, '/redfish/v1/Systems', redfish_version='1.0.2')
 
     def test__parse_attributes(self):
-        self.sys_col._parse_attributes()
+        self.sys_col._parse_attributes(self.json_doc)
         self.assertEqual('1.0.2', self.sys_col.redfish_version)
         self.assertEqual('Computer System Collection', self.sys_col.name)
         self.assertEqual(('/redfish/v1/Systems/437XR1138R2',),

@@ -28,14 +28,16 @@ class FabricTestCase(base.TestCase):
         super(FabricTestCase, self).setUp()
         self.conn = mock.Mock()
         with open('sushy/tests/unit/json_samples/fabric.json') as f:
-            self.conn.get.return_value.json.return_value = json.load(f)
+            self.json_doc = json.load(f)
+
+        self.conn.get.return_value.json.return_value = self.json_doc
 
         self.fabric = fabric.Fabric(self.conn, '/redfish/v1/Fabrics/SAS',
                                     redfish_version='1.0.3')
 
     def test__parse_attributes(self):
         # | WHEN |
-        self.fabric._parse_attributes()
+        self.fabric._parse_attributes(self.json_doc)
         # | THEN |
         self.assertEqual('1.0.3', self.fabric.redfish_version)
         self.assertEqual('SAS', self.fabric.identity)

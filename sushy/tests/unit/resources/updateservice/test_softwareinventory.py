@@ -27,7 +27,9 @@ class SoftwareInventoryTestCase(base.TestCase):
         conn = mock.Mock()
         with open(
             'sushy/tests/unit/json_samples/softwareinventory.json') as f:
-            conn.get.return_value.json.return_value = json.load(f)
+            self.json_doc = json.load(f)
+
+        conn.get.return_value.json.return_value = self.json_doc
 
         self.soft_inv = softwareinventory.SoftwareInventory(
             conn,
@@ -35,7 +37,7 @@ class SoftwareInventoryTestCase(base.TestCase):
             redfish_version='1.3.0')
 
     def test__parse_attributes(self):
-        self.soft_inv._parse_attributes()
+        self.soft_inv._parse_attributes(self.json_doc)
         self.assertEqual('BMC', self.soft_inv.identity)
         self.assertEqual(
             '1.30.367a12-rev1',
@@ -57,7 +59,7 @@ class SoftwareInventoryTestCase(base.TestCase):
         self.soft_inv.json.pop('Id')
         self.assertRaisesRegex(
             exceptions.MissingAttributeError, 'attribute Id',
-            self.soft_inv._parse_attributes)
+            self.soft_inv._parse_attributes, self.json_doc)
 
 
 class SoftwareInventoryCollectionTestCase(base.TestCase):
@@ -67,14 +69,16 @@ class SoftwareInventoryCollectionTestCase(base.TestCase):
         conn = mock.Mock()
         with open('sushy/tests/unit/json_samples/'
                   'softwareinventory_collection.json') as f:
-            conn.get.return_value.json.return_value = json.load(f)
+            self.json_doc = json.load(f)
+
+        conn.get.return_value.json.return_value = self.json_doc
 
         self.soft_inv_col = softwareinventory.SoftwareInventoryCollection(
             conn, '/redfish/v1/UpdateService/SoftwareInventory',
             redfish_version='1.3.0')
 
     def test__parse_attributes(self):
-        self.soft_inv_col._parse_attributes()
+        self.soft_inv_col._parse_attributes(self.json_doc)
         self.assertEqual('1.3.0', self.soft_inv_col.redfish_version)
         self.assertEqual(
             'Software Inventory Collection',

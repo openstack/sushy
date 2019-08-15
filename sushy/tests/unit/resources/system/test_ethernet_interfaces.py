@@ -26,7 +26,9 @@ class EthernetInterfaceTestCase(base.TestCase):
         self.conn = mock.Mock()
         with open('sushy/tests/unit/json_samples/'
                   'ethernet_interfaces.json') as f:
-            self.conn.get.return_value.json.return_value = json.load(f)
+            self.json_doc = json.load(f)
+
+        self.conn.get.return_value.json.return_value = self.json_doc
 
         eth_path = ("/redfish/v1/Systems/437XR1138R2/EthernetInterfaces/"
                     "12446A3B0411")
@@ -34,7 +36,7 @@ class EthernetInterfaceTestCase(base.TestCase):
             self.conn, eth_path, redfish_version='1.0.2')
 
     def test__parse_attributes(self):
-        self.sys_eth._parse_attributes()
+        self.sys_eth._parse_attributes(self.json_doc)
         self.assertEqual('1.0.2', self.sys_eth.redfish_version)
         self.assertEqual('1', self.sys_eth.identity)
         self.assertEqual('Ethernet Interface', self.sys_eth.name)
@@ -54,13 +56,16 @@ class EthernetInterfaceCollectionTestCase(base.TestCase):
         self.conn = mock.Mock()
         with open('sushy/tests/unit/json_samples/'
                   'ethernet_interfaces_collection.json') as f:
-            self.conn.get.return_value.json.return_value = json.load(f)
+            self.json_doc = json.load(f)
+
+        self.conn.get.return_value.json.return_value = self.json_doc
+
         self.sys_eth_col = ethernet_interface.EthernetInterfaceCollection(
             self.conn, '/redfish/v1/Systems/437XR1138R2/EthernetInterfaces',
             redfish_version='1.0.2')
 
     def test__parse_attributes(self):
-        self.sys_eth_col._parse_attributes()
+        self.sys_eth_col._parse_attributes(self.json_doc)
         self.assertEqual('1.0.2', self.sys_eth_col.redfish_version)
         self.assertEqual('Ethernet Interface Collection',
                          self.sys_eth_col.name)

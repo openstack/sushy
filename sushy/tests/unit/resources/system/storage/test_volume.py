@@ -27,14 +27,16 @@ class VolumeTestCase(base.TestCase):
         super(VolumeTestCase, self).setUp()
         self.conn = mock.Mock()
         with open('sushy/tests/unit/json_samples/volume.json') as f:
-            self.conn.get.return_value.json.return_value = json.load(f)
+            self.json_doc = json.load(f)
+
+        self.conn.get.return_value.json.return_value = self.json_doc
 
         self.stor_volume = volume.Volume(
             self.conn, '/redfish/v1/Systems/437XR1138R2/Storage/1/Volumes/1',
             redfish_version='1.0.2')
 
     def test__parse_attributes(self):
-        self.stor_volume._parse_attributes()
+        self.stor_volume._parse_attributes(self.json_doc)
         self.assertEqual('1.0.2', self.stor_volume.redfish_version)
         self.assertEqual('1', self.stor_volume.identity)
         self.assertEqual('Virtual Disk 1', self.stor_volume.name)
@@ -84,14 +86,17 @@ class VolumeCollectionTestCase(base.TestCase):
         self.conn = mock.Mock()
         with open('sushy/tests/unit/json_samples/'
                   'volume_collection.json') as f:
-            self.conn.get.return_value.json.return_value = json.load(f)
+            self.json_doc = json.load(f)
+
+        self.conn.get.return_value.json.return_value = self.json_doc
+
         self.stor_vol_col = volume.VolumeCollection(
             self.conn, '/redfish/v1/Systems/437XR1138R2/Storage/1/Volumes',
             redfish_version='1.0.2')
         self.stor_vol_col.refresh = mock.Mock()
 
     def test__parse_attributes(self):
-        self.stor_vol_col._parse_attributes()
+        self.stor_vol_col._parse_attributes(self.json_doc)
         self.assertEqual((
             '/redfish/v1/Systems/437XR1138R2/Storage/1/Volumes/1',
             '/redfish/v1/Systems/437XR1138R2/Storage/1/Volumes/2',

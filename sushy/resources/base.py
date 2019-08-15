@@ -431,11 +431,16 @@ class ResourceBase(object):
 
         self.refresh()
 
-    def _parse_attributes(self):
-        """Parse the attributes of a resource."""
+    def _parse_attributes(self, json_doc):
+        """Parse the attributes of a resource.
+
+        Parsed JSON fields are set to `self` as declared in the class.
+
+        :param json_doc: parsed JSON document in form of Python types
+        """
         for attr, field in _collect_fields(self):
             # Hide the Field object behind the real value
-            setattr(self, attr, field._load(self.json, self))
+            setattr(self, attr, field._load(json_doc, self))
 
     def refresh(self, force=True):
         """Refresh the resource
@@ -464,7 +469,7 @@ class ResourceBase(object):
         LOG.debug('Received representation of %(type)s %(path)s: %(json)s',
                   {'type': self.__class__.__name__,
                    'path': self._path, 'json': self._json})
-        self._parse_attributes()
+        self._parse_attributes(self._json)
         self._do_refresh(force)
 
         # Mark it fresh
@@ -515,6 +520,13 @@ class ResourceBase(object):
     @property
     def path(self):
         return self._path
+
+    def clone_resource(self, new_resource, path=''):
+        """Instantiate given resource using existing BMC connection context"""
+        return new_resource(
+            self._conn, path or self.path,
+            redfish_version=self.redfish_version,
+            reader=self._reader)
 
     @property
     def resource_name(self):

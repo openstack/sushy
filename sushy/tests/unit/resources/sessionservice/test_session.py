@@ -28,10 +28,10 @@ class SessionTestCase(base.TestCase):
         self.conn = mock.Mock()
         self.auth = mock.Mock()
         with open('sushy/tests/unit/json_samples/session.json') as f:
-            sample_json = json.load(f)
-            self.conn.get.return_value.json.return_value = sample_json
+            self.json_doc = json.load(f)
+            self.conn.get.return_value.json.return_value = self.json_doc
             self.auth._session_key = 'fake_x_auth_token'
-            self.auth._session_uri = sample_json['@odata.id']
+            self.auth._session_uri = self.json_doc['@odata.id']
             self.conn._auth = self.auth
 
         self.sess_inst = session.Session(
@@ -39,7 +39,7 @@ class SessionTestCase(base.TestCase):
             redfish_version='1.0.2')
 
     def test__parse_attributes(self):
-        self.sess_inst._parse_attributes()
+        self.sess_inst._parse_attributes(self.json_doc)
         self.assertEqual('1.0.2', self.sess_inst.redfish_version)
         self.assertEqual('1234567890ABCDEF', self.sess_inst.identity)
         self.assertEqual('User Session', self.sess_inst.name)
@@ -50,7 +50,7 @@ class SessionTestCase(base.TestCase):
         self.sess_inst.json.pop('Id')
         self.assertRaisesRegex(
             exceptions.MissingAttributeError, 'attribute Id',
-            self.sess_inst._parse_attributes)
+            self.sess_inst._parse_attributes, self.json_doc)
 
     def test_session_close(self):
         session_key = self.sess_inst._conn._auth._session_key
@@ -68,7 +68,9 @@ class SessionCollectionTestCase(base.TestCase):
         self.conn = mock.Mock()
         with open('sushy/tests/unit/json_samples/'
                   'session_collection.json') as f:
-            self.conn.get.return_value.json.return_value = json.load(f)
+            self.json_doc = json.load(f)
+
+        self.conn.get.return_value.json.return_value = self.json_doc
 
         self.sess_col = session.SessionCollection(
             self.conn, '/redfish/v1/SessionService/Sessions',
@@ -76,7 +78,7 @@ class SessionCollectionTestCase(base.TestCase):
 
     def test__parse_attributes(self):
         path = '/redfish/v1/SessionService/Sessions/104f9d68f58abb85'
-        self.sess_col._parse_attributes()
+        self.sess_col._parse_attributes(self.json_doc)
         self.assertEqual('1.0.2', self.sess_col.redfish_version)
         self.assertEqual('Session Collection', self.sess_col.name)
         self.assertEqual((path,), self.sess_col.members_identities)

@@ -30,14 +30,16 @@ class ChassisTestCase(base.TestCase):
         super(ChassisTestCase, self).setUp()
         self.conn = mock.Mock()
         with open('sushy/tests/unit/json_samples/chassis.json') as f:
-            self.conn.get.return_value.json.return_value = json.load(f)
+            self.json_doc = json.load(f)
+
+        self.conn.get.return_value.json.return_value = self.json_doc
 
         self.chassis = chassis.Chassis(self.conn, '/redfish/v1/Chassis/Blade1',
                                        redfish_version='1.8.0')
 
     def test__parse_attributes(self):
         # | WHEN |
-        self.chassis._parse_attributes()
+        self.chassis._parse_attributes(self.json_doc)
         # | THEN |
         self.assertEqual('1.8.0', self.chassis.redfish_version)
         self.assertEqual('Blade1', self.chassis.identity)

@@ -28,7 +28,9 @@ class ResourceBlockTestCase(base.TestCase):
         super(ResourceBlockTestCase, self).setUp()
         self.conn = mock.Mock()
         with open('sushy/tests/unit/json_samples/resourceblock.json') as f:
-            self.conn.get.return_value.json.return_value = json.load(f)
+            self.json_doc = json.load(f)
+
+        self.conn.get.return_value.json.return_value = self.json_doc
 
         self.res_block = resourceblock.ResourceBlock(
             self.conn,
@@ -36,7 +38,7 @@ class ResourceBlockTestCase(base.TestCase):
             redfish_version='1.0.2')
 
     def test__parse_attributes(self):
-        self.res_block._parse_attributes()
+        self.res_block._parse_attributes(self.json_doc)
         self.assertEqual(
             res_block_cons.COMPOSITION_STATE_COMPOSED,
             self.res_block.composition_status.composition_state)
@@ -63,7 +65,7 @@ class ResourceBlockTestCase(base.TestCase):
         self.res_block.json.pop('Id')
         self.assertRaisesRegex(
             exceptions.MissingAttributeError, 'attribute Id',
-            self.res_block._parse_attributes)
+            self.res_block._parse_attributes, self.json_doc)
 
 
 class ResourceBlockCollectionTestCase(base.TestCase):
@@ -73,7 +75,9 @@ class ResourceBlockCollectionTestCase(base.TestCase):
         self.conn = mock.Mock()
         with open('sushy/tests/unit/json_samples/'
                   'resourceblock_collection.json') as f:
-            self.conn.get.return_value.json.return_value = json.load(f)
+            self.json_doc = json.load(f)
+
+        self.conn.get.return_value.json.return_value = self.json_doc
 
         self.res_block_col = resourceblock.ResourceBlockCollection(
             self.conn, '/redfish/v1/CompositionService/ResourceBlocks',
@@ -81,7 +85,7 @@ class ResourceBlockCollectionTestCase(base.TestCase):
 
     def test__parse_attributes(self):
         path = '/redfish/v1/CompositionService/ResourceBlocks/ComputeBlock1'
-        self.res_block_col._parse_attributes()
+        self.res_block_col._parse_attributes(self.json_doc)
         self.assertEqual('1.0.2', self.res_block_col.redfish_version)
         self.assertEqual(
             'Resource Block Collection',

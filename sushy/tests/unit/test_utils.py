@@ -129,13 +129,13 @@ class UtilsTestCase(base.TestCase):
 
 class NestedResource(resource_base.ResourceBase):
 
-    def _parse_attributes(self):
+    def _parse_attributes(self, json_doc):
         pass
 
 
 class BaseResource(resource_base.ResourceBase):
 
-    def _parse_attributes(self):
+    def _parse_attributes(self, json_doc):
         pass
 
     def _do_some_crunch_work_to_get_a(self):

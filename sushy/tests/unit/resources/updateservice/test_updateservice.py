@@ -28,14 +28,16 @@ class UpdateServiceTestCase(base.TestCase):
         super(UpdateServiceTestCase, self).setUp()
         self.conn = mock.Mock()
         with open('sushy/tests/unit/json_samples/updateservice.json') as f:
-            self.conn.get.return_value.json.return_value = json.load(f)
+            self.json_doc = json.load(f)
+
+        self.conn.get.return_value.json.return_value = self.json_doc
 
         self.upd_serv = updateservice.UpdateService(
             self.conn, '/redfish/v1/UpdateService/UpdateService',
             redfish_version='1.3.0')
 
     def test__parse_attributes(self):
-        self.upd_serv._parse_attributes()
+        self.upd_serv._parse_attributes(self.json_doc)
         self.assertEqual('UpdateService', self.upd_serv.identity)
         self.assertEqual('/FWUpdate', self.upd_serv.http_push_uri)
         self.assertIn('/FWUpdate', self.upd_serv.http_push_uri_targets)
@@ -52,7 +54,7 @@ class UpdateServiceTestCase(base.TestCase):
         self.upd_serv.json.pop('Actions')
         self.assertRaisesRegex(
             exceptions.MissingAttributeError, 'attribute Actions',
-            self.upd_serv._parse_attributes)
+            self.upd_serv._parse_attributes, self.json_doc)
 
     def test_simple_update(self):
         self.upd_serv.simple_update(

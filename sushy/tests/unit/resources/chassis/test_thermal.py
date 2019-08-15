@@ -26,14 +26,16 @@ class ThermalTestCase(base.TestCase):
         super(ThermalTestCase, self).setUp()
         self.conn = mock.Mock()
         with open('sushy/tests/unit/json_samples/thermal.json') as f:
-            self.conn.get.return_value.json.return_value = json.load(f)
+            self.json_doc = json.load(f)
+
+        self.conn.get.return_value.json.return_value = self.json_doc
 
         self.thermal = thermal.Thermal(
             self.conn, '/redfish/v1/Chassis/Blade1/Thermal',
             redfish_version='1.5.0')
 
     def test__parse_attributes(self):
-        self.thermal._parse_attributes()
+        self.thermal._parse_attributes(self.json_doc)
         self.assertEqual('1.5.0', self.thermal.redfish_version)
         self.assertEqual('Thermal', self.thermal.identity)
         self.assertEqual('Blade Thermal', self.thermal.name)

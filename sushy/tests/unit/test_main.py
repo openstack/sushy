@@ -45,14 +45,16 @@ class MainTestCase(base.TestCase):
         mock_session_service.return_value = self.sess_serv
         mock_connector.return_value = self.conn
         with open('sushy/tests/unit/json_samples/root.json') as f:
-            self.conn.get.return_value.json.return_value = json.load(f)
+            self.json_doc = json.load(f)
+
+        self.conn.get.return_value.json.return_value = self.json_doc
         self.root = main.Sushy('http://foo.bar:1234',
                                verify=True, auth=mock_auth)
         mock_connector.assert_called_once_with(
             'http://foo.bar:1234', verify=True)
 
     def test__parse_attributes(self):
-        self.root._parse_attributes()
+        self.root._parse_attributes(self.json_doc)
         self.assertEqual('RootService', self.root.identity)
         self.assertEqual('Root Service', self.root.name)
         self.assertEqual('1.0.2', self.root.redfish_version)

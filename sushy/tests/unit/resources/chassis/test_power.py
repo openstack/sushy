@@ -26,14 +26,16 @@ class PowerTestCase(base.TestCase):
         super(PowerTestCase, self).setUp()
         self.conn = mock.Mock()
         with open('sushy/tests/unit/json_samples/power.json') as f:
-            self.conn.get.return_value.json.return_value = json.load(f)
+            self.json_doc = json.load(f)
+
+        self.conn.get.return_value.json.return_value = self.json_doc
 
         self.power = power.Power(
             self.conn, '/redfish/v1/Chassis/MultiBladeEnc1/Power',
             redfish_version='1.5.0')
 
     def test__parse_attributes(self):
-        self.power._parse_attributes()
+        self.power._parse_attributes(self.json_doc)
         self.assertEqual('1.5.0', self.power.redfish_version)
         self.assertEqual('Power', self.power.identity)
         self.assertEqual('Quad Blade Chassis Power', self.power.name)

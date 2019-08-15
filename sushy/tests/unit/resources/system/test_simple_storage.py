@@ -26,14 +26,16 @@ class SimpleStorageTestCase(base.TestCase):
         self.conn = mock.Mock()
         with open('sushy/tests/unit/json_samples/'
                   'simple_storage.json') as f:
-            self.conn.get.return_value.json.return_value = json.load(f)
+            self.json_doc = json.load(f)
+
+        self.conn.get.return_value.json.return_value = self.json_doc
 
         self.simpl_stor = simple_storage.SimpleStorage(
             self.conn, '/redfish/v1/Systems/437XR1138R2/SimpleStorage/1',
             redfish_version='1.0.2')
 
     def test__parse_attributes(self):
-        self.simpl_stor._parse_attributes()
+        self.simpl_stor._parse_attributes(self.json_doc)
         self.assertEqual('1.0.2', self.simpl_stor.redfish_version)
         self.assertEqual('1', self.simpl_stor.identity)
         self.assertEqual('Simple Storage Controller', self.simpl_stor.name)
@@ -56,13 +58,17 @@ class SimpleStorageCollectionTestCase(base.TestCase):
         self.conn = mock.Mock()
         with open('sushy/tests/unit/json_samples/'
                   'simple_storage_collection.json') as f:
-            self.conn.get.return_value.json.return_value = json.load(f)
+
+            self.json_doc = json.load(f)
+
+        self.conn.get.return_value.json.return_value = self.json_doc
+
         self.simpl_stor_col = simple_storage.SimpleStorageCollection(
             self.conn, '/redfish/v1/Systems/437XR1138R2/SimpleStorage',
             redfish_version='1.0.2')
 
     def test__parse_attributes(self):
-        self.simpl_stor_col._parse_attributes()
+        self.simpl_stor_col._parse_attributes(self.json_doc)
         self.assertEqual((
             '/redfish/v1/Systems/437XR1138R2/SimpleStorage/1',),
             self.simpl_stor_col.members_identities)

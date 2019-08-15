@@ -26,7 +26,9 @@ class ResourceZoneTestCase(base.TestCase):
         super(ResourceZoneTestCase, self).setUp()
         self.conn = mock.Mock()
         with open('sushy/tests/unit/json_samples/resourcezone.json') as f:
-            self.conn.get.return_value.json.return_value = json.load(f)
+            self.json_doc = json.load(f)
+
+        self.conn.get.return_value.json.return_value = self.json_doc
 
         self.res_zone = resourcezone.ResourceZone(
             self.conn,
@@ -34,7 +36,7 @@ class ResourceZoneTestCase(base.TestCase):
             redfish_version='1.0.2')
 
     def test__parse_attributes(self):
-        self.res_zone._parse_attributes()
+        self.res_zone._parse_attributes(self.json_doc)
         self.assertEqual('ResourceZone1', self.res_zone.description)
         self.assertEqual('1', self.res_zone.identity)
         self.assertEqual('Resource Zone 1', self.res_zone.name)
@@ -51,7 +53,7 @@ class ResourceZoneTestCase(base.TestCase):
         self.res_zone.json.pop('Id')
         self.assertRaisesRegex(
             exceptions.MissingAttributeError, 'attribute Id',
-            self.res_zone._parse_attributes)
+            self.res_zone._parse_attributes, self.json_doc)
 
 
 class ResourceZoneCollectionTestCase(base.TestCase):
@@ -61,7 +63,9 @@ class ResourceZoneCollectionTestCase(base.TestCase):
         self.conn = mock.Mock()
         with open('sushy/tests/unit/json_samples/'
                   'resourcezone_collection.json') as f:
-            self.conn.get.return_value.json.return_value = json.load(f)
+            self.json_doc = json.load(f)
+
+        self.conn.get.return_value.json.return_value = self.json_doc
 
         self.res_zone_col = resourcezone.ResourceZoneCollection(
             self.conn, '/redfish/v1/CompositionService/ResourceZones',
@@ -69,7 +73,7 @@ class ResourceZoneCollectionTestCase(base.TestCase):
 
     def test__parse_attributes(self):
         path = '/redfish/v1/CompositionService/ResourceZones/1'
-        self.res_zone_col._parse_attributes()
+        self.res_zone_col._parse_attributes(self.json_doc)
         self.assertEqual('1.0.2', self.res_zone_col.redfish_version)
         self.assertEqual('Resource Zone Collection', self.res_zone_col.name)
         self.assertEqual((path,), self.res_zone_col.members_identities)

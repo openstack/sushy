@@ -30,13 +30,16 @@ class VirtualMediaTestCase(base.TestCase):
         self.conn = mock.Mock()
         with open('sushy/tests/unit/json_samples/'
                   'virtual_media.json') as f:
-            self.conn.get.return_value.json.return_value = json.load(f)
+            self.json_doc = json.load(f)
+
+        self.conn.get.return_value.json.return_value = self.json_doc
+
         self.sys_virtual_media = virtual_media.VirtualMedia(
             self.conn, '/redfish/v1/Managers/BMC/VirtualMedia/Floppy1',
             redfish_version='1.0.2')
 
     def test__parse_atrtributes(self):
-        self.sys_virtual_media._parse_attributes()
+        self.sys_virtual_media._parse_attributes(self.json_doc)
         self.assertEqual('Virtual Removable Media',
                          self.sys_virtual_media.name)
         self.assertEqual('Floppy1', self.sys_virtual_media.identity)

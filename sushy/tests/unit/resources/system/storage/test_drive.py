@@ -26,7 +26,9 @@ class DriveTestCase(base.TestCase):
         super(DriveTestCase, self).setUp()
         self.conn = mock.Mock()
         with open('sushy/tests/unit/json_samples/drive.json') as f:
-            self.conn.get.return_value.json.return_value = json.load(f)
+            self.json_doc = json.load(f)
+
+        self.conn.get.return_value.json.return_value = self.json_doc
 
         self.stor_drive = drive.Drive(
             self.conn,
@@ -34,7 +36,7 @@ class DriveTestCase(base.TestCase):
             redfish_version='1.0.2')
 
     def test__parse_attributes(self):
-        self.stor_drive._parse_attributes()
+        self.stor_drive._parse_attributes(self.json_doc)
         self.assertEqual('1.0.2', self.stor_drive.redfish_version)
         self.assertEqual('32ADF365C6C1B7BD', self.stor_drive.identity)
         self.assertEqual('Drive Sample', self.stor_drive.name)

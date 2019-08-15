@@ -156,9 +156,15 @@ class Sushy(base.ResourceBase):
                             'with %s: %s', self._base_url, ex)
             self._auth = None
 
-    def _parse_attributes(self):
-        super(Sushy, self)._parse_attributes()
-        self.redfish_version = self.json.get('RedfishVersion')
+    def _parse_attributes(self, json_doc):
+        """Parse the attributes of a resource.
+
+        Parsed JSON fields are set to `self` as declared in the class.
+
+        :param json_doc: parsed JSON document in form of Python types
+        """
+        super(Sushy, self)._parse_attributes(json_doc)
+        self.redfish_version = json_doc.get('RedfishVersion')
 
     def get_system_collection(self):
         """Get the SystemCollection object

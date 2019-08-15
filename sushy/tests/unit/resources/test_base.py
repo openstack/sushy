@@ -47,7 +47,7 @@ BASE_RESOURCE_JSON = {
 
 class BaseResource(resource_base.ResourceBase):
 
-    def _parse_attributes(self):
+    def _parse_attributes(self, json_doc):
         pass
 
 
@@ -182,7 +182,7 @@ class TestResource(resource_base.ResourceBase):
                                            redfish_version, registries)
         self.identity = identity
 
-    def _parse_attributes(self):
+    def _parse_attributes(self, json_doc):
         pass
 
 

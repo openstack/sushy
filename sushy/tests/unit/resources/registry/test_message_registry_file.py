@@ -27,14 +27,16 @@ class MessageRegistryFileTestCase(base.TestCase):
         self.conn = mock.Mock()
         with open('sushy/tests/unit/json_samples/'
                   'message_registry_file.json') as f:
-            self.conn.get.return_value.json.return_value = json.load(f)
+            self.json_doc = json.load(f)
+
+        self.conn.get.return_value.json.return_value = self.json_doc
 
         self.reg_file = message_registry_file.MessageRegistryFile(
             self.conn, '/redfish/v1/Registries/Test',
             redfish_version='1.0.2')
 
     def test__parse_attributes(self):
-        self.reg_file._parse_attributes()
+        self.reg_file._parse_attributes(self.json_doc)
         self.assertEqual('Test', self.reg_file.identity)
         self.assertEqual('Test Message Registry File', self.reg_file.name)
         self.assertEqual('Message Registry file for testing',
@@ -197,14 +199,17 @@ class MessageRegistryFileCollectionTestCase(base.TestCase):
         self.conn = mock.Mock()
         with open('sushy/tests/unit/json_samples/'
                   'message_registry_file_collection.json') as f:
-            self.conn.get.return_value.json.return_value = json.load(f)
+            self.json_doc = json.load(f)
+
+        self.conn.get.return_value.json.return_value = self.json_doc
+
         self.reg_file_col =\
             message_registry_file.MessageRegistryFileCollection(
                 self.conn, '/redfish/v1/Registries',
                 redfish_version='1.0.2')
 
     def test__parse_attributes(self):
-        self.reg_file_col._parse_attributes()
+        self.reg_file_col._parse_attributes(self.json_doc)
         self.assertEqual('1.0.2', self.reg_file_col.redfish_version)
         self.assertEqual('Message Registry Test Collection',
                          self.reg_file_col.name)

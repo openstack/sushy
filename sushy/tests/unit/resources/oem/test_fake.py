@@ -30,7 +30,11 @@ class FakeOEMSystemExtensionTestCase(base.TestCase):
         self.sys_instance = system.System(
             self.conn, '/redfish/v1/Systems/437XR1138R2',
             redfish_version='1.0.2')
-        self.fake_sys_oem_extn = fake.FakeOEMSystemExtension(self.sys_instance)
+        self.fake_sys_oem_extn = fake.FakeOEMSystemExtension(
+            self.conn, '',
+            redfish_version='1.0.2')
+        self.fake_sys_oem_extn = self.fake_sys_oem_extn.set_parent_resource(
+            self.sys_instance, 'Contoso')
 
     def test__parse_oem_attributes(self):
         self.assertEqual('http://Contoso.com/Schema#Contoso.ComputerSystem',

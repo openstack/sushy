@@ -31,14 +31,14 @@ class BiosTestCase(base.TestCase):
         super(BiosTestCase, self).setUp()
         self.conn = mock.Mock()
         with open('sushy/tests/unit/json_samples/bios.json') as f:
-            bios_json = json.load(f)
+            self.bios_json = json.load(f)
         with open('sushy/tests/unit/json_samples/bios_settings.json') as f:
-            bios_settings_json = json.load(f)
+            self.bios_settings_json = json.load(f)
 
         self.conn.get.return_value.json.side_effect = [
-            bios_json,
-            bios_settings_json,
-            bios_settings_json]
+            self.bios_json,
+            self.bios_settings_json,
+            self.bios_settings_json]
 
         conn = mock.Mock()
         with open('sushy/tests/unit/json_samples/message_registry.json') as f:
@@ -53,7 +53,7 @@ class BiosTestCase(base.TestCase):
             redfish_version='1.0.2')
 
     def test__parse_attributes(self):
-        self.sys_bios._parse_attributes()
+        self.sys_bios._parse_attributes(self.bios_json)
         self.assertEqual('1.0.2', self.sys_bios.redfish_version)
         self.assertEqual('BIOS', self.sys_bios.identity)
         self.assertEqual('BIOS Configuration Current Settings',
@@ -151,7 +151,7 @@ class BiosTestCase(base.TestCase):
         self.assertRaisesRegex(
             exceptions.MissingAttributeError,
             'attribute Actions/#Bios.ResetBios/target',
-            self.sys_bios._parse_attributes)
+            self.sys_bios._parse_attributes, self.bios_json)
 
     def test_reset_bios(self):
         self.sys_bios.reset_bios()
@@ -202,7 +202,7 @@ class BiosTestCase(base.TestCase):
         self.assertRaisesRegex(
             exceptions.MissingAttributeError,
             'attribute Actions/#Bios.ChangePassword/target',
-            self.sys_bios._parse_attributes)
+            self.sys_bios._parse_attributes, self.bios_json)
 
     def test_change_password(self):
         self.sys_bios.change_password('newpassword',

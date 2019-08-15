@@ -29,14 +29,16 @@ class MessageRegistryTestCase(base.TestCase):
         super(MessageRegistryTestCase, self).setUp()
         self.conn = mock.Mock()
         with open('sushy/tests/unit/json_samples/message_registry.json') as f:
-            self.conn.get.return_value.json.return_value = json.load(f)
+            self.json_doc = json.load(f)
+
+        self.conn.get.return_value.json.return_value = self.json_doc
 
         self.registry = message_registry.MessageRegistry(
             self.conn, '/redfish/v1/Registries/Test',
             redfish_version='1.0.2')
 
     def test__parse_attributes(self):
-        self.registry._parse_attributes()
+        self.registry._parse_attributes(self.json_doc)
         self.assertEqual('Test.1.1.1', self.registry.identity)
         self.assertEqual('Test Message Registry', self.registry.name)
         self.assertEqual('en', self.registry.language)
@@ -65,7 +67,7 @@ class MessageRegistryTestCase(base.TestCase):
             ['unknown_type']
         self.assertRaisesRegex(KeyError,
                                'unknown_type',
-                               self.registry._parse_attributes)
+                               self.registry._parse_attributes, self.json_doc)
 
     def test_parse_message(self):
         conn = mock.Mock()

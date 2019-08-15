@@ -41,14 +41,16 @@ class StorageTestCase(base.TestCase):
         super(StorageTestCase, self).setUp()
         self.conn = mock.Mock()
         with open('sushy/tests/unit/json_samples/storage.json') as f:
-            self.conn.get.return_value.json.return_value = json.load(f)
+            self.json_doc = json.load(f)
+
+        self.conn.get.return_value.json.return_value = self.json_doc
 
         self.storage = storage.Storage(
             self.conn, '/redfish/v1/Systems/437XR1138R2/Storage/1',
             redfish_version='1.0.2')
 
     def test__parse_attributes(self):
-        self.storage._parse_attributes()
+        self.storage._parse_attributes(self.json_doc)
         self.assertEqual('1.0.2', self.storage.redfish_version)
         self.assertEqual('1', self.storage.identity)
         self.assertEqual('Local Storage Controller', self.storage.name)
@@ -233,13 +235,16 @@ class StorageCollectionTestCase(base.TestCase):
         self.conn = mock.Mock()
         with open('sushy/tests/unit/json_samples/'
                   'storage_collection.json') as f:
-            self.conn.get.return_value.json.return_value = json.load(f)
+            self.json_doc = json.load(f)
+
+        self.conn.get.return_value.json.return_value = self.json_doc
+
         self.stor_col = storage.StorageCollection(
             self.conn, '/redfish/v1/Systems/437XR1138R2/Storage',
             redfish_version='1.0.2')
 
     def test__parse_attributes(self):
-        self.stor_col._parse_attributes()
+        self.stor_col._parse_attributes(self.json_doc)
         self.assertEqual((
             '/redfish/v1/Systems/437XR1138R2/Storage/1',),
             self.stor_col.members_identities)

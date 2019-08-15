@@ -28,14 +28,16 @@ class ProcessorTestCase(base.TestCase):
         super(ProcessorTestCase, self).setUp()
         self.conn = mock.Mock()
         with open('sushy/tests/unit/json_samples/processor.json') as f:
-            self.conn.get.return_value.json.return_value = json.load(f)
+            self.json_doc = json.load(f)
+
+        self.conn.get.return_value.json.return_value = self.json_doc
 
         self.sys_processor = processor.Processor(
             self.conn, '/redfish/v1/Systems/437XR1138R2/Processors/CPU1',
             redfish_version='1.0.2')
 
     def test__parse_attributes(self):
-        self.sys_processor._parse_attributes()
+        self.sys_processor._parse_attributes(self.json_doc)
         self.assertEqual('1.0.2', self.sys_processor.redfish_version)
         self.assertEqual('CPU1', self.sys_processor.identity)
         self.assertEqual('CPU 1', self.sys_processor.socket)
@@ -82,13 +84,16 @@ class ProcessorCollectionTestCase(base.TestCase):
         self.conn = mock.Mock()
         with open('sushy/tests/unit/json_samples/'
                   'processor_collection.json') as f:
-            self.conn.get.return_value.json.return_value = json.load(f)
+            self.json_doc = json.load(f)
+
+        self.conn.get.return_value.json.return_value = self.json_doc
+
         self.sys_processor_col = processor.ProcessorCollection(
             self.conn, '/redfish/v1/Systems/437XR1138R2/Processors',
             redfish_version='1.0.2')
 
     def test__parse_attributes(self):
-        self.sys_processor_col._parse_attributes()
+        self.sys_processor_col._parse_attributes(self.json_doc)
         self.assertEqual('1.0.2', self.sys_processor_col.redfish_version)
         self.assertEqual('Processors Collection', self.sys_processor_col.name)
         self.assertEqual(('/redfish/v1/Systems/437XR1138R2/Processors/CPU1',

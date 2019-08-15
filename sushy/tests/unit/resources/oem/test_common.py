@@ -20,18 +20,12 @@ from sushy.resources.oem import common as oem_common
 from sushy.tests.unit import base
 
 
-class ContosoResourceOEMExtension(oem_base.OEMExtensionResourceBase):
-
-    def __init__(self, resource, *args, **kwargs):
-        super(ContosoResourceOEMExtension, self).__init__(
-            resource, 'Contoso', *args, **kwargs)
+class ContosoResourceOEMExtension(oem_base.OEMResourceBase):
+    pass
 
 
-class FauxResourceOEMExtension(oem_base.OEMExtensionResourceBase):
-
-    def __init__(self, resource, *args, **kwargs):
-        super(FauxResourceOEMExtension, self).__init__(
-            resource, 'Faux', *args, **kwargs)
+class FauxResourceOEMExtension(oem_base.OEMResourceBase):
+    pass
 
 
 class ResourceOEMCommonMethodsTestCase(base.TestCase):
@@ -50,17 +44,18 @@ class ResourceOEMCommonMethodsTestCase(base.TestCase):
         contoso_ep.module_name = __name__
         contoso_ep.attrs = ['ContosoResourceOEMExtension']
         self.contoso_extn = stevedore.extension.Extension(
-            'contoso', contoso_ep, ContosoResourceOEMExtension, None)
+            'contoso', contoso_ep, lambda: ContosoResourceOEMExtension, None)
         self.contoso_extn_dup = stevedore.extension.Extension(
-            'contoso_dup', contoso_ep, ContosoResourceOEMExtension, None)
+            'contoso_dup', contoso_ep,
+            lambda: ContosoResourceOEMExtension, None)
 
         faux_ep = mock.Mock()
         faux_ep.module_name = __name__
         faux_ep.attrs = ['FauxResourceOEMExtension']
         self.faux_extn = stevedore.extension.Extension(
-            'faux', faux_ep, FauxResourceOEMExtension, None)
+            'faux', faux_ep, lambda: FauxResourceOEMExtension, None)
         self.faux_extn_dup = stevedore.extension.Extension(
-            'faux_dup', faux_ep, FauxResourceOEMExtension, None)
+            'faux_dup', faux_ep, lambda: FauxResourceOEMExtension, None)
 
         self.fake_ext_mgr = (
             stevedore.extension.ExtensionManager.make_test_instance(
@@ -124,41 +119,54 @@ class ResourceOEMCommonMethodsTestCase(base.TestCase):
         extension_mock = mock.MagicMock()
         extension_mock.obj = None
 
+        mock_oem_resource = extension_mock.plugin.return_value
+
         result = oem_common._get_resource_vendor_extension_obj(
-            extension_mock, resource_instance_mock)
-        self.assertEqual(extension_mock.plugin.return_value, result)
-        extension_mock.plugin.assert_called_once_with(resource_instance_mock)
+            extension_mock, resource_instance_mock, 'fish-n-chips')
+
+        mock_clone_resource = resource_instance_mock.clone_resource
+        mock_clone_resource.assert_called_once_with(mock_oem_resource)
+        mock_ext = mock_clone_resource.return_value
+        mock_ext.set_parent_resource.assert_called_once_with(
+            resource_instance_mock, 'fish-n-chips')
+        mock_ext = mock_ext.set_parent_resource.return_value
+        self.assertEqual(result, mock_ext)
+
         extension_mock.reset_mock()
 
         # extension_mock.obj is not None anymore
-        result = oem_common._get_resource_vendor_extension_obj(
-            extension_mock, resource_instance_mock)
-        self.assertEqual(extension_mock.plugin.return_value, result)
+        oem_common._get_resource_vendor_extension_obj(
+            extension_mock, resource_instance_mock, 'fish-n-chips')
+
         self.assertFalse(extension_mock.plugin.called)
 
     @mock.patch.object(stevedore, 'ExtensionManager', autospec=True)
     def test_get_resource_extension_by_vendor(self, ExtensionManager_mock):
-        resource_instance_mock = mock.Mock(spec=res_base.ResourceBase)
+        oem_resource_mock = mock.Mock()
+        oem_resource_mock.set_parent_resource = lambda *x: oem_resource_mock
+        resource_instance_mock = mock.Mock()
+        resource_instance_mock.clone_resource = lambda *x: oem_resource_mock
         ExtensionManager_mock.side_effect = [self.fake_ext_mgr,
                                              self.fake_ext_mgr2]
 
         result = oem_common.get_resource_extension_by_vendor(
             'system', 'Faux', resource_instance_mock)
-        self.assertIsInstance(result, FauxResourceOEMExtension)
+        self.assertEqual(result, oem_resource_mock)
         ExtensionManager_mock.assert_called_once_with(
             'sushy.resources.system.oems', propagate_map_exceptions=True,
             on_load_failure_callback=oem_common._raise)
         ExtensionManager_mock.reset_mock()
 
+        oem_resource_mock.obj = None
         result = oem_common.get_resource_extension_by_vendor(
             'system', 'Contoso', resource_instance_mock)
-        self.assertIsInstance(result, ContosoResourceOEMExtension)
+        self.assertEqual(result, oem_resource_mock)
         self.assertFalse(ExtensionManager_mock.called)
         ExtensionManager_mock.reset_mock()
 
         result = oem_common.get_resource_extension_by_vendor(
             'manager', 'Faux_dup', resource_instance_mock)
-        self.assertIsInstance(result, FauxResourceOEMExtension)
+        self.assertEqual(result, oem_resource_mock)
         ExtensionManager_mock.assert_called_once_with(
             'sushy.resources.manager.oems', propagate_map_exceptions=True,
             on_load_failure_callback=oem_common._raise)
@@ -166,7 +174,7 @@ class ResourceOEMCommonMethodsTestCase(base.TestCase):
 
         result = oem_common.get_resource_extension_by_vendor(
             'manager', 'Contoso_dup', resource_instance_mock)
-        self.assertIsInstance(result, ContosoResourceOEMExtension)
+        self.assertEqual(result, oem_resource_mock)
         self.assertFalse(ExtensionManager_mock.called)
         ExtensionManager_mock.reset_mock()
 

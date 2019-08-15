@@ -13,33 +13,30 @@
 import logging
 
 from sushy.resources import base
+from sushy.resources import common
 from sushy.resources.oem import base as oem_base
 
 LOG = logging.getLogger(__name__)
 
 
-class ProductionLocationField(oem_base.OEMCompositeField):
+class ProductionLocationField(base.CompositeField):
     facility_name = base.Field('FacilityName')
     country = base.Field('Country')
 
 
-class ContosoActionsField(oem_base.OEMActionsField):
-    reset = oem_base.OEMActionField('#Contoso.Reset')
+class ContosoActionsField(base.CompositeField):
+    reset = common.ResetActionField('#Contoso.Reset')
 
 
-class FakeOEMSystemExtension(oem_base.OEMExtensionResourceBase):
+class FakeOEMSystemExtension(oem_base.OEMResourceBase):
 
-    data_type = oem_base.OEMField('@odata.type')
+    data_type = base.Field('@odata.type')
     production_location = ProductionLocationField('ProductionLocation')
     _actions = ContosoActionsField('Actions')
 
-    def __init__(self, resource, *args, **kwargs):
-        """A class representing ComputerSystem OEM extension for Contoso
-
-        :param resource: The parent System resource instance
-        """
-        super(FakeOEMSystemExtension, self).__init__(
-            resource, 'Contoso', *args, **kwargs)
-
     def get_reset_system_path(self):
         return self._actions.reset.target_uri
+
+
+def get_extension(*args, **kwargs):
+    return FakeOEMSystemExtension
