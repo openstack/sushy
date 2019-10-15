@@ -82,7 +82,7 @@ use following command::
   openssl req -x509 -newkey rsa:2048 -keyout key.pem -out cert.pem -days 365
 
 Start the mockup server passing the ``--ssl-certificate`` and
-``--ssl-key`` parameters to it to it, for example::
+``--ssl-key`` parameters to it, for example::
 
  sushy-emulator --ssl-key key.pem --ssl-certificate cert.pem
 
