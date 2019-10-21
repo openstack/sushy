@@ -294,6 +294,64 @@ Creating and using a sushy session service object
   sess_serv.close_session(sess_col.members_identities[0])
 
 
+--------------------
+Using OEM extensions
+--------------------
+
+Before running this example, please make sure you have a Redfish BMC that
+includes the OEM piece for a specific vendor, as well as the Sushy OEM
+extension package installed in the system for the same vendor.
+
+You can check the presence of the OEM extension within each Redfish
+resource by specifying the vendor ID and search for them.
+
+In the following example, we are looking up "Acme" vendor extension to Redfish
+Manager resource.
+
+.. code-block:: python
+
+  import sushy
+
+  root = sushy.Sushy('http://localhost:8000/redfish/v1')
+
+  # Instantiate a system object
+  system = root.get_system('/redfish/v1/Systems/437XR1138R2')
+
+  print('Working on system resource %s' % system.identity)
+
+  for manager in system.managers:
+
+      print('Using System manager %s' % manager.identity)
+
+      # Get a list of OEM extension names for the system manager
+      oem_vendors = manager.oem_vendors
+
+      print('Listing OEM extension name(s) for the System '
+            'manager %s' % manager.identity )
+
+      print(*oem_vendors, sep="\n")
+
+      try:
+          manager_oem = manager.get_oem_extension('Acme')
+
+      except sushy.exceptions.OEMExtensionNotFoundError:
+          print('ERROR: Acme OEM extension not found in '
+                'Manager %s' % manager.identity)
+          continue
+
+      print('%s is an OEM extension of Manager %s'
+             % (manager_oem.get_extension(), manager.identity))
+
+      # set boot device to a virtual media device image
+      manager_oem.set_virtual_boot_device(sushy.VIRTUAL_MEDIA_CD,
+                                          manager=manager)
+
+
 If you do not have any real baremetal machine that supports the Redfish
 protocol you can look at the :ref:`contributing` page to learn how to
 run a Redfish emulator.
+
+For the OEM extension example, presently, both of the emulators
+(static/dynamic) do not expose any OEM; as a result, users may need to add
+manually some OEM resources to emulators' templates. It may be easier to
+start with a static emulator.
