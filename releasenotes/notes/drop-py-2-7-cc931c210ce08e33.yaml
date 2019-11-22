@@ -1,0 +1,5 @@
+upgrade:
+  - |
+    Python 2.7 support has been dropped. Last release of sushy
+    to support Python 2.7 is OpenStack Train. The minimum version of Python now
+    supported by sushy is Python 3.6.
