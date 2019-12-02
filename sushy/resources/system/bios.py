@@ -13,8 +13,8 @@
 # This is referred from Redfish standard schema.
 # https://redfish.dmtf.org/schemas/Bios.v1_0_3.json
 
+from http import client as http_client
 import logging
-from six.moves import http_client
 
 from sushy import exceptions
 from sushy.resources import base

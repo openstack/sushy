@@ -16,21 +16,12 @@
 import abc
 import collections
 
-# (rpittau) this allows usage of collection ABC abstract classes in both
-# Python 2.7 and Python 3.8+
-try:
-    collectionsAbc = collections.abc
-except AttributeError:
-    collectionsAbc = collections
-
 import copy
 import io
 import json
 import logging
 import pkg_resources
 import zipfile
-
-import six
 
 from sushy import exceptions
 from sushy.resources import oem
@@ -143,8 +134,7 @@ def _collect_fields(resource):
             yield (attr, field)
 
 
-@six.add_metaclass(abc.ABCMeta)
-class CompositeField(collectionsAbc.Mapping, Field):
+class CompositeField(collections.abc.Mapping, Field, metaclass=abc.ABCMeta):
     """Base class for fields consisting of several sub-fields."""
 
     def __init__(self, *args, **kwargs):
@@ -175,7 +165,6 @@ class CompositeField(collectionsAbc.Mapping, Field):
         return instance
 
     # Satisfy the mapping interface, see
-    # https://docs.python.org/2/library/collections.html#collections.Mapping.
     # https://docs.python.org/3/library/collections.abc.html#collections.abc.Mapping
 
     def __getitem__(self, key):
@@ -274,7 +263,7 @@ class MappedField(Field):
             Only has effect when the field is not required. This value is not
             matched against the mapping.
         """
-        if not isinstance(mapping, collectionsAbc.Mapping):
+        if not isinstance(mapping, collections.abc.Mapping):
             raise TypeError("The mapping argument must be a mapping")
 
         super(MappedField, self).__init__(
@@ -300,7 +289,7 @@ class MappedListField(Field):
         :param default: the default value to use when the field is missing.
             Only has effect when the field is not required.
         """
-        if not isinstance(mapping, collectionsAbc.Mapping):
+        if not isinstance(mapping, collections.abc.Mapping):
             raise TypeError("The mapping argument must be a mapping")
 
         self._mapping_adapter = mapping.get
@@ -328,8 +317,7 @@ class MappedListField(Field):
         return instances
 
 
-@six.add_metaclass(abc.ABCMeta)
-class AbstractJsonReader(object):
+class AbstractJsonReader(object, metaclass=abc.ABCMeta):
 
     def set_connection(self, connector, path):
         """Sets mandatory connection parameters
@@ -406,8 +394,7 @@ class JsonPackagedFileReader(AbstractJsonReader):
             return json.loads(resource.read().decode(encoding='utf-8'))
 
 
-@six.add_metaclass(abc.ABCMeta)
-class ResourceBase(object):
+class ResourceBase(object, metaclass=abc.ABCMeta):
 
     redfish_version = None
     """The Redfish version"""
@@ -568,8 +555,7 @@ class ResourceBase(object):
         return self._registries
 
 
-@six.add_metaclass(abc.ABCMeta)
-class ResourceCollectionBase(ResourceBase):
+class ResourceCollectionBase(ResourceBase, metaclass=abc.ABCMeta):
 
     name = Field('Name')
     """The name of the collection"""

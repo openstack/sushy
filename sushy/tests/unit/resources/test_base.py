@@ -14,11 +14,10 @@
 #    under the License.
 
 import copy
+from http import client as http_client
 import io
 import json
 import mock
-
-from six.moves import http_client
 
 from sushy import exceptions
 from sushy.resources import base as resource_base

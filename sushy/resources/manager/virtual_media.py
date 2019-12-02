@@ -13,7 +13,7 @@
 # This is referred from Redfish standard schema.
 # https://redfish.dmtf.org/schemas/VirtualMedia.v1_2_0.json
 
-from six.moves import http_client
+from http import client as http_client
 
 from sushy import exceptions
 from sushy.resources import base

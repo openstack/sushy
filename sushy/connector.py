@@ -14,9 +14,9 @@
 #    under the License.
 
 import logging
+from urllib import parse as urlparse
 
 import requests
-from six.moves.urllib import parse
 
 from sushy import exceptions
 
@@ -77,7 +77,7 @@ class Connector(object):
         :raises: ConnectionError
         :raises: HTTPError
         """
-        url = parse.urljoin(self._url, path)
+        url = urlparse.urljoin(self._url, path)
         headers = headers or {}
         if not any(k.lower() == 'odata-version' for k in headers):
             headers['OData-Version'] = '4.0'

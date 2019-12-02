@@ -12,11 +12,11 @@
 #    License for the specific language governing permissions and limitations
 #    under the License.
 
+from http import client as http_client
 import json
 import mock
 
 from dateutil import parser
-from six.moves import http_client
 
 from sushy import exceptions
 from sushy.resources.registry import message_registry

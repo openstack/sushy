@@ -15,15 +15,12 @@
 import abc
 import logging
 
-import six
-
 from sushy import exceptions
 
 LOG = logging.getLogger(__name__)
 
 
-@six.add_metaclass(abc.ABCMeta)
-class AuthBase(object):
+class AuthBase(object, metaclass=abc.ABCMeta):
 
     def __init__(self, username=None, password=None):
         """A class representing a base Sushy authentication mechanism
