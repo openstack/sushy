@@ -102,6 +102,19 @@ class SimpleStorageCollectionTestCase(base.TestCase):
         self.assertEqual([4000000000000, 8000000000000],
                          self.simpl_stor_col.disks_sizes_bytes)
 
+    def test_disks_sizes_bytes_capacity_bytes_none(self):
+        self.conn.get.return_value.json.reset_mock()
+
+        with open('sushy/tests/unit/json_samples/'
+                  'simple_storage.json') as f:
+            json_doc = json.load(f)
+
+        json_doc['Devices'][0]['CapacityBytes'] = None
+        self.conn.get.return_value.json.return_value = json_doc
+
+        self.assertEqual([4000000000000],
+                         self.simpl_stor_col.disks_sizes_bytes)
+
     def test_max_size_bytes(self):
         self.conn.get.return_value.json.reset_mock()
 

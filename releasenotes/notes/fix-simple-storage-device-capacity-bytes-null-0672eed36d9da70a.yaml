@@ -1,0 +1,11 @@
+---
+fixes:
+  - |
+    Fixes bug in ``SimpleStorageCollection.disks_sizes_bytes`` which assumed
+    the type of a disk's ``CapacityBytes`` property is ``integer``. According
+    to the Distributed Management Task Force (DMTF) Redfish standard schema
+    [1], it can be ``null``, which is converted to ``None`` in Python. For
+    more information, see `story 2006918
+    <https://storyboard.openstack.org/#!/story/2006918>`_.
+
+    [1] https://redfish.dmtf.org/schemas/SimpleStorage.v1_2_3.json
