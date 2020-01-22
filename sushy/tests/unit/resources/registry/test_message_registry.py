@@ -63,7 +63,7 @@ class MessageRegistryTestCase(base.TestCase):
         self.assertEqual('Panic', self.registry.messages['Failed'].resolution)
         self.assertEqual(
             2, len(self.registry.messages['MissingThings'].param_types))
-        self.assertEqual(res_cons.SEVERITY_CRITICAL,
+        self.assertEqual(res_cons.SEVERITY_WARNING,
                          self.registry.messages['MissingThings'].severity)
         self.assertEqual(
             res_cons.PARAMTYPE_STRING,
@@ -73,6 +73,16 @@ class MessageRegistryTestCase(base.TestCase):
             self.registry.messages['MissingThings'].param_types[1])
         self.assertEqual(
             'Try Later', self.registry.messages['MissingThings'].resolution)
+
+    def test__parse_attributes_missing_msg_desc(self):
+        self.json_doc['Messages']['Success'].pop('Description')
+        self.registry._parse_attributes(self.json_doc)
+        self.assertEqual('', self.registry.messages['Success'].description)
+
+    def test__parse_attributes_missing_msg_severity(self):
+        self.json_doc['Messages']['Success'].pop('Severity')
+        self.registry._parse_attributes(self.json_doc)
+        self.assertEqual('warning', self.registry.messages['Success'].severity)
 
     def test__parse_attribtues_unknown_param_type(self):
         self.registry.json['Messages']['Failed']['ParamTypes'] = \
