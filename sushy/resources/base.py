@@ -40,10 +40,9 @@ class Field(object):
 
         :param path: JSON field to fetch the value from. Either a string,
             or a list of strings in case of a nested field.
-        :param required: whether this field is required. Missing required
-            fields result in MissingAttributeError.
+        :param required: whether this field is required. Missing required,
+            but not defaulted, fields result in MissingAttributeError.
         :param default: the default value to use when the field is missing.
-            Only has effect when the field is not required.
         :param adapter: a function to call to transform and/or validate
             the received value. UnicodeError, ValueError or TypeError from
             this call are reraised as MalformedAttributeError.
@@ -80,7 +79,8 @@ class Field(object):
         :param resource: ResourceBase instance for which the field is loaded.
         :param nested_in: parent resource path (for error reporting only),
             must be a list of strings or None.
-        :raises: MissingAttributeError if a required field is missing.
+        :raises: MissingAttributeError if a required field is missing
+            and not defaulted.
         :raises: MalformedAttributeError on invalid field value or type.
         :returns: loaded and verified value
         """
@@ -94,12 +94,18 @@ class Field(object):
         except KeyError:
             if self._required:
                 path = (nested_in or []) + self._path
-                raise exceptions.MissingAttributeError(
-                    attribute='/'.join(path),
-                    resource=resource.path)
-            else:
-                # Do not run the adapter on the default value
-                return self._default
+
+                if self._default is None:
+                    raise exceptions.MissingAttributeError(
+                        attribute='/'.join(path),
+                        resource=resource.path)
+
+                logging.warning(
+                    'Applying default "%s" on required, but missing '
+                    'attribute "%s"' % (self._default, path))
+
+            # Do not run the adapter on the default value
+            return self._default
 
         # NOTE(etingof): this is just to account for schema violation
         if item is None:
@@ -251,11 +257,10 @@ class MappedField(Field):
             a string or a list of string. In the latter case, the value will
             be fetched from a nested object.
         :param mapping: a mapping to take values from.
-        :param required: whether this field is required. Missing required
-            fields result in MissingAttributeError.
+        :param required: whether this field is required. Missing required,
+            but not defaulted, fields result in MissingAttributeError.
         :param default: the default value to use when the field is missing.
-            Only has effect when the field is not required. This value is not
-            matched against the mapping.
+            This value is not matched against the mapping.
         """
         if not isinstance(mapping, collections.abc.Mapping):
             raise TypeError("The mapping argument must be a mapping")
@@ -278,10 +283,9 @@ class MappedListField(Field):
 
         :param field: JSON field to fetch the list of values from.
         :param mapping: a mapping for the list elements.
-        :param required: whether this field is required. Missing required
-            fields result in MissingAttributeError.
+        :param required: whether this field is required. Missing required,
+            but not defaulted, fields result in MissingAttributeError.
         :param default: the default value to use when the field is missing.
-            Only has effect when the field is not required.
         """
         if not isinstance(mapping, collections.abc.Mapping):
             raise TypeError("The mapping argument must be a mapping")

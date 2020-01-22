@@ -21,7 +21,7 @@ from sushy.resources import mappings as res_maps
 
 class MessageDictionaryField(base.DictionaryField):
 
-    description = base.Field('Description', required=False)
+    description = base.Field('Description', required=True, default='')
     """Indicates how and when the message is returned by the Redfish service"""
 
     message = base.Field('Message', required=True)
@@ -47,7 +47,8 @@ class MessageDictionaryField(base.DictionaryField):
 
     severity = base.MappedField('Severity',
                                 res_maps.SEVERITY_VALUE_MAP,
-                                default=res_cons.SEVERITY_CRITICAL)
+                                required=True,
+                                default=res_cons.SEVERITY_WARNING)
     """Mapped severity of the message"""
 
 
