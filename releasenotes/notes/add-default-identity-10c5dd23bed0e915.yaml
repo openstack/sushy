@@ -1,0 +1,10 @@
+---
+features:
+  - |
+    The ``get_system``, ``get_manager`` and ``get_chassis`` methods modified
+    not to require the ``identity`` parameter referring to a particular
+    resource instance. If ``identity`` is omited, sushy will default to the
+    only available resource for as long as it's single and therefore
+    deterministic.
+    The intent is to simplify user API by not requiring the consumer to
+    discover available resources prior to requesting one.

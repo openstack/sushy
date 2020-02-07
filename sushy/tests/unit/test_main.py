@@ -116,12 +116,84 @@ class MainTestCase(base.TestCase):
             redfish_version=self.root.redfish_version,
             registries=mock_registries)
 
+    @mock.patch.object(system, 'SystemCollection', autospec=True)
+    @mock.patch.object(system, 'System', autospec=True)
+    @mock.patch('sushy.Sushy.registries', autospec=True)
+    def test_get_system_default_ok(
+            self, mock_registries, mock_system, mock_system_collection):
+        self.root._standard_message_registries_path = None
+        mock_system.path = 'fake-system-id'
+        mock_members = mock_system_collection.return_value.get_members
+        mock_members.return_value = [mock_system]
+        self.root.get_system()
+        mock_system_collection.assert_called_once_with(
+            self.root._conn, '/redfish/v1/Systems',
+            redfish_version=self.root.redfish_version,
+            registries=mock_registries
+        )
+        mock_system.assert_called_once_with(
+            self.root._conn, 'fake-system-id',
+            redfish_version=self.root.redfish_version,
+            registries=mock_registries)
+
+    @mock.patch.object(system, 'SystemCollection', autospec=True)
+    @mock.patch.object(system, 'System', autospec=True)
+    @mock.patch('sushy.Sushy.registries', autospec=True)
+    def test_get_system_default_failure(
+            self, mock_registries, mock_system, mock_system_collection):
+        self.root._standard_message_registries_path = None
+        mock_members = mock_system_collection.return_value.get_members
+        mock_members.return_value = []
+        self.assertRaises(exceptions.UnknownDefaultError, self.root.get_system)
+        mock_system_collection.assert_called_once_with(
+            self.root._conn, '/redfish/v1/Systems',
+            redfish_version=self.root.redfish_version,
+            registries=mock_registries
+        )
+
     @mock.patch.object(chassis, 'Chassis', autospec=True)
     def test_get_chassis(self, mock_chassis):
         self.root.get_chassis('fake-chassis-id')
         mock_chassis.assert_called_once_with(
             self.root._conn, 'fake-chassis-id',
             self.root.redfish_version, self.root.registries)
+
+    @mock.patch.object(chassis, 'ChassisCollection', autospec=True)
+    @mock.patch.object(chassis, 'Chassis', autospec=True)
+    @mock.patch('sushy.Sushy.registries', autospec=True)
+    def test_get_chassis_default_ok(
+            self, mock_registries, mock_chassis, mock_chassis_collection):
+        self.root._standard_message_registries_path = None
+        mock_chassis.path = 'fake-chassis-id'
+        mock_members = mock_chassis_collection.return_value.get_members
+        mock_members.return_value = [mock_chassis]
+        self.root.get_chassis()
+        mock_chassis_collection.assert_called_once_with(
+            self.root._conn, '/redfish/v1/Chassis',
+            redfish_version=self.root.redfish_version,
+            registries=mock_registries
+        )
+        mock_chassis.assert_called_once_with(
+            self.root._conn, 'fake-chassis-id',
+            redfish_version=self.root.redfish_version,
+            registries=mock_registries
+        )
+
+    @mock.patch.object(chassis, 'ChassisCollection', autospec=True)
+    @mock.patch.object(chassis, 'Chassis', autospec=True)
+    @mock.patch('sushy.Sushy.registries', autospec=True)
+    def test_get_chassis_default_failure(
+            self, mock_registries, mock_chassis, mock_chassis_collection):
+        self.root._standard_message_registries_path = None
+        mock_members = mock_chassis_collection.return_value.get_members
+        mock_members.return_value = []
+        self.assertRaises(
+            exceptions.UnknownDefaultError, self.root.get_chassis)
+        mock_chassis_collection.assert_called_once_with(
+            self.root._conn, '/redfish/v1/Chassis',
+            redfish_version=self.root.redfish_version,
+            registries=mock_registries
+        )
 
     @mock.patch.object(chassis, 'ChassisCollection', autospec=True)
     def test_get_chassis_collection(self, chassis_collection_mock):
@@ -157,6 +229,42 @@ class MainTestCase(base.TestCase):
         Manager_mock.assert_called_once_with(
             self.root._conn, 'fake-manager-id',
             self.root.redfish_version, self.root.registries)
+
+    @mock.patch.object(manager, 'ManagerCollection', autospec=True)
+    @mock.patch.object(manager, 'Manager', autospec=True)
+    @mock.patch('sushy.Sushy.registries', autospec=True)
+    def test_get_manager_default_ok(
+            self, mock_registries, mock_manager, mock_manager_collection):
+        self.root._standard_message_registries_path = None
+        mock_manager.path = 'fake-manager-id'
+        mock_members = mock_manager_collection.return_value.get_members
+        mock_members.return_value = [mock_manager]
+        self.root.get_manager()
+        mock_manager_collection.assert_called_once_with(
+            self.root._conn, '/redfish/v1/Managers',
+            redfish_version=self.root.redfish_version,
+            registries=mock_registries
+        )
+        mock_manager.assert_called_once_with(
+            self.root._conn, 'fake-manager-id',
+            redfish_version=self.root.redfish_version,
+            registries=mock_registries)
+
+    @mock.patch.object(manager, 'ManagerCollection', autospec=True)
+    @mock.patch.object(manager, 'Manager', autospec=True)
+    @mock.patch('sushy.Sushy.registries', autospec=True)
+    def test_get_manager_default_failure(
+            self, mock_registries, mock_manager, mock_system_collection):
+        self.root._standard_message_registries_path = None
+        mock_members = mock_system_collection.return_value.get_members
+        mock_members.return_value = []
+        self.assertRaises(
+            exceptions.UnknownDefaultError, self.root.get_manager)
+        mock_system_collection.assert_called_once_with(
+            self.root._conn, '/redfish/v1/Managers',
+            redfish_version=self.root.redfish_version,
+            registries=mock_registries
+        )
 
     @mock.patch.object(sessionservice, 'SessionService', autospec=True)
     def test_get_sessionservice(self, mock_sess_serv):

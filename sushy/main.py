@@ -182,12 +182,25 @@ class Sushy(base.ResourceBase):
             redfish_version=self.redfish_version,
             registries=self.registries)
 
-    def get_system(self, identity):
+    def get_system(self, identity=None):
         """Given the identity return a System object
 
-        :param identity: The identity of the System resource
+        :param identity: The identity of the System resource. If not given,
+            sushy will default to the single available System or fail
+            if there appear to be more or less then one System listed.
+        :raises: `UnknownDefaultError` if default system can't be determined.
         :returns: The System object
         """
+        if identity is None:
+            systems_collection = self.get_system_collection()
+            listed_systems = systems_collection.get_members()
+            if len(listed_systems) != 1:
+                raise exceptions.UnknownDefaultError(
+                    entity='ComputerSystem',
+                    error='System count is not exactly one')
+
+            identity = listed_systems[0].path
+
         return system.System(self._conn, identity,
                              redfish_version=self.redfish_version,
                              registries=self.registries)
@@ -207,12 +220,25 @@ class Sushy(base.ResourceBase):
                                          redfish_version=self.redfish_version,
                                          registries=self.registries)
 
-    def get_chassis(self, identity):
+    def get_chassis(self, identity=None):
         """Given the identity return a Chassis object
 
-        :param identity: The identity of the Chassis resource
+        :param identity: The identity of the Chassis resource. If not given,
+            sushy will default to the single available chassis or fail
+            if there appear to be more or less then one Chassis listed.
+        :raises: `UnknownDefaultError` if default system can't be determined.
         :returns: The Chassis object
         """
+        if identity is None:
+            chassis_collection = self.get_chassis_collection()
+            listed_chassis = chassis_collection.get_members()
+            if len(listed_chassis) != 1:
+                raise exceptions.UnknownDefaultError(
+                    entity='Chassis',
+                    error='Chassis count is not exactly one')
+
+            identity = listed_chassis[0].path
+
         return chassis.Chassis(self._conn, identity,
                                redfish_version=self.redfish_version,
                                registries=self.registries)
@@ -257,12 +283,24 @@ class Sushy(base.ResourceBase):
                                          redfish_version=self.redfish_version,
                                          registries=self.registries)
 
-    def get_manager(self, identity):
+    def get_manager(self, identity=None):
         """Given the identity return a Manager object
 
-        :param identity: The identity of the Manager resource
+        :param identity: The identity of the Manager resource. If not given,
+            sushy will default to the single available Manager or fail
+            if there appear to be more or less then one Manager listed.
         :returns: The Manager object
         """
+        if identity is None:
+            managers_collection = self.get_manager_collection()
+            listed_managers = managers_collection.get_members()
+            if len(listed_managers) != 1:
+                raise exceptions.UnknownDefaultError(
+                    entity='Manager',
+                    error='Manager count is not exactly one')
+
+            identity = listed_managers[0].path
+
         return manager.Manager(self._conn, identity,
                                redfish_version=self.redfish_version,
                                registries=self.registries)

@@ -60,6 +60,10 @@ class ArchiveParsingError(SushyError):
     message = 'Failed parsing archive "%(path)s": %(error)s'
 
 
+class UnknownDefaultError(SushyError):
+    message = 'Failed at determining default for "%(entity)s": %(error)s'
+
+
 class ExtensionError(SushyError):
     message = ('Sushy Extension Error: %(error)s')
 
