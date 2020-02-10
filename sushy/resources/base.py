@@ -101,16 +101,12 @@ class Field(object):
                 # Do not run the adapter on the default value
                 return self._default
 
-        try:
-            # Get the value based on the name, defaulting to an empty dict
-            # Check to ensure that value is implemented by OEM
-            # TODO(etingof): we should revisit this logic/code
-            if (item is not None and item != {} and
-               str(item).lower() != 'none'):
-                value = self._adapter(item)
+        # NOTE(etingof): this is just to account for schema violation
+        if item is None:
+            return
 
-            else:
-                value = item
+        try:
+            return self._adapter(item)
 
         except (UnicodeError, ValueError, TypeError) as exc:
             path = (nested_in or []) + self._path
@@ -118,8 +114,6 @@ class Field(object):
                 attribute='/'.join(path),
                 resource=resource.path,
                 error=exc)
-
-        return value
 
 
 def _collect_fields(resource):
