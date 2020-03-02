@@ -56,12 +56,6 @@ class SessionServiceTestCase(base.TestCase):
         self.assertEqual(30, self.sess_serv_inst.session_timeout)
         self.assertEqual(exp_path, self.sess_serv_inst.path)
 
-    def test__parse_attributes_missing_timeout(self):
-        self.sess_serv_inst.json.pop('SessionTimeout')
-        self.assertRaisesRegex(
-            exceptions.MissingAttributeError, 'attribute SessionTimeout',
-            self.sess_serv_inst._parse_attributes(self.json_doc))
-
     def test__get_sessions_collection_path(self):
         self.sess_serv_inst.json.pop('Sessions')
         self.assertRaisesRegex(
