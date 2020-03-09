@@ -191,6 +191,16 @@ class MessageRegistryFileTestCase(base.TestCase):
             'No message registry found for %(language)s or default',
             {'language': 'en'})
 
+    @mock.patch('sushy.resources.base.logging.warning',
+                autospec=True)
+    def test__parse_attributes_missing_registry(self, mock_log):
+        self.json_doc.pop('Registry')
+        self.reg_file._parse_attributes(self.json_doc)
+        self.assertEqual('UNKNOWN.0.0', self.reg_file.registry)
+        mock_log.assert_called_with(
+            'Applying default "UNKNOWN.0.0" on required, but missing '
+            'attribute "[\'Registry\']"')
+
 
 class MessageRegistryFileCollectionTestCase(base.TestCase):
 
