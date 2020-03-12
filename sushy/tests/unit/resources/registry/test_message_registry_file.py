@@ -150,6 +150,48 @@ class MessageRegistryFileTestCase(base.TestCase):
             'No message registry found for %(language)s or default',
             {'language': 'en'})
 
+    @mock.patch('sushy.resources.registry.message_registry.MessageRegistry',
+                autospec=True)
+    @mock.patch('sushy.resources.registry.message_registry_file.RegistryType',
+                autospec=True)
+    @mock.patch('sushy.resources.registry.message_registry_file.LOG',
+                autospec=True)
+    def test_get_message_registry_invalid_uri(
+            self, mock_log, mock_msg_reg_type, mock_msg_reg):
+        mock_msg_reg_rv = mock.Mock()
+        mock_msg_reg.return_value = mock_msg_reg_rv
+        self.reg_file.location[0].uri = {'extref': 'http://127.0.0.1/reg'}
+        mock_msg_reg.side_effect = TypeError('Wrong URL type')
+        mock_msg_reg_type.return_value._odata_type = mock.MagicMock(
+            endswith=mock.MagicMock(return_value=True))
+
+        registry = self.reg_file.get_message_registry('en', None)
+
+        self.assertIsNone(registry)
+
+        mock_msg_reg_type.assert_called_once_with(
+            mock.ANY,
+            path={'extref': 'http://127.0.0.1/reg'}, reader=None,
+            redfish_version='1.0.2')
+
+        mock_msg_reg.assert_called_once_with(
+            mock.ANY,
+            path={'extref': 'http://127.0.0.1/reg'}, reader=None,
+            redfish_version='1.0.2')
+
+        expected_calls = [
+            mock.call(
+                'Cannot load message registry from location %(location)s: '
+                '%(error)s',
+                {'location': {'extref': 'http://127.0.0.1/reg'},
+                 'error': mock.ANY}),
+            mock.call(
+                'No message registry found for %(language)s or default',
+                {'language': 'en'})
+        ]
+
+        mock_log.warning.assert_has_calls(expected_calls)
+
     @mock.patch('sushy.resources.registry.message_registry_file.RegistryType',
                 autospec=True)
     def test_get_message_registry_non_default_lang(self, mock_registry_type):
