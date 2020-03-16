@@ -27,11 +27,14 @@ LOG = logging.getLogger(__name__)
 
 class Connector(object):
 
-    def __init__(self, url, username=None, password=None, verify=True):
+    def __init__(
+            self, url, username=None, password=None, verify=True,
+            response_callback=None):
         self._url = url
         self._verify = verify
         self._session = requests.Session()
         self._session.verify = self._verify
+        self._response_callback = response_callback
 
         # NOTE(etingof): field studies reveal that some BMCs choke at
         # long-running persistent HTTP connections (or TCP connections).
@@ -100,6 +103,10 @@ class Connector(object):
                                              **extra_session_req_kwargs)
         except requests.ConnectionError as e:
             raise exceptions.ConnectionError(url=url, error=e)
+
+        if self._response_callback:
+            self._response_callback(response)
+
         # If we received an AccessError, and we
         # previously established a redfish session
         # there is a chance that the session has timed-out.

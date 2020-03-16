@@ -43,6 +43,16 @@ class ConnectorMethodsTestCase(base.TestCase):
                                    password='password')
         self.assertEqual(conn._session.auth, ('admin', 'password'))
 
+    def test_init_with_callback(self):
+        def response_callback(response):
+            return
+
+        conn = connector.Connector('http://foo.bar:1234',
+                                   username='admin',
+                                   password='password',
+                                   response_callback=response_callback)
+        self.assertIs(conn._response_callback, response_callback)
+
     @mock.patch.object(connector.Connector, '_op', autospec=True)
     def test_get(self, mock__op):
         self.conn.get(path='fake/path', data=self.data.copy(),
@@ -168,6 +178,13 @@ class ConnectorOpTestCase(base.TestCase):
         self.request.assert_called_once_with(
             'GET', 'http://foo.bar:1234/fake/path',
             headers=self.headers, json=None)
+
+    def test_response_callback(self):
+        mock_response_callback = mock.MagicMock()
+        self.conn._response_callback = mock_response_callback
+
+        self.conn._op('GET', path='fake/path', headers=self.headers)
+        self.assertEqual(1, mock_response_callback.call_count)
 
     def test_ok_get_url_redirect_false(self):
         self.conn._op('GET', path='fake/path', headers=self.headers,

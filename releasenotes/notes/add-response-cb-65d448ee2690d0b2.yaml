@@ -1,0 +1,7 @@
+---
+features:
+  - |
+    Adds optional ``response_callback`` parameter to ``Connector`` class
+    that can be used by the application to receive vanilla HTTP messages
+    in the course of running Redfish call. The intention is to facilitate
+    Redfish exchange debugging.
