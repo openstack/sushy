@@ -1,0 +1,6 @@
+---
+fixes:
+  - |
+    Postpones (potentially very large) Redfish message registries download and
+    processing up to the first access by the client. The goal is to reduce
+    the amount of unnecessary traffic and CPU cycles.
