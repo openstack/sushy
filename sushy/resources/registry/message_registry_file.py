@@ -126,10 +126,28 @@ class MessageRegistryFile(base.ResourceBase):
                             {'language': language})
                 continue
 
-            registry = RegistryType(*args, **kwargs)
+            try:
+                registry = RegistryType(*args, **kwargs)
+
+            except Exception as exc:
+                LOG.warning(
+                    'Cannot load message registry type from location '
+                    '%(location)s: %(error)s', {
+                        'location': kwargs['path'],
+                        'error': exc})
+                continue
 
             if registry._odata_type.endswith('MessageRegistry'):
-                return message_registry.MessageRegistry(*args, **kwargs)
+                try:
+                    return message_registry.MessageRegistry(*args, **kwargs)
+
+                except Exception as exc:
+                    LOG.warning(
+                        'Cannot load message registry from location '
+                        '%(location)s: %(error)s', {
+                            'location': kwargs['path'],
+                            'error': exc})
+                    continue
 
             LOG.warning('Ignoring unsupported flavor of registry %(registry)s',
                         {'registry': registry._odata_type})
