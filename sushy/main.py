@@ -171,8 +171,8 @@ class Sushy(base.ResourceBase):
             Defaults to 'en'.
         """
         self._root_prefix = root_prefix
-        if (auth is not None and (password is not None or
-                                  username is not None)):
+        if (auth is not None and (password is not None
+                                  or username is not None)):
             msg = ('Username or Password were provided to Sushy '
                    'when an authentication mechanism was specified.')
             raise ValueError(msg)
@@ -430,12 +430,13 @@ class Sushy(base.ResourceBase):
         message_registries = []
         resource_package_name = __name__
         for json_file in pkg_resources.resource_listdir(
-            resource_package_name, STANDARD_REGISTRY_PATH):
-                # Not using path.join according to pkg_resources docs
-                mes_reg = message_registry.MessageRegistry(
-                    None, STANDARD_REGISTRY_PATH + json_file,
-                    reader=base.JsonPackagedFileReader(resource_package_name))
-                message_registries.append(mes_reg)
+                resource_package_name, STANDARD_REGISTRY_PATH):
+            # Not using path.join according to pkg_resources docs
+            mes_reg = message_registry.MessageRegistry(
+                None, STANDARD_REGISTRY_PATH + json_file,
+                reader=base.JsonPackagedFileReader(
+                    resource_package_name))
+            message_registries.append(mes_reg)
 
         return message_registries
 
@@ -453,8 +454,8 @@ class Sushy(base.ResourceBase):
         """
         standard = self._get_standard_message_registry_collection()
 
-        registries = {r.registry_prefix + '.' +
-                      r.registry_version.rsplit('.', 1)[0]: r
+        registries = {r.registry_prefix + '.'
+                      + r.registry_version.rsplit('.', 1)[0]: r
                       for r in standard if r.language == self._language}
 
         registry_col = self._get_registry_collection()
