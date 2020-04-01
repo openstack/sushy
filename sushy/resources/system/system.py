@@ -16,6 +16,7 @@
 # This is referred from Redfish standard schema.
 # https://redfish.dmtf.org/schemas/ComputerSystem.v1_5_0.json
 
+import collections
 import logging
 
 from sushy import exceptions
@@ -207,41 +208,44 @@ class System(base.ResourceBase):
                     set(sys_maps.BOOT_SOURCE_TARGET_MAP).
                     intersection(self.boot.allowed_values)])
 
-    def set_system_boot_source(self, target,
-                               enabled=sys_cons.BOOT_SOURCE_ENABLED_ONCE,
-                               mode=None):
-        """Set the boot source.
+    def set_system_boot_options(self, target=None, enabled=None, mode=None):
+        """Set boot source and/or boot frequency and/or boot mode.
 
-        Set the boot source to use on next reboot of the System.
+        Set the boot source and/or boot frequency and/or boot mode to use
+        on next reboot of the System.
 
-        :param target: The target boot source.
+        :param target: The target boot source, optional.
         :param enabled: The frequency, whether to set it for the next
             reboot only (BOOT_SOURCE_ENABLED_ONCE) or persistent to all
             future reboots (BOOT_SOURCE_ENABLED_CONTINUOUS) or disabled
-            (BOOT_SOURCE_ENABLED_DISABLED).
-        :param mode: The boot mode, UEFI (BOOT_SOURCE_MODE_UEFI) or
-            BIOS (BOOT_SOURCE_MODE_BIOS).
+            (BOOT_SOURCE_ENABLED_DISABLED), optional.
+        :param mode: The boot mode (UEFI: BOOT_SOURCE_MODE_UEFI or
+            BIOS: BOOT_SOURCE_MODE_BIOS), optional.
         :raises: InvalidParameterValueError, if any information passed is
             invalid.
         """
-        valid_targets = self.get_allowed_system_boot_source_values()
-        if target not in valid_targets:
-            raise exceptions.InvalidParameterValueError(
-                parameter='target', value=target, valid_values=valid_targets)
+        data = collections.defaultdict(dict)
 
-        if enabled not in sys_maps.BOOT_SOURCE_ENABLED_MAP_REV:
-            raise exceptions.InvalidParameterValueError(
-                parameter='enabled', value=enabled,
-                valid_values=list(sys_maps.BOOT_SOURCE_ENABLED_MAP_REV))
+        if target is not None:
+            valid_targets = self.get_allowed_system_boot_source_values()
+            if target not in valid_targets:
+                raise exceptions.InvalidParameterValueError(
+                    parameter='target', value=target,
+                    valid_values=valid_targets)
 
-        data = {
-            'Boot': {
-                'BootSourceOverrideTarget':
-                    sys_maps.BOOT_SOURCE_TARGET_MAP_REV[target],
-                'BootSourceOverrideEnabled':
-                    sys_maps.BOOT_SOURCE_ENABLED_MAP_REV[enabled]
-            }
-        }
+            fishy_target = sys_maps.BOOT_SOURCE_TARGET_MAP_REV[target]
+
+            data['Boot']['BootSourceOverrideTarget'] = fishy_target
+
+        if enabled is not None:
+            if enabled not in sys_maps.BOOT_SOURCE_ENABLED_MAP_REV:
+                raise exceptions.InvalidParameterValueError(
+                    parameter='enabled', value=enabled,
+                    valid_values=list(sys_maps.BOOT_SOURCE_ENABLED_MAP_REV))
+
+            fishy_freq = sys_maps.BOOT_SOURCE_ENABLED_MAP_REV[enabled]
+
+            data['Boot']['BootSourceOverrideEnabled'] = fishy_freq
 
         if mode is not None:
             if mode not in sys_maps.BOOT_SOURCE_MODE_MAP_REV:
@@ -249,12 +253,37 @@ class System(base.ResourceBase):
                     parameter='mode', value=mode,
                     valid_values=list(sys_maps.BOOT_SOURCE_MODE_MAP_REV))
 
-            data['Boot']['BootSourceOverrideMode'] = (
-                sys_maps.BOOT_SOURCE_MODE_MAP_REV[mode])
+            fishy_mode = sys_maps.BOOT_SOURCE_MODE_MAP_REV[mode]
+
+            data['Boot']['BootSourceOverrideMode'] = fishy_mode
 
         # TODO(lucasagomes): Check the return code and response body ?
         #                    Probably we should call refresh() as well.
         self._conn.patch(self.path, data=data)
+
+    # TODO(etingof): we should remove this method, eventually
+    def set_system_boot_source(
+            self, target, enabled=sys_cons.BOOT_SOURCE_ENABLED_ONCE,
+            mode=None):
+        """Set boot source and/or boot frequency and/or boot mode.
+
+        Set the boot source and/or boot frequency and/or boot mode to use
+        on next reboot of the System.
+
+        This method is obsoleted by `set_system_boot_options`.
+
+        :param target: The target boot source.
+        :param enabled: The frequency, whether to set it for the next
+            reboot only (BOOT_SOURCE_ENABLED_ONCE) or persistent to all
+            future reboots (BOOT_SOURCE_ENABLED_CONTINUOUS) or disabled
+            (BOOT_SOURCE_ENABLED_DISABLED).
+            Default is `BOOT_SOURCE_ENABLED_ONCE`.
+        :param mode: The boot mode (UEFI: BOOT_SOURCE_MODE_UEFI or
+            BIOS: BOOT_SOURCE_MODE_BIOS), optional.
+        :raises: InvalidParameterValueError, if any information passed is
+            invalid.
+        """
+        self.set_system_boot_options(target, enabled, mode)
 
     def set_indicator_led(self, state):
         """Set IndicatorLED to the given state.

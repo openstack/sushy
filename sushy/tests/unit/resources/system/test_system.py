@@ -226,6 +226,64 @@ class SystemTestCase(base.TestCase):
         self.assertIsInstance(values, set)
         self.assertEqual(1, mock_log.call_count)
 
+    def test_set_system_boot_options(self):
+        self.sys_inst.set_system_boot_options(
+            sushy.BOOT_SOURCE_TARGET_PXE,
+            enabled=sushy.BOOT_SOURCE_ENABLED_CONTINUOUS,
+            mode=sushy.BOOT_SOURCE_MODE_UEFI)
+        self.sys_inst._conn.patch.assert_called_once_with(
+            '/redfish/v1/Systems/437XR1138R2',
+            data={'Boot': {'BootSourceOverrideEnabled': 'Continuous',
+                           'BootSourceOverrideTarget': 'Pxe',
+                           'BootSourceOverrideMode': 'UEFI'}})
+
+    def test_set_system_boot_options_no_mode_specified(self):
+        self.sys_inst.set_system_boot_options(
+            sushy.BOOT_SOURCE_TARGET_HDD,
+            enabled=sushy.BOOT_SOURCE_ENABLED_ONCE)
+        self.sys_inst._conn.patch.assert_called_once_with(
+            '/redfish/v1/Systems/437XR1138R2',
+            data={'Boot': {'BootSourceOverrideEnabled': 'Once',
+                           'BootSourceOverrideTarget': 'Hdd'}})
+
+    def test_set_system_boot_options_no_target_specified(self):
+        self.sys_inst.set_system_boot_options(
+            enabled=sushy.BOOT_SOURCE_ENABLED_CONTINUOUS,
+            mode=sushy.BOOT_SOURCE_MODE_UEFI)
+        self.sys_inst._conn.patch.assert_called_once_with(
+            '/redfish/v1/Systems/437XR1138R2',
+            data={'Boot': {'BootSourceOverrideEnabled': 'Continuous',
+                           'BootSourceOverrideMode': 'UEFI'}})
+
+    def test_set_system_boot_options_no_freq_specified(self):
+        self.sys_inst.set_system_boot_options(
+            target=sushy.BOOT_SOURCE_TARGET_PXE,
+            mode=sushy.BOOT_SOURCE_MODE_UEFI)
+        self.sys_inst._conn.patch.assert_called_once_with(
+            '/redfish/v1/Systems/437XR1138R2',
+            data={'Boot': {'BootSourceOverrideTarget': 'Pxe',
+                           'BootSourceOverrideMode': 'UEFI'}})
+
+    def test_set_system_boot_options_nothing_specified(self):
+        self.sys_inst.set_system_boot_options()
+        self.sys_inst._conn.patch.assert_called_once_with(
+            '/redfish/v1/Systems/437XR1138R2', data={})
+
+    def test_set_system_boot_options_invalid_target(self):
+        self.assertRaises(exceptions.InvalidParameterValueError,
+                          self.sys_inst.set_system_boot_source,
+                          'invalid-target')
+
+    def test_set_system_boot_options_invalid_enabled(self):
+        with self.assertRaisesRegex(
+            exceptions.InvalidParameterValueError,
+            '"enabled" value.*{0}'.format(
+                list(sys_map.BOOT_SOURCE_ENABLED_MAP_REV))):
+
+            self.sys_inst.set_system_boot_options(
+                sushy.BOOT_SOURCE_TARGET_HDD,
+                enabled='invalid-enabled')
+
     def test_set_system_boot_source(self):
         self.sys_inst.set_system_boot_source(
             sushy.BOOT_SOURCE_TARGET_PXE,

@@ -1,0 +1,10 @@
+---
+fixes:
+  - |
+    Adds a new ``set_system_boot_options`` method to the ``System`` object
+    superseding the ``set_system_boot_source`` method. The new method has
+    all boot parameters optional to allow for more atomicity when PATCH'ing
+    Redfish ``Boot`` object. The new method will only include those items in
+    the PATCH document, that are explicitly passed by the user. This change
+    might improve interoperability with BMCs that do not handle certain
+    attributes of the ``Boot`` object.
