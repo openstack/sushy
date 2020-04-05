@@ -34,6 +34,7 @@ requests==2.14.2
 requestsexceptions==1.2.0
 snowballstemmer==1.2.1
 Sphinx==1.6.2
+sphinxcontrib-apidoc==0.2.0
 sphinxcontrib-websupport==1.0.1
 stevedore==1.29.0
 stestr==2.0.0

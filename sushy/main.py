@@ -64,7 +64,7 @@ class LazyRegistries(collections.MutableMapping):
     the BMC unless the consumer is actually trying to use them.
 
     :param service_root: Redfish service root object
-    :type service_root: Sushy
+    :type service_root: sushy.main.Sushy
     """
 
     def __init__(self, service_root):
