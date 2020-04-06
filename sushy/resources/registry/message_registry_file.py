@@ -66,7 +66,7 @@ class MessageRegistryFile(base.ResourceBase):
     languages = base.Field('Languages', required=True)
     """List of RFC 5646 language codes supported by this resource"""
 
-    registry = base.Field('Registry', required=True)
+    registry = base.Field('Registry', required=True, default='UNKNOWN.0.0')
     """Prefix for MessageId used for messages from this resource
 
     This attribute is in form Registry_name.Major_version.Minor_version
