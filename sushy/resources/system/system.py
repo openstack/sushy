@@ -56,6 +56,8 @@ class BootField(base.CompositeField):
 
     target = base.MappedField('BootSourceOverrideTarget', sys_cons.BootSource)
 
+    http_boot_uri = base.Field('HttpBootUri')
+
 
 class MemorySummaryField(base.CompositeField):
     health = base.Field(['Status', 'HealthRollup'])
@@ -212,7 +214,8 @@ class System(base.ResourceBase):
         return {v for v in sys_cons.BootSource
                 if v.value in self.boot.allowed_values}
 
-    def set_system_boot_options(self, target=None, enabled=None, mode=None):
+    def set_system_boot_options(self, target=None, enabled=None, mode=None,
+                                http_boot_uri=None):
         """Set boot source and/or boot frequency and/or boot mode.
 
         Set the boot source and/or boot frequency and/or boot mode to use
@@ -220,10 +223,19 @@ class System(base.ResourceBase):
 
         :param target: The target boot source,
             a :py:class:`sushy.BootSource` value. Optional.
-        :param enabled: How long the override be enabled,
+        :param enabled: How long the override is enabled,
             a :py:class:`sushy.BootSourceOverrideEnabled` value. Optional.
         :param mode: The boot mode,
             a :py:class:`sushy.BootSourceOverrideMode` value. Optional.
+        :param http_boot_uri: The requested HTTP Boot URI to transmit to the
+            BMC. Only valid when BootSourceOverrideTarget is set to UefiHTTP,
+            when utilizing the ``target`` parameter. If no value is supplied,
+            and the target is set to UefiHTTP, then an empty value will be
+            sent to the BMC to remove any prior setting, allowing the host
+            to load configuration from DHCP.
+            If not explicitly set, any value will be removed from a BMC when
+            UefiHttp boot is not engaged.
+
         :raises: InvalidParameterValueError, if any information passed is
             invalid.
         """
@@ -235,6 +247,7 @@ class System(base.ResourceBase):
             settings_boot_section = settings_resp.json().get('Boot', {})
         else:
             settings_resp = None
+            settings_boot_section = {}
 
         if target is not None:
             valid_targets = self.get_allowed_system_boot_source_values()
@@ -292,6 +305,25 @@ class System(base.ResourceBase):
                 settings_data['Boot']['BootSourceOverrideMode'] = fishy_mode
             else:
                 data['Boot']['BootSourceOverrideMode'] = fishy_mode
+
+        if target == sys_cons.BootSource.UEFI_HTTP:
+            # The http_boot_uri value *can* be set independently of the
+            # target, but the BMC will just ignore it unless the target
+            # is set. So we should only, and explicitly set it when we've
+            # been requested to boot from UefiHTTP.
+            if not http_boot_uri:
+                # This should clear out any old entries, as no URI translates
+                # to the intent of "use whatever the dhcp server says".
+                data['Boot']['HttpBootUri'] = None
+            else:
+                # Explicilty set the URI.
+                data['Boot']['HttpBootUri'] = http_boot_uri
+        elif not http_boot_uri:
+            # We're not doing boot from URL, we should cleanup any setting
+            # which may be from a prior step/call.
+            if settings_boot_section.get('HttpBootUri'):
+                # If the setting is present, and has any value, unset it.
+                data['Boot']['HttpBootUri'] = None
 
         # TODO(lucasagomes): Check the return code and response body ?
         #                    Probably we should call refresh() as well.
