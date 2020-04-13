@@ -9,7 +9,6 @@
       - openstack/sushy
     vars:
       devstack_localrc:
-        IRONIC_RAMDISK_TYPE: tinyipa
         IRONIC_DEPLOY_DRIVER: redfish
         IRONIC_ENABLED_HARDWARE_TYPES: redfish
         IRONIC_DEFAULT_RESCUE_INTERFACE: ""
