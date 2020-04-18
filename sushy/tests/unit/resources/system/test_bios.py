@@ -14,7 +14,7 @@
 
 from http import client as http_client
 import json
-import mock
+from unittest import mock
 
 from dateutil import parser
 

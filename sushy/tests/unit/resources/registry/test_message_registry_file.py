@@ -14,7 +14,7 @@
 
 
 import json
-import mock
+from unittest import mock
 
 from sushy.resources.registry import message_registry_file
 from sushy.tests.unit import base

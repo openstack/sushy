@@ -13,8 +13,8 @@
 #    under the License.
 
 import json
+from unittest import mock
 
-import mock
 
 import sushy
 from sushy.resources import constants as res_cons

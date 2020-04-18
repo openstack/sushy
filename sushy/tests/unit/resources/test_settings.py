@@ -14,7 +14,7 @@
 #    under the License.
 
 import json
-import mock
+from unittest import mock
 
 from sushy.resources import constants as res_cons
 from sushy.resources.registry import message_registry

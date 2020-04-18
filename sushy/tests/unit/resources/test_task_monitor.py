@@ -14,9 +14,9 @@
 
 from datetime import datetime
 from datetime import timedelta
+from unittest import mock
 
 from dateutil import parser
-import mock
 
 from sushy.resources.task_monitor import TaskMonitor
 from sushy.tests.unit import base

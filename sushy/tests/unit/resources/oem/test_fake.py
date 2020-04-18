@@ -11,8 +11,8 @@
 # under the License.
 
 import json
+from unittest import mock
 
-import mock
 
 from sushy.resources.oem import fake
 from sushy.resources.system import system

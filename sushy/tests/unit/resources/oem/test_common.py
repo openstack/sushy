@@ -10,8 +10,8 @@
 # License for the specific language governing permissions and limitations
 # under the License.
 
-import mock
 import stevedore
+from unittest import mock
 
 from sushy import exceptions
 from sushy.resources import base as res_base

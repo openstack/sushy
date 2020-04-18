@@ -13,8 +13,8 @@
 # under the License.
 
 import json
+from unittest import mock
 
-import mock
 
 from sushy.resources.chassis.power import power
 from sushy.tests.unit import base

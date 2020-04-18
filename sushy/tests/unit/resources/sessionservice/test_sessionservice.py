@@ -14,8 +14,8 @@
 #    under the License.
 
 import json
+from unittest import mock
 
-import mock
 
 from sushy import exceptions
 from sushy.resources.sessionservice import session

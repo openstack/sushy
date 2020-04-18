@@ -12,7 +12,7 @@
 # limitations under the License.
 
 import json
-import mock
+from unittest import mock
 
 from sushy import exceptions
 from sushy.resources.compositionservice import constants as res_block_cons

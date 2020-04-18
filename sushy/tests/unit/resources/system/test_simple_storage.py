@@ -11,8 +11,8 @@
 #    under the License.
 
 import json
+from unittest import mock
 
-import mock
 
 from sushy.resources import constants as res_cons
 from sushy.resources.system import simple_storage

@@ -17,7 +17,7 @@ import copy
 from http import client as http_client
 import io
 import json
-import mock
+from unittest import mock
 
 from sushy import exceptions
 from sushy.resources import base as resource_base
