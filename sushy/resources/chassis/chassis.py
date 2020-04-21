@@ -13,6 +13,8 @@
 # This is referred from Redfish standard schema.
 # http://redfish.dmtf.org/schemas/v1/Chassis.v1_8_0.json
 
+import logging
+
 from sushy import exceptions
 from sushy.resources import base
 from sushy.resources.chassis import mappings as cha_maps
@@ -23,7 +25,6 @@ from sushy.resources.manager import manager
 from sushy.resources import mappings as res_maps
 from sushy import utils
 
-import logging
 
 LOG = logging.getLogger(__name__)
 
