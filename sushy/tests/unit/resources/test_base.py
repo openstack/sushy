@@ -18,11 +18,11 @@ from http import client as http_client
 import io
 import json
 from unittest import mock
+import zipfile
 
 from sushy import exceptions
 from sushy.resources import base as resource_base
 from sushy.tests.unit import base
-import zipfile
 
 
 BASE_RESOURCE_JSON = {

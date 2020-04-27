@@ -15,13 +15,13 @@
 
 import abc
 import collections
-
 import copy
 import io
 import json
 import logging
-import pkg_resources
 import zipfile
+
+import pkg_resources
 
 from sushy import exceptions
 from sushy.resources import oem

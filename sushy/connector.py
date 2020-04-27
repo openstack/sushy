@@ -14,10 +14,10 @@
 #    under the License.
 
 import logging
+import time
 from urllib import parse as urlparse
 
 import requests
-import time
 
 from sushy import exceptions
 from sushy.resources.task_monitor import TaskMonitor

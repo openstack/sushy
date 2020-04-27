@@ -18,7 +18,6 @@ from sushy import exceptions
 from sushy.resources.compositionservice import constants as res_block_cons
 from sushy.resources.compositionservice import resourceblock
 from sushy.resources import constants as res_cons
-
 from sushy.tests.unit import base
 
 

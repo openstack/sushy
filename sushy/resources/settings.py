@@ -13,8 +13,9 @@
 # This is referred from Redfish standard schema.
 # https://redfish.dmtf.org/schemas/Settings.v1_2_0.json
 
-from dateutil import parser
 import logging
+
+from dateutil import parser
 
 from sushy.resources import base
 from sushy.resources import common

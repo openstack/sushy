@@ -13,13 +13,14 @@
 # This is referred from Redfish standard schema.
 # http://redfish.dmtf.org/schemas/v1/Fabric.v1_0_4.json
 
+import logging
+
 from sushy.resources import base
 from sushy.resources import common
 from sushy.resources.fabric import endpoint as fab_endpoint
 from sushy.resources import mappings as res_maps
 from sushy import utils
 
-import logging
 
 LOG = logging.getLogger(__name__)
 
