@@ -10,6 +10,7 @@
     vars:
       devstack_localrc:
         IRONIC_RAMDISK_TYPE: tinyipa
+        IRONIC_DEFAULT_BOOT_OPTION: netboot
         IRONIC_DEPLOY_DRIVER: redfish
         IRONIC_ENABLED_HARDWARE_TYPES: redfish
         IRONIC_DEFAULT_RESCUE_INTERFACE: ""
