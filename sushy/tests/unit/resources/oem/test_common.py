@@ -114,32 +114,6 @@ class ResourceOEMCommonMethodsTestCase(base.TestCase):
             self.assertTrue(extension in (self.contoso_extn,
                                           self.faux_extn))
 
-    def test__get_resource_vendor_extension_obj_lazy_plugin_invoke(self):
-        resource_instance_mock = mock.Mock()
-        extension_mock = mock.MagicMock()
-        extension_mock.obj = None
-
-        mock_oem_resource = extension_mock.plugin.return_value
-
-        result = oem_common._get_resource_vendor_extension_obj(
-            extension_mock, resource_instance_mock, 'fish-n-chips')
-
-        mock_clone_resource = resource_instance_mock.clone_resource
-        mock_clone_resource.assert_called_once_with(mock_oem_resource)
-        mock_ext = mock_clone_resource.return_value
-        mock_ext.set_parent_resource.assert_called_once_with(
-            resource_instance_mock, 'fish-n-chips')
-        mock_ext = mock_ext.set_parent_resource.return_value
-        self.assertEqual(result, mock_ext)
-
-        extension_mock.reset_mock()
-
-        # extension_mock.obj is not None anymore
-        oem_common._get_resource_vendor_extension_obj(
-            extension_mock, resource_instance_mock, 'fish-n-chips')
-
-        self.assertFalse(extension_mock.plugin.called)
-
     @mock.patch.object(stevedore, 'ExtensionManager', autospec=True)
     def test_get_resource_extension_by_vendor(self, ExtensionManager_mock):
         oem_resource_mock = mock.Mock()
@@ -192,3 +166,30 @@ class ResourceOEMCommonMethodsTestCase(base.TestCase):
             'by name "faux"',
             oem_common.get_resource_extension_by_vendor,
             'sushy.resources.system.oems', 'Faux', resource_instance_mock)
+
+    @mock.patch.object(stevedore, 'ExtensionManager', autospec=True)
+    def test_get_resource_extension_by_vendor_different_resources(
+            self, ExtensionManager_mock):
+        oem_resource_mock = mock.Mock()
+        oem_resource_mock.set_parent_resource = lambda *x: oem_resource_mock
+        resource_instance_mock = mock.Mock()
+        resource_instance_mock.clone_resource = lambda *x: oem_resource_mock
+        oem_resource_mock2 = mock.Mock()
+        oem_resource_mock2.set_parent_resource = lambda *x: oem_resource_mock2
+        resource_instance_mock2 = mock.Mock()
+        resource_instance_mock2.clone_resource = lambda *x: oem_resource_mock2
+        ExtensionManager_mock.side_effect = [self.fake_ext_mgr]
+
+        result = oem_common.get_resource_extension_by_vendor(
+            'system', 'Faux', resource_instance_mock)
+        self.assertEqual(result, oem_resource_mock)
+        ExtensionManager_mock.assert_called_once_with(
+            'sushy.resources.system.oems', propagate_map_exceptions=True,
+            on_load_failure_callback=oem_common._raise)
+        ExtensionManager_mock.reset_mock()
+
+        result2 = oem_common.get_resource_extension_by_vendor(
+            'system', 'Faux', resource_instance_mock2)
+        self.assertEqual(result2, oem_resource_mock2)
+        ExtensionManager_mock.assert_not_called()
+        ExtensionManager_mock.reset_mock()

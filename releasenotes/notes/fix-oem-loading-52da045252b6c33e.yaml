@@ -1,0 +1,6 @@
+---
+fixes:
+  - |
+    Fixes Sushy OEM extension loading when using multiple servers that
+    caused loaded extensions to point to server for which the extension
+    was loaded first.
