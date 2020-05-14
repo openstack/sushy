@@ -1,0 +1,2 @@
+# fonts-freefont-otf is needed for pdf docs builds with the 'xelatex' engine
+fonts-freefont-otf [doc]

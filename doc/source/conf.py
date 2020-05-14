@@ -59,6 +59,12 @@ html_theme = 'openstackdocs'
 # Output file base name for HTML help builder.
 htmlhelp_basename = 'sushydoc'
 
+# The openstackdocstheme 2.1.0 extension stopped always overriding latex_engine
+# to 'xelatex'. We need the 'xelatex' engine in order to handle some Unicode
+# characters we use in our feature classification matrix, like the "X" mark, so
+# we specify it here.
+latex_engine = 'xelatex'
+
 latex_use_xindy = False
 
 # Grouping the document tree into LaTeX files. List of tuples
