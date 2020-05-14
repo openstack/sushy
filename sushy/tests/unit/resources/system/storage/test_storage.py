@@ -62,7 +62,7 @@ class StorageTestCase(base.TestCase):
              '/redfish/v1/Systems/437XR1138R2/Storage/1/Drives/3F5A8C54207B7233',  # noqa
              '/redfish/v1/Systems/437XR1138R2/Storage/1/Drives/32ADF365C6C1B7BD',  # noqa
              '/redfish/v1/Systems/437XR1138R2/Storage/1/Drives/3D58ECBC375FD9F2',  # noqa
-            ), self.storage.drives_identities)
+             ), self.storage.drives_identities)
 
     def test_get_drive(self):
         # | WHEN |
