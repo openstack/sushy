@@ -85,26 +85,6 @@ def _get_extension_manager_of_resource(resource_name):
     return _global_extn_mgrs_by_resource[resource_name]
 
 
-@utils.synchronized
-def _get_resource_vendor_extension_obj(extension, resource, vendor):
-    """Get the object returned by extension's plugin() method.
-
-    :param extension: stevedore Extension
-    :param resource: The Sushy resource instance
-    :param vendor: This is the OEM vendor string which is the vendor-specific
-        extensibility identifier. Examples are: 'Contoso', 'Hpe'. As a matter
-        of fact the lowercase of this string will be the plugin entry point
-        name.
-    :returns: The object returned by ``plugin(*args, **kwds)`` of extension.
-    """
-    if extension.obj is None:
-        oem_resource = extension.plugin()
-        extension.obj = resource.clone_resource(
-            oem_resource).set_parent_resource(resource, vendor)
-
-    return extension.obj
-
-
 def get_resource_extension_by_vendor(
         resource_name, vendor, resource):
     """Helper method to get Resource specific OEM extension object for vendor
@@ -131,7 +111,6 @@ def get_resource_extension_by_vendor(
         raise exceptions.OEMExtensionNotFoundError(
             resource=resource_name, name=vendor.lower())
 
-    if resource_vendor_extn.obj is None:
-        return _get_resource_vendor_extension_obj(
-            resource_vendor_extn, resource, vendor)
-    return resource_vendor_extn.obj
+    oem_resource = resource_vendor_extn.plugin()
+    return resource.clone_resource(
+        oem_resource).set_parent_resource(resource, vendor)
