@@ -46,7 +46,12 @@ add_function_parentheses = True
 add_module_names = True
 
 # The name of the Pygments (syntax highlighting) style to use.
-pygments_style = 'sphinx'
+pygments_style = 'native'
+
+# openstackdocstheme options
+openstackdocs_repo_name = 'openstack/sushy'
+openstackdocs_use_storyboard = True
+openstackdocs_pdf_link = True
 
 # -- Options for HTML output --------------------------------------------------
 

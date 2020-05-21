@@ -12,9 +12,6 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-# Glance Release Notes documentation build configuration file, created by
-# sphinx-quickstart on Tue Nov  3 17:40:50 2015.
-#
 # This file is execfile()d with the current directory set to its
 # containing dir.
 #
@@ -98,13 +95,17 @@ exclude_patterns = []
 # show_authors = False
 
 # The name of the Pygments (syntax highlighting) style to use.
-pygments_style = 'sphinx'
+pygments_style = 'native'
 
 # A list of ignored prefixes for module index sorting.
 # modindex_common_prefix = []
 
 # If true, keep warnings as "system message" paragraphs in the built documents.
 # keep_warnings = False
+
+# openstackdocstheme options
+openstackdocs_repo_name = 'openstack/sushy'
+openstackdocs_use_storyboard = True
 
 
 # -- Options for HTML output ----------------------------------------------
