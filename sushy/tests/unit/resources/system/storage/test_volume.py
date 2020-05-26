@@ -59,7 +59,7 @@ class VolumeTestCase(base.TestCase):
                      'Volumes/1/Actions/Volume.Initialize'
         self.stor_volume.initialize_volume('fast')
         self.stor_volume._conn.post.assert_called_once_with(
-            target_uri, data={'InitializeType': 'Fast'})
+            target_uri, data={'InitializeType': 'Fast'}, blocking=True)
 
     def test_initialize_volume_bad_value(self):
         self.assertRaisesRegex(
@@ -70,13 +70,13 @@ class VolumeTestCase(base.TestCase):
     def test_delete_volume(self):
         self.stor_volume.delete_volume()
         self.stor_volume._conn.delete.assert_called_once_with(
-            self.stor_volume._path, data=None)
+            self.stor_volume._path, data=None, blocking=True)
 
     def test_delete_volume_with_payload(self):
         payload = {'@Redfish.OperationApplyTime': 'OnReset'}
         self.stor_volume.delete_volume(payload=payload)
         self.stor_volume._conn.delete.assert_called_once_with(
-            self.stor_volume._path, data=payload)
+            self.stor_volume._path, data=payload, blocking=True)
 
 
 class VolumeCollectionTestCase(base.TestCase):
@@ -190,7 +190,7 @@ class VolumeCollectionTestCase(base.TestCase):
         new_vol = self.stor_vol_col.create_volume(payload)
         self.stor_vol_col._conn.post.assert_called_once_with(
             '/redfish/v1/Systems/437XR1138R2/Storage/1/Volumes',
-            data=payload)
+            data=payload, blocking=True)
         self.stor_vol_col.refresh.assert_called_once()
         self.assertIsNotNone(new_vol)
         self.assertEqual('4', new_vol.identity)
