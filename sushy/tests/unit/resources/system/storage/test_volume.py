@@ -179,6 +179,7 @@ class VolumeCollectionTestCase(base.TestCase):
         payload = {
             'Name': 'My Volume 4',
             'VolumeType': 'Mirrored',
+            'RAIDType': 'RAID1',
             'CapacityBytes': 107374182400
         }
         with open('sushy/tests/unit/json_samples/volume4.json') as f:
@@ -197,3 +198,4 @@ class VolumeCollectionTestCase(base.TestCase):
         self.assertEqual('My Volume 4', new_vol.name)
         self.assertEqual(107374182400, new_vol.capacity_bytes)
         self.assertEqual(sushy.VOLUME_TYPE_MIRRORED, new_vol.volume_type)
+        self.assertEqual(sushy.RAID_TYPE_RAID1, new_vol.raid_type)

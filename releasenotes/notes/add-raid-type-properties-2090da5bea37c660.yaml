@@ -1,0 +1,5 @@
+---
+features:
+  - |
+    Add RAIDType property to the Volume resource and SupportedRAIDTypes
+    property to the Storage resource.
