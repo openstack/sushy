@@ -96,7 +96,8 @@ class Volume(base.ResourceBase):
                 parameter='value', value=value, valid_values=valid_values)
         value = store_maps.VOLUME_INIT_TYPE_MAP_REV[value]
         target_uri = self._get_initialize_action_element().target_uri
-        self._conn.post(target_uri, data={'InitializeType': value})
+        self._conn.post(target_uri, data={'InitializeType': value},
+                        blocking=True)
 
     def delete_volume(self, payload=None):
         """Delete the volume.
@@ -105,7 +106,7 @@ class Volume(base.ResourceBase):
         :raises: ConnectionError
         :raises: HTTPError
         """
-        self._conn.delete(self._path, data=payload)
+        self._conn.delete(self._path, data=payload, blocking=True)
 
 
 class VolumeCollection(base.ResourceCollectionBase):
@@ -147,15 +148,11 @@ class VolumeCollection(base.ResourceCollectionBase):
         :param payload: The payload representing the new volume to create.
         :raises: ConnectionError
         :raises: HTTPError
+        :returns: Newly created Volume resource or None if no Location header
         """
-        r = self._conn.post(self._path, data=payload)
+        r = self._conn.post(self._path, data=payload, blocking=True)
         location = r.headers.get('Location')
-        new_volume = None
         if r.status_code == 201:
             if location:
                 self.refresh()
-                new_volume = self.get_member(location)
-        elif r.status_code == 202:
-            # TODO(billdodd): TaskMonitor support to be added in subsequent PR
-            pass
-        return new_volume
+                return self.get_member(location)

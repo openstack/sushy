@@ -1,0 +1,4 @@
+---
+features:
+  - |
+    Make POST and DELETE operations in Volume and VolumeCollection blocking.
