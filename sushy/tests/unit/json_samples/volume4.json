@@ -9,6 +9,7 @@
     },
     "Encrypted": false,
     "VolumeType": "Mirrored",
+    "RAIDType": "RAID1",
     "CapacityBytes": 107374182400,
     "Identifiers": [
         {

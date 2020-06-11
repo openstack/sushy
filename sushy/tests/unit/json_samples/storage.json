@@ -39,6 +39,10 @@
             "SupportedDeviceProtocols": [
                 "SAS",
                 "SATA"
+            ],
+            "SupportedRAIDTypes": [
+                "RAID0",
+                "RAID1"
             ]
         }
     ],

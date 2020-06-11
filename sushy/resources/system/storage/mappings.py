@@ -31,3 +31,22 @@ VOLUME_TYPE_TYPE_MAP = {
     'SpannedStripesWithParity':
         store_cons.VOLUME_TYPE_SPANNED_STRIPES_WITH_PARITY
 }
+
+RAID_TYPE_TYPE_MAP = {
+    'RAID0': store_cons.RAID_TYPE_RAID0,
+    'RAID1': store_cons.RAID_TYPE_RAID1,
+    'RAID3': store_cons.RAID_TYPE_RAID3,
+    'RAID4': store_cons.RAID_TYPE_RAID4,
+    'RAID5': store_cons.RAID_TYPE_RAID5,
+    'RAID6': store_cons.RAID_TYPE_RAID6,
+    'RAID10': store_cons.RAID_TYPE_RAID10,
+    'RAID01': store_cons.RAID_TYPE_RAID01,
+    'RAID6TP': store_cons.RAID_TYPE_RAID6TP,
+    'RAID1E': store_cons.RAID_TYPE_RAID1E,
+    'RAID50': store_cons.RAID_TYPE_RAID50,
+    'RAID60': store_cons.RAID_TYPE_RAID60,
+    'RAID00': store_cons.RAID_TYPE_RAID00,
+    'RAID10E': store_cons.RAID_TYPE_RAID10E,
+    'RAID1Triple': store_cons.RAID_TYPE_RAID1Triple,
+    'RAID10Triple': store_cons.RAID_TYPE_RAID10Triple,
+}

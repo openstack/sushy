@@ -44,6 +44,9 @@ class Volume(base.ResourceBase):
                                    store_maps.VOLUME_TYPE_TYPE_MAP)
     """The type of this volume."""
 
+    raid_type = base.MappedField('RAIDType', store_maps.RAID_TYPE_TYPE_MAP)
+    """The RAID type of this volume."""
+
     encrypted = base.Field('Encrypted', adapter=bool)
     """Is this Volume encrypted."""
 
