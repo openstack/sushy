@@ -28,7 +28,6 @@ from sushy.resources.system import bios
 from sushy.resources.system import mappings as sys_map
 from sushy.resources.system import processor
 from sushy.resources.system import simple_storage
-from sushy.resources.system.storage import storage
 from sushy.resources.system import system
 from sushy.tests.unit import base
 
@@ -51,7 +50,7 @@ class SystemTestCase(base.TestCase):
         self.sys_inst._parse_attributes(self.json_doc)
         self.assertEqual('1.0.2', self.sys_inst.redfish_version)
         self.assertEqual('Chicago-45Z-2381', self.sys_inst.asset_tag)
-        self.assertEqual('P79 v1.33 (02/28/2015)', self.sys_inst.bios_version)
+        self.assertEqual('P79 v1.45 (12/06/2017)', self.sys_inst.bios_version)
         self.assertEqual('Web Front End node', self.sys_inst.description)
         self.assertEqual('web483', self.sys_inst.hostname)
         self.assertEqual('437XR1138R2', self.sys_inst.identity)
@@ -127,7 +126,8 @@ class SystemTestCase(base.TestCase):
                           "GracefulRestart",
                           "ForceRestart",
                           "Nmi",
-                          "ForceOn"
+                          "ForceOn",
+                          "PushPowerButton"
                           ],
                          value.allowed_values)
 
@@ -145,7 +145,8 @@ class SystemTestCase(base.TestCase):
                         sushy.RESET_FORCE_OFF,
                         sushy.RESET_FORCE_ON,
                         sushy.RESET_ON,
-                        sushy.RESET_NMI])
+                        sushy.RESET_NMI,
+                        sushy.RESET_PUSH_POWER_BUTTON])
         self.assertEqual(expected, values)
         self.assertIsInstance(values, set)
 
@@ -538,7 +539,7 @@ class SystemTestCase(base.TestCase):
                               simple_storage.SimpleStorageCollection)
 
     def test_storage_for_missing_attr(self):
-        self.sys_inst.json.pop('Storage')
+        self.sys_inst.json.pop('SimpleStorage')
         with self.assertRaisesRegex(
                 exceptions.MissingAttributeError, 'attribute Storage'):
             self.sys_inst.storage
@@ -550,16 +551,17 @@ class SystemTestCase(base.TestCase):
                   'storage_collection.json') as f:
             self.conn.get.return_value.json.return_value = json.load(f)
         # | WHEN |
-        actual_storage = self.sys_inst.storage
+        actual_storage = self.sys_inst.simple_storage
         # | THEN |
-        self.assertIsInstance(actual_storage, storage.StorageCollection)
+        self.assertIsInstance(actual_storage,
+                              simple_storage.SimpleStorageCollection)
         self.conn.get.return_value.json.assert_called_once_with()
 
         # reset mock
         self.conn.get.return_value.json.reset_mock()
         # | WHEN & THEN |
         # tests for same object on invoking subsequently
-        self.assertIs(actual_storage, self.sys_inst.storage)
+        self.assertIs(actual_storage, self.sys_inst.simple_storage)
         self.conn.get.return_value.json.assert_not_called()
 
     def test_storage_on_refresh(self):
@@ -568,8 +570,8 @@ class SystemTestCase(base.TestCase):
                   'storage_collection.json') as f:
             self.conn.get.return_value.json.return_value = json.load(f)
         # | WHEN & THEN |
-        self.assertIsInstance(self.sys_inst.storage,
-                              storage.StorageCollection)
+        self.assertIsInstance(self.sys_inst.simple_storage,
+                              simple_storage.SimpleStorageCollection)
 
         # On refreshing the system instance...
         with open('sushy/tests/unit/json_samples/system.json') as f:
@@ -583,7 +585,8 @@ class SystemTestCase(base.TestCase):
                   'storage_collection.json') as f:
             self.conn.get.return_value.json.return_value = json.load(f)
         # | WHEN & THEN |
-        self.assertIsInstance(self.sys_inst.storage, storage.StorageCollection)
+        self.assertIsInstance(self.sys_inst.simple_storage,
+                              simple_storage.SimpleStorageCollection)
 
     def test_managers(self):
         # | GIVEN |

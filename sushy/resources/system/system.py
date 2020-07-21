@@ -14,7 +14,7 @@
 #    under the License.
 
 # This is referred from Redfish standard schema.
-# https://redfish.dmtf.org/schemas/ComputerSystem.v1_5_0.json
+# https://redfish.dmtf.org/schemas/v1/ComputerSystem.v1_10_0.json
 
 import collections
 import logging

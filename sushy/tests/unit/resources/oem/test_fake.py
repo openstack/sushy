@@ -37,7 +37,7 @@ class FakeOEMSystemExtensionTestCase(base.TestCase):
             self.sys_instance, 'Contoso')
 
     def test__parse_oem_attributes(self):
-        self.assertEqual('http://Contoso.com/Schema#Contoso.ComputerSystem',
+        self.assertEqual('#Contoso.ComputerSystem',
                          self.fake_sys_oem_extn.data_type)
         self.assertEqual('PacWest Production Facility', (
             self.fake_sys_oem_extn.production_location.facility_name))
