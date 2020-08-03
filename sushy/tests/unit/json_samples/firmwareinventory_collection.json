@@ -1,0 +1,19 @@
+{
+    "@odata.context": "/redfish/v1/$metadata#SoftwareInventoryCollection.SoftwareInventoryCollection",
+    "@odata.id": "/redfish/v1/UpdateService/FirmwareInventory",
+    "@odata.type": "#SoftwareInventoryCollection.SoftwareInventoryCollection",
+    "Description": "Collection of Firmware Inventory",
+    "Members": [
+        {
+            "@odata.id": "/redfish/v1/UpdateService/FirmwareInventory/Current-101560-25.5.6.0009"
+        },
+        {
+            "@odata.id": "/redfish/v1/UpdateService/FirmwareInventory/Installed-101560-25.5.6.0009"
+        },
+        {
+            "@odata.id": "/redfish/v1/UpdateService/FirmwareInventory/Previous-102302-18.8.9"
+        }
+    ],
+    "Members@odata.count": 3,
+    "Name": "Firmware Inventory Collection"
+}

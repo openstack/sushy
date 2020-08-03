@@ -68,27 +68,52 @@ class SoftwareInventoryCollectionTestCase(base.TestCase):
         super(SoftwareInventoryCollectionTestCase, self).setUp()
         conn = mock.Mock()
         with open('sushy/tests/unit/json_samples/'
-                  'softwareinventory_collection.json') as f:
+                  'firmwareinventory_collection.json') as f:
             self.json_doc = json.load(f)
 
         conn.get.return_value.json.return_value = self.json_doc
 
         self.soft_inv_col = softwareinventory.SoftwareInventoryCollection(
-            conn, '/redfish/v1/UpdateService/SoftwareInventory',
+            conn, '/redfish/v1/UpdateService/FirmwareInventory',
             redfish_version='1.3.0')
 
     def test__parse_attributes(self):
         self.soft_inv_col._parse_attributes(self.json_doc)
         self.assertEqual('1.3.0', self.soft_inv_col.redfish_version)
         self.assertEqual(
-            'Software Inventory Collection',
+            'Firmware Inventory Collection',
             self.soft_inv_col.name)
 
     @mock.patch.object(
         softwareinventory, 'SoftwareInventory', autospec=True)
     def test_get_member(self, mock_softwareinventory):
-        path = '/redfish/v1/UpdateService/SoftwareInventory/1'
+        path = ('/redfish/v1/UpdateService/FirmwareInventory/'
+                'Current-102303-19.0.12')
         self.soft_inv_col.get_member(path)
         mock_softwareinventory.assert_called_once_with(
             self.soft_inv_col._conn, path,
             self.soft_inv_col.redfish_version, None)
+
+    @mock.patch.object(
+        softwareinventory, 'SoftwareInventory', autospec=True)
+    def test_get_members(self, mock_softwareinventory):
+        members = self.soft_inv_col.get_members()
+        calls = [
+            mock.call(self.soft_inv_col._conn,
+                      ('/redfish/v1/UpdateService/FirmwareInventory/'
+                       'Current-101560-25.5.6.0009'),
+                      self.soft_inv_col.redfish_version, None),
+
+            mock.call(self.soft_inv_col._conn,
+                      ('/redfish/v1/UpdateService/FirmwareInventory/'
+                       'Installed-101560-25.5.6.0009'),
+                      self.soft_inv_col.redfish_version, None),
+
+            mock.call(self.soft_inv_col._conn,
+                      ('/redfish/v1/UpdateService/FirmwareInventory/'
+                       'Previous-102302-18.8.9'),
+                      self.soft_inv_col.redfish_version, None)
+        ]
+        mock_softwareinventory.assert_has_calls(calls)
+        self.assertIsInstance(members, list)
+        self.assertEqual(3, len(members))

@@ -60,6 +60,10 @@ class UpdateService(base.ResourceBase):
 
     _actions = ActionsField('Actions', required=True)
 
+    _firmware_inventory_path = base.Field(['FirmwareInventory', '@odata.id'])
+
+    _software_inventory_path = base.Field(['SoftwareInventory', '@odata.id'])
+
     def __init__(self, connector, identity, redfish_version=None,
                  registries=None):
         """A class representing a UpdateService
@@ -142,26 +146,32 @@ class UpdateService(base.ResourceBase):
             data['Targets'] = targets
         self._conn.post(target_uri, data=data)
 
-    def _get_software_inventory_collection_path(self):
-        """Helper function to find the SoftwareInventoryCollections path"""
-        soft_inv_col = self.json.get('SoftwareInventory')
-        if not soft_inv_col:
-            raise exceptions.MissingAttributeError(
-                attribute='SoftwareInventory', resource=self._path)
-        return soft_inv_col.get('@odata.id')
-
     @property
     @utils.cache_it
     def software_inventory(self):
-        """Property to reference SoftwareInventoryCollection instance"""
+        """Property to reference SoftwareInventory collection instance"""
+        if not self._software_inventory_path:
+            raise exceptions.MissingAttributeError(
+                attribute='SoftwareInventory/@odata.id',
+                resource=self._software_inventory_path)
+
         return softwareinventory.SoftwareInventoryCollection(
-            self._conn, self._get_software_inventory_collection_path,
-            redfish_version=self.redfish_version, registries=self.registries)
+            self._conn,
+            self._software_inventory_path,
+            redfish_version=self.redfish_version,
+            registries=self.registries)
 
     @property
     @utils.cache_it
     def firmware_inventory(self):
-        """Property to reference SoftwareInventoryCollection instance"""
+        """Property to reference FirmwareInventory collection instance"""
+        if not self._firmware_inventory_path:
+            raise exceptions.MissingAttributeError(
+                attribute='FirmwareInventory/@odata.id',
+                resource=self._firmware_inventory_path)
+
         return softwareinventory.SoftwareInventoryCollection(
-            self._conn, self._get_software_inventory_collection_path,
-            redfish_version=self.redfish_version, registries=self.registries)
+            self._conn,
+            self._firmware_inventory_path,
+            redfish_version=self.redfish_version,
+            registries=self.registries)

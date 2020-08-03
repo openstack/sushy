@@ -98,42 +98,48 @@ class UpdateServiceTestCase(base.TestCase):
             targets='/redfish/v1/UpdateService/Actions/SimpleUpdate',
             transfer_protocol='ROYAL')
 
-    def test_software_inventory(self):
-        # | GIVEN |
-        self.conn.get.return_value.json.reset_mock()
-        with open('sushy/tests/unit/json_samples/'
-                  'softwareinventory_collection.json') as f:
-            self.conn.get.return_value.json.return_value = json.load(f)
-        # | WHEN |
-        actual_software_inventory = self.upd_serv.software_inventory
-        # | THEN |
-        self.assertIsInstance(actual_software_inventory,
-                              softwareinventory.SoftwareInventoryCollection)
-        self.conn.get.return_value.json.assert_called_once_with()
+    @mock.patch.object(softwareinventory, 'SoftwareInventoryCollection',
+                       autospec=True)
+    def test_software_inventory(self, software_inventory_collection_mock):
+        self.upd_serv.software_inventory
+        software_inventory_collection_mock.assert_called_once_with(
+            self.conn, '/redfish/v1/UpdateService/SoftwareInventory',
+            self.upd_serv.redfish_version,
+            self.upd_serv._registries)
 
-        # reset mock
-        self.conn.get.return_value.json.reset_mock()
-        # | WHEN & THEN |
-        self.assertIs(actual_software_inventory,
-                      self.upd_serv.software_inventory)
-        self.conn.get.return_value.json.assert_not_called()
+    @mock.patch.object(softwareinventory, 'SoftwareInventoryCollection',
+                       autospec=True)
+    def test_firmware_inventory(self, software_inventory_collection_mock):
+        self.upd_serv.firmware_inventory
+        software_inventory_collection_mock.assert_called_once_with(
+            self.conn, '/redfish/v1/UpdateService/FirmwareInventory',
+            self.upd_serv.redfish_version,
+            self.upd_serv._registries)
 
-    def test_firmware_inventory(self):
-        # | GIVEN |
-        self.conn.get.return_value.json.reset_mock()
-        with open('sushy/tests/unit/json_samples/'
-                  'softwareinventory_collection.json') as f:
-            self.conn.get.return_value.json.return_value = json.load(f)
-        # | WHEN |
-        actual_firmware_inventory = self.upd_serv.firmware_inventory
-        # | THEN |
-        self.assertIsInstance(actual_firmware_inventory,
-                              softwareinventory.SoftwareInventoryCollection)
-        self.conn.get.return_value.json.assert_called_once_with()
 
-        # reset mock
-        self.conn.get.return_value.json.reset_mock()
-        # | WHEN & THEN |
-        self.assertIs(actual_firmware_inventory,
-                      self.upd_serv.firmware_inventory)
-        self.conn.get.return_value.json.assert_not_called()
+class UpdateServiceNoInvTestCase(base.TestCase):
+
+    def setUp(self):
+        super(UpdateServiceNoInvTestCase, self).setUp()
+        self.conn = mock.Mock()
+        no_inv_json = 'sushy/tests/unit/json_samples/updateservice_no_inv.json'
+        with open(no_inv_json) as f:
+            self.json_doc = json.load(f)
+
+        self.conn.get.return_value.json.return_value = self.json_doc
+
+        self.upd_serv = updateservice.UpdateService(
+            self.conn, '/redfish/v1/UpdateService/UpdateService',
+            redfish_version='1.3.0')
+
+    def test_software_inventory_when_sw_inv_absent(self):
+        self.assertRaisesRegex(
+            exceptions.MissingAttributeError,
+            'SoftwareInventory/@odata.id',
+            getattr, self.upd_serv, 'software_inventory')
+
+    def test_firmware_inventory_when_fw_inv_absent(self):
+        self.assertRaisesRegex(
+            exceptions.MissingAttributeError,
+            'FirmwareInventory/@odata.id',
+            getattr, self.upd_serv, 'firmware_inventory')

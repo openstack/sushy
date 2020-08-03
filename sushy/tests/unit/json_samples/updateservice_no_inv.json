@@ -1,0 +1,24 @@
+{
+    "@odata.type": "#UpdateService.v1_2_1.UpdateService",
+    "Id": "UpdateService",
+    "Name": "Update service",
+    "Status": {
+        "State": "Enabled",
+        "Health": "OK",
+        "HealthRollup": "OK"
+    },
+    "ServiceEnabled": true,
+    "HttpPushUri": "/FWUpdate",
+    "HttpPushUriTargets": ["/FWUpdate"],
+    "HttpPushUriTargetsBusy": false,
+    "Actions": {
+        "#UpdateService.SimpleUpdate": {
+            "target": "/redfish/v1/UpdateService/Actions/SimpleUpdate",
+            "@Redfish.ActionInfo": "/redfish/v1/UpdateService/SimpleUpdateActionInfo"
+        },
+        "Oem": {}
+    },
+    "Oem": {},
+    "@odata.context": "/redfish/v1/$metadata#UpdateService.UpdateService",
+    "@odata.id": "/redfish/v1/UpdateService"
+}

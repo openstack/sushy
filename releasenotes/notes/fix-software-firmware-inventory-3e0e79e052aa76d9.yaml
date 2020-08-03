@@ -1,0 +1,5 @@
+---
+fixes:
+  - |
+    Fixes bugs in the ``UpdateService.software_inventory`` and
+    ``UpdateService.firmware_inventory`` properties making them operational.
