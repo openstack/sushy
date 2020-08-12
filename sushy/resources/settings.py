@@ -62,35 +62,6 @@ class SettingsUpdate(object):
 LOG = logging.getLogger(__name__)
 
 
-class MessageListField(base.ListField):
-    """List of messages with details of settings update status"""
-
-    message_id = base.Field('MessageId', required=True)
-    """The key for this message which can be used
-    to look up the message in a message registry
-    """
-
-    message = base.Field('Message')
-    """Human readable message, if provided"""
-
-    severity = base.MappedField('Severity',
-                                res_maps.SEVERITY_VALUE_MAP)
-    """Severity of the error"""
-
-    resolution = base.Field('Resolution')
-    """Used to provide suggestions on how to resolve
-    the situation that caused the error
-    """
-
-    _related_properties = base.Field('RelatedProperties')
-    """List of properties described by the message"""
-
-    message_args = base.Field('MessageArgs')
-    """List of message substitution arguments for the message
-    referenced by `message_id` from the message registry
-    """
-
-
 class MaintenanceWindowField(base.CompositeField):
 
     maintenance_window_duration_in_seconds = base.Field(
@@ -172,7 +143,7 @@ class SettingsField(base.CompositeField):
                     '(e.g. System resource)')
         return None
 
-    messages = MessageListField("Messages")
+    messages = base.MessageListField("Messages")
     """Represents the results of the last time the values of the Settings
     resource were applied to the server"""
 

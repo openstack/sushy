@@ -44,6 +44,12 @@ class UtilsTestCase(base.TestCase):
         self.assertEqual(1, utils.int_or_none('1'))
         self.assertIsNone(None, utils.int_or_none(None))
 
+    def test_bool_or_none_none(self):
+        self.assertIsNone(utils.bool_or_none(None))
+
+    def test_bool_or_none_bool(self):
+        self.assertEqual(True, utils.bool_or_none(True))
+
     def setUp(self):
         super(UtilsTestCase, self).setUp()
         self.conn = mock.MagicMock()

@@ -16,6 +16,7 @@
 import json
 from unittest import mock
 
+from sushy.resources.base import FieldData
 from sushy.resources.registry import message_registry_file
 from sushy.tests.unit import base
 
@@ -59,9 +60,9 @@ class MessageRegistryFileTestCase(base.TestCase):
     def test_get_message_registry_uri(self, mock_reader, mock_msg_reg):
         mock_reader_rv = mock.Mock()
         mock_reader.return_value = mock_reader_rv
-        mock_reader_rv.get_json.return_value = {
+        mock_reader_rv.get_data.return_value = FieldData(200, {}, {
             "@odata.type": "#MessageRegistry.v1_1_1.MessageRegistry",
-        }
+        })
         mock_msg_reg_rv = mock.Mock()
         mock_msg_reg.return_value = mock_msg_reg_rv
 
@@ -78,9 +79,9 @@ class MessageRegistryFileTestCase(base.TestCase):
         mock_reader_rv = mock.Mock()
         mock_reader.return_value = mock_reader_rv
         mock_msg_reg_rv = mock.Mock()
-        mock_reader_rv.get_json.return_value = {
+        mock_reader_rv.get_data.return_value = FieldData(200, {}, {
             "@odata.type": "#MessageRegistry.v1_1_1.MessageRegistry",
-        }
+        })
         mock_msg_reg.return_value = mock_msg_reg_rv
         self.reg_file.location[0].uri = None
 
@@ -100,9 +101,9 @@ class MessageRegistryFileTestCase(base.TestCase):
         mock_reader_rv = mock.Mock()
         mock_reader.return_value = mock_reader_rv
         mock_msg_reg_rv = mock.Mock()
-        mock_reader_rv.get_json.return_value = {
+        mock_reader_rv.get_data.return_value = FieldData(200, {}, {
             "@odata.type": "#MessageRegistry.v1_1_1.MessageRegistry",
-        }
+        })
         mock_msg_reg.return_value = mock_msg_reg_rv
         self.reg_file.location[0].uri = None
         self.reg_file.location[0].archive_uri = None

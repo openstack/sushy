@@ -1,0 +1,5 @@
+---
+features:
+  - |
+    Added the ability to monitor the progress of a firmware update by changing
+    the ``simple_update`` operation to return a task monitor object.
