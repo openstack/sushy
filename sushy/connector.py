@@ -119,15 +119,29 @@ class Connector(object):
         # Attempt to re-establish a session.
         try:
             exceptions.raise_for_response(method, url, response)
-        except exceptions.AccessError:
+        except exceptions.AccessError as e:
             if self._auth.can_refresh_session():
-                self._auth.refresh_session()
+                try:
+                    self._auth.refresh_session()
+                except exceptions.AccessError as refresh_exc:
+                    LOG.error("A failure occured while attempting to refresh "
+                              "the session. Error: %s", refresh_exc.message)
+                    raise
                 LOG.debug("Authentication refreshed successfully, "
                           "retrying the call.")
-                response = self._session.request(method, url, json=data,
-                                                 headers=headers,
-                                                 **extra_session_req_kwargs)
+                try:
+                    response = self._session.request(
+                        method, url, json=data,
+                        headers=headers,
+                        **extra_session_req_kwargs)
+                except exceptions.HTTPError as retry_exc:
+                    LOG.error("Failure occured while attempting to retry "
+                              "request after refreshing the session. Error: "
+                              "%s", retry_exc.message)
+                    raise
             else:
+                LOG.error("Authentication error detected. Cannot proceed: "
+                          "%s", e.message)
                 raise
 
         if blocking and response.status_code == 202:

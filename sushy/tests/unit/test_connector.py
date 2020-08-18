@@ -286,6 +286,7 @@ class ConnectorOpTestCase(base.TestCase):
         response = self.conn._op('POST', path='fake/path', data=self.data,
                                  headers=self.headers)
         self.auth.refresh_session.assert_called_with()
+        self.auth.can_refresh_session.assert_called_with()
         self.assertEqual(response.json, second_response.json)
 
     def test_connection_error(self):
