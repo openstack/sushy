@@ -113,9 +113,8 @@ class SessionService(base.ResourceBase):
                 target_uri = self.path + '/Sessions'
 
         data = {'UserName': username, 'Password': password}
-        headers = {'X-Auth-Token': None}
-
-        rsp = self._conn.post(target_uri, data=data, headers=headers)
+        LOG.debug("Requesting new session from %s.", target_uri)
+        rsp = self._conn.post(target_uri, data=data)
         session_key = rsp.headers.get('X-Auth-Token')
         if session_key is None:
             raise exceptions.MissingXAuthToken(

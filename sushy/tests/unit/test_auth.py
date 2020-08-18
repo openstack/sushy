@@ -15,6 +15,8 @@
 
 import mock
 
+import requests
+
 from sushy import auth
 from sushy import connector
 from sushy import exceptions
@@ -85,6 +87,9 @@ class SessionAuthTestCase(base.TestCase):
         self.sess_auth = auth.SessionAuth(self.username,
                                           self.password)
         self.conn = mock_connector.return_value
+        self.conn._session = mock.Mock(spec=requests.Session)
+        self.conn._session.headers = {}
+        self.conn._session.auth = None
         self.root = mock_root.return_value
 
     def test_init(self):
@@ -108,8 +113,10 @@ class SessionAuthTestCase(base.TestCase):
                          self.sess_auth.get_session_resource_id())
 
     def test_reset_session_attrs(self):
+        self.sess_auth.set_context(self.root, self.conn)
         self.sess_auth._session_key = self.sess_key
         self.sess_auth._session_resource_id = self.sess_uri
+        self.conn._session.headers = {'X-Auth-Token': 'meow'}
         self.assertEqual(self.sess_uri,
                          self.sess_auth.get_session_resource_id())
         self.assertEqual(self.sess_key,
@@ -117,6 +124,7 @@ class SessionAuthTestCase(base.TestCase):
         self.sess_auth.reset_session_attrs()
         self.assertIsNone(self.sess_auth.get_session_resource_id())
         self.assertIsNone(self.sess_auth.get_session_key())
+        self.assertNotIn('X-Auth-Token', self.conn._session.headers)
 
     def test_set_context(self):
         self.sess_auth.set_context(self.root, self.conn)
@@ -162,6 +170,7 @@ class SessionAuthTestCase(base.TestCase):
         mock_sess_serv.create_session.return_value = (self.sess_key,
                                                       self.sess_uri)
         self.root.get_session_service.return_value = mock_sess_serv
+        self._session = mock.Mock(spec=requests.Session)
         self.sess_auth.set_context(self.root, self.conn)
         self.sess_auth.refresh_session()
         self.assertEqual(self.sess_uri,
@@ -220,7 +229,11 @@ class SessionOrBasicAuthTestCase(base.TestCase):
         self.sess_uri = ('https://testing:8000/redfish/v1/'
                          'SessionService/Sessions/testing')
         self.conn = mock_connector.return_value
+        self.conn._session = mock.Mock(spec=requests.Session)
+        self.conn._session.headers = {}
+        self.conn._session.auth = None
         self.root = mock_root.return_value
+
         self.sess_basic_auth = auth.SessionOrBasicAuth(self.username,
                                                        self.password)
 
@@ -245,8 +258,11 @@ class SessionOrBasicAuthTestCase(base.TestCase):
                          self.sess_basic_auth.get_session_resource_id())
 
     def test_reset_session_attrs(self):
+        self.sess_basic_auth.set_context(self.root, self.conn)
         self.sess_basic_auth._session_key = self.sess_key
         self.sess_basic_auth._session_resource_id = self.sess_uri
+        self.conn._session.auth = 'meow'
+        self.conn._session.headers = {'X-Auth-Token': 'meow'}
         self.assertEqual(self.sess_uri,
                          self.sess_basic_auth.get_session_resource_id())
         self.assertEqual(self.sess_key,
@@ -254,6 +270,8 @@ class SessionOrBasicAuthTestCase(base.TestCase):
         self.sess_basic_auth.reset_session_attrs()
         self.assertIsNone(self.sess_basic_auth.get_session_resource_id())
         self.assertIsNone(self.sess_basic_auth.get_session_key())
+        self.assertNotIn('X-Auth-Token', self.conn._session.headers)
+        self.assertIsNone(self.conn._session.auth)
 
     def test_set_context(self):
         self.sess_basic_auth.set_context(self.root, self.conn)
