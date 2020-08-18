@@ -96,10 +96,8 @@ class SessionServiceTestCase(base.TestCase):
             session_uri)
         uri = self.sess_serv_inst.path + '/Sessions'
         data = {'UserName': 'foo', 'Password': 'secret'}
-        headers = {'X-Auth-Token': None}
         self.conn.post.assert_called_once_with(uri,
-                                               data=data,
-                                               headers=headers)
+                                               data=data)
 
     def test_create_session_missing_x_auth_token(self):
         with open('sushy/tests/unit/json_samples/'

@@ -199,6 +199,16 @@ class SessionAuth(AuthBase):
         """Reset active session related attributes."""
         self._session_key = None
         self._session_resource_id = None
+        # Requests session object data is merged with user submitted data
+        # per https://requests.readthedocs.io/en/master/user/advanced/
+        # so we need to clear data explicitly set on the session too.
+        self._connector._session.auth = None
+        if 'X-Auth-Token' in self._connector._session.headers:
+            # Delete the token value that was saved to the session
+            # as otherwise we would end up with a dictionary containing
+            # a {'X-Auth-Token': null} being sent across to the remote
+            # bmc.
+            del self._connector._session.headers['X-Auth-Token']
 
 
 class SessionOrBasicAuth(SessionAuth):
