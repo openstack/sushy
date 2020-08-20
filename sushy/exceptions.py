@@ -106,7 +106,8 @@ class HTTPError(SushyError):
             ext_info = self.body.get('@Message.ExtendedInfo', [{}])
             index = self._get_most_severe_msg_index(ext_info)
             self.detail = ext_info[index].get('Message', self.detail)
-            error = '%s: %s' % (self.code, self.detail or 'unknown error')
+            error = '%s: %s extended: %s' % (
+                self.code, self.detail or 'unknown error', ext_info or None)
 
         kwargs = {'method': method, 'url': url, 'code': self.status_code,
                   'error': error}
