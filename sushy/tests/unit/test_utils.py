@@ -231,3 +231,10 @@ class CacheTestCase(base.TestCase):
     def test_cache_clear_failure(self):
         self.assertRaises(
             TypeError, utils.cache_clear, self.res, False, only_these=10)
+
+    def test_sanitize(self):
+        orig = {'UserName': 'admin', 'Password': 'pwd',
+                'nested': {'answer': 42, 'password': 'secret'}}
+        expected = {'UserName': 'admin', 'Password': '***',
+                    'nested': {'answer': 42, 'password': '***'}}
+        self.assertEqual(expected, utils.sanitize(orig))

@@ -19,6 +19,7 @@ import requests
 from six.moves.urllib import parse
 
 from sushy import exceptions
+from sushy import utils
 
 LOG = logging.getLogger(__name__)
 
@@ -82,8 +83,10 @@ class Connector(object):
         # information
         LOG.debug('HTTP request: %(method)s %(url)s; headers: %(headers)s; '
                   'body: %(data)s; session arguments: %(session)s;',
-                  {'method': method, 'url': url, 'headers': headers,
-                   'data': data, 'session': extra_session_req_kwargs})
+                  {'method': method, 'url': url,
+                   'headers': utils.sanitize(headers),
+                   'data': utils.sanitize(data),
+                   'session': extra_session_req_kwargs})
         try:
             response = self._session.request(method, url, json=data,
                                              headers=headers,
