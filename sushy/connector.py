@@ -21,6 +21,7 @@ import time
 
 from sushy import exceptions
 from sushy.resources.task_monitor import TaskMonitor
+from sushy import utils
 
 LOG = logging.getLogger(__name__)
 
@@ -94,8 +95,10 @@ class Connector(object):
         LOG.debug('HTTP request: %(method)s %(url)s; headers: %(headers)s; '
                   'body: %(data)s; blocking: %(blocking)s; timeout: '
                   '%(timeout)s; session arguments: %(session)s;',
-                  {'method': method, 'url': url, 'headers': headers,
-                   'data': data, 'blocking': blocking, 'timeout': timeout,
+                  {'method': method, 'url': url,
+                   'headers': utils.sanitize(headers),
+                   'data': utils.sanitize(data),
+                   'blocking': blocking, 'timeout': timeout,
                    'session': extra_session_req_kwargs})
         try:
             response = self._session.request(method, url, json=data,
