@@ -20,6 +20,7 @@ import requests
 from six.moves.urllib import parse
 
 from sushy import exceptions
+from sushy import utils
 
 LOG = logging.getLogger(__name__)
 
@@ -83,12 +84,11 @@ class Connector(object):
             headers['Content-Type'] = 'application/json'
 
         url = parse.urljoin(self._url, path)
-        # TODO(lucasagomes): We should mask the data to remove sensitive
-        # information
-        LOG.debug('HTTP request: %(method)s %(url)s; '
-                  'headers: %(headers)s; body: %(data)s',
-                  {'method': method, 'url': url, 'headers': headers,
-                   'data': json_data})
+        LOG.debug('HTTP request: %(method)s %(url)s; headers: %(headers)s; '
+                  'body: %(data)s',
+                  {'method': method, 'url': url,
+                   'headers': utils.sanitize(headers),
+                   'data': utils.sanitize(data)})
         try:
             response = self._session.request(method, url,
                                              data=json_data,

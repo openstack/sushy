@@ -96,3 +96,10 @@ class UtilsTestCase(base.TestCase):
         self.assertEqual(821, utils.max_safe([15, 300, 270, None, 821, None]))
         self.assertEqual(0, utils.max_safe([]))
         self.assertIsNone(utils.max_safe([], default=None))
+
+    def test_sanitize(self):
+        orig = {'UserName': 'admin', 'Password': 'pwd',
+                'nested': {'answer': 42, 'password': 'secret'}}
+        expected = {'UserName': 'admin', 'Password': '***',
+                    'nested': {'answer': 42, 'password': '***'}}
+        self.assertEqual(expected, utils.sanitize(orig))

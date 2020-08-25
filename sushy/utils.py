@@ -106,3 +106,15 @@ def max_safe(iterable, default=0):
     except ValueError:
         # TypeError is not caught here as that should be thrown.
         return default
+
+
+_REMOVE = frozenset(['password', 'x-auth-token'])
+
+
+def sanitize(item):
+    """Remove passwords from the item."""
+    if isinstance(item, dict):
+        return {key: ('***' if key.lower() in _REMOVE else sanitize(value))
+                for key, value in item.items()}
+    else:
+        return item
