@@ -45,7 +45,7 @@ class SessionServiceTestCase(base.TestCase):
                 'GET', 'any_url', mock.MagicMock()))
         sessionservice.SessionService(
             self.conn, '/redfish/v1/SessionService', redfish_version='1.0.2')
-        self.assertTrue(mock_LOG.warning.called)
+        self.assertTrue(mock_LOG.debug.called)
 
     def test__parse_attributes(self):
         self.sess_serv_inst._parse_attributes(self.json_doc)

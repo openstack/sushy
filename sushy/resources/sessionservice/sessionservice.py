@@ -59,9 +59,10 @@ class SessionService(base.ResourceBase):
                 connector, identity, redfish_version, registries)
 
         except exceptions.AccessError as ae:
-            LOG.warning('Received access error "%(ae)s". '
-                        'Unable to refresh SessionService.',
-                        {'ae': ae})
+            LOG.debug('Received access error "%s" when trying to refresh the '
+                      'SessionService. If this happens before '
+                      'authentication, we\'ll have to guess the Sessions URL.',
+                      ae)
 
     def _get_sessions_collection_path(self):
         """Helper function to find the SessionCollections path"""
