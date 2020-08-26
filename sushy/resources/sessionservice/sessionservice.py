@@ -91,20 +91,26 @@ class SessionService(base.ResourceBase):
         """
         self._conn.delete(session_uri)
 
-    def create_session(self, username, password):
+    def create_session(self, username, password, target_uri=None):
         """This function will try to create a session.
 
+        :param username: the username of the user requesting a new session
+        :param password: the password associated to the user requesting
+            a new session
+        :param target_uri: the "Sessions" uri, usually in the form:
+            '/redfish/v1/SessionService/Sessions'
         :returns: A session key and uri in the form of a tuple
         :raises: MissingXAuthToken
         :raises: ConnectionError
         :raises: AccessError
         :raises: HTTPError
         """
-        try:
-            target_uri = self._get_sessions_collection_path()
-        except Exception:
-            # Defaulting to /Sessions
-            target_uri = self.path + '/Sessions'
+        if not target_uri:
+            try:
+                target_uri = self._get_sessions_collection_path()
+            except Exception:
+                # Defaulting to /Sessions
+                target_uri = self.path + '/Sessions'
 
         data = {'UserName': username, 'Password': password}
         headers = {'X-Auth-Token': None}

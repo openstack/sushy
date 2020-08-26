@@ -282,6 +282,16 @@ class Sushy(base.ResourceBase):
             self._conn, self._session_service_path,
             redfish_version=self.redfish_version)
 
+    def get_sessions_path(self):
+        """Returns the Sessions url"""
+
+        try:
+            links_url = self.json.get('Links')
+            return links_url['Sessions']['@odata.id']
+        except (TypeError, KeyError):
+            raise exceptions.MissingAttributeError(
+                attribute='Links/Sessions/@data.id', resource=self.path)
+
     def get_session(self, identity):
         """Given the identity return a Session object
 

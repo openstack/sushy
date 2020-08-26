@@ -1,0 +1,8 @@
+---
+fixes:
+  - |
+    Instead of trying to GET /redfish/v1/SessionService, which is usually
+    reachable via authentication, fail, and then guess
+    /redfish/v1/SessionService/Sessions as Sessions URL, we try first to use
+    directly the Sessions URL provided by the root service, if available.
+
