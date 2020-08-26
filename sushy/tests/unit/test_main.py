@@ -390,6 +390,10 @@ class MainTestCase(base.TestCase):
         registries[1]
         self.assertEqual(1, mock_registries.__getitem__.call_count)
 
+    def test_get_sessions_path(self):
+        expected = '/redfish/v1/SessionService/Sessions'
+        self.assertEqual(expected, self.root.get_sessions_path())
+
 
 class BareMinimumMainTestCase(base.TestCase):
 
@@ -432,11 +436,15 @@ class BareMinimumMainTestCase(base.TestCase):
             exceptions.MissingAttributeError,
             'UpdateService/@odata.id', self.root.get_update_service)
 
-    def test_get_composition_service_when_compositionservice_attr_absent(
-        self):
+    def test_get_composition_service_when_compositionservice_attr_absent(self):
         self.assertRaisesRegex(
             exceptions.MissingAttributeError,
             'CompositionService/@odata.id', self.root.get_composition_service)
 
     def test__get_registry_collection_when_registries_attr_absent(self):
         self.assertIsNone(self.root._get_registry_collection())
+
+    def test_get_sessions_path_fail(self):
+        self.assertRaisesRegex(
+            exceptions.MissingAttributeError,
+            'Links/Sessions/@data.id', self.root.get_sessions_path)
