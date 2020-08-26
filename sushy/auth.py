@@ -149,10 +149,18 @@ class SessionAuth(AuthBase):
         :raises: AccessError
         :raises: HTTPError
         """
+        target_uri = None
+        try:
+            target_uri = self._root_resource.get_sessions_path()
+        except exceptions.MissingAttributeError:
+            LOG.debug('Missing Sessions attribute under Links in Root '
+                      'Service, we\'ll try to determine it from Session '
+                      'Service')
         session_service = self._root_resource.get_session_service()
         session_auth_token, session_uri = (
             session_service.create_session(self._username,
-                                           self._password))
+                                           self._password,
+                                           target_uri=target_uri))
         self._session_key = session_auth_token
         self._session_resource_id = session_uri
         self._connector.set_http_session_auth(session_auth_token)
