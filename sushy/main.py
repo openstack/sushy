@@ -459,9 +459,10 @@ class Sushy(base.ResourceBase):
         Fetches all registries if any provided by Redfish service
         and combines together with packaged standard registries.
 
-        :returns: dict of combined message registries where key is
-            Registry_name.Major_version.Minor_version and value is registry
-            itself.
+        :returns: dict of combined message registries keyed by both the
+            registry name (Registry_name.Major_version.Minor_version) and the
+            message registry file identity, with the value being the actual
+            registry itself.
         """
         standard = self._get_standard_message_registry_collection()
 
@@ -473,9 +474,13 @@ class Sushy(base.ResourceBase):
 
         if registry_col:
             provided = registry_col.get_members()
-            registries.update({r.registry: r.get_message_registry(
-                               self._language,
-                               self._public_connector) for r in provided})
+            for r in provided:
+                message_registry = r.get_message_registry(
+                    self._language,
+                    self._public_connector)
+                registries[r.registry] = message_registry
+                if r.identity not in registries:
+                    registries[r.identity] = message_registry
 
         return registries
 

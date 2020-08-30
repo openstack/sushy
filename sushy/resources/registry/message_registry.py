@@ -13,10 +13,13 @@
 # This is referred from Redfish standard schema.
 # https://redfish.dmtf.org/schemas/v1/MessageRegistry.v1_1_1.json
 
+import logging
 
 from sushy.resources import base
 from sushy.resources import constants as res_cons
 from sushy.resources import mappings as res_maps
+
+LOG = logging.getLogger(__name__)
 
 
 class MessageDictionaryField(base.DictionaryField):
@@ -92,13 +95,44 @@ def parse_message(message_registries, message_field):
     :returns: parsed settings.MessageListField with missing attributes filled
     """
 
-    registry, msg_key = message_field.message_id.rsplit('.', 1)
+    reg_msg = None
+    if '.' in message_field.message_id:
+        registry, msg_key = message_field.message_id.rsplit('.', 1)
 
-    reg_msg = message_registries[registry].messages[msg_key]
+        if (registry in message_registries and msg_key
+                in message_registries[registry].messages):
+            reg_msg = message_registries[registry].messages[msg_key]
+    else:
+        # Some firmware only reports the MessageKey and no RegistryName.
+        # Fall back to the MessageRegistryFile with Id of Messages next, and
+        # BaseMessages as a last resort
+        registry = 'unknown'
+        msg_key = message_field.message_id
+
+        mrf_ids = ['Messages', 'BaseMessages']
+        for mrf_id in mrf_ids:
+            if (mrf_id in message_registries and msg_key in
+                    message_registries[mrf_id].messages):
+                reg_msg = message_registries[mrf_id].messages[msg_key]
+                break
+
+    if not reg_msg:
+        LOG.warning(
+            'Unable to find message for registry %(registry), '
+            'message ID %(msg_key)', {
+                'registry': registry,
+                'msg_key': msg_key})
+        if message_field.message is None:
+            message_field.message = 'unknown'
+        return message_field
 
     msg = reg_msg.message
     for i in range(1, reg_msg.number_of_args + 1):
-        msg = msg.replace('%%%i' % i, str(message_field.message_args[i - 1]))
+        if i <= len(message_field.message_args):
+            msg = msg.replace('%%%i' % i,
+                              str(message_field.message_args[i - 1]))
+        else:
+            msg = msg.replace('%%%i' % i, 'unknown')
 
     message_field.message = msg
     if not message_field.severity:

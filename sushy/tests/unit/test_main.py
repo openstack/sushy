@@ -325,13 +325,15 @@ class MainTestCase(base.TestCase):
         mock_msg_reg2.registry_prefix = 'RegistryB'
         mock_msg_reg2.registry_version = '1.0.0'
         mock_msg_reg_file = mock.Mock()
+        mock_msg_reg_file.identity = 'Messages'
         mock_msg_reg_file.registry = 'RegistryB.1.0'
         mock_msg_reg_file.get_message_registry.return_value = mock_msg_reg2
         mock_col.return_value.get_members.return_value = [mock_msg_reg_file]
 
         registries = self.root.registries
         self.assertEqual({'RegistryA.2.0': mock_msg_reg1,
-                          'RegistryB.1.0': mock_msg_reg2}, registries)
+                          'RegistryB.1.0': mock_msg_reg2,
+                          'Messages': mock_msg_reg2}, registries)
 
     @mock.patch('sushy.Sushy._get_standard_message_registry_collection',
                 autospec=True)
@@ -347,6 +349,7 @@ class MainTestCase(base.TestCase):
         mock_msg_reg2.registry_prefix = 'RegistryB'
         mock_msg_reg2.registry_version = '1.0.0'
         mock_msg_reg_file = mock.Mock()
+        mock_msg_reg_file.identity = 'Messages'
         mock_msg_reg_file.registry = 'RegistryB.1.0'
         mock_msg_reg_file.get_message_registry.return_value = mock_msg_reg2
         mock_col.return_value.get_members.return_value = [mock_msg_reg_file]
@@ -363,7 +366,8 @@ class MainTestCase(base.TestCase):
 
         expected = {
             'RegistryA.2.0': mock_msg_reg1,
-            'RegistryB.1.0': mock_msg_reg2
+            'RegistryB.1.0': mock_msg_reg2,
+            'Messages': mock_msg_reg2
         }
 
         self.assertEqual(expected, registries)
