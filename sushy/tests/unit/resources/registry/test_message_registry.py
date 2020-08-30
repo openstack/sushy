@@ -131,3 +131,130 @@ class MessageRegistryTestCase(base.TestCase):
         self.assertEqual(res_cons.SEVERITY_OK, parsed_msg.severity)
         self.assertEqual('Everything done successfully.',
                          parsed_msg.message)
+
+    def test_parse_message_bad_registry(self):
+        conn = mock.Mock()
+        with open('sushy/tests/unit/json_samples/message_registry.json') as f:
+            conn.get.return_value.json.return_value = json.load(f)
+        registry = message_registry.MessageRegistry(
+            conn, '/redfish/v1/Registries/Test',
+            redfish_version='1.0.2')
+        registries = {'Test.1.0.0': registry}
+        message_field = sushy_base.MessageListField('Foo')
+        message_field.message_id = 'BadRegistry.TooBig'
+
+        parsed_msg = message_registry.parse_message(registries, message_field)
+
+        self.assertEqual(message_field, parsed_msg)
+
+    def test_parse_message_bad_message_key_existing_message(self):
+        conn = mock.Mock()
+        with open('sushy/tests/unit/json_samples/message_registry.json') as f:
+            conn.get.return_value.json.return_value = json.load(f)
+        registry = message_registry.MessageRegistry(
+            conn, '/redfish/v1/Registries/Test',
+            redfish_version='1.0.2')
+        registries = {'Test.1.0.0': registry}
+        message_field = sushy_base.MessageListField('Foo')
+        message_field.message_id = 'Test.1.0.0.BadMessageKey'
+        message_field.message = 'Message'
+
+        parsed_msg = message_registry.parse_message(registries, message_field)
+
+        self.assertEqual(message_field.message, 'Message')
+        self.assertEqual(message_field.message, parsed_msg.message)
+
+    def test_parse_message_bad_message_key_no_existing_message(self):
+        conn = mock.Mock()
+        with open('sushy/tests/unit/json_samples/message_registry.json') as f:
+            conn.get.return_value.json.return_value = json.load(f)
+        registry = message_registry.MessageRegistry(
+            conn, '/redfish/v1/Registries/Test',
+            redfish_version='1.0.2')
+        registries = {'Test.1.0.0': registry}
+        message_field = sushy_base.MessageListField('Foo')
+        message_field.message_id = 'Test.1.0.0.BadMessageKey'
+        message_field.message = None
+
+        parsed_msg = message_registry.parse_message(registries, message_field)
+
+        self.assertEqual(message_field.message, 'unknown')
+        self.assertEqual(message_field.message, parsed_msg.message)
+
+    def test_parse_message_fallback_to_messages(self):
+        conn = mock.Mock()
+        with open('sushy/tests/unit/json_samples/message_registry.json') as f:
+            conn.get.return_value.json.return_value = json.load(f)
+        registry = message_registry.MessageRegistry(
+            conn, '/redfish/v1/Registries/Test',
+            redfish_version='1.0.2')
+        registries = {'Messages': registry}
+        message_field = sushy_base.MessageListField('Foo')
+        message_field.message_id = 'Success'
+        message_field.severity = res_cons.SEVERITY_OK
+        message_field.resolution = 'Do nothing'
+
+        parsed_msg = message_registry.parse_message(registries, message_field)
+
+        self.assertEqual('Do nothing', parsed_msg.resolution)
+        self.assertEqual(res_cons.SEVERITY_OK, parsed_msg.severity)
+        self.assertEqual('Everything done successfully.',
+                         parsed_msg.message)
+
+    def test_parse_message_fallback_to_basemessages(self):
+        conn = mock.Mock()
+        with open('sushy/tests/unit/json_samples/message_registry.json') as f:
+            conn.get.return_value.json.return_value = json.load(f)
+        registry = message_registry.MessageRegistry(
+            conn, '/redfish/v1/Registries/Test',
+            redfish_version='1.0.2')
+        registries = {'BaseMessages': registry}
+        message_field = sushy_base.MessageListField('Foo')
+        message_field.message_id = 'Success'
+        message_field.severity = res_cons.SEVERITY_OK
+        message_field.resolution = 'Do nothing'
+
+        parsed_msg = message_registry.parse_message(registries, message_field)
+
+        self.assertEqual('Do nothing', parsed_msg.resolution)
+        self.assertEqual(res_cons.SEVERITY_OK, parsed_msg.severity)
+        self.assertEqual('Everything done successfully.',
+                         parsed_msg.message)
+
+    def test_parse_message_fallback_failed(self):
+        conn = mock.Mock()
+        with open('sushy/tests/unit/json_samples/message_registry.json') as f:
+            conn.get.return_value.json.return_value = json.load(f)
+        registry = message_registry.MessageRegistry(
+            conn, '/redfish/v1/Registries/Test',
+            redfish_version='1.0.2')
+        registries = {'Test.1.0.0': registry}
+        message_field = sushy_base.MessageListField('Foo')
+        message_field.message_id = 'BadMessageKey'
+        message_field.message = None
+
+        parsed_msg = message_registry.parse_message(registries, message_field)
+
+        self.assertEqual(message_field.message, 'unknown')
+        self.assertEqual(message_field.message, parsed_msg.message)
+
+    def test_parse_message_not_enough_args(self):
+        conn = mock.Mock()
+        with open('sushy/tests/unit/json_samples/message_registry.json') as f:
+            conn.get.return_value.json.return_value = json.load(f)
+        registry = message_registry.MessageRegistry(
+            conn, '/redfish/v1/Registries/Test',
+            redfish_version='1.0.2')
+        registries = {'Test.1.0.0': registry}
+        message_field = sushy_base.MessageListField('Foo')
+        message_field.message_id = 'Test.1.0.0.TooBig'
+        message_field.message_args = ['arg1']
+        message_field.severity = None
+        message_field.resolution = None
+
+        parsed_msg = message_registry.parse_message(registries, message_field)
+
+        self.assertEqual('Try again', parsed_msg.resolution)
+        self.assertEqual(res_cons.SEVERITY_WARNING, parsed_msg.severity)
+        self.assertEqual('Property\'s arg1 value cannot be greater than '
+                         'unknown.', parsed_msg.message)

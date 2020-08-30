@@ -1,0 +1,10 @@
+---
+fixes:
+  - |
+    Makes message parsing more resilient by handling the case where the message
+    ID only contains a message key and no registry name. In this case, fall
+    back to the ``Messages`` message registry file and then to the
+    ``BaseMessages`` message registry file. If the message ID cannot be found,
+    then set the message to ``unknown``.  When parsing messages, if not enough
+    arguments were supplied, then fill in the remaining arguments with
+    ``unknown``.
