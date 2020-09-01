@@ -19,6 +19,7 @@ import logging
 from sushy import exceptions
 from sushy.resources import base
 from sushy.resources import common
+from sushy.resources import mappings as res_maps
 from sushy.resources import settings
 from sushy import utils
 
@@ -67,6 +68,11 @@ class Bios(base.ResourceBase):
     To update use :py:func:`~set_attribute` or :py:func:`~set_attributes`
     """
 
+    maintenance_window = settings.MaintenanceWindowField(
+        '@Redfish.MaintenanceWindow')
+    """Indicates if a given resource has a maintenance window assignment
+    for applying settings or operations"""
+
     _actions = ActionsField('Actions')
 
     _apply_time_settings = settings.SettingsApplyTimeField()
@@ -93,7 +99,9 @@ class Bios(base.ResourceBase):
     def apply_time_settings(self):
         return self._pending_settings_resource._apply_time_settings
 
-    def set_attribute(self, key, value):
+    def set_attribute(self, key, value, apply_time=None,
+                      maint_window_start_time=None,
+                      maint_window_duration=None):
         """Update an attribute
 
         Attribute update is not immediate but requires system restart.
@@ -102,10 +110,25 @@ class Bios(base.ResourceBase):
 
         :param key: Attribute name
         :param value: Attribute value
+        :param apply_time: When to update the attribute. Optional.
+            APPLY_TIME_IMMEDIATE - Immediate,
+            APPLY_TIME_ON_RESET - On reset,
+            APPLY_TIME_MAINT_START - During specified maintenance time
+            APPLY_TIME_MAINT_RESET - On reset during specified maintenance time
+        :param maint_window_start_time: The start time of a maintenance window,
+            datetime. Required when updating during maintenance window and
+            default maintenance window not set by the system.
+        :param maint_window_duration: Duration of maintenance time since
+            maintenance window start time in seconds. Required when updating
+            during maintenance window and default maintenance window not
+            set by the system.
         """
-        self.set_attributes({key: value})
+        self.set_attributes({key: value}, apply_time, maint_window_start_time,
+                            maint_window_duration)
 
-    def set_attributes(self, value):
+    def set_attributes(self, value, apply_time=None,
+                       maint_window_start_time=None,
+                       maint_window_duration=None):
         """Update many attributes at once
 
         Attribute update is not immediate but requires system restart.
@@ -113,9 +136,41 @@ class Bios(base.ResourceBase):
         property
 
         :param value: Key-value pairs for attribute name and value
+        :param apply_time: When to update the attributes. Optional.
+            APPLY_TIME_IMMEDIATE - Immediate,
+            APPLY_TIME_ON_RESET - On reset,
+            APPLY_TIME_MAINT_START - During specified maintenance time
+            APPLY_TIME_MAINT_RESET - On reset during specified maintenance time
+        :param maint_window_start_time: The start time of a maintenance window,
+            datetime. Required when updating during maintenance window and
+            default maintenance window not set by the system.
+        :param maint_window_duration: Duration of maintenance time since
+            maintenance window start time in seconds. Required when updating
+            during maintenance window and default maintenance window not
+            set by the system.
         """
+        payload = {'Attributes': value}
+        if (not apply_time
+                and (maint_window_start_time or maint_window_duration)):
+            raise ValueError('"apply_time" missing when passing maintenance '
+                             'window settings')
+        if apply_time:
+            prop = '@Redfish.SettingsApplyTime'
+            payload[prop] = {
+                '@odata.type': '#Settings.v1_0_0.PreferredApplyTime',
+                'ApplyTime': res_maps.APPLY_TIME_VALUE_MAP_REV[apply_time]
+            }
+            if maint_window_start_time and not maint_window_duration:
+                raise ValueError('"maint_window_duration" missing')
+            if not maint_window_start_time and maint_window_duration:
+                raise ValueError('"maint_window_start_time" missing')
+            if maint_window_start_time and maint_window_duration:
+                payload[prop]['MaintenanceWindowStartTime'] =\
+                    maint_window_start_time.isoformat()
+                payload[prop]['MaintenanceWindowDurationInSeconds'] =\
+                    maint_window_duration
         self._settings.commit(self._conn,
-                              {'Attributes': value})
+                              payload)
         utils.cache_clear(self, force_refresh=False,
                           only_these=['_pending_settings_resource'])
 
@@ -183,3 +238,11 @@ class Bios(base.ResourceBase):
             containing status and any messages
         """
         return self._settings.get_status(self._registries)
+
+    @property
+    def supported_apply_times(self):
+        """List of supported BIOS update apply times
+
+        :returns: List of supported update apply time names
+        """
+        return self._settings._supported_apply_times
