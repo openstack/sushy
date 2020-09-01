@@ -63,6 +63,9 @@ class SettingsFieldTestCase(base.TestCase):
                          instance.messages[0]._related_properties[0])
         self.assertEqual('/redfish/v1/Systems/437XR1138R2/BIOS/Settings',
                          instance._settings_object_idref.resource_uri)
+        self.assertEqual([res_cons.APPLY_TIME_ON_RESET,
+                          res_cons.APPLY_TIME_MAINT_RESET],
+                         instance._supported_apply_times)
         self.assertIsNone(instance.maintenance_window)
         mock_LOG.warning.assert_called_once()
         mock_LOG.reset_mock()

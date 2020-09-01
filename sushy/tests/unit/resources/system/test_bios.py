@@ -12,6 +12,7 @@
 #    License for the specific language governing permissions and limitations
 #    under the License.
 
+import datetime
 from http import client as http_client
 import json
 from unittest import mock
@@ -19,6 +20,7 @@ from unittest import mock
 from dateutil import parser
 
 from sushy import exceptions
+from sushy.resources import constants as res_cons
 from sushy.resources.registry import message_registry
 from sushy.resources import settings
 from sushy.resources.system import bios
@@ -64,6 +66,14 @@ class BiosTestCase(base.TestCase):
         self.assertEqual('', self.sys_bios.attributes['AdminPhone'])
         self.assertEqual('Uefi', self.sys_bios.attributes['BootMode'])
         self.assertEqual(0, self.sys_bios.attributes['ProcCoreDisable'])
+        self.assertEqual([res_cons.APPLY_TIME_ON_RESET,
+                          res_cons.APPLY_TIME_MAINT_RESET],
+                         self.sys_bios.supported_apply_times)
+        self.assertEqual(600, self.sys_bios.maintenance_window
+                         .maintenance_window_duration_in_seconds)
+        self.assertEqual(parser.parse('2020-09-01T04:30:00-06:00'),
+                         self.sys_bios.maintenance_window
+                         .maintenance_window_start_time)
         # testing here if settings subfield parsed by checking ETag,
         # other settings fields tested in specific settings test
         self.assertEqual('9234ac83b9700123cc32',
@@ -78,6 +88,30 @@ class BiosTestCase(base.TestCase):
         self.sys_bios._conn.patch.assert_called_once_with(
             '/redfish/v1/Systems/437XR1138R2/BIOS/Settings',
             data={'Attributes': {'ProcTurboMode': 'Disabled'}})
+
+    def test_set_attribute_apply_time(self):
+        self.sys_bios.set_attribute('ProcTurboMode', 'Disabled',
+                                    res_cons.APPLY_TIME_ON_RESET)
+        self.sys_bios._conn.patch.assert_called_once_with(
+            '/redfish/v1/Systems/437XR1138R2/BIOS/Settings',
+            data={'Attributes': {'ProcTurboMode': 'Disabled'},
+                  '@Redfish.SettingsApplyTime': {
+                      '@odata.type': '#Settings.v1_0_0.PreferredApplyTime',
+                      'ApplyTime': 'OnReset'}})
+
+    def test_set_attribute_apply_time_with_maintenance_window(self):
+        self.sys_bios.set_attribute('ProcTurboMode', 'Disabled',
+                                    res_cons.APPLY_TIME_MAINT_RESET,
+                                    datetime.datetime(2020, 9, 1, 4, 30, 0),
+                                    600)
+        self.sys_bios._conn.patch.assert_called_once_with(
+            '/redfish/v1/Systems/437XR1138R2/BIOS/Settings',
+            data={'Attributes': {'ProcTurboMode': 'Disabled'},
+                  '@Redfish.SettingsApplyTime': {
+                      '@odata.type': '#Settings.v1_0_0.PreferredApplyTime',
+                      'ApplyTime': 'InMaintenanceWindowOnReset',
+                      'MaintenanceWindowStartTime': '2020-09-01T04:30:00',
+                      'MaintenanceWindowDurationInSeconds': 600}})
 
     def test_set_attribute_on_refresh(self):
         self.conn.get.reset_mock()
@@ -102,6 +136,58 @@ class BiosTestCase(base.TestCase):
             '/redfish/v1/Systems/437XR1138R2/BIOS/Settings',
             data={'Attributes': {'ProcTurboMode': 'Disabled',
                                  'UsbControl': 'UsbDisabled'}})
+
+    def test_set_attributes_apply_time(self):
+        self.sys_bios.set_attributes({'ProcTurboMode': 'Disabled',
+                                      'UsbControl': 'UsbDisabled'},
+                                     res_cons.APPLY_TIME_IMMEDIATE)
+        self.sys_bios._conn.patch.assert_called_once_with(
+            '/redfish/v1/Systems/437XR1138R2/BIOS/Settings',
+            data={'Attributes': {'ProcTurboMode': 'Disabled',
+                                 'UsbControl': 'UsbDisabled'},
+                  '@Redfish.SettingsApplyTime': {
+                      '@odata.type': '#Settings.v1_0_0.PreferredApplyTime',
+                      'ApplyTime': 'Immediate'}})
+
+    def test_set_attributes_apply_time_with_maintenance_window(self):
+        self.sys_bios.set_attributes({'ProcTurboMode': 'Disabled',
+                                      'UsbControl': 'UsbDisabled'},
+                                     res_cons.APPLY_TIME_MAINT_START,
+                                     datetime.datetime(2020, 9, 1, 4, 30, 0),
+                                     600)
+        self.sys_bios._conn.patch.assert_called_once_with(
+            '/redfish/v1/Systems/437XR1138R2/BIOS/Settings',
+            data={'Attributes': {'ProcTurboMode': 'Disabled',
+                                 'UsbControl': 'UsbDisabled'},
+                  '@Redfish.SettingsApplyTime': {
+                      '@odata.type': '#Settings.v1_0_0.PreferredApplyTime',
+                      'ApplyTime': 'AtMaintenanceWindowStart',
+                      'MaintenanceWindowStartTime': '2020-09-01T04:30:00',
+                      'MaintenanceWindowDurationInSeconds': 600}})
+
+    def test_set_attributes_apply_time_missing(self):
+        self.assertRaises(ValueError,
+                          self.sys_bios.set_attributes,
+                          {'ProcTurboMode': 'Disabled',
+                           'UsbControl': 'UsbDisabled'},
+                          maint_window_start_time=datetime.datetime.now(),
+                          maint_window_duration=600)
+
+    def test_set_attributes_maint_window_start_time_missing(self):
+        self.assertRaises(ValueError,
+                          self.sys_bios.set_attributes,
+                          {'ProcTurboMode': 'Disabled',
+                           'UsbControl': 'UsbDisabled'},
+                          res_cons.APPLY_TIME_MAINT_START,
+                          maint_window_duration=600)
+
+    def test_set_attributes_maint_window_duration_missing(self):
+        self.assertRaises(ValueError,
+                          self.sys_bios.set_attributes,
+                          {'ProcTurboMode': 'Disabled',
+                           'UsbControl': 'UsbDisabled'},
+                          res_cons.APPLY_TIME_MAINT_START,
+                          datetime.datetime.now())
 
     def test_set_attributes_on_refresh(self):
         self.conn.get.reset_mock()

@@ -115,3 +115,14 @@ DUR_NAME_FORMAT_VALUE_MAP = {
     'UUID': res_cons.DURABLE_NAME_FORMAT_UUID,
     'iQN': res_cons.DURABLE_NAME_FORMAT_iQN,
 }
+
+APPLY_TIME_VALUE_MAP = {
+    'Immediate': res_cons.APPLY_TIME_IMMEDIATE,
+    'OnReset': res_cons.APPLY_TIME_ON_RESET,
+    'AtMaintenanceWindowStart':
+        res_cons.APPLY_TIME_MAINT_START,
+    'InMaintenanceWindowOnReset':
+        res_cons.APPLY_TIME_MAINT_RESET,
+}
+
+APPLY_TIME_VALUE_MAP_REV = utils.revert_dictionary(APPLY_TIME_VALUE_MAP)

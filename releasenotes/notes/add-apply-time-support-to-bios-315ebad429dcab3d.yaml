@@ -1,0 +1,12 @@
+---
+features:
+  - |
+    Adds support for ``bios`` resource to allow specifying BIOS attribute
+    update time and maintenance window when updating BIOS attributes using
+    ``set_attribute`` or ``set_attributes``.
+
+    The update is backward compatible and when new parameters not passed, they
+    default to ``None``.
+
+    Also adds ``maintenance_window`` for ``bios`` resource to expose default
+    maintenance window set by the system if any.
