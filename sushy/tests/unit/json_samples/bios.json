@@ -32,16 +32,7 @@
         "SettingsObject": {
             "@odata.id": "/redfish/v1/Systems/437XR1138R2/BIOS/Settings"
         },
-        "Time": "2016-03-07T14:44.30-05:00",
-        "SupportedApplyTimes": [
-            "OnReset",
-            "InMaintenanceWindowOnReset"
-        ]
-    },
-    "@Redfish.MaintenanceWindow": {
-        "@odata.type": "#Settings.v1_2_0.MaintenanceWindow",
-        "MaintenanceWindowDurationInSeconds": 600,
-        "MaintenanceWindowStartTime": "2020-09-01T04:30:00-06:00"
+        "Time": "2016-03-07T14:44.30-05:00"
     },
     "Actions": {
         "#Bios.ResetBios": {

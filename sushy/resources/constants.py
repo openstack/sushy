@@ -143,10 +143,3 @@ DURABLE_NAME_FORMAT_NQN = 'NVMe Qualified Name'
 DURABLE_NAME_FORMAT_NSID = 'NVM Namespace Identifier'
 DURABLE_NAME_FORMAT_UUID = 'Universally Unique Identifier'
 DURABLE_NAME_FORMAT_iQN = 'iSCSI Qualified Name'
-
-# Apply time constants
-
-APPLY_TIME_IMMEDIATE = 'immediate'
-APPLY_TIME_ON_RESET = 'on reset'
-APPLY_TIME_MAINT_START = 'at maintenance window start'
-APPLY_TIME_MAINT_RESET = 'in maintenance window on reset'
