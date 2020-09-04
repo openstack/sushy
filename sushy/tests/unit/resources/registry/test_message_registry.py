@@ -17,9 +17,9 @@ import json
 from unittest import mock
 
 
+from sushy.resources import base as sushy_base
 from sushy.resources import constants as res_cons
 from sushy.resources.registry import message_registry
-from sushy.resources import settings
 from sushy.tests.unit import base
 
 
@@ -99,7 +99,7 @@ class MessageRegistryTestCase(base.TestCase):
             conn, '/redfish/v1/Registries/Test',
             redfish_version='1.0.2')
         registries = {'Test.1.0.0': registry}
-        message_field = settings.MessageListField('Foo')
+        message_field = sushy_base.MessageListField('Foo')
         message_field.message_id = 'Test.1.0.0.TooBig'
         message_field.message_args = ['arg1', 10]
         message_field.severity = None
@@ -120,7 +120,7 @@ class MessageRegistryTestCase(base.TestCase):
             conn, '/redfish/v1/Registries/Test',
             redfish_version='1.0.2')
         registries = {'Test.1.0.0': registry}
-        message_field = settings.MessageListField('Foo')
+        message_field = sushy_base.MessageListField('Foo')
         message_field.message_id = 'Test.1.0.0.Success'
         message_field.severity = res_cons.SEVERITY_OK
         message_field.resolution = 'Do nothing'

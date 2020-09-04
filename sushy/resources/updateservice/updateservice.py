@@ -19,6 +19,7 @@ import logging
 from sushy import exceptions
 from sushy.resources import base
 from sushy.resources import common
+from sushy.resources.taskservice import taskmonitor
 from sushy.resources.updateservice import constants as up_cons
 from sushy.resources.updateservice import mappings as up_maps
 from sushy.resources.updateservice import softwareinventory
@@ -115,7 +116,10 @@ class UpdateService(base.ResourceBase):
 
     def simple_update(self, image_uri, targets=None,
                       transfer_protocol=up_cons.UPDATE_PROTOCOL_HTTP):
-        """Simple Update is used to update software components"""
+        """Simple Update is used to update software components.
+
+        :returns: A task monitor.
+        """
         valid_transfer_protocols = self.get_allowed_transfer_protocols()
 
         if transfer_protocol in valid_transfer_protocols:
@@ -144,7 +148,33 @@ class UpdateService(base.ResourceBase):
         data = {'ImageURI': image_uri, 'TransferProtocol': transfer_protocol}
         if targets:
             data['Targets'] = targets
-        self._conn.post(target_uri, data=data)
+        rsp = self._conn.post(target_uri, data=data)
+
+        json_data = rsp.json() if rsp.content else {}
+        field_data = base.FieldData(rsp.status_code, rsp.headers, json_data)
+
+        header = 'Location'
+        task_monitor = rsp.headers.get(header)
+        if not task_monitor:
+            raise exceptions.MissingHeaderError(target_uri=target_uri,
+                                                header=header)
+
+        return taskmonitor.TaskMonitor(self._conn,
+                                       task_monitor,
+                                       redfish_version=self.redfish_version,
+                                       registries=self.registries,
+                                       field_data=field_data)
+
+    def get_task_monitor(self, task_monitor):
+        """Used to retrieve a TaskMonitor.
+
+        :returns: A task monitor.
+        """
+        return taskmonitor.TaskMonitor(
+            self._conn,
+            task_monitor,
+            redfish_version=self.redfish_version,
+            registries=self.registries)
 
     @property
     @utils.cache_it

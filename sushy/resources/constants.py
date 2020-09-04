@@ -32,6 +32,21 @@ STATE_DEFERRING = 'deferring'
 STATE_QUIESCED = 'quiesced'
 STATE_UPDATING = 'updating'
 
+# Task state related constants
+TASK_STATE_NEW = 'new'
+TASK_STATE_STARTING = 'starting'
+TASK_STATE_RUNNING = 'running'
+TASK_STATE_SUSPENDED = 'suspended'
+TASK_STATE_INTERRUPTED = 'interrupted'
+TASK_STATE_PENDING = 'pending'
+TASK_STATE_STOPPING = 'stopping'
+TASK_STATE_COMPLETED = 'completed'
+TASK_STATE_KILLED = 'killed'
+TASK_STATE_EXCEPTION = 'exception'
+TASK_STATE_SERVICE = 'service'
+TASK_STATE_CANCELLING = 'cancelling'
+TASK_STATE_CANCELLED = 'cancelled'
+
 # Message Registry message parameter type related constants.
 PARAMTYPE_STRING = 'string'
 PARAMTYPE_NUMBER = 'number'

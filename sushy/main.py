@@ -180,6 +180,7 @@ class Sushy(base.ResourceBase):
         if auth is None:
             auth = sushy_auth.SessionOrBasicAuth(username=username,
                                                  password=password)
+        self._auth = auth
 
         super(Sushy, self).__init__(
             connector or sushy_connector.Connector(base_url, verify=verify),
@@ -187,7 +188,6 @@ class Sushy(base.ResourceBase):
         self._public_connector = public_connector or requests
         self._language = language
         self._base_url = base_url
-        self._auth = auth
         self._auth.set_context(self, self._conn)
         self._auth.authenticate()
 

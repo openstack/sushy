@@ -72,6 +72,10 @@ class OEMExtensionNotFoundError(SushyError):
     message = 'No %(resource)s OEM extension found by name "%(name)s".'
 
 
+class MissingHeaderError(SushyError):
+    message = 'Response to %(target_uri)s did not contain a %(header)s header'
+
+
 class HTTPError(SushyError):
     """Basic exception for HTTP errors"""
 

@@ -66,6 +66,18 @@ def int_or_none(x):
     return int(x)
 
 
+def bool_or_none(x):
+    """Given a value x this method returns either a bool or None
+
+    :param x: The value to transform and return
+    :returns: Either None or x cast to a bool
+
+    """
+    if x is None:
+        return None
+    return bool(x)
+
+
 def get_sub_resource_path_by(resource, subresource_name, is_collection=False):
     """Helper function to find the subresource path
 

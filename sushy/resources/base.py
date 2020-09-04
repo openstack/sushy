@@ -24,6 +24,7 @@ import zipfile
 import pkg_resources
 
 from sushy import exceptions
+from sushy.resources import mappings as res_maps
 from sushy.resources import oem
 from sushy import utils
 
@@ -315,7 +316,61 @@ class MappedListField(Field):
         return instances
 
 
-class AbstractJsonReader(object, metaclass=abc.ABCMeta):
+class MessageListField(ListField):
+    """List of messages with details of settings update status"""
+
+    message_id = Field('MessageId', required=True)
+    """The key for this message which can be used
+    to look up the message in a message registry
+    """
+
+    message = Field('Message')
+    """Human readable message, if provided"""
+
+    severity = MappedField('Severity',
+                           res_maps.SEVERITY_VALUE_MAP)
+    """Severity of the error"""
+
+    resolution = Field('Resolution')
+    """Used to provide suggestions on how to resolve
+    the situation that caused the error
+    """
+
+    _related_properties = Field('RelatedProperties')
+    """List of properties described by the message"""
+
+    message_args = Field('MessageArgs')
+    """List of message substitution arguments for the message
+    referenced by `message_id` from the message registry
+    """
+
+
+class FieldData(object):
+    """Contains data to be used when constructing Fields"""
+
+    def __init__(self, status_code, headers, json_doc):
+        """Initializes the FieldData instance"""
+        self._status_code = status_code
+        self._headers = headers
+        self._json_doc = json_doc
+
+    @property
+    def status_code(self):
+        """The status code"""
+        return self._status_code
+
+    @property
+    def headers(self):
+        """The headers"""
+        return self._headers
+
+    @property
+    def json_doc(self):
+        """The parsed JSON body"""
+        return self._json_doc
+
+
+class AbstractDataReader(object, metaclass=abc.ABCMeta):
 
     def set_connection(self, connector, path):
         """Sets mandatory connection parameters
@@ -327,28 +382,33 @@ class AbstractJsonReader(object, metaclass=abc.ABCMeta):
         self._path = path
 
     @abc.abstractmethod
-    def get_json(self):
+    def get_data(self):
         """Based on data source get data and parse to JSON"""
 
 
-class JsonDataReader(AbstractJsonReader):
+class JsonDataReader(AbstractDataReader):
     """Gets the data from HTTP response given by path"""
 
-    def get_json(self):
+    def get_data(self):
         """Gets JSON file from URI directly"""
         data = self._conn.get(path=self._path)
-        return data.json() if data.content else {}
+
+        json_data = data.json() if data.content else {}
+
+        return FieldData(data.status_code, data.headers, json_data)
 
 
-class JsonPublicFileReader(AbstractJsonReader):
+class JsonPublicFileReader(AbstractDataReader):
     """Loads the data from the Internet"""
 
-    def get_json(self):
+    def get_data(self):
         """Get JSON file from full URI"""
-        return self._conn.get(self._path).json()
+        data = self._conn.get(self._path)
+
+        return FieldData(data.status_code, data.headers, data.json())
 
 
-class JsonArchiveReader(AbstractJsonReader):
+class JsonArchiveReader(AbstractDataReader):
     """Gets the data from JSON file in archive"""
 
     def __init__(self, archive_file):
@@ -358,15 +418,16 @@ class JsonArchiveReader(AbstractJsonReader):
         """
         self._archive_file = archive_file
 
-    def get_json(self):
+    def get_data(self):
         """Gets JSON file from archive. Currently supporting ZIP only"""
 
         data = self._conn.get(path=self._path)
         if data.headers.get('content-type') == 'application/zip':
             try:
                 archive = zipfile.ZipFile(io.BytesIO(data.content))
-                return json.loads(archive.read(self._archive_file)
-                                  .decode(encoding='utf-8'))
+                json_data = json.loads(archive.read(self._archive_file)
+                                       .decode(encoding='utf-8'))
+                return FieldData(data.status_code, data.headers, json_data)
             except (zipfile.BadZipfile, ValueError) as e:
                 raise exceptions.ArchiveParsingError(
                     path=self._path, error=e)
@@ -374,8 +435,10 @@ class JsonArchiveReader(AbstractJsonReader):
             LOG.error('Support for %(type)s not implemented',
                       {'type': data.headers['content-type']})
 
+            return FieldData(data.status_code, data.headers, None)
 
-class JsonPackagedFileReader(AbstractJsonReader):
+
+class JsonPackagedFileReader(AbstractDataReader):
     """Gets the data from packaged file given by path"""
 
     def __init__(self, resource_package_name):
@@ -385,12 +448,28 @@ class JsonPackagedFileReader(AbstractJsonReader):
         """
         self._resource_package_name = resource_package_name
 
-    def get_json(self):
+    def get_data(self):
         """Gets JSON file from packaged file denoted by path"""
 
         with pkg_resources.resource_stream(self._resource_package_name,
                                            self._path) as resource:
-            return json.loads(resource.read().decode(encoding='utf-8'))
+            json_data = json.loads(resource.read().decode(encoding='utf-8'))
+            return FieldData(None, None, json_data)
+
+
+def get_reader(connector, path, reader=None):
+    """Create and configure the reader.
+
+    :param connector: A Connector instance
+    :param path: sub-URI path to the resource.
+    :param reader: Reader to use to fetch JSON data.
+    :returns: the reader
+    """
+    if reader is None:
+        reader = JsonDataReader()
+    reader.set_connection(connector, path)
+
+    return reader
 
 
 class ResourceBase(object, metaclass=abc.ABCMeta):
@@ -406,7 +485,8 @@ class ResourceBase(object, metaclass=abc.ABCMeta):
                  path='',
                  redfish_version=None,
                  registries=None,
-                 reader=None):
+                 reader=None,
+                 json_doc=None):
         """A class representing the base of any Redfish resource
 
         Invokes the ``refresh()`` method of resource for the first
@@ -418,6 +498,7 @@ class ResourceBase(object, metaclass=abc.ABCMeta):
         :param registries: Dict of Redfish Message Registry objects to be
             used in any resource that needs registries to parse messages
         :param reader: Reader to use to fetch JSON data.
+        :param json_doc: parsed JSON document in form of Python types.
         """
         self._conn = connector
         self._path = path
@@ -429,12 +510,9 @@ class ResourceBase(object, metaclass=abc.ABCMeta):
         # attribute values are fetched.
         self._is_stale = True
 
-        if reader is None:
-            reader = JsonDataReader()
-        reader.set_connection(connector, path)
-        self._reader = reader
+        self._reader = get_reader(connector, path, reader)
 
-        self.refresh()
+        self.refresh(json_doc=json_doc)
 
     def _parse_attributes(self, json_doc):
         """Parse the attributes of a resource.
@@ -447,7 +525,7 @@ class ResourceBase(object, metaclass=abc.ABCMeta):
             # Hide the Field object behind the real value
             setattr(self, attr, field._load(json_doc, self))
 
-    def refresh(self, force=True):
+    def refresh(self, force=True, json_doc=None):
         """Refresh the resource
 
         Freshly retrieves/fetches the resource attributes and invokes
@@ -460,6 +538,7 @@ class ResourceBase(object, metaclass=abc.ABCMeta):
         :param force: if set to False, will only refresh if the resource is
             marked as stale, otherwise neither it nor its subresources will
             be refreshed.
+        :param json_doc: parsed JSON document in form of Python types.
         :raises: ResourceNotFoundError
         :raises: ConnectionError
         :raises: HTTPError
@@ -469,7 +548,10 @@ class ResourceBase(object, metaclass=abc.ABCMeta):
         if not self._is_stale and not force:
             return
 
-        self._json = self._reader.get_json()
+        if json_doc:
+            self._json = json_doc
+        else:
+            self._json = self._reader.get_data().json_doc
 
         LOG.debug('Received representation of %(type)s %(path)s: %(json)s',
                   {'type': self.__class__.__name__,
