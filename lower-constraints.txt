@@ -17,7 +17,7 @@ iso8601==0.1.11
 Jinja2==2.10
 keystoneauth1==3.4.0
 linecache2==1.0.0
-MarkupSafe==1.0
+MarkupSafe==1.1.1
 mccabe==0.2.1
 mox3==0.20.0
 openstackdocstheme==2.2.1
@@ -35,7 +35,7 @@ python-dateutil==2.7.0
 python-mimeparse==1.6.0
 python-subunit==1.0.0
 pytz==2013.6
-PyYAML==3.12
+PyYAML==3.13
 reno==3.1.0
 requests==2.14.2
 requestsexceptions==1.2.0
