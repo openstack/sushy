@@ -60,7 +60,7 @@ class Volume(base.ResourceBase):
     """Indicates if a client is allowed to request for a specific apply
     time of a create, delete, or action operation of a given resource"""
 
-    _actions = ActionsField('Actions', required=True)
+    _actions = ActionsField('Actions')
 
     def _get_initialize_action_element(self):
         initialize_action = self._actions.initialize
