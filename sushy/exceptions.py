@@ -91,7 +91,8 @@ class HTTPError(SushyError):
     detail = None
     """Error message defined in the Redfish specification, if present."""
 
-    message = ('HTTP %(method)s %(url)s returned code %(code)s. %(error)s')
+    message = ('HTTP %(method)s %(url)s returned code %(code)s. %(error)s '
+               'Extended information: %(ext_info)s')
 
     def __init__(self, method, url, response):
         self.status_code = response.status_code
@@ -103,6 +104,7 @@ class HTTPError(SushyError):
                         {'method': method, 'url': url, 'code':
                          self.status_code})
             error = 'unknown error'
+            ext_info = 'none'
         else:
             self.body = body.get('error', {})
             self.code = self.body.get('code', 'Base.1.0.GeneralError')
@@ -110,13 +112,13 @@ class HTTPError(SushyError):
             ext_info = self.body.get('@Message.ExtendedInfo', [{}])
             index = self._get_most_severe_msg_index(ext_info)
             self.detail = ext_info[index].get('Message', self.detail)
-            error = '%s: %s extended: %s' % (
-                self.code, self.detail or 'unknown error', ext_info or None)
+            error = '%s: %s' % (self.code, self.detail or 'unknown error.')
 
         kwargs = {'method': method, 'url': url, 'code': self.status_code,
-                  'error': error}
+                  'error': error, 'ext_info': ext_info}
         LOG.debug('HTTP response for %(method)s %(url)s: '
-                  'status code: %(code)s, error: %(error)s', kwargs)
+                  'status code: %(code)s, error: %(error)s, '
+                  'extended: %(ext_info)s', kwargs)
         super(HTTPError, self).__init__(**kwargs)
 
     @staticmethod
