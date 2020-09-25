@@ -170,6 +170,18 @@ class BiosTestCase(base.TestCase):
         self.sys_bios.reset_bios()
         self.sys_bios._conn.post.assert_has_calls(post_calls)
 
+    def test_reset_bios_handle_http_error_400(self):
+
+        target_uri = (
+            '/redfish/v1/Systems/437XR1138R2/BIOS/Actions/Bios.ResetBios')
+        self.conn.post.side_effect = [exceptions.HTTPError(
+            method='POST', url=target_uri, response=mock.MagicMock(
+                status_code=http_client.BAD_REQUEST)), '200']
+        post_calls = [
+            mock.call(target_uri), mock.call(target_uri, data={})]
+        self.sys_bios.reset_bios()
+        self.sys_bios._conn.post.assert_has_calls(post_calls)
+
     def test_reset_bios_handle_http_error_405(self):
 
         target_uri = (
