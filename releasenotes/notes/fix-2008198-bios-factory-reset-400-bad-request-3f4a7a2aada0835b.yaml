@@ -1,0 +1,7 @@
+---
+fixes:
+  - |
+    Fixes an issue in performing action ``#Bios.ResetBios`` when no body in
+    POST request provided and BMC responds with HTTP 400 Bad request, for
+    example, Dell R630 having iDRAC 2.75.75.75. See `story 2008198
+    <https://storyboard.openstack.org/#!/story/2008198>`__ for details.

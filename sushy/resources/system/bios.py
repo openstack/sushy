@@ -212,7 +212,8 @@ class Bios(base.ResourceBase):
             self._conn.post(target_uri)
         except exceptions.HTTPError as resp:
             # Send empty payload, if BMC expects body
-            if resp.status_code == http_client.UNSUPPORTED_MEDIA_TYPE:
+            if resp.status_code in [http_client.UNSUPPORTED_MEDIA_TYPE,
+                                    http_client.BAD_REQUEST]:
                 self._conn.post(target_uri, data={})
             else:
                 raise
