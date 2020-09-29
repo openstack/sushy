@@ -54,6 +54,15 @@ class MessageRegistryFileTestCase(base.TestCase):
         self.assertEqual('Test.1.0.json',
                          self.reg_file.location[0].archive_file)
 
+    def test__parse_attributes_return(self):
+        attributes = self.reg_file._parse_attributes(self.json_doc)
+
+        # Test that various types are returned correctly
+        self.assertEqual('Test Message Registry File', attributes.get('name'))
+        self.assertEqual('Test', attributes.get('identity'))
+        self.assertEqual(['en'], attributes.get('languages'))
+        self.assertEqual('Test.1.0', attributes.get('registry'))
+
     @mock.patch('sushy.resources.registry.message_registry.MessageRegistry',
                 autospec=True)
     @mock.patch('sushy.resources.base.JsonDataReader', autospec=True)

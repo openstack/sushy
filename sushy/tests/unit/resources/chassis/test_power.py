@@ -135,3 +135,56 @@ class PowerTestCase(base.TestCase):
                          self.power.power_supplies[1].part_number)
         self.assertEqual('425-591-654',
                          self.power.power_supplies[1].spare_part_number)
+
+    def test__parse_attributes_return(self):
+        attributes = self.power._parse_attributes(self.json_doc)
+
+        # Test that various types are returned correctly
+        self.assertEqual('Quad Blade Chassis Power', attributes.get('name'))
+        self.assertEqual([{'firmware_version': '2.20',
+                           'identity': '0',
+                           'indicator_led': None,
+                           'input_ranges':
+                           [{'input_type': 'ac',
+                             'maximum_frequency_hz': 63,
+                             'maximum_voltage': 250,
+                             'minimum_frequency_hz': 47,
+                             'minimum_voltage': 185,
+                             'output_wattage': 1450}],
+                           'last_power_output_watts': 650,
+                           'line_input_voltage': 220,
+                           'line_input_voltage_type': 'ac240v',
+                           'manufacturer': 'Cyberdyne',
+                           'model': '325457-A06',
+                           'name': 'Power Supply 0',
+                           'part_number': '425-591-654',
+                           'power_capacity_watts': 1450,
+                           'power_supply_type': 'ac',
+                           'serial_number': '1S0000523',
+                           'spare_part_number': '425-591-654',
+                           'status': {'health': 'ok', 'health_rollup': None,
+                                      'state': 'enabled'}},
+                          {'firmware_version': '2.20',
+                           'identity': '1',
+                           'indicator_led': None,
+                           'input_ranges':
+                           [{'input_type': 'ac',
+                             'maximum_frequency_hz': 63,
+                             'maximum_voltage': 250,
+                             'minimum_frequency_hz': 47,
+                             'minimum_voltage': 185,
+                             'output_wattage': 1450}],
+                           'last_power_output_watts': 635,
+                           'line_input_voltage': 222,
+                           'line_input_voltage_type': 'ac240v',
+                           'manufacturer': 'Cyberdyne',
+                           'model': '325457-A06',
+                           'name': 'Power Supply 1',
+                           'part_number': '425-591-654',
+                           'power_capacity_watts': 1450,
+                           'power_supply_type': 'ac',
+                           'serial_number': '1S0000524',
+                           'spare_part_number': '425-591-654',
+                           'status': {'health': 'ok', 'health_rollup': None,
+                                      'state': 'enabled'}}],
+                         attributes.get('power_supplies'))

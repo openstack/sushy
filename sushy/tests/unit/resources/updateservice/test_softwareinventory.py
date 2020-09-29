@@ -55,6 +55,17 @@ class SoftwareInventoryTestCase(base.TestCase):
         self.assertTrue(self.soft_inv.updateable)
         self.assertEqual('1.45.455b66-rev4', self.soft_inv.version)
 
+    def test__parse_attributes_return(self):
+        attributes = self.soft_inv._parse_attributes(self.json_doc)
+
+        # Test that various types are returned correctly
+        self.assertEqual('BMC', attributes.get('identity'))
+        self.assertEqual({'health': res_cons.HEALTH_OK,
+                          'health_rollup': None,
+                          'state': res_cons.STATE_ENABLED},
+                         attributes.get('status'))
+        self.assertEqual(True, attributes.get('updateable'))
+
     def test__parse_attributes_missing_identity(self):
         self.soft_inv.json.pop('Id')
         self.assertRaisesRegex(

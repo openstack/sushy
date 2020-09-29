@@ -1,0 +1,5 @@
+---
+fixes:
+  - |
+    Reduce the logging from sushy by logging only attributes and values
+    set in the redfish response, not the entire json.
