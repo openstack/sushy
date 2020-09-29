@@ -74,6 +74,22 @@ class ChassisTestCase(base.TestCase):
                          self.chassis.physical_security.intrusion_sensor_re_arm
                          )
 
+    def test__parse_attributes_return(self):
+        attributes = self.chassis._parse_attributes(self.json_doc)
+
+        # Test that various types are returned correctly
+        self.assertEqual('Blade', attributes.get('name'))
+        self.assertEqual(sushy.INDICATOR_LED_OFF,
+                         attributes.get('indicator_led'))
+        self.assertEqual(sushy.POWER_STATE_ON, attributes.get('power_state'))
+        self.assertEqual({'intrusion_sensor':
+                          sushy.CHASSIS_INTRUSION_SENSOR_NORMAL,
+                          'intrusion_sensor_number':
+                          123,
+                          'intrusion_sensor_re_arm':
+                          'manual re arm chassis intrusion sensor'},
+                         attributes.get('physical_security'))
+
     def test_get_allowed_reset_chasis_values(self):
         # | GIVEN |
         expected = {sushy.RESET_TYPE_POWER_CYCLE,

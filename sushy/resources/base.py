@@ -214,6 +214,9 @@ class ListField(Field):
 
         return instances
 
+    def __getitem__(self, key):
+        return getattr(self, key)
+
 
 class DictionaryField(Field):
     """Base class for fields consisting of dictionary of several sub-fields."""
@@ -246,6 +249,9 @@ class DictionaryField(Field):
             instances[key] = instance_value
 
         return instances
+
+    def __getitem__(self, key):
+        return getattr(self, key)
 
 
 class MappedField(Field):
@@ -514,16 +520,48 @@ class ResourceBase(object, metaclass=abc.ABCMeta):
 
         self.refresh(json_doc=json_doc)
 
+    def _get_value(self, val):
+        """Iterate through the input to get values for all attributes
+
+        :param val: Either a value or a resource
+        :returns: Attribute value, which may be a dictionary
+        """
+        if isinstance(val, dict):
+            subfields = {}
+            for key, s_val in val.items():
+                subfields[key] = self._get_value(s_val)
+            return subfields
+
+        elif isinstance(val, list):
+            return [self._get_value(val[i]) for i in range(len(val))]
+
+        elif (isinstance(val, DictionaryField)
+              or isinstance(val, CompositeField)
+              or isinstance(val, ListField)):
+            subfields = {}
+            for attr, field in val._subfields.items():
+                subfields[attr] = self._get_value(val.__getitem__(attr))
+            return subfields
+
+        return val
+
     def _parse_attributes(self, json_doc):
         """Parse the attributes of a resource.
 
         Parsed JSON fields are set to `self` as declared in the class.
 
         :param json_doc: parsed JSON document in form of Python types
+        :returns: dictionary of attribute/values after parsing
         """
+        settings = {}
         for attr, field in _collect_fields(self):
             # Hide the Field object behind the real value
             setattr(self, attr, field._load(json_doc, self))
+
+            # Get the attribute/value pairs that have been parsed
+            settings[attr] = self._get_value(getattr(self, attr))
+
+        return settings
 
     def refresh(self, force=True, json_doc=None):
         """Refresh the resource
@@ -553,10 +591,10 @@ class ResourceBase(object, metaclass=abc.ABCMeta):
         else:
             self._json = self._reader.get_data().json_doc
 
+        attributes = self._parse_attributes(self._json)
         LOG.debug('Received representation of %(type)s %(path)s: %(json)s',
                   {'type': self.__class__.__name__,
-                   'path': self._path, 'json': self._json})
-        self._parse_attributes(self._json)
+                   'path': self._path, 'json': attributes})
         self._do_refresh(force)
 
         # Mark it fresh
