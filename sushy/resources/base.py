@@ -218,6 +218,11 @@ class ListField(Field):
         return getattr(self, key)
 
 
+class LinksField(CompositeField):
+    """Reference to linked resources."""
+    oem_vendors = Field('Oem', adapter=list)
+
+
 class DictionaryField(Field):
     """Base class for fields consisting of dictionary of several sub-fields."""
 
@@ -483,8 +488,10 @@ class ResourceBase(object, metaclass=abc.ABCMeta):
     redfish_version = None
     """The Redfish version"""
 
-    oem_vendors = Field('Oem', adapter=list)
+    _oem_vendors = Field('Oem', adapter=list)
     """The list of OEM extension names for this resource."""
+
+    links = LinksField('Links')
 
     def __init__(self,
                  connector,
@@ -637,6 +644,12 @@ class ResourceBase(object, metaclass=abc.ABCMeta):
         self._is_stale = True
         if force_refresh:
             self.refresh()
+
+    @property
+    def oem_vendors(self):
+        return list(
+            set((self._oem_vendors or []) + (self.links.oem_vendors or []))
+        )
 
     @property
     def json(self):
