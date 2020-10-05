@@ -83,6 +83,28 @@ class BiosTestCase(base.TestCase):
         self.assertEqual(settings.UPDATE_FAILURE,
                          self.sys_bios.update_status.status)
 
+    def test__parse_attributes_return(self):
+        attributes = self.sys_bios._parse_attributes(self.bios_json)
+
+        # Test that various types are returned correctly
+        self.assertEqual('BIOS Configuration Current Settings',
+                         attributes.get('name'))
+        self.assertEqual({'AdminPhone': '',
+                          'BootMode': 'Uefi',
+                          'EmbeddedSata': 'Raid',
+                          'NicBoot1': 'NetworkBoot',
+                          'NicBoot2': 'Disabled',
+                          'PowerProfile': 'MaxPerf',
+                          'ProcCoreDisable': 0,
+                          'ProcHyperthreading': 'Enabled',
+                          'ProcTurboMode': 'Enabled',
+                          'UsbControl': 'UsbEnabled'},
+                         attributes.get('attributes'))
+        self.assertEqual({'maintenance_window_duration_in_seconds': 600,
+                         'maintenance_window_start_time':
+                          parser.parse('2020-09-01T04:30:00-06:00')},
+                         attributes.get('maintenance_window'))
+
     def test_set_attribute(self):
         self.sys_bios.set_attribute('ProcTurboMode', 'Disabled')
         self.sys_bios._conn.patch.assert_called_once_with(

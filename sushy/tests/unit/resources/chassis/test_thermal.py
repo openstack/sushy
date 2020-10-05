@@ -73,3 +73,48 @@ class ThermalTestCase(base.TestCase):
         self.assertEqual(120,
                          self.thermal.temperatures[0].max_reading_range_temp)
         self.assertEqual('CPU', self.thermal.temperatures[0].physical_context)
+
+    def test__parse_attributes_return(self):
+        attributes = self.thermal._parse_attributes(self.json_doc)
+
+        # Test that various types are returned correctly
+        self.assertEqual([{'identity': '0',
+                           'indicator_led': None,
+                           'lower_threshold_critical': None,
+                           'lower_threshold_fatal': 2000,
+                           'lower_threshold_non_critical': None,
+                           'manufacturer': None,
+                           'max_reading_range': 10000,
+                           'min_reading_range': 0,
+                           'model': None,
+                           'name': 'CPU Fan',
+                           'part_number': None,
+                           'physical_context': 'CPU',
+                           'reading': 6000,
+                           'reading_units': 'RPM',
+                           'serial_number': None,
+                           'status':
+                           {'health': 'ok', 'health_rollup': None,
+                            'state': 'enabled'},
+                           'upper_threshold_critical': None,
+                           'upper_threshold_fatal': None,
+                           'upper_threshold_non_critical': None}],
+                         attributes.get('fans'))
+        self.assertEqual([{'identity': '0',
+                           'lower_threshold_critical': None,
+                           'lower_threshold_fatal': None,
+                           'lower_threshold_non_critical': None,
+                           'max_allowable_operating_value': None,
+                           'max_reading_range_temp': 120,
+                           'min_allowable_operating_value': None,
+                           'min_reading_range_temp': 0,
+                           'name': 'CPU Temp',
+                           'physical_context': 'CPU',
+                           'reading_celsius': 62,
+                           'sensor_number': None,
+                           'status': {'health': 'ok', 'health_rollup': None,
+                                      'state': 'enabled'},
+                           'upper_threshold_critical': 90,
+                           'upper_threshold_fatal': 95,
+                           'upper_threshold_non_critical': 75}],
+                         attributes.get('temperatures'))

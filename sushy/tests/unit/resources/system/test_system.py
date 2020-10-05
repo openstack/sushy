@@ -82,6 +82,39 @@ class SystemTestCase(base.TestCase):
         for oem_vendor in self.sys_inst.oem_vendors:
             self.assertIn(oem_vendor, ('Contoso', 'Chipwise'))
 
+    def test__parse_attributes_return(self):
+        attributes = self.sys_inst._parse_attributes(self.json_doc)
+
+        # Test that various types are returned correctly
+        self.assertEqual('Chicago-45Z-2381', attributes.get('asset_tag'))
+        self.assertEqual(sushy.INDICATOR_LED_OFF,
+                         attributes.get('indicator_led'))
+        self.assertEqual({'health': res_cons.HEALTH_OK,
+                          'health_rollup': res_cons.HEALTH_OK,
+                          'state': res_cons.STATE_ENABLED},
+                         attributes.get('status'))
+        self.assertEqual({'maintenance_window_duration_in_seconds': 1,
+                          'maintenance_window_start_time':
+                          parser.parse('2016-03-07T14:44:30-05:05')},
+                         attributes.get('maintenance_window'))
+        self.assertEqual({'reset': {'allowed_values':
+                         ['On', 'ForceOff', 'GracefulShutdown',
+                             'GracefulRestart', 'ForceRestart', 'Nmi',
+                             'ForceOn', 'PushPowerButton'],
+                         'operation_apply_time_support':
+                         {'_maintenance_window_resource':
+                             {'resource_uri':
+                                 '/redfish/v1/Systems/437XR1138R2'},
+                          'maintenance_window_duration_in_seconds': 600,
+                          'maintenance_window_start_time':
+                          parser.parse('2017-05-03T23:12:37-05:00'),
+                              'supported_values':
+                              ['Immediate', 'AtMaintenanceWindowStart']},
+                         'target_uri':
+                         '/redfish/v1/Systems/437XR1138R2/Actions/'
+                         'ComputerSystem.Reset'}},
+                         attributes.get('_actions'))
+
     def test__parse_attributes_missing_actions(self):
         self.sys_inst.json.pop('Actions')
         self.assertRaisesRegex(

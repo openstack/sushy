@@ -38,7 +38,7 @@ class VirtualMediaTestCase(base.TestCase):
             self.conn, '/redfish/v1/Managers/BMC/VirtualMedia/Floppy1',
             redfish_version='1.0.2')
 
-    def test__parse_atrtributes(self):
+    def test__parse_attributes(self):
         self.sys_virtual_media._parse_attributes(self.json_doc)
         self.assertEqual('Virtual Removable Media',
                          self.sys_virtual_media.name)
@@ -54,6 +54,18 @@ class VirtualMediaTestCase(base.TestCase):
                          self.sys_virtual_media.media_types)
         self.assertEqual(True, self.sys_virtual_media.inserted)
         self.assertEqual(False, self.sys_virtual_media.write_protected)
+
+    def test__parse_attributes_return(self):
+        attributes = self.sys_virtual_media._parse_attributes(self.json_doc)
+
+        # Test that various types are returned correctly
+        self.assertEqual('https://www.dmtf.org/freeImages/Sardine.img',
+                         attributes.get('image'))
+        self.assertEqual(sushy.CONNECTED_VIA_URI,
+                         attributes.get('connected_via'))
+        self.assertEqual([sushy.VIRTUAL_MEDIA_FLOPPY,
+                          sushy.VIRTUAL_MEDIA_USBSTICK],
+                         attributes.get('media_types'))
 
     def test_insert_media_none(self):
         self.sys_virtual_media._actions.insert_media = None

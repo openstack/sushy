@@ -74,6 +74,39 @@ class MessageRegistryTestCase(base.TestCase):
         self.assertEqual(
             'Try Later', self.registry.messages['MissingThings'].resolution)
 
+    def test__parse_attributes_return(self):
+        attributes = self.registry._parse_attributes(self.json_doc)
+
+        self.assertEqual({'Failed':
+                          {'description': 'Nothing is OK',
+                           'message': 'The property %1 broke everything.',
+                           'number_of_args': 1,
+                           'param_types': ['string'],
+                           'resolution': 'Panic',
+                           'severity': 'critical'},
+                          'MissingThings':
+                          {'description': '',
+                           'message':
+                           "Property's %1 value cannot be less than %2.",
+                           'number_of_args': 2,
+                           'param_types': ['string', 'number'],
+                           'resolution': 'Try Later',
+                           'severity': 'warning'},
+                          'Success':
+                          {'description': 'Everything OK',
+                           'message': 'Everything done successfully.',
+                           'number_of_args': 0, 'param_types': None,
+                           'resolution': 'None', 'severity': 'ok'},
+                          'TooBig':
+                          {'description': 'Value too big',
+                           'message':
+                           "Property's %1 value cannot be greater than %2.",
+                           'number_of_args': 2,
+                           'param_types': ['string', 'number'],
+                           'resolution': 'Try again',
+                           'severity': 'warning'}},
+                         attributes.get('messages'))
+
     def test__parse_attributes_missing_msg_desc(self):
         self.json_doc['Messages']['Success'].pop('Description')
         self.registry._parse_attributes(self.json_doc)
