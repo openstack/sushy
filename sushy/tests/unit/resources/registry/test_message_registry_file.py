@@ -125,22 +125,20 @@ class MessageRegistryFileTestCase(base.TestCase):
             reader=mock_reader_rv)
         self.assertEqual(mock_msg_reg_rv, registry)
 
-    @mock.patch('sushy.resources.registry.message_registry.MessageRegistry',
+    @mock.patch('sushy.resources.registry.message_registry_file.RegistryType',
                 autospec=True)
-    @mock.patch('sushy.resources.base.JsonDataReader', autospec=True)
+    @mock.patch('sushy.resources.registry.message_registry_file.LOG',
+                autospec=True)
     def test_get_message_registry_unknown_type(
-            self, mock_reader, mock_msg_reg):
-        mock_reader_rv = mock.Mock()
-        mock_reader.return_value = mock_reader_rv
-        mock_reader_rv.get_json.return_value = {
-            "@odata.type": "#FishingRegistry.v1_1_1.FishingRegistry",
-        }
-        mock_msg_reg_rv = mock.Mock()
-        mock_msg_reg.return_value = mock_msg_reg_rv
+            self, mock_log, mock_registry_type):
+        mock_fishing_registry = mock_registry_type.return_value
+        mock_fishing_registry._odata_type = 'FishingRegistry'
 
         registry = self.reg_file.get_message_registry('en', None)
-        self.assertFalse(mock_msg_reg.called)
         self.assertIsNone(registry)
+        mock_log.debug.assert_called_with(
+            'Ignoring unsupported flavor of registry %(registry)s',
+            {'registry': 'FishingRegistry'})
 
     @mock.patch('sushy.resources.registry.message_registry.MessageRegistry',
                 autospec=True)
@@ -213,6 +211,26 @@ class MessageRegistryFileTestCase(base.TestCase):
             self.conn, path='/redfish/v1/Registries/Test/Test.1.0.json',
             reader=None, redfish_version=self.reg_file.redfish_version)
         self.assertIsNone(registry)
+
+    @mock.patch('sushy.resources.registry.message_registry_file.LOG',
+                autospec=True)
+    @mock.patch('sushy.resources.registry.message_registry_file.RegistryType',
+                autospec=True)
+    def test_get_message_registry_loading_type_fails(
+            self, mock_reg_type, mock_log):
+        mock_reg_type.side_effect = TypeError('Something wrong')
+
+        registry = self.reg_file.get_message_registry('en', None)
+        self.assertTrue(mock_reg_type.called)
+        self.assertIsNone(registry)
+        mock_log.warning.assert_any_call(
+            'Cannot load message registry type from location '
+            '%(location)s: %(error)s',
+            {'location': '/redfish/v1/Registries/Test/Test.1.0.json',
+             'error': mock.ANY})
+        mock_log.warning.assert_called_with(
+            'No message registry found for %(language)s or default',
+            {'language': 'en'})
 
     @mock.patch('sushy.resources.registry.message_registry_file.RegistryType',
                 autospec=True)

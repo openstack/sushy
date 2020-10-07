@@ -149,8 +149,9 @@ class MessageRegistryFile(base.ResourceBase):
                             'error': exc})
                     continue
 
-            LOG.warning('Ignoring unsupported flavor of registry %(registry)s',
-                        {'registry': registry._odata_type})
+            LOG.debug('Ignoring unsupported flavor of registry %(registry)s',
+                      {'registry': registry._odata_type})
+            return
 
         LOG.warning('No message registry found for %(language)s or '
                     'default', {'language': language})
