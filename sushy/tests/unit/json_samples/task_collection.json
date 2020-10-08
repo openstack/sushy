@@ -1,0 +1,16 @@
+{
+  "@odata.context": "/redfish/v1/$metadata#TaskCollection.TaskCollection",
+  "@odata.id": "/redfish/v1/TaskService/Tasks",
+  "@odata.type": "#TaskCollection.TaskCollection",
+  "Description": "Collection of Tasks",
+  "Members": [
+    {
+      "@odata.id": "/redfish/v1/TaskService/Tasks/545"
+    },
+    {
+      "@odata.id": "/redfish/v1/TaskService/Tasks/546"
+    }
+  ],
+  "Members@odata.count": 2,
+  "Name": "Task Collection"
+}

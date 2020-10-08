@@ -87,3 +87,24 @@ class Task(base.ResourceBase):
         """Parses the messages"""
         for m in self.messages:
             message_registry.parse_message(self._registries, m)
+
+
+class TaskCollection(base.ResourceCollectionBase):
+
+    @property
+    def _resource_type(self):
+        return Task
+
+    @property
+    @utils.cache_it
+    def summary(self):
+        """Summary of task ids and corresponding state
+
+        :returns: dictionary in the format
+            {'jid_123456789': sushy.TASK_STATE_NEW,
+            'jid_123454321': sushy.TASK_STATE_RUNNING}
+        """
+        task_dict = {}
+        for task in self.get_members():
+            task_dict[task.identity] = task.task_state
+        return task_dict

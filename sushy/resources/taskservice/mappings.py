@@ -14,6 +14,8 @@
 # limitations under the License.
 
 from sushy.resources import constants as res_cons
+from sushy.resources.taskservice import constants as ts_cons
+from sushy import utils
 
 
 TASK_STATE_VALUE_MAP = {
@@ -31,3 +33,11 @@ TASK_STATE_VALUE_MAP = {
     'Cancelling': res_cons.TASK_STATE_CANCELLING,
     'Cancelled': res_cons.TASK_STATE_CANCELLED
 }
+
+OVERWRITE_POLICY_VALUE_MAP = {
+    'Oldest': ts_cons.OVERWRITE_POLICY_OLDEST,
+    'Manual': ts_cons.OVERWRITE_POLICY_MANUAL,
+}
+
+OVERWRITE_POLICY_VALUE_MAP_REV = (
+    utils.revert_dictionary(OVERWRITE_POLICY_VALUE_MAP))
