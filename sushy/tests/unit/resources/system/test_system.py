@@ -107,9 +107,12 @@ class SystemTestCase(base.TestCase):
                                  '/redfish/v1/Systems/437XR1138R2'},
                           'maintenance_window_duration_in_seconds': 600,
                           'maintenance_window_start_time':
-                          parser.parse('2017-05-03T23:12:37-05:00'),
-                              'supported_values':
-                              ['Immediate', 'AtMaintenanceWindowStart']},
+                              parser.parse('2017-05-03T23:12:37-05:00'),
+                          'supported_values':
+                              ['Immediate', 'AtMaintenanceWindowStart'],
+                          'mapped_supported_values':
+                              [res_cons.APPLY_TIME_IMMEDIATE,
+                               res_cons.APPLY_TIME_MAINT_START]},
                          'target_uri':
                          '/redfish/v1/Systems/437XR1138R2/Actions/'
                          'ComputerSystem.Reset'}},
@@ -206,6 +209,9 @@ class SystemTestCase(base.TestCase):
         self.assertIsNotNone(support)
         self.assertEqual(['Immediate', 'AtMaintenanceWindowStart'],
                          support.supported_values)
+        self.assertEqual([res_cons.APPLY_TIME_IMMEDIATE,
+                          res_cons.APPLY_TIME_MAINT_START],
+                         support.mapped_supported_values)
         self.assertEqual(parser.parse('2017-05-03T23:12:37-05:00'),
                          support.maintenance_window_start_time)
         self.assertEqual(600, support.maintenance_window_duration_in_seconds)

@@ -42,8 +42,18 @@ class OperationApplyTimeSupportField(base.CompositeField):
 
     supported_values = base.Field('SupportedValues', required=True,
                                   adapter=list)
-    """The client is allowed request when performing a create, delete, or
-    action operation"""
+    """The types of apply times that the client is allowed request when
+    performing a create, delete, or action operation returned as an unmapped
+    list
+
+    Deprecated: Use `mapped_supported_values`.
+    """
+
+    mapped_supported_values = base.MappedListField(
+        'SupportedValues', res_maps.APPLY_TIME_VALUE_MAP, required=True)
+    """The types of apply times that the client is allowed request when
+    performing a create, delete, or action operation returned as a mapped
+    list"""
 
 
 class ActionField(base.CompositeField):
