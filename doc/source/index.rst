@@ -9,6 +9,24 @@ Welcome to Sushy's documentation!
 
 .. include:: ../../README.rst
 
+Features
+========
+
+* Abstraction around the SystemCollection and System resources (Basic
+  server identification and asset information)
+* RAID in Redfish based Systems
+* Redfish Ethernet Interface
+* System mappings
+* System processor
+* Storage management
+* Systems power management (Both soft and hard; Including NMI injection)
+* Changing systems boot device, frequency (Once or permanently) and mode
+  (UEFI or BIOS)
+* Chassis management
+* OEM extention
+* Virtual media management
+* Session Management
+
 Documentation
 =============
 

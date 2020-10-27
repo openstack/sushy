@@ -1,5 +1,5 @@
-About Sushy
-===========
+Overview
+========
 
 Sushy is a Python library to communicate with `Redfish`_ based systems.
 
