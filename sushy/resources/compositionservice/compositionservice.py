@@ -85,7 +85,7 @@ class CompositionService(base.ResourceBase):
     def resource_blocks(self):
         """Property to reference `ResourceBlockCollection` instance"""
         return resourceblock.ResourceBlockCollection(
-            self.conn, self._get_resource_blocks_collection_path,
+            self._conn, self._get_resource_blocks_collection_path,
             self.redfish_version, self.registries)
 
     @property
@@ -93,5 +93,5 @@ class CompositionService(base.ResourceBase):
     def resource_zones(self):
         """Property to reference `ResourceZoneCollection` instance"""
         return resourcezone.ResourceZoneCollection(
-            self.conn, self._get_resource_zones_collection_path,
+            self._conn, self._get_resource_zones_collection_path,
             self.redfish_version, self.registries)
