@@ -2,6 +2,8 @@
     name: sushy-tempest-partition-bios-redfish-pxe
     parent: ironic-tempest-partition-bios-redfish-pxe
     irrelevant-files:
+      - ^.*\.rst$
+      - ^doc/.*$
       - ^test-requirements.txt$
       - ^sushy/tests/.*$
     required-projects:
@@ -11,6 +13,8 @@
     name: sushy-tempest-partition-uefi-redfish-vmedia
     parent: ironic-tempest-partition-uefi-redfish-vmedia
     irrelevant-files:
+      - ^.*\.rst$
+      - ^doc/.*$
       - ^test-requirements.txt$
       - ^sushy/tests/.*$
     required-projects:
