@@ -15,6 +15,8 @@ import json
 from unittest import mock
 
 from sushy.resources.compositionservice import compositionservice
+from sushy.resources.compositionservice import resourceblock
+from sushy.resources.compositionservice import resourcezone
 from sushy.resources import constants as res_cons
 from sushy.tests.unit import base
 
@@ -49,3 +51,19 @@ class CompositionServiceTestCase(base.TestCase):
         self.assertEqual(res_cons.STATE_ENABLED, self.comp_ser.status.state)
         self.assertEqual(res_cons.HEALTH_OK, self.comp_ser.status.health)
         self.assertTrue(self.comp_ser.service_enabled)
+
+    @mock.patch.object(resourceblock, 'ResourceBlockCollection', autospec=True)
+    def test_get_resource_blocks(self, mock_resourceblock_col):
+        _ = self.comp_ser.resource_blocks
+        mock_resourceblock_col.assert_called_once_with(
+            self.comp_ser._conn,
+            self.comp_ser._get_resource_blocks_collection_path,
+            self.comp_ser.redfish_version, None)
+
+    @mock.patch.object(resourcezone, 'ResourceZoneCollection', autospec=True)
+    def test_get_resource_zones(self, mock_resourcezone_col):
+        _ = self.comp_ser.resource_zones
+        mock_resourcezone_col.assert_called_once_with(
+            self.comp_ser._conn,
+            self.comp_ser._get_resource_zones_collection_path,
+            self.comp_ser.redfish_version, None)
