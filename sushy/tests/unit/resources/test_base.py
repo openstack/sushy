@@ -40,7 +40,21 @@ BASE_RESOURCE_JSON = {
             "@odata.type": "http://AnotherStandardsBody/schemas.v1_0_1#styleInfoExt",  # noqa
             "Style": "Executive"
         }
+    },
+    "Links": {
+        "Oem": {
+            "Contoso": {
+                "@odata.type": "http://contoso.com/schemas/extensions.v1_2_1#contoso.AnvilTypes1",  # noqa
+                "slogan": "Contoso never fail",
+                "disclaimer": "* Most of the time"
+            },
+            "EID_420_ASB_345": {
+                "@odata.type": "http://AnotherStandardsBody/schemas.v1_0_1#styleInfoExt",  # noqa
+                "Style": "Executive"
+            }
+        }
     }
+
 }
 
 
@@ -139,8 +153,10 @@ class ResourceBaseTestCase(base.TestCase):
         self.assertIsNot(resource_a._reader, resource_b._reader)
 
     def test__parse_attributes(self):
-        for oem_vendor in self.base_resource2.oem_vendors:
-            self.assertTrue(oem_vendor in ('Contoso', 'EID_412_ASB_123'))
+        expected_oem_vendors = ['Contoso', 'EID_412_ASB_123',
+                                'EID_420_ASB_345']
+        actual_oem_vendors = sorted(self.base_resource2.oem_vendors)
+        self.assertEqual(expected_oem_vendors, actual_oem_vendors)
         self.assertEqual('base_resource2', self.base_resource2.resource_name)
 
     def test_refresh_local(self):
