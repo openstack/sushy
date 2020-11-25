@@ -1,0 +1,5 @@
+---
+fixes:
+  - |
+    Fixes an issue in the ``Connector`` class where an exception is not raised
+    when an asynchronous operations fails.
