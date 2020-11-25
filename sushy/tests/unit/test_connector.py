@@ -371,3 +371,23 @@ class ConnectorOpTestCase(base.TestCase):
         with self.assertRaisesRegex(exceptions.ConnectionError,
                                     'status 202, but no Location header'):
             self.conn._op('POST', 'http://foo.bar', blocking=True)
+
+    @mock.patch('sushy.connector.time.sleep', autospec=True)
+    def test_blocking_task_fails(self, mock_sleep):
+        response1 = mock.MagicMock(spec=requests.Response)
+        response1.status_code = http_client.ACCEPTED
+        response1.headers = {
+            'retry-after': 5,
+            'location': '/redfish/v1/taskmon/1'
+        }
+        response2 = mock.MagicMock(spec=requests.Response)
+        response2.status_code = http_client.BAD_REQUEST
+        message = 'Unable to create Volume with given parameters'
+        response2.json.return_value = {
+            'error': {
+                'message': message
+            }
+        }
+        self.request.side_effect = [response1, response1, response2]
+        with self.assertRaisesRegex(exceptions.BadRequestError, message):
+            self.conn._op('POST', 'http://foo.bar', blocking=True)
