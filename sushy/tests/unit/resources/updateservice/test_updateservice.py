@@ -58,7 +58,7 @@ class UpdateServiceTestCase(base.TestCase):
             self.upd_serv._parse_attributes, self.json_doc)
 
     def test_simple_update(self):
-        with open('sushy/tests/unit/json_samples/task.json') as f:
+        with open('sushy/tests/unit/json_samples/task_monitor.json') as f:
             task_json = json.load(f)
         task_submitted = mock.Mock()
         task_submitted.json.return_value = task_json
@@ -82,8 +82,33 @@ class UpdateServiceTestCase(base.TestCase):
                 'Targets': ['/redfish/v1/UpdateService/FirmwareInventory/BMC'],
                 'TransferProtocol': 'HTTPS'})
 
-    def test_simple_update_missing_location(self):
+    def test_simple_update_task_uri(self):
         with open('sushy/tests/unit/json_samples/task.json') as f:
+            task_json = json.load(f)
+        task_submitted = mock.Mock()
+        task_submitted.json.return_value = task_json
+        task_submitted.status_code = 202
+        task_submitted.headers = {'Content-Length': 42,
+                                  'Location': '/Taskmonitor/545'}
+        self.conn.post.return_value = task_submitted
+
+        tm = self.upd_serv.simple_update(
+            image_uri='local.server/update.exe',
+            targets=['/redfish/v1/UpdateService/FirmwareInventory/BMC'],
+            transfer_protocol=ups_cons.UPDATE_PROTOCOL_HTTPS)
+
+        self.assertIsInstance(tm, taskmonitor.TaskMonitor)
+        self.assertEqual('/redfish/v1/TaskService/Tasks/545', tm.task_monitor)
+
+        self.upd_serv._conn.post.assert_called_once_with(
+            '/redfish/v1/UpdateService/Actions/SimpleUpdate',
+            data={
+                'ImageURI': 'local.server/update.exe',
+                'Targets': ['/redfish/v1/UpdateService/FirmwareInventory/BMC'],
+                'TransferProtocol': 'HTTPS'})
+
+    def test_simple_update_missing_location(self):
+        with open('sushy/tests/unit/json_samples/task_monitor.json') as f:
             task_json = json.load(f)
         task_submitted = mock.Mock()
         task_submitted.json.return_value = task_json

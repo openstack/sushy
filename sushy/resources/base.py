@@ -325,7 +325,7 @@ class MappedListField(Field):
 class MessageListField(ListField):
     """List of messages with details of settings update status"""
 
-    message_id = Field('MessageId', required=True)
+    message_id = Field('MessageId')
     """The key for this message which can be used
     to look up the message in a message registry
     """

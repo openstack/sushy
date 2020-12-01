@@ -58,7 +58,10 @@ class TaskMonitorTestCase(base.TestCase):
             self.conn, '/Task/545',
             field_data=field_data)
 
-        self.assertIsNone(task_monitor.task)
+        self.assertEqual(http_client.ACCEPTED,
+                         task_monitor._field_data._status_code)
+        self.assertEqual(
+            0, task_monitor._field_data._headers['Content-Length'])
 
     def test_init_accepted_content(self):
         self.assertIsNotNone(self.task_monitor._task)
