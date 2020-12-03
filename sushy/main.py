@@ -31,6 +31,7 @@ from sushy.resources.registry import message_registry_file
 from sushy.resources.sessionservice import session
 from sushy.resources.sessionservice import sessionservice
 from sushy.resources.system import system
+from sushy.resources.taskservice import taskservice
 from sushy.resources.updateservice import updateservice
 from sushy import utils
 
@@ -397,6 +398,16 @@ class Sushy(base.ResourceBase):
 
         return updateservice.UpdateService(
             self._conn, self._update_service_path,
+            redfish_version=self.redfish_version,
+            registries=self.lazy_registries)
+
+    def get_task_service(self):
+        """Get the TaskService object
+
+        :returns: The TaskService object
+        """
+        return taskservice.TaskService(
+            self._conn, utils.get_sub_resource_path_by(self, 'Tasks'),
             redfish_version=self.redfish_version,
             registries=self.lazy_registries)
 

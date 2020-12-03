@@ -72,3 +72,101 @@ class TaskTestCase(base.TestCase):
         self.task.parse_messages()
         self.assertEqual('Property SKU is read only.',
                          self.task.messages[0].message)
+
+
+class TaskCollectionTestCase(base.TestCase):
+
+    def setUp(self):
+        super(TaskCollectionTestCase, self).setUp()
+        self.conn = mock.Mock()
+        with open('sushy/tests/unit/json_samples/'
+                  'task_collection.json') as f:
+            self.json_doc = json.load(f)
+
+        self.conn.get.return_value.json.return_value = self.json_doc
+
+        self.task_col = task.TaskCollection(
+            self.conn, '/redfish/v1/TaskService/Tasks',
+            redfish_version='1.0.2')
+
+    def test__parse_attributes(self):
+        self.task_col._parse_attributes(self.json_doc)
+        self.assertEqual('1.0.2', self.task_col.redfish_version)
+        self.assertEqual('Task Collection', self.task_col.name)
+        self.assertEqual(('/redfish/v1/TaskService/Tasks/545',
+                          '/redfish/v1/TaskService/Tasks/546'),
+                         self.task_col.members_identities)
+
+    @mock.patch.object(task, 'Task', autospec=True)
+    def test_get_member(self, mock_task):
+        self.task_col.get_member(
+            '/redfish/v1/TaskService/Tasks/545')
+        mock_task.assert_called_once_with(
+            self.task_col._conn,
+            '/redfish/v1/TaskService/Tasks/545',
+            self.task_col.redfish_version, None)
+
+    @mock.patch.object(task, 'Task', autospec=True)
+    def test_get_members(self, mock_task):
+        members = self.task_col.get_members()
+        calls = [
+            mock.call(self.task_col._conn,
+                      '/redfish/v1/TaskService/Tasks/545',
+                      self.task_col.redfish_version, None),
+            mock.call(self.task_col._conn,
+                      '/redfish/v1/TaskService/Tasks/546',
+                      self.task_col.redfish_version, None),
+        ]
+        mock_task.assert_has_calls(calls)
+        self.assertIsInstance(members, list)
+        self.assertEqual(2, len(members))
+
+    def _setUp_task_summary(self):
+        self.conn.get.return_value.json.reset_mock()
+        successive_return_values = []
+        file_names = ['sushy/tests/unit/json_samples/task.json',
+                      'sushy/tests/unit/json_samples/task2.json']
+        for file_name in file_names:
+            with open(file_name) as f:
+                successive_return_values.append(json.load(f))
+
+        self.conn.get.return_value.json.side_effect = successive_return_values
+
+    def test_summary(self):
+        # | GIVEN |
+        self._setUp_task_summary()
+        # | WHEN |
+        actual_summary = self.task_col.summary
+        # | THEN |
+        self.assertEqual({'545': 'completed', '546': 'pending'},
+                         actual_summary)
+
+        # reset mock
+        self.conn.get.return_value.json.reset_mock()
+
+        # | WHEN & THEN |
+        # tests for same object on invoking subsequently
+        self.assertIs(actual_summary,
+                      self.task_col.summary)
+        self.conn.get.return_value.json.assert_not_called()
+
+    def test_summary_on_refresh(self):
+        # | GIVEN |
+        self._setUp_task_summary()
+        # | WHEN & THEN |
+        self.assertEqual({'545': 'completed', '546': 'pending'},
+                         self.task_col.summary)
+
+        self.conn.get.return_value.json.side_effect = None
+        # On refreshing the task_col instance...
+        with open('sushy/tests/unit/json_samples/'
+                  'task_collection.json') as f:
+            self.conn.get.return_value.json.return_value = json.load(f)
+        self.task_col.invalidate()
+        self.task_col.refresh(force=False)
+
+        # | GIVEN |
+        self._setUp_task_summary()
+        # | WHEN & THEN |
+        self.assertEqual({'545': 'completed', '546': 'pending'},
+                         self.task_col.summary)
