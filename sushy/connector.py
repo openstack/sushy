@@ -163,6 +163,7 @@ class Connector(object):
                             'timeout': timeout})
                     raise exceptions.ConnectionError(url=url, error=m)
             response = mon.response
+            exceptions.raise_for_response(method, url, response)
 
         LOG.debug('HTTP response for %(method)s %(url)s: '
                   'status code: %(code)s',
