@@ -1,0 +1,19 @@
+---
+deprecations:
+  - |
+    The ``supported_values`` property in the
+    ``OperationApplyTimeSupportField`` class is deprecated. Use the
+    ``mapped_supported_values`` property instead. The
+    ``mapped_supported_values`` property uses the ``MappedListField`` type
+    to map the Redfish schema-defined enumeration values to constants exposed
+    by the Sushy package.
+features:
+  - |
+    Update the ``create_volume`` method in the ``VolumeCollection`` class and
+    the ``delete_volume`` and ``initialize_volume`` methods in the ``Volume``
+    class to take optional ``apply_time`` and ``timeout`` keyword parameters.
+    This allows the caller of those volume methods to specify a preferred
+    ``OperationApplyTime`` annotation and a maximum timeout for synchronous
+    operations. For asynchronous operations, those three methods will now
+    return a ``TaskMonitor`` instance that the caller can use to monitor the
+    state of the task.
