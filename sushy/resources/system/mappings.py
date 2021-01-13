@@ -113,3 +113,27 @@ SYSTEM_TYPE_VALUE_MAP = {
 
 SYSTEM_TYPE_VALUE_MAP_REV = (
     utils.revert_dictionary(SYSTEM_TYPE_VALUE_MAP))
+
+SECURE_BOOT_STATE = {
+    'Enabled': sys_cons.SECURE_BOOT_ENABLED,
+    'Disabled': sys_cons.SECURE_BOOT_DISABLED,
+}
+
+SECURE_BOOT_STATE_REV = utils.revert_dictionary(SECURE_BOOT_STATE)
+
+SECURE_BOOT_MODE = {
+    'SetupMode': sys_cons.SECURE_BOOT_MODE_SETUP,
+    'UserMode': sys_cons.SECURE_BOOT_MODE_USER,
+    'AuditMode': sys_cons.SECURE_BOOT_MODE_AUDIT,
+    'DeployedMode': sys_cons.SECURE_BOOT_MODE_DEPLOYED,
+}
+
+SECURE_BOOT_MODE_REV = utils.revert_dictionary(SECURE_BOOT_MODE)
+
+SECURE_BOOT_RESET_KEYS = {
+    'ResetAllKeysToDefault': sys_cons.SECURE_BOOT_RESET_KEYS_TO_DEFAULT,
+    'DeleteAllKeys': sys_cons.SECURE_BOOT_RESET_KEYS_DELETE_ALL,
+    'DeletePK': sys_cons.SECURE_BOOT_RESET_KEYS_DELETE_PK,
+}
+
+SECURE_BOOT_RESET_KEYS_REV = utils.revert_dictionary(SECURE_BOOT_RESET_KEYS)

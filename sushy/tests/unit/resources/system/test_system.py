@@ -27,6 +27,7 @@ from sushy.resources.oem import fake
 from sushy.resources.system import bios
 from sushy.resources.system import mappings as sys_map
 from sushy.resources.system import processor
+from sushy.resources.system import secure_boot
 from sushy.resources.system import simple_storage
 from sushy.resources.system import system
 from sushy.tests.unit import base
@@ -519,6 +520,15 @@ class SystemTestCase(base.TestCase):
         self.assertIsInstance(self.sys_inst.bios, bios.Bios)
         self.assertEqual('BIOS Configuration Current Settings',
                          self.sys_inst.bios.name)
+
+    def test_secure_boot(self):
+        self.conn.get.return_value.json.reset_mock()
+        with open('sushy/tests/unit/json_samples/secure_boot.json') as f:
+            self.conn.get.return_value.json.side_effect = [json.load(f)]
+
+        self.assertIsInstance(self.sys_inst.secure_boot,
+                              secure_boot.SecureBoot)
+        self.assertEqual('UEFI Secure Boot', self.sys_inst.secure_boot.name)
 
     def test_simple_storage_for_missing_attr(self):
         self.sys_inst.json.pop('SimpleStorage')
