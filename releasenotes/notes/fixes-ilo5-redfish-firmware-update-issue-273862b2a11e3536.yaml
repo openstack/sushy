@@ -1,0 +1,6 @@
+---
+features:
+  - |
+    Adding a new attribute task_uri to monitor redfish firmware
+    update since some vendors(ilo) does not provide appropriate
+    response with task_monitor uri.
