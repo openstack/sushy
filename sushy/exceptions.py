@@ -25,7 +25,9 @@ class SushyError(Exception):
 
     message = None
 
-    def __init__(self, **kwargs):
+    def __init__(self, message=None, **kwargs):
+        if message is not None:
+            self.message = message
         if self.message and kwargs:
             self.message = self.message % kwargs
 

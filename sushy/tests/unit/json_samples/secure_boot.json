@@ -1,0 +1,22 @@
+{
+    "@odata.id": "/redfish/v1/Systems/437XR1138R2/SecureBoot",
+    "@odata.type": "#SecureBoot.v1_1_0.SecureBoot",
+    "Id": "SecureBoot",
+    "Name": "UEFI Secure Boot",
+    "Actions": {
+        "#SecureBoot.ResetKeys": {
+            "target": "/redfish/v1/Systems/437XR1138R2/SecureBoot/Actions/SecureBoot.ResetKeys",
+            "ResetKeysType@Redfish.AllowableValues": [
+                "ResetAllKeysToDefault",
+                "DeleteAllKeys",
+                "DeletePK"
+            ]
+        }
+    } ,
+    "SecureBootEnable": false,
+    "SecureBootCurrentBoot": "Disabled",
+    "SecureBootMode": "DeployedMode",
+    "SecureBootDatabases": {
+        "@odata.id": "/redfish/v1/Systems/437XR1138R2/SecureBoot/SecureBootDatabases"
+    }
+}

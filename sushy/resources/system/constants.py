@@ -173,3 +173,20 @@ SYSTEM_TYPE_VIRTUALLY_PARTITIONED = "VirtuallyPartitioned"
 """A virtual or software-based partition of a computer system"""
 SYSTEM_TYPE_COMPOSED = "Composed"
 """A computer system created by binding resource blocks together"""
+
+# Secure boot constants
+
+SECURE_BOOT_ENABLED = "Enabled"
+"""UEFI secure boot is enabled."""
+
+SECURE_BOOT_DISABLED = "Disabled"
+"""UEFI secure boot is disabled."""
+
+SECURE_BOOT_MODE_SETUP = "SetupMode"
+SECURE_BOOT_MODE_USER = "UserMode"
+SECURE_BOOT_MODE_AUDIT = "AuditMode"
+SECURE_BOOT_MODE_DEPLOYED = "DeployedMode"
+
+SECURE_BOOT_RESET_KEYS_TO_DEFAULT = "ResetAllKeysToDefault"
+SECURE_BOOT_RESET_KEYS_DELETE_ALL = "DeleteAllKeys"
+SECURE_BOOT_RESET_KEYS_DELETE_PK = "DeletePK"

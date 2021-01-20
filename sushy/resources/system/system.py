@@ -31,6 +31,7 @@ from sushy.resources.system import constants as sys_cons
 from sushy.resources.system import ethernet_interface
 from sushy.resources.system import mappings as sys_maps
 from sushy.resources.system import processor
+from sushy.resources.system import secure_boot
 from sushy.resources.system import simple_storage as sys_simple_storage
 from sushy.resources.system.storage import storage as sys_storage
 from sushy import utils
@@ -435,6 +436,21 @@ class System(base.ResourceBase):
                                 redfish_version=self.redfish_version,
                                 registries=self.registries)
                 for path in paths]
+
+    @property
+    @utils.cache_it
+    def secure_boot(self):
+        """Property to reference `SecureBoot` instance
+
+        It is set once when the first time it is queried. On refresh,
+        this property is marked as stale (greedy-refresh not done).
+        Here the actual refresh of the sub-resource happens, if stale.
+        """
+        return secure_boot.SecureBoot(
+            self._conn,
+            utils.get_sub_resource_path_by(self, 'SecureBoot'),
+            redfish_version=self.redfish_version,
+            registries=self.registries)
 
 
 class SystemCollection(base.ResourceCollectionBase):

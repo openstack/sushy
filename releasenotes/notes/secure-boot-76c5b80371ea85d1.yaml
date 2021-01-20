@@ -1,0 +1,5 @@
+---
+features:
+  - |
+    Adds support for UEFI secure boot: reading the current status, enabling or
+    disabling secure boot, resetting keys.
