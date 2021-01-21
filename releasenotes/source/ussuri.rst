@@ -1,6 +1,6 @@
-===========================
-Ussuri Series Release Notes
-===========================
+===========================================
+Ussuri Series (3.0.0 - 3.2.x) Release Notes
+===========================================
 
 .. release-notes::
    :branch: stable/ussuri
