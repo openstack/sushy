@@ -255,6 +255,21 @@ class ConnectorOpTestCase(base.TestCase):
         self.assertIsNotNone(exc.body)
         self.assertIn('body submitted was malformed JSON', exc.detail)
 
+    def test_known_http_error_nonlist_ext_info(self):
+        self.request.return_value.status_code =\
+            http_client.UNSUPPORTED_MEDIA_TYPE
+        with open('sushy/tests/unit/json_samples/'
+                  'error_single_ext_info.json') as f:
+            self.request.return_value.json.return_value = json.load(f)
+
+        with self.assertRaisesRegex(exceptions.HTTPError,
+                                    'See Resolution for information') as cm:
+            self.conn._op('POST', 'http://foo.bar')
+        exc = cm.exception
+        self.assertEqual(http_client.UNSUPPORTED_MEDIA_TYPE, exc.status_code)
+        self.assertIsNotNone(exc.body)
+        self.assertIn('See Resolution for information', exc.detail)
+
     def test_not_found_error(self):
         self.request.return_value.status_code = http_client.NOT_FOUND
         self.request.return_value.json.side_effect = ValueError('no json')
