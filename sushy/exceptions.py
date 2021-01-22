@@ -108,10 +108,9 @@ class HTTPError(SushyError):
             self.code = self.body.get('code', 'Base.1.0.GeneralError')
             self.detail = self.body.get('message')
             ext_info = self.body.get('@Message.ExtendedInfo', [{}])
-            index = self._get_most_severe_msg_index(ext_info)
-            self.detail = ext_info[index].get('Message', self.detail)
-            error = '%s: %s extended: %s' % (
-                self.code, self.detail or 'unknown error', ext_info or None)
+            message = self._get_most_severe_msg(ext_info)
+            self.detail = message or self.detail
+            error = '%s: %s' % (self.code, self.detail or 'unknown error.')
 
         kwargs = {'method': method, 'url': url, 'code': self.status_code,
                   'error': error}
@@ -120,13 +119,14 @@ class HTTPError(SushyError):
         super(HTTPError, self).__init__(**kwargs)
 
     @staticmethod
-    def _get_most_severe_msg_index(extended_info):
+    def _get_most_severe_msg(extended_info):
+        if not isinstance(extended_info, list):
+            return extended_info.get('Message', None)
         if len(extended_info) > 0:
             for sev in ['Critical', 'Warning']:
                 for i, m in enumerate(extended_info):
                     if m.get('Severity') == sev:
-                        return i
-        return 0
+                        return m.get('Message')
 
 
 class BadRequestError(HTTPError):

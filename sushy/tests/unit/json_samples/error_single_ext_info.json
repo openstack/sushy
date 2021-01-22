@@ -1,0 +1,13 @@
+{
+    "error": {
+        "code": "Base.1.5.GeneralError",
+        "message": "A general error has occurred. See ExtendedInfo for more information.",
+        "@Message.ExtendedInfo": {
+            "@odata.type": "#Message.v1_0_0.Message",
+            "MessageId": "Base.1.5.GeneralError",
+            "Message": "A general error has occurred. See Resolution for information on how to resolve the error.",
+            "Resolution": "Redfish request contains unsupported media type. Correct the request body and resubmit.",
+            "Severity": "Warning"
+        }
+    }
+}
