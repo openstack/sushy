@@ -1,0 +1,7 @@
+---
+fixes:
+  - |
+    Fixes ``AttributeError: 'str' object has no attribute 'get'`` during error
+    handling. This occurs when BMC does not return a list of messages inside
+    ``@Message.ExtendedInfo``, but a single item. This has been observed with
+    iDRAC.
