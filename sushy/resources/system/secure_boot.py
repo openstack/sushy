@@ -19,6 +19,8 @@ from sushy import exceptions
 from sushy.resources import base
 from sushy.resources import common
 from sushy.resources.system import mappings
+from sushy.resources.system import secure_boot_database
+from sushy import utils
 
 LOG = logging.getLogger(__name__)
 
@@ -72,6 +74,25 @@ class SecureBoot(base.ResourceBase):
             parsing messages of attribute update status
         """
         super().__init__(connector, path, redfish_version, registries)
+
+    @property
+    @utils.cache_it
+    def databases(self):
+        """A collection of secure boot databases.
+
+        It is set once when the first time it is queried. On refresh,
+        this property is marked as stale (greedy-refresh not done).
+        Here the actual refresh of the sub-resource happens, if stale.
+
+        :raises: MissingAttributeError if 'SecureBootDatabases/@odata.id' field
+            is missing.
+        :returns: `SimpleStorageCollection` instance
+        """
+        return secure_boot_database.SecureBootDatabaseCollection(
+            self._conn, utils.get_sub_resource_path_by(
+                self, "SecureBootDatabases"),
+            redfish_version=self.redfish_version,
+            registries=self.registries)
 
     def _get_reset_action_element(self):
         reset_action = self._actions.reset_keys
