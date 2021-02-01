@@ -1,0 +1,8 @@
+---
+fixes:
+  - |
+    Fixes issues in the ``volume`` module where the first parameter passed to
+    the ``TaskMonitor`` constructor was incorrect. The parameter passed was
+    the resource object (self), but it should have been the connector object
+    (self._conn). This affected the ``create_volume()`` and
+    ``delete_volume()`` methods.

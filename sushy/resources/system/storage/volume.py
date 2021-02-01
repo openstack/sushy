@@ -153,7 +153,7 @@ class Volume(base.ResourceBase):
         r = self._conn.delete(self._path, data=payload, blocking=blocking,
                               timeout=timeout)
         if r.status_code == 202:
-            return (TaskMonitor(self, r.headers.get('location'))
+            return (TaskMonitor(self._conn, r.headers.get('location'))
                     .set_retry_after(r.headers.get('retry-after')))
 
 
@@ -221,5 +221,5 @@ class VolumeCollection(base.ResourceCollectionBase):
                 self.refresh()
                 return self.get_member(location)
         elif r.status_code == 202:
-            return (TaskMonitor(self, location)
+            return (TaskMonitor(self._conn, location)
                     .set_retry_after(r.headers.get('retry-after')))
