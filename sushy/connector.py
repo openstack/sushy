@@ -26,6 +26,10 @@ from sushy import utils
 LOG = logging.getLogger(__name__)
 
 
+_SERVER_SIDE_RETRIES = 5
+_SERVER_SIDE_RETRY_DELAY = 3
+
+
 class Connector(object):
 
     def __init__(
@@ -68,7 +72,8 @@ class Connector(object):
         self._session.close()
 
     def _op(self, method, path='', data=None, headers=None, blocking=False,
-            timeout=60, **extra_session_req_kwargs):
+            timeout=60, server_side_retries=_SERVER_SIDE_RETRIES,
+            **extra_session_req_kwargs):
         """Generic RESTful request handler.
 
         :param method: The HTTP method to be used, e.g: GET, POST,
@@ -140,6 +145,18 @@ class Connector(object):
                 LOG.error("Authentication error detected. Cannot proceed: "
                           "%s", e.message)
                 raise
+        except exceptions.ServerSideError as e:
+            if method.lower() != 'get' or server_side_retries <= 0:
+                raise
+            else:
+                LOG.warning('Got server side error %s in response to a '
+                            'GET request, retrying after %d seconds',
+                            e, _SERVER_SIDE_RETRY_DELAY)
+                time.sleep(_SERVER_SIDE_RETRY_DELAY)
+                return self._op(method, path, data=data, headers=headers,
+                                blocking=blocking, timeout=timeout,
+                                server_side_retries=server_side_retries - 1,
+                                **extra_session_req_kwargs)
 
         if blocking and response.status_code == 202:
             if not response.headers.get('location'):

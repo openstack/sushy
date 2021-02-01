@@ -332,7 +332,8 @@ class ConnectorOpTestCase(base.TestCase):
         self.assertIsNotNone(exc.body)
         self.assertIn('See Resolution for information', exc.detail)
 
-    def test_not_found_error(self):
+    @mock.patch('time.sleep', autospec=True)
+    def test_not_found_error(self, mock_sleep):
         self.request.return_value.status_code = http_client.NOT_FOUND
         self.request.return_value.json.side_effect = ValueError('no json')
 
@@ -341,8 +342,11 @@ class ConnectorOpTestCase(base.TestCase):
             self.conn._op('GET', 'http://foo.bar')
         exc = cm.exception
         self.assertEqual(http_client.NOT_FOUND, exc.status_code)
+        self.assertFalse(mock_sleep.called)
+        self.assertEqual(1, self.request.call_count)
 
-    def test_server_error(self):
+    @mock.patch('time.sleep', autospec=True)
+    def test_server_error(self, mock_sleep):
         self.request.return_value.status_code = (
             http_client.INTERNAL_SERVER_ERROR)
         self.request.return_value.json.side_effect = ValueError('no json')
@@ -352,6 +356,8 @@ class ConnectorOpTestCase(base.TestCase):
             self.conn._op('GET', 'http://foo.bar')
         exc = cm.exception
         self.assertEqual(http_client.INTERNAL_SERVER_ERROR, exc.status_code)
+        self.assertEqual(5, mock_sleep.call_count)
+        self.assertEqual(6, self.request.call_count)
 
     def test_access_error(self):
         self.conn._auth.can_refresh_session.return_value = False
