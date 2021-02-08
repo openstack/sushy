@@ -45,6 +45,14 @@ class TaskMonitorTestCase(base.TestCase):
             field_data=self.field_data
         )
 
+    @mock.patch.object(taskmonitor.LOG, 'warning', autospec=True)
+    def test_init_deprecation_warning(self, mock_log):
+        taskmonitor.TaskMonitor(self.conn, '/Task/545')
+
+        mock_log.assert_called_once_with(
+            'sushy.resources.taskservice.taskmonitor.TaskMonitor '
+            'is deprecated. Use sushy.taskmonitor.TaskMonitor.')
+
     def test_init_accepted_no_content(self):
         field_data = resource_base.FieldData(
             http_client.ACCEPTED,
@@ -81,6 +89,7 @@ class TaskMonitorTestCase(base.TestCase):
         self.conn.reset_mock()
         self.conn.get.return_value.status_code = 202
         self.conn.get.return_value.headers = {'Content-Length': 0}
+        self.conn.get.return_value.content = None
 
         self.task_monitor.refresh()
 

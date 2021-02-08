@@ -29,6 +29,7 @@ from sushy.resources.sessionservice import session
 from sushy.resources.sessionservice import sessionservice
 from sushy.resources.system import system
 from sushy.resources.updateservice import updateservice
+from sushy import taskmonitor
 from sushy.tests.unit import base
 
 
@@ -397,6 +398,13 @@ class MainTestCase(base.TestCase):
     def test_get_sessions_path(self):
         expected = '/redfish/v1/SessionService/Sessions'
         self.assertEqual(expected, self.root.get_sessions_path())
+
+    @mock.patch.object(taskmonitor, 'TaskMonitor', autospec=True)
+    def test_get_task_monitor(self, mock_task_mon):
+        self.root.get_task_monitor('/TaskService/Task/123')
+        mock_task_mon.assert_called_once_with(
+            self.root._conn, '/TaskService/Task/123',
+            self.root.redfish_version, self.root.lazy_registries)
 
 
 class BareMinimumMainTestCase(base.TestCase):

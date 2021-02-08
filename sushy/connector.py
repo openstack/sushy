@@ -20,7 +20,7 @@ from urllib import parse as urlparse
 import requests
 
 from sushy import exceptions
-from sushy.resources.task_monitor import TaskMonitor
+from sushy.taskmonitor import TaskMonitor
 from sushy import utils
 
 LOG = logging.getLogger(__name__)
@@ -159,21 +159,20 @@ class Connector(object):
                                 **extra_session_req_kwargs)
 
         if blocking and response.status_code == 202:
-            if not response.headers.get('location'):
+            if not response.headers.get('Location'):
                 m = ('HTTP response for %(method)s request to %(url)s '
                      'returned status 202, but no Location header'
                      % {'method': method, 'url': url})
                 raise exceptions.ConnectionError(url=url, error=m)
             timeout_at = time.time() + timeout
-            mon = (TaskMonitor(self, response.headers.get('location'))
-                   .set_retry_after(response.headers.get('retry-after')))
-            while mon.in_progress:
+            mon = TaskMonitor.get_task_monitor(self, response, path)
+            while mon.check_is_processing:
                 LOG.debug('Blocking for in-progress %(method)s call to '
                           '%(url)s; sleeping for %(sleep)s seconds',
                           {'method': method, 'url': url,
                            'sleep': mon.sleep_for})
                 time.sleep(mon.sleep_for)
-                if time.time() >= timeout_at and mon.in_progress:
+                if time.time() >= timeout_at and mon.check_is_processing:
                     m = ('Timeout waiting for blocking %(method)s '
                          'request to %(url)s (timeout = %(timeout)s)'
                          % {'method': method, 'url': url,

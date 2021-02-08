@@ -383,9 +383,11 @@ class ConnectorOpTestCase(base.TestCase):
         response1 = mock.MagicMock(spec=requests.Response)
         response1.status_code = http_client.ACCEPTED
         response1.headers = {
-            'retry-after': 5,
-            'location': '/redfish/v1/taskmon/1'
+            'Retry-After': 5,
+            'Location': '/redfish/v1/taskmon/1',
+            'Content-Length': 10
         }
+        response1.json.return_value = {'Id': 3, 'Name': 'Test'}
         response2 = mock.MagicMock(spec=requests.Response)
         response2.status_code = http_client.BAD_REQUEST
         message = 'Unable to create Volume with given parameters'

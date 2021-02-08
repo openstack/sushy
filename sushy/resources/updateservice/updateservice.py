@@ -15,15 +15,14 @@
 # https://redfish.dmtf.org/schemas/UpdateService.v1_2_2.json
 
 import logging
-from urllib.parse import urljoin
 
 from sushy import exceptions
 from sushy.resources import base
 from sushy.resources import common
-from sushy.resources.taskservice import taskmonitor
 from sushy.resources.updateservice import constants as up_cons
 from sushy.resources.updateservice import mappings as up_maps
 from sushy.resources.updateservice import softwareinventory
+from sushy import taskmonitor
 from sushy import utils
 
 LOG = logging.getLogger(__name__)
@@ -151,29 +150,13 @@ class UpdateService(base.ResourceBase):
             data['Targets'] = targets
         rsp = self._conn.post(target_uri, data=data)
 
-        json_data = rsp.json() if rsp.content else {}
-        field_data = base.FieldData(rsp.status_code, rsp.headers, json_data)
-
-        header = 'Location'
-        task_monitor = rsp.headers.get(header)
-        task_uri_data = json_data.get('@odata.id')
-
-        if task_uri_data:
-            task_monitor = urljoin(task_monitor, task_uri_data)
-
-        if not task_monitor:
-            raise exceptions.MissingHeaderError(target_uri=target_uri,
-                                                header=header)
-
-        return taskmonitor.TaskMonitor(self._conn,
-                                       task_monitor,
-                                       redfish_version=self.redfish_version,
-                                       registries=self.registries,
-                                       field_data=field_data)
+        return taskmonitor.TaskMonitor.get_task_monitor(
+            self._conn, rsp, target_uri, self.redfish_version, self.registries)
 
     def get_task_monitor(self, task_monitor):
         """Used to retrieve a TaskMonitor.
 
+        Deprecated: Use sushy.Sushy.get_task_monitor
         :returns: A task monitor.
         """
         return taskmonitor.TaskMonitor(

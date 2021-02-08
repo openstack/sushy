@@ -16,10 +16,10 @@ from unittest import mock
 
 from sushy import exceptions
 from sushy.resources import constants as res_cons
-from sushy.resources.taskservice import taskmonitor
 from sushy.resources.updateservice import constants as ups_cons
 from sushy.resources.updateservice import softwareinventory
 from sushy.resources.updateservice import updateservice
+from sushy import taskmonitor
 from sushy.tests.unit import base
 
 
