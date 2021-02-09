@@ -58,7 +58,7 @@ class ProtocolFeaturesSupportedField(base.CompositeField):
     """The select query parameter is supported"""
 
 
-class LazyRegistries(collections.MutableMapping):
+class LazyRegistries(collections.abc.MutableMapping):
     """Download registries on demand.
 
     Redfish message registries can be very large. On top of that,
