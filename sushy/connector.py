@@ -126,8 +126,13 @@ class Connector(object):
                               "%s", retry_exc.message)
                     raise
             else:
-                LOG.error("Authentication error detected. Cannot proceed: "
-                          "%s", e.message)
+                if method == 'GET' and url.endswith('SessionService'):
+                    LOG.debug('HTTP GET of SessionService failed %s, '
+                              'this is expected prior to authentication',
+                              e.message)
+                else:
+                    LOG.error("Authentication error detected. Cannot proceed: "
+                              "%s", e.message)
                 raise
 
         LOG.debug('HTTP response for %(method)s %(url)s: '
