@@ -366,6 +366,24 @@ class ConnectorOpTestCase(base.TestCase):
         exc = cm.exception
         self.assertEqual(http_client.FORBIDDEN, exc.status_code)
 
+    @mock.patch.object(connector.LOG, 'debug', autospec=True)
+    def test_access_error_service_session(self, mock_log):
+        self.conn._auth.can_refresh_session.return_value = False
+
+        self.request.return_value.status_code = http_client.FORBIDDEN
+        self.request.return_value.json.side_effect = ValueError('no json')
+
+        with self.assertRaisesRegex(exceptions.AccessError,
+                                    'unknown error') as cm:
+            self.conn._op('GET', 'http://redfish/v1/SessionService')
+        exc = cm.exception
+        mock_log.assert_called_with(
+            'HTTP GET of SessionService failed %s, '
+            'this is expected prior to authentication', 'HTTP GET '
+            'http://redfish/v1/SessionService returned code '
+            'HTTPStatus.FORBIDDEN. unknown error')
+        self.assertEqual(http_client.FORBIDDEN, exc.status_code)
+
     def test_blocking_no_location_header(self):
         self.request.return_value.status_code = http_client.ACCEPTED
         self.request.return_value.headers = {'retry-after': 5}
