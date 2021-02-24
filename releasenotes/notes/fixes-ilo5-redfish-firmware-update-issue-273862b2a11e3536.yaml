@@ -1,0 +1,8 @@
+---
+fixes:
+  - |
+    Fixes TaskMonitor for hardware(ilo) that doesn't contain
+    content-length in the response. This fix also uses task_uri
+    instead of task_monitor uri to monitor redfish firmware
+    update since using task_monitor uri doesn't provide
+    appropriate response.

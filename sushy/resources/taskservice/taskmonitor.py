@@ -40,6 +40,7 @@ class TaskMonitor(object):
             the object according to schema of the given version.
         :param registries: Dict of Redfish Message Registry objects to be
             used in any resource that needs registries to parse messages.
+        :param field_data: the data to use populating the fields.
         """
         self._connector = connector
         self._task_monitor = task_monitor
@@ -50,11 +51,9 @@ class TaskMonitor(object):
         self._task = None
 
         if self._field_data:
-            # If a body was returned, assume it's a Task on a 202 status code
-            content_length = int(self._field_data.headers.get(
-                'Content-Length'))
-            if (self._field_data.status_code == http_client.ACCEPTED
-                    and content_length > 0):
+            # We do not check 'content-length' as it is not always present
+            # and will rely on task uri in those cases.
+            if self._field_data.status_code == http_client.ACCEPTED:
                 self._task = task.Task(self._connector, self._task_monitor,
                                        redfish_version=self._redfish_version,
                                        registries=self._registries,

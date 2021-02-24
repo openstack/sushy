@@ -15,6 +15,7 @@
 # https://redfish.dmtf.org/schemas/UpdateService.v1_2_2.json
 
 import logging
+from urllib.parse import urljoin
 
 from sushy import exceptions
 from sushy.resources import base
@@ -155,6 +156,11 @@ class UpdateService(base.ResourceBase):
 
         header = 'Location'
         task_monitor = rsp.headers.get(header)
+        task_uri_data = json_data.get('@odata.id')
+
+        if task_uri_data:
+            task_monitor = urljoin(task_monitor, task_uri_data)
+
         if not task_monitor:
             raise exceptions.MissingHeaderError(target_uri=target_uri,
                                                 header=header)
