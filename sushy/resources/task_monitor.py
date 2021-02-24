@@ -26,6 +26,7 @@ LOG = logging.getLogger(__name__)
 
 
 class TaskMonitor(base.ResourceBase):
+    """Deprecated: Use sushy.taskmonitor.TaskMonitor"""
 
     def __init__(self,
                  connector,
@@ -38,6 +39,8 @@ class TaskMonitor(base.ResourceBase):
         :param redfish_version: The version of Redfish. Used to construct
             the object according to schema of the given version.
         """
+        LOG.warning('sushy.resources.task_monitor.TaskMonitor is deprecated. '
+                    'Use sushy.taskmonitor.TaskMonitor')
         super(TaskMonitor, self).__init__(connector, path, redfish_version)
         self._retry_after = None
         self._location_header = None

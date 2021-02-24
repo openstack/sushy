@@ -33,6 +33,7 @@ from sushy.resources.sessionservice import sessionservice
 from sushy.resources.system import system
 from sushy.resources.taskservice import taskservice
 from sushy.resources.updateservice import updateservice
+from sushy import taskmonitor
 from sushy import utils
 
 LOG = logging.getLogger(__name__)
@@ -507,3 +508,15 @@ class Sushy(base.ResourceBase):
             itself.
         """
         return LazyRegistries(self)
+
+    def get_task_monitor(self, task_monitor_uri):
+        """Used to retrieve a TaskMonitor by task monitor URI.
+
+        :param task_monitor_uri: Task monitor URI
+        :returns: A task monitor.
+        """
+        return taskmonitor.TaskMonitor(
+            self._conn,
+            task_monitor_uri,
+            redfish_version=self.redfish_version,
+            registries=self.registries)

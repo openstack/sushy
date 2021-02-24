@@ -1,0 +1,38 @@
+---
+features:
+  - |
+    Adds new method ``get_task_monitor`` to retrieve TaskMonitor instance by
+    task monitor URI.
+deprecations:
+  - |
+    Existing two ``TaskMonitor``-s are deprecated and replaced with one
+    ``taskmonitor.TaskMonitor``.
+
+    For ``resources.task_monitor.TaskMonitor`` users changes include:
+
+    * ``in_progress`` is replaced with method ``check_is_processing``
+    * ``location_header`` is replaced with method ``task_monitor_uri``
+    * there is no replacement for ``set_retry_after``,
+      ``taskmonitor.TaskMonitor`` sets this internally from Retry-After
+      header
+
+    For ``resources.taskservice.taskmonitor.TaskMonitor`` users changes
+    include:
+
+    * ``check_is_processing``, ``sleep_for`` and static ``get_task_monitor``
+      added.
+    * in ``__init__`` parameter ``field_data`` is deprecated, use ``response``
+    * in ``__init__`` parameter ``task_monitor`` is renamed to
+      ``task_monitor_uri``
+    * ``task_monitor`` is deprecated, use ``task_monitor_uri``
+    * ``retry_after`` is deprecated, use ``sleep_for``
+
+    Methods ``create_volume``, ``delete_volume``, ``initialize_volume`` in
+    volume module are deprecated and replaced with ones named ``create``,
+    ``delete`` and ``initialize``. New methods for asynchronous operations
+    return ``taskmonitor.TaskMonitor`` instead of
+    deprecated ``resources.task_monitor.TaskMonitor``.
+
+    Method ``resources.updateservice.UpdateService.get_task_monitor`` is
+    deprecated, use ``Sushy.get_task_monitor`` instead.
+

@@ -22,7 +22,8 @@ from sushy.resources import constants as res_cons
 from sushy.resources import mappings as res_maps
 from sushy.resources.system.storage import constants as store_cons
 from sushy.resources.system.storage import mappings as store_maps
-from sushy.resources.task_monitor import TaskMonitor
+from sushy.resources.task_monitor import TaskMonitor as TaskMonitorDepr
+from sushy.taskmonitor import TaskMonitor
 from sushy import utils
 
 LOG = logging.getLogger(__name__)
@@ -90,23 +91,8 @@ class Volume(base.ResourceBase):
                     set(store_maps.VOLUME_INIT_TYPE_MAP).
                     intersection(action.allowed_values)])
 
-    def initialize_volume(self, value=store_cons.VOLUME_INIT_TYPE_FAST,
-                          apply_time=None, timeout=500):
-        """Initialize the volume.
-
-        :param value: The InitializeType value.
-        :param apply_time: When to update the attributes. Optional.
-            APPLY_TIME_IMMEDIATE - Immediate,
-            APPLY_TIME_ON_RESET - On reset,
-            APPLY_TIME_MAINT_START - During specified maintenance time
-            APPLY_TIME_MAINT_RESET - On reset during specified maintenance time
-        :param timeout: Max time in seconds to wait for blocking async call.
-        :raises: InvalidParameterValueError, if the target value is not
-            allowed.
-        :raises: ConnectionError
-        :raises: HTTPError
-        :returns: TaskMonitor if async task or None if successful init
-        """
+    def _initialize(self, value=store_cons.VOLUME_INIT_TYPE_FAST,
+                    apply_time=None, timeout=500):
         valid_values = self.get_allowed_initialize_volume_values()
         if value not in valid_values:
             raise exceptions.InvalidParameterValueError(
@@ -123,11 +109,70 @@ class Volume(base.ResourceBase):
         target_uri = self._get_initialize_action_element().target_uri
         r = self._conn.post(target_uri, data=payload, blocking=blocking,
                             timeout=timeout)
+        return r, target_uri
+
+    def initialize(self, value=store_cons.VOLUME_INIT_TYPE_FAST,
+                   apply_time=None, timeout=500):
+        """Initialize the volume.
+
+        :param value: The InitializeType value.
+        :param apply_time: When to update the attributes. Optional.
+            APPLY_TIME_IMMEDIATE - Immediate,
+            APPLY_TIME_ON_RESET - On reset,
+            APPLY_TIME_MAINT_START - During specified maintenance time
+            APPLY_TIME_MAINT_RESET - On reset during specified maintenance time
+        :param timeout: Max time in seconds to wait for blocking async call.
+        :raises: InvalidParameterValueError, if the target value is not
+            allowed.
+        :raises: ConnectionError
+        :raises: HTTPError
+        :returns: TaskMonitor if async task or None if successful init
+        """
+        r, target_uri = self._initialize(value, apply_time, timeout)
         if r.status_code == 202:
-            return (TaskMonitor(self, r.headers.get('location'))
+            return TaskMonitor.get_task_monitor(
+                self._conn, r, target_uri, self.redfish_version,
+                self.registries)
+
+    def initialize_volume(self, value=store_cons.VOLUME_INIT_TYPE_FAST,
+                          apply_time=None, timeout=500):
+        """Initialize the volume.
+
+        Deprecated: Use initialize
+
+        :param value: The InitializeType value.
+        :param apply_time: When to update the attributes. Optional.
+            APPLY_TIME_IMMEDIATE - Immediate,
+            APPLY_TIME_ON_RESET - On reset,
+            APPLY_TIME_MAINT_START - During specified maintenance time
+            APPLY_TIME_MAINT_RESET - On reset during specified maintenance time
+        :param timeout: Max time in seconds to wait for blocking async call.
+        :raises: InvalidParameterValueError, if the target value is not
+            allowed.
+        :raises: ConnectionError
+        :raises: HTTPError
+        :returns: TaskMonitor if async task or None if successful init
+        """
+        r, _ = self._initialize(value, apply_time, timeout)
+        if r.status_code == 202:
+            return (TaskMonitorDepr(self, r.headers.get('location'))
                     .set_retry_after(r.headers.get('retry-after')))
 
-    def delete_volume(self, payload=None, apply_time=None, timeout=500):
+    def _delete(self, payload=None, apply_time=None, timeout=500):
+        blocking = False
+        oat_prop = '@Redfish.OperationApplyTime'
+        if apply_time:
+            if payload is None:
+                payload = {}
+            payload[oat_prop] = res_maps.APPLY_TIME_VALUE_MAP_REV[apply_time]
+        if (payload and payload.get(oat_prop) == res_maps.
+                APPLY_TIME_VALUE_MAP_REV[res_cons.APPLY_TIME_IMMEDIATE]):
+            blocking = True
+        r = self._conn.delete(self._path, data=payload, blocking=blocking,
+                              timeout=timeout)
+        return r
+
+    def delete(self, payload=None, apply_time=None, timeout=500):
         """Delete the volume.
 
         :param payload: May contain @Redfish.OperationApplyTime property
@@ -141,19 +186,31 @@ class Volume(base.ResourceBase):
         :raises: HTTPError
         :returns: TaskMonitor if async task or None if successful deletion
         """
-        blocking = False
-        oat_prop = '@Redfish.OperationApplyTime'
-        if apply_time:
-            if payload is None:
-                payload = {}
-            payload[oat_prop] = res_maps.APPLY_TIME_VALUE_MAP_REV[apply_time]
-        if (payload and payload.get(oat_prop) == res_maps.
-                APPLY_TIME_VALUE_MAP_REV[res_cons.APPLY_TIME_IMMEDIATE]):
-            blocking = True
-        r = self._conn.delete(self._path, data=payload, blocking=blocking,
-                              timeout=timeout)
+        r = self._delete(payload, apply_time, timeout)
         if r.status_code == 202:
-            return (TaskMonitor(self._conn, r.headers.get('location'))
+            return TaskMonitor.get_task_monitor(
+                self._conn, r, self._path, self.redfish_version,
+                self.registries)
+
+    def delete_volume(self, payload=None, apply_time=None, timeout=500):
+        """Delete the volume.
+
+        Deprecated: Use delete
+
+        :param payload: May contain @Redfish.OperationApplyTime property
+        :param apply_time: When to update the attributes. Optional.
+            APPLY_TIME_IMMEDIATE - Immediate,
+            APPLY_TIME_ON_RESET - On reset,
+            APPLY_TIME_MAINT_START - During specified maintenance time
+            APPLY_TIME_MAINT_RESET - On reset during specified maintenance time
+        :param timeout: Max time in seconds to wait for blocking async call.
+        :raises: ConnectionError
+        :raises: HTTPError
+        :returns: TaskMonitor if async task or None if successful deletion
+        """
+        r = self._delete(payload, apply_time, timeout)
+        if r.status_code == 202:
+            return (TaskMonitorDepr(self._conn, r.headers.get('location'))
                     .set_retry_after(r.headers.get('retry-after')))
 
 
@@ -190,7 +247,22 @@ class VolumeCollection(base.ResourceCollectionBase):
     """Indicates if a client is allowed to request for a specific apply
     time of a create, delete, or action operation of a given resource"""
 
-    def create_volume(self, payload, apply_time=None, timeout=500):
+    def _create(self, payload, apply_time=None, timeout=500):
+        blocking = False
+        oat_prop = '@Redfish.OperationApplyTime'
+        if apply_time:
+            if payload is None:
+                payload = {}
+            payload[oat_prop] = res_maps.APPLY_TIME_VALUE_MAP_REV[apply_time]
+        if (payload and payload.get(oat_prop) == res_maps.
+                APPLY_TIME_VALUE_MAP_REV[res_cons.APPLY_TIME_IMMEDIATE]):
+            blocking = True
+        r = self._conn.post(self._path, data=payload, blocking=blocking,
+                            timeout=timeout)
+        location = r.headers.get('Location')
+        return r, location
+
+    def create(self, payload, apply_time=None, timeout=500):
         """Create a volume.
 
         :param payload: The payload representing the new volume to create.
@@ -204,22 +276,37 @@ class VolumeCollection(base.ResourceCollectionBase):
         :raises: HTTPError
         :returns: Newly created Volume resource or TaskMonitor if async task
         """
-        blocking = False
-        oat_prop = '@Redfish.OperationApplyTime'
-        if apply_time:
-            if payload is None:
-                payload = {}
-            payload[oat_prop] = res_maps.APPLY_TIME_VALUE_MAP_REV[apply_time]
-        if (payload and payload.get(oat_prop) == res_maps.
-                APPLY_TIME_VALUE_MAP_REV[res_cons.APPLY_TIME_IMMEDIATE]):
-            blocking = True
-        r = self._conn.post(self._path, data=payload, blocking=blocking,
-                            timeout=timeout)
-        location = r.headers.get('Location')
+        r, location = self._create(payload, apply_time, timeout)
         if r.status_code == 201:
             if location:
                 self.refresh()
                 return self.get_member(location)
         elif r.status_code == 202:
-            return (TaskMonitor(self._conn, location)
+            return TaskMonitor.get_task_monitor(
+                self._conn, r, self._path, self.redfish_version,
+                self.registries)
+
+    def create_volume(self, payload, apply_time=None, timeout=500):
+        """Create a volume.
+
+        Deprecated: Use create.
+
+        :param payload: The payload representing the new volume to create.
+        :param apply_time: When to update the attributes. Optional.
+            APPLY_TIME_IMMEDIATE - Immediate,
+            APPLY_TIME_ON_RESET - On reset,
+            APPLY_TIME_MAINT_START - During specified maintenance time
+            APPLY_TIME_MAINT_RESET - On reset during specified maintenance time
+        :param timeout: Max time in seconds to wait for blocking async call.
+        :raises: ConnectionError
+        :raises: HTTPError
+        :returns: Newly created Volume resource or TaskMonitor if async task
+        """
+        r, location = self._create(payload, apply_time, timeout)
+        if r.status_code == 201:
+            if location:
+                self.refresh()
+                return self.get_member(location)
+        elif r.status_code == 202:
+            return (TaskMonitorDepr(self._conn, location)
                     .set_retry_after(r.headers.get('retry-after')))

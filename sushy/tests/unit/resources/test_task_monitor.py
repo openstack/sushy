@@ -18,6 +18,7 @@ from unittest import mock
 
 from dateutil import parser
 
+from sushy.resources import task_monitor
 from sushy.resources.task_monitor import TaskMonitor
 from sushy.tests.unit import base
 
@@ -36,6 +37,21 @@ class TaskMonitorTestCase(base.TestCase):
                              'retry-after': self.http_date}
         self.res_headers2 = {'location': 'https://sample.com/foo/bar',
                              'retry-after': str(self.seconds)}
+
+    @mock.patch.object(task_monitor.LOG, 'warning', autospec=True)
+    def test_init_deprecation_warning(self, mock_log):
+        self.conn.post.return_value.status_code = 202
+        self.conn.post.return_value.headers = self.res_headers1.copy()
+        self.conn.get.return_value.status_code = 202
+        self.conn.get.return_value.headers = self.res_headers1.copy()
+        self.conn.get.return_value.json.return_value = {}
+        res = self.conn.post(path='fake/path', data=self.data.copy(),
+                             headers=self.req_headers.copy())
+        TaskMonitor(self.conn, res.headers.get('location'))\
+            .set_retry_after(res.headers.get('retry-after'))
+        mock_log.assert_called_once_with(
+            'sushy.resources.task_monitor.TaskMonitor is deprecated. '
+            'Use sushy.taskmonitor.TaskMonitor')
 
     def test_task_in_progress(self):
         self.conn.post.return_value.status_code = 202
