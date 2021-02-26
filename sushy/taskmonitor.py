@@ -17,6 +17,7 @@ from datetime import datetime
 from http import client as http_client
 import json
 import logging
+import time
 from urllib.parse import urljoin
 
 from dateutil import parser
@@ -86,6 +87,7 @@ class TaskMonitor(object):
         :raises: HTTPError
         """
         self._response = self._connector.get(path=self.task_monitor_uri)
+
         if self._response.status_code == http_client.ACCEPTED:
             # A Task should have been returned, but wasn't
             if not self._response.content:
@@ -216,9 +218,32 @@ class TaskMonitor(object):
                          redfish_version=self._redfish_version,
                          registries=self._registries)
 
+    def wait(self, timeout_sec):
+        """Waits until task is completed or it times out.
+
+        :param timeout_sec: Timeout to wait
+        :raises: ConnectionError when times out
+        """
+        timeout_at = time.time() + timeout_sec
+
+        while self.check_is_processing:
+
+            LOG.debug('Waiting for task monitor %(url)s; sleeping for '
+                      '%(sleep)s seconds',
+                      {'url': self.task_monitor_uri,
+                       'sleep': self.sleep_for})
+            time.sleep(self.sleep_for)
+            if time.time() >= timeout_at and self.check_is_processing:
+                m = ('Timeout waiting for task monitor %(url)s '
+                     '(timeout = %(timeout)s)'
+                     % {'url': self.task_monitor_uri,
+                        'timeout': timeout_sec})
+                raise exceptions.ConnectionError(url=self.task_monitor_uri,
+                                                 error=m)
+
     @staticmethod
-    def get_task_monitor(conn, response, target_uri, redfish_version=None,
-                         registries=None):
+    def from_response(conn, response, target_uri, redfish_version=None,
+                      registries=None):
         """Construct TaskMonitor instance from received response.
 
         :response: Unprocessed response

@@ -150,7 +150,7 @@ class UpdateService(base.ResourceBase):
             data['Targets'] = targets
         rsp = self._conn.post(target_uri, data=data)
 
-        return taskmonitor.TaskMonitor.get_task_monitor(
+        return taskmonitor.TaskMonitor.from_response(
             self._conn, rsp, target_uri, self.redfish_version, self.registries)
 
     def get_task_monitor(self, task_monitor):

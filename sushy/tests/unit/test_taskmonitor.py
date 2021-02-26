@@ -15,6 +15,8 @@ from http import client as http_client
 import json
 from unittest import mock
 
+import requests
+
 from sushy import exceptions
 from sushy.resources import base as resource_base
 from sushy.resources.taskservice import task
@@ -250,7 +252,51 @@ class TaskMonitorTestCase(base.TestCase):
         self.assertIsInstance(tm_task, task.Task)
         self.assertEqual('545', tm_task.identity)
 
-    def test_get_task_monitor_no_content(self):
+    @mock.patch('time.sleep', autospec=True)
+    def test_wait(self, mock_time):
+        self.conn.reset_mock()
+        response1 = mock.MagicMock(spec=requests.Response)
+        response1.status_code = http_client.ACCEPTED
+        response1.headers = {
+            'Retry-After': 5,
+            'Location': '/redfish/v1/taskmon/1',
+            'Content-Length': 10
+        }
+        response1.json.return_value = {'Id': 3, 'Name': 'Test'}
+
+        response2 = mock.MagicMock(spec=requests.Response)
+        response2.status_code = http_client.OK
+        response2.headers = {
+            'Retry-After': 5,
+            'Location': '/redfish/v1/taskmon/1',
+            'Content-Length': 10
+        }
+        response2.json.return_value = {'Id': 3, 'Name': 'Test'}
+
+        self.conn.get.side_effect = [response1, response2]
+        self.task_monitor.wait(60)
+
+        self.assertFalse(self.task_monitor.is_processing)
+        self.assertEqual(response2, self.task_monitor.response)
+
+    @mock.patch('time.sleep', autospec=True)
+    def test_wait_timeout(self, mock_time):
+        self.conn.reset_mock()
+        response1 = mock.MagicMock(spec=requests.Response)
+        response1.status_code = http_client.ACCEPTED
+        response1.headers = {
+            'Retry-After': 5,
+            'Location': '/redfish/v1/taskmon/1',
+            'Content-Length': 10
+        }
+        response1.json.return_value = {'Id': 3, 'Name': 'Test'}
+
+        self.conn.get.side_effect = [response1, response1]
+
+        self.assertRaises(exceptions.ConnectionError,
+                          self.task_monitor.wait, -10)
+
+    def test_from_response_no_content(self):
         self.conn.reset_mock()
         self.conn.get.return_value.status_code = 202
         response = mock.Mock()
@@ -258,7 +304,7 @@ class TaskMonitorTestCase(base.TestCase):
         response.headers = {'Location': '/Task/545'}
         response.status_code = http_client.ACCEPTED
 
-        tm = taskmonitor.TaskMonitor.get_task_monitor(
+        tm = taskmonitor.TaskMonitor.from_response(
             self.conn, response,
             '/redfish/v1/UpdateService/Actions/SimpleUpdate')
 
@@ -267,7 +313,7 @@ class TaskMonitorTestCase(base.TestCase):
         self.assertIsNotNone(tm.task)
         self.assertEqual('545', tm.task.identity)
 
-    def test_get_task_monitor_odata_id(self):
+    def test_from_response_odata_id(self):
         response = mock.Mock()
         response.content = "something"
         response.json.return_value = {'Id': '545', 'Name': 'test',
@@ -275,7 +321,7 @@ class TaskMonitorTestCase(base.TestCase):
         response.headers = {'Location': '/TaskMonitor/'}
         response.status_code = http_client.ACCEPTED
 
-        tm = taskmonitor.TaskMonitor.get_task_monitor(
+        tm = taskmonitor.TaskMonitor.from_response(
             self.conn, response,
             '/redfish/v1/UpdateService/Actions/SimpleUpdate')
 
@@ -284,7 +330,7 @@ class TaskMonitorTestCase(base.TestCase):
         self.assertIsNotNone(tm.task)
         self.assertEqual('545', tm.task.identity)
 
-    def test_get_task_monitor_location_header_missing(self):
+    def test_from_response_location_header_missing(self):
         response = mock.Mock()
         response.content = "something"
         response.json.return_value = {'Id': '545', 'Name': 'test'}
@@ -292,18 +338,18 @@ class TaskMonitorTestCase(base.TestCase):
         response.status_code = http_client.ACCEPTED
 
         self.assertRaises(exceptions.MissingHeaderError,
-                          taskmonitor.TaskMonitor.get_task_monitor,
+                          taskmonitor.TaskMonitor.from_response,
                           self.conn, response,
                           '/redfish/v1/UpdateService/Actions/SimpleUpdate')
 
-    def test_get_task_monitor(self):
+    def test_from_response(self):
         response = mock.Mock()
         response.content = "something"
         response.json.return_value = {'Id': '545', 'Name': 'test'}
         response.headers = {'Location': '/Task/545'}
         response.status_code = http_client.ACCEPTED
 
-        tm = taskmonitor.TaskMonitor.get_task_monitor(
+        tm = taskmonitor.TaskMonitor.from_response(
             self.conn, response,
             '/redfish/v1/UpdateService/Actions/SimpleUpdate')
 

@@ -130,7 +130,7 @@ class Volume(base.ResourceBase):
         """
         r, target_uri = self._initialize(value, apply_time, timeout)
         if r.status_code == 202:
-            return TaskMonitor.get_task_monitor(
+            return TaskMonitor.from_response(
                 self._conn, r, target_uri, self.redfish_version,
                 self.registries)
 
@@ -188,7 +188,7 @@ class Volume(base.ResourceBase):
         """
         r = self._delete(payload, apply_time, timeout)
         if r.status_code == 202:
-            return TaskMonitor.get_task_monitor(
+            return TaskMonitor.from_response(
                 self._conn, r, self._path, self.redfish_version,
                 self.registries)
 
@@ -282,7 +282,7 @@ class VolumeCollection(base.ResourceCollectionBase):
                 self.refresh()
                 return self.get_member(location)
         elif r.status_code == 202:
-            return TaskMonitor.get_task_monitor(
+            return TaskMonitor.from_response(
                 self._conn, r, self._path, self.redfish_version,
                 self.registries)
 

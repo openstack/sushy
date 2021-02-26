@@ -169,20 +169,9 @@ class Connector(object):
                      'returned status 202, but no Location header'
                      % {'method': method, 'url': url})
                 raise exceptions.ConnectionError(url=url, error=m)
-            timeout_at = time.time() + timeout
-            mon = TaskMonitor.get_task_monitor(self, response, path)
-            while mon.check_is_processing:
-                LOG.debug('Blocking for in-progress %(method)s call to '
-                          '%(url)s; sleeping for %(sleep)s seconds',
-                          {'method': method, 'url': url,
-                           'sleep': mon.sleep_for})
-                time.sleep(mon.sleep_for)
-                if time.time() >= timeout_at and mon.check_is_processing:
-                    m = ('Timeout waiting for blocking %(method)s '
-                         'request to %(url)s (timeout = %(timeout)s)'
-                         % {'method': method, 'url': url,
-                            'timeout': timeout})
-                    raise exceptions.ConnectionError(url=url, error=m)
+
+            mon = TaskMonitor.from_response(self, response, path)
+            mon.wait(timeout)
             response = mon.response
             exceptions.raise_for_response(method, url, response)
 
