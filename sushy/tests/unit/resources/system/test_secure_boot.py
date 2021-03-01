@@ -16,6 +16,7 @@ from unittest import mock
 from sushy import exceptions
 from sushy.resources.system import constants
 from sushy.resources.system import secure_boot
+from sushy.resources.system import secure_boot_database
 from sushy.tests.unit import base
 
 
@@ -27,9 +28,7 @@ class SecureBootTestCase(base.TestCase):
         with open('sushy/tests/unit/json_samples/secure_boot.json') as f:
             self.secure_boot_json = json.load(f)
 
-        self.conn.get.return_value.json.side_effect = [
-            self.secure_boot_json
-        ]
+        self.conn.get.return_value.json.return_value = self.secure_boot_json
         self.secure_boot = secure_boot.SecureBoot(
             self.conn, '/redfish/v1/Systems/437XR1138R2/SecureBoot',
             registries={}, redfish_version='1.1.0')
@@ -94,3 +93,20 @@ class SecureBootTestCase(base.TestCase):
     def test_reset_keys_wrong_value(self):
         self.assertRaises(exceptions.InvalidParameterValueError,
                           self.secure_boot.reset_keys, 'DeleteEverything')
+
+    def test_databases(self):
+        self.conn.get.return_value.json.reset_mock()
+
+        with open('sushy/tests/unit/json_samples/'
+                  'secure_boot_database_collection.json') as f:
+            self.conn.get.return_value.json.return_value = json.load(f)
+
+        result = self.secure_boot.databases
+        self.assertIsInstance(
+            result, secure_boot_database.SecureBootDatabaseCollection)
+        self.conn.get.return_value.json.assert_called_once_with()
+
+        self.conn.get.return_value.json.reset_mock()
+
+        self.assertIs(result, self.secure_boot.databases)
+        self.conn.get.return_value.json.assert_not_called()
