@@ -93,7 +93,10 @@ class Connector(object):
         url = path if urlparse.urlparse(path).netloc else urlparse.urljoin(
             self._url, path)
         headers = headers or {}
-        if not any(k.lower() == 'odata-version' for k in headers):
+        lc_headers = [k.lower() for k in headers]
+        if data is not None and 'content-type' not in lc_headers:
+            headers['Content-Type'] = 'application/json'
+        if 'odata-version' not in lc_headers:
             headers['OData-Version'] = '4.0'
         # TODO(lucasagomes): We should mask the data to remove sensitive
         # information
