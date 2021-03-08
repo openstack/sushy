@@ -220,6 +220,7 @@ class ConnectorOpTestCase(base.TestCase):
         self.conn._session.headers['X-Auth-Token'] = 'asdf1234'
         expected_headers = self.headers.copy()
         expected_headers['OData-Version'] = '4.0'
+        expected_headers['Content-Type'] = 'application/json'
         self.conn._op('POST', path='fake/path', headers=self.headers,
                       data=self.data)
         self.request.assert_called_once_with(
