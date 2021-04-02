@@ -155,7 +155,7 @@ class MessageRegistryFileTestCase(base.TestCase):
         mock_msg_reg.assert_not_called()
         self.assertIsNone(registry)
         mock_log.warning.assert_called_with(
-            'No message registry found for %(language)s or default',
+            'No registry found for %(language)s or default',
             {'language': 'en'})
 
     @mock.patch('sushy.resources.registry.message_registry.MessageRegistry',
@@ -189,12 +189,13 @@ class MessageRegistryFileTestCase(base.TestCase):
 
         expected_calls = [
             mock.call(
-                'Cannot load message registry from location %(location)s: '
+                'Cannot load registry %(type)s from location %(location)s: '
                 '%(error)s',
-                {'location': {'extref': 'http://127.0.0.1/reg'},
+                {'type': 'MessageRegistry',
+                 'location': {'extref': 'http://127.0.0.1/reg'},
                  'error': mock.ANY}),
             mock.call(
-                'No message registry found for %(language)s or default',
+                'No registry found for %(language)s or default',
                 {'language': 'en'})
         ]
 
@@ -224,12 +225,12 @@ class MessageRegistryFileTestCase(base.TestCase):
         self.assertTrue(mock_reg_type.called)
         self.assertIsNone(registry)
         mock_log.warning.assert_any_call(
-            'Cannot load message registry type from location '
+            'Cannot load registry type from location '
             '%(location)s: %(error)s',
             {'location': '/redfish/v1/Registries/Test/Test.1.0.json',
              'error': mock.ANY})
         mock_log.warning.assert_called_with(
-            'No message registry found for %(language)s or default',
+            'No registry found for %(language)s or default',
             {'language': 'en'})
 
     @mock.patch('sushy.resources.registry.message_registry_file.RegistryType',
@@ -258,7 +259,7 @@ class MessageRegistryFileTestCase(base.TestCase):
         mock_msg_reg.assert_not_called()
         self.assertIsNone(registry)
         mock_log.warning.assert_called_with(
-            'No message registry found for %(language)s or default',
+            'No registry found for %(language)s or default',
             {'language': 'en'})
 
     @mock.patch('sushy.resources.base.logging.warning',
@@ -270,6 +271,44 @@ class MessageRegistryFileTestCase(base.TestCase):
         mock_log.assert_called_with(
             'Applying default "UNKNOWN.0.0" on required, but missing '
             'attribute "[\'Registry\']"')
+
+
+class BiosRegistryTestCase(base.TestCase):
+
+    def setUp(self):
+        super(BiosRegistryTestCase, self).setUp()
+        self.conn = mock.Mock()
+        with open('sushy/tests/unit/json_samples/'
+                  'bios_attribute_registry_file.json') as f:
+            self.json_doc = json.load(f)
+
+        self.conn.get.return_value.json.return_value = self.json_doc
+
+        self.reg_file = message_registry_file.MessageRegistryFile(
+            self.conn, '/redfish/v1/Registries/BiosAttributeRegistry.v1_0',
+            redfish_version='1.0.2')
+
+    @mock.patch('sushy.resources.registry.attribute_registry.'
+                'AttributeRegistry',
+                autospec=True)
+    @mock.patch('sushy.resources.base.JsonDataReader', autospec=True)
+    def test_get_bios_registry_uri(self, mock_reader, mock_msg_reg):
+        mock_reader_rv = mock.Mock()
+        mock_reader.return_value = mock_reader_rv
+        mock_reader_rv.get_data.return_value = FieldData(200, {}, {
+            "@odata.type": "#AttributeRegistry.v1_0_0.AttributeRegistry",
+            "Id": "BiosAttributeRegistry.v1_0",
+        })
+        mock_msg_reg_rv = mock.Mock()
+        mock_msg_reg.return_value = mock_msg_reg_rv
+
+        registry = self.reg_file.get_attribute_registry('en', None)
+        mock_msg_reg.assert_called_once_with(
+            self.conn,
+            path='/redfish/v1/registrystore/registries/en/'
+                 'biosattributeregistry.v1_0',
+            reader=None, redfish_version=self.reg_file.redfish_version)
+        self.assertEqual(mock_msg_reg_rv, registry)
 
 
 class MessageRegistryFileCollectionTestCase(base.TestCase):

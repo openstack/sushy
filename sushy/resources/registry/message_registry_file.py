@@ -17,6 +17,7 @@
 import logging
 
 from sushy.resources import base
+from sushy.resources.registry import attribute_registry
 from sushy.resources.registry import message_registry
 
 LOG = logging.getLogger(__name__)
@@ -76,15 +77,43 @@ class MessageRegistryFile(base.ResourceBase):
     """List of locations of Registry files for each supported language"""
 
     def get_message_registry(self, language, public_connector):
-        """Load message registry file depending on its source
-
-        Will try to find `MessageRegistry` based on `odata.type` property and
-        provided language. If desired language is not found, will pick a
-        registry that has 'default' language.
+        """Get a Message Registry from the location
 
         :param language: RFC 5646 language code for registry files
         :param public_connector: connector to use when downloading registry
             from the Internet
+        :returns: a MessageRegistry or None if not found
+        """
+        return self._get_registry(language, public_connector,
+                                  'MessageRegistry',
+                                  message_registry.MessageRegistry)
+
+    def get_attribute_registry(self, language, public_connector):
+        """Get an Attribute Registry from the location
+
+        :param language: RFC 5646 language code for registry files
+        :param public_connector: connector to use when downloading registry
+            from the Internet
+        :returns: an AttributeRegistry or None if not found
+        """
+        return self._get_registry(language, public_connector,
+                                  'AttributeRegistry',
+                                  attribute_registry.AttributeRegistry)
+
+    def _get_registry(self, language, public_connector, requested_type,
+                      registry_class):
+        """Load registry file depending on the registry type
+
+        Will try to find requested_type based on `odata.type` property,
+        location, and provided language. If desired language is not found,
+        will pick a registry that has 'default' language.
+
+        :param language: RFC 5646 language code for registry files
+        :param public_connector: connector to use when downloading registry
+            from the Internet
+        :param requested_type: string identifying registry
+        :param registry_class: registry class
+        :returns: registry or None if not found
         """
 
         # NOTE (etingof): as per RFC5646, languages are case-insensitive
@@ -127,34 +156,35 @@ class MessageRegistryFile(base.ResourceBase):
                 continue
 
             try:
-                registry = RegistryType(*args, **kwargs)
+                registry_type = RegistryType(*args, **kwargs)
 
             except Exception as exc:
                 LOG.warning(
-                    'Cannot load message registry type from location '
+                    'Cannot load registry type from location '
                     '%(location)s: %(error)s', {
                         'location': kwargs['path'],
                         'error': exc})
                 continue
 
-            if registry._odata_type.endswith('MessageRegistry'):
+            if registry_type._odata_type.endswith(requested_type):
                 try:
-                    return message_registry.MessageRegistry(*args, **kwargs)
+                    return registry_class(*args, **kwargs)
 
                 except Exception as exc:
                     LOG.warning(
-                        'Cannot load message registry from location '
+                        'Cannot load registry %(type)s from location '
                         '%(location)s: %(error)s', {
+                            'type': requested_type,
                             'location': kwargs['path'],
                             'error': exc})
                     continue
 
             LOG.debug('Ignoring unsupported flavor of registry %(registry)s',
-                      {'registry': registry._odata_type})
+                      {'registry': registry_type._odata_type})
             return
 
-        LOG.warning('No message registry found for %(language)s or '
-                    'default', {'language': language})
+        LOG.warning('No registry found for %(language)s or default',
+                    {'language': language})
 
 
 class MessageRegistryFileCollection(base.ResourceCollectionBase):

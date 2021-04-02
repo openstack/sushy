@@ -1,0 +1,6 @@
+---
+features:
+  - |
+    Add support for caching Redfish Attribute Registries. In particular,
+    cache the BIOS Attribute Registry and provide a function to return it
+    if it matches the AttributeRegistry field in System BIOS.

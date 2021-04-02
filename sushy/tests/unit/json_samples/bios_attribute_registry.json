@@ -1,0 +1,65 @@
+{
+  "@odata.context": "/redfish/v1/$metadata#AttributeRegistry.AttributeRegistry",
+  "@odata.id": "/redfish/v1/Test/Bios/BiosRegistry",
+  "@odata.type": "#AttributeRegistry.v1_1_1.AttributeRegistry",
+  "Description": "This is a test of BIOS Attribute Registry",
+  "Id": "BiosAttributeRegistryP89.v1_0_0",
+  "Language": "en",
+  "Name": "BIOS Attribute Registry",
+  "OwningEntity": "VendorA",
+  "RegistryVersion": "1.0.0",
+  "SupportedSystems": [
+    {
+      "FirmwareVersion": "2.0",
+      "ProductName": "Ultra 4",
+      "SystemId": "URGR8"
+    }
+  ],
+  "RegistryEntries": {
+    "Attributes": [
+      {
+        "AttributeName": "SystemModelName",
+        "CurrentValue": null,
+        "DisplayName": "System Model Name",
+        "DisplayOrder": 200,
+        "HelpText": "Indicates the product name of the system.",
+        "Hidden": false,
+        "Immutable": true,
+        "MaxLength": 40,
+        "MenuPath": "./SysInformationRef",
+        "MinLength": 0,
+        "ReadOnly": true,
+        "Type": "String",
+        "ValueExpression": null,
+        "WriteOnly": false
+      },
+      {
+        "AttributeName": "ProcVirtualization",
+        "CurrentValue": null,
+        "DisplayName": "Virtualization Technology",
+        "DisplayOrder": 404,
+        "HelpText": "When set to Enabled, the BIOS will enable processor Virtualization features",
+        "Hidden": false,
+        "Immutable": false,
+        "MenuPath": "./ProcSettingsRef",
+        "ReadOnly": false,
+        "ResetRequired": true,
+        "Type": "Enumeration",
+        "Value": [
+          {
+            "ValueDisplayName": "Enabled",
+            "ValueName": "Enabled"
+          },
+          {
+            "ValueDisplayName": "Disabled",
+            "ValueName": "Disabled"
+          }
+        ],
+        "WarningText": null,
+        "WriteOnly": false
+      }
+    ]
+  }
+}
+
+
