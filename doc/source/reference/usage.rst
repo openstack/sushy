@@ -10,11 +10,13 @@ Specifying an authentication type
 -----------------------------------------
 
 There are three authentication objects. By default we use SessionOrBasicAuth.
+
 Authentication Modes:
-auth.SessionOrBasicAuth: Use session based authentication. If we are unable
-to create a session we will fallback to basic authentication.
-auth.BasicAuth: Use basic authentication only.
-auth.SessionAuth: Use session based authentication only.
+
+* auth.SessionOrBasicAuth: Use session based authentication. If we are unable
+  to create a session we will fallback to basic authentication.
+* auth.BasicAuth: Use basic authentication only.
+* auth.SessionAuth: Use session based authentication only.
 
 .. code-block:: python
 
