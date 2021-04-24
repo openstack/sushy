@@ -67,19 +67,31 @@ class VirtualMedia(base.ResourceBase):
     _actions = ActionsField('Actions')
     """Insert/eject action for virtual media"""
 
-    def _get_insert_media_element(self):
-        insert_media = self._actions.insert_media
+    def _get_insert_media_uri(self):
+        insert_media = self._actions.insert_media if self._actions else None
+        use_patch = False
         if not insert_media:
-            raise exceptions.MissingActionError(
-                action='#VirtualMedia.InsertMedia', resource=self._path)
-        return insert_media
+            insert_uri = self.path
+            use_patch = self._allow_patch()
+            if not use_patch:
+                raise exceptions.MissingActionError(
+                    action='#VirtualMedia.InsertMedia', resource=self._path)
+        else:
+            insert_uri = insert_media.target_uri
+        return insert_uri, use_patch
 
-    def _get_eject_media_element(self):
-        eject_media = self._actions.eject_media
+    def _get_eject_media_uri(self):
+        eject_media = self._actions.eject_media if self._actions else None
+        use_patch = False
         if not eject_media:
-            raise exceptions.MissingActionError(
-                action='#VirtualMedia.EjectMedia', resource=self._path)
-        return eject_media
+            eject_uri = self.path
+            use_patch = self._allow_patch()
+            if not use_patch:
+                raise exceptions.MissingActionError(
+                    action='#VirtualMedia.EjectMedia', resource=self._path)
+        else:
+            eject_uri = eject_media.target_uri
+        return eject_uri, use_patch
 
     def insert_media(self, image, inserted=True, write_protected=False):
         """Attach remote media to virtual media
@@ -89,9 +101,17 @@ class VirtualMedia(base.ResourceBase):
             completion of the action.
         :param write_protected: indicates the media is write protected
         """
-        target_uri = self._get_insert_media_element().target_uri
-        self._conn.post(target_uri, data={"Image": image, "Inserted": inserted,
-                                          "WriteProtected": write_protected})
+        target_uri, use_patch = self._get_insert_media_uri()
+        payload = {"Image": image, "Inserted": inserted,
+                   "WriteProtected": write_protected}
+        if use_patch:
+            headers = None
+            etag = self._get_etag()
+            if etag is not None:
+                headers = {"If-Match": etag}
+            self._conn.patch(target_uri, data=payload, headers=headers)
+        else:
+            self._conn.post(target_uri, data=payload)
         self.invalidate()
 
     def eject_media(self):
@@ -101,8 +121,19 @@ class VirtualMedia(base.ResourceBase):
         empty.
         """
         try:
-            target_uri = self._get_eject_media_element().target_uri
-            self._conn.post(target_uri)
+            target_uri, use_patch = self._get_eject_media_uri()
+            if use_patch:
+                payload = {
+                    "Image": None,
+                    "Inserted": False
+                }
+                headers = None
+                etag = self._get_etag()
+                if etag is not None:
+                    headers = {"If-Match": etag}
+                self._conn.patch(target_uri, data=payload, headers=headers)
+            else:
+                self._conn.post(target_uri)
         except exceptions.HTTPError as response:
             # Some vendors like HPE iLO has this kind of implementation.
             # It needs to pass an empty dict.

@@ -1,0 +1,7 @@
+---
+fixes:
+  - |
+    Adds a fallback for inserting and ejecting virtual media
+    using the PATCH HTTP request instead of the explicit action URIs.
+    The fallback is required for Lenovo ThinkSystem machines (i.e. SD530, ..)
+    that only implement the PATCH method.

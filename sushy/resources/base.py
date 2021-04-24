@@ -19,6 +19,7 @@ import copy
 import io
 import json
 import logging
+import re
 import zipfile
 
 import pkg_resources
@@ -562,6 +563,35 @@ class ResourceBase(object, metaclass=abc.ABCMeta):
             settings[attr] = self._get_value(getattr(self, attr))
 
         return settings
+
+    def _get_etag(self):
+        """Returns the ETag of the HTTP request if any was specified.
+
+        :returns ETag or None
+        """
+        pattern = re.compile(r'^(W\/)?("\w*")$')
+        match = pattern.match(self._get_headers().get('ETag', ''))
+        if match:
+            return match.group(2)
+        return None
+
+    def _get_headers(self):
+        """Returns the HTTP headers of the request for the resource.
+
+        :returns: dict of HTTP headers
+        """
+        return self._reader.get_data()._headers
+
+    def _allow_patch(self):
+        """Returns if the resource supports the PATCH HTTP method.
+
+        If the resource supports the PATCH HTTP method for updates,
+        it will return it in the Allow HTTP header.
+        :returns: Boolean flag if PATCH is supported or not
+        """
+        allow_header = self._get_headers().get('Allow', '')
+        methods = set([h.strip().upper() for h in allow_header.split(',')])
+        return "PATCH" in methods
 
     def refresh(self, force=True, json_doc=None):
         """Refresh the resource
