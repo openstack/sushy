@@ -28,6 +28,7 @@ class VirtualMediaTestCase(base.TestCase):
     def setUp(self):
         super(VirtualMediaTestCase, self).setUp()
         self.conn = mock.Mock()
+        self.conn.get.return_value.headers = {'Allow': 'GET,HEAD'}
         with open('sushy/tests/unit/json_samples/'
                   'virtual_media.json') as f:
             self.json_doc = json.load(f)
@@ -74,6 +75,12 @@ class VirtualMediaTestCase(base.TestCase):
             self.sys_virtual_media.insert_media,
             "https://www.dmtf.org/freeImages/Sardine.img", True, False)
 
+        self.sys_virtual_media._actions = None
+        self.assertRaisesRegex(
+            exceptions.MissingActionError, 'action #VirtualMedia.InsertMedia',
+            self.sys_virtual_media.insert_media,
+            "https://www.dmtf.org/freeImages/Sardine.img", True, False)
+
     def test_insert_media(self):
         self.assertFalse(self.sys_virtual_media._is_stale)
         self.sys_virtual_media.insert_media(
@@ -86,8 +93,51 @@ class VirtualMediaTestCase(base.TestCase):
         )
         self.assertTrue(self.sys_virtual_media._is_stale)
 
+    def test_insert_media_fallback(self):
+        self.conn.get.return_value.headers = {'Allow': 'GET,HEAD,PATCH'}
+        self.sys_virtual_media._actions.insert_media = None
+        self.sys_virtual_media.insert_media(
+            "https://www.dmtf.org/freeImages/Sardine.img", True, False)
+        self.sys_virtual_media._conn.patch.assert_called_once_with(
+            ("/redfish/v1/Managers/BMC/VirtualMedia/Floppy1"),
+            data={"Image": "https://www.dmtf.org/freeImages/Sardine.img",
+                  "Inserted": True, "WriteProtected": False},
+            headers=None)
+        self.assertTrue(self.sys_virtual_media._is_stale)
+
+    def test_insert_media_fallback_with_etag(self):
+        self.conn.get.return_value.headers = {'Allow': 'GET,HEAD,PATCH',
+                                              'ETag': '"3d7b8a7360bf2941d"'}
+        self.sys_virtual_media._actions.insert_media = None
+        self.sys_virtual_media.insert_media(
+            "https://www.dmtf.org/freeImages/Sardine.img", True, False)
+        self.sys_virtual_media._conn.patch.assert_called_once_with(
+            ("/redfish/v1/Managers/BMC/VirtualMedia/Floppy1"),
+            data={"Image": "https://www.dmtf.org/freeImages/Sardine.img",
+                  "Inserted": True, "WriteProtected": False},
+            headers={"If-Match": '"3d7b8a7360bf2941d"'})
+        self.assertTrue(self.sys_virtual_media._is_stale)
+
+    def test_insert_media_fallback_with_weak_etag(self):
+        self.conn.get.return_value.headers = {'Allow': 'GET,HEAD,PATCH',
+                                              'ETag': 'W/"3d7b8a7360bf2941d"'}
+        self.sys_virtual_media._actions.insert_media = None
+        self.sys_virtual_media.insert_media(
+            "https://www.dmtf.org/freeImages/Sardine.img", True, False)
+        self.sys_virtual_media._conn.patch.assert_called_once_with(
+            ("/redfish/v1/Managers/BMC/VirtualMedia/Floppy1"),
+            data={"Image": "https://www.dmtf.org/freeImages/Sardine.img",
+                  "Inserted": True, "WriteProtected": False},
+            headers={"If-Match": '"3d7b8a7360bf2941d"'})
+        self.assertTrue(self.sys_virtual_media._is_stale)
+
     def test_eject_media_none(self):
         self.sys_virtual_media._actions.eject_media = None
+        self.assertRaisesRegex(
+            exceptions.MissingActionError, 'action #VirtualMedia.EjectMedia',
+            self.sys_virtual_media.eject_media)
+
+        self.sys_virtual_media._actions = None
         self.assertRaisesRegex(
             exceptions.MissingActionError, 'action #VirtualMedia.EjectMedia',
             self.sys_virtual_media.eject_media)
@@ -98,6 +148,37 @@ class VirtualMediaTestCase(base.TestCase):
         self.sys_virtual_media._conn.post.assert_called_once_with(
             ("/redfish/v1/Managers/BMC/VirtualMedia/Floppy1/Actions"
              "/VirtualMedia.EjectMedia"))
+        self.assertTrue(self.sys_virtual_media._is_stale)
+
+    def test_eject_media_fallback(self):
+        self.conn.get.return_value.headers = {'Allow': 'GET,HEAD,PATCH'}
+        self.sys_virtual_media._actions.eject_media = None
+        self.sys_virtual_media.eject_media()
+        self.sys_virtual_media._conn.patch.assert_called_once_with(
+            ("/redfish/v1/Managers/BMC/VirtualMedia/Floppy1"),
+            data={"Image": None, "Inserted": False}, headers=None)
+        self.assertTrue(self.sys_virtual_media._is_stale)
+
+    def test_eject_media_fallback_with_etag(self):
+        self.conn.get.return_value.headers = {'Allow': 'GET,HEAD,PATCH',
+                                              'ETag': '"3d7b8a7360bf2941d"'}
+        self.sys_virtual_media._actions.eject_media = None
+        self.sys_virtual_media.eject_media()
+        self.sys_virtual_media._conn.patch.assert_called_once_with(
+            ("/redfish/v1/Managers/BMC/VirtualMedia/Floppy1"),
+            data={"Image": None, "Inserted": False},
+            headers={"If-Match": '"3d7b8a7360bf2941d"'})
+        self.assertTrue(self.sys_virtual_media._is_stale)
+
+    def test_eject_media_fallback_with_weak_etag(self):
+        self.conn.get.return_value.headers = {'Allow': 'GET,HEAD,PATCH',
+                                              'ETag': 'W/"3d7b8a7360bf2941d"'}
+        self.sys_virtual_media._actions.eject_media = None
+        self.sys_virtual_media.eject_media()
+        self.sys_virtual_media._conn.patch.assert_called_once_with(
+            ("/redfish/v1/Managers/BMC/VirtualMedia/Floppy1"),
+            data={"Image": None, "Inserted": False},
+            headers={"If-Match": '"3d7b8a7360bf2941d"'})
         self.assertTrue(self.sys_virtual_media._is_stale)
 
     def test_eject_media_pass_empty_dict_415(self):
