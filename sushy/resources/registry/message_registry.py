@@ -87,9 +87,11 @@ class MessageRegistry(base.ResourceBase):
 
 
 def parse_message(message_registries, message_field):
-    """Using message registries parse the message and substitute any parms
+    """Parse the messages in registries and substitute any parms
 
-    :param message_registries: dict of Message Registries
+    Check only registries that support messages.
+
+    :param registries: dict of Message Registries
     :param message_field: settings.MessageListField to parse
 
     :returns: parsed settings.MessageListField with missing attributes filled
@@ -99,8 +101,9 @@ def parse_message(message_registries, message_field):
     if '.' in message_field.message_id:
         registry, msg_key = message_field.message_id.rsplit('.', 1)
 
-        if (registry in message_registries and msg_key
-                in message_registries[registry].messages):
+        if (registry in message_registries
+                and hasattr(message_registries[registry], "messages")
+                and msg_key in message_registries[registry].messages):
             reg_msg = message_registries[registry].messages[msg_key]
     else:
         # Some firmware only reports the MessageKey and no RegistryName.

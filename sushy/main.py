@@ -466,14 +466,16 @@ class Sushy(base.ResourceBase):
     @property
     @utils.cache_it
     def registries(self):
-        """Gets and combines all message registries together
+        """Gets and combines all registries together
 
         Fetches all registries if any provided by Redfish service
         and combines together with packaged standard registries.
+        Both message and attribute registries are supported from
+        the Redfish service.
 
-        :returns: dict of combined message registries keyed by both the
+        :returns: dict of combined registries keyed by both the
             registry name (Registry_name.Major_version.Minor_version) and the
-            message registry file identity, with the value being the actual
+            registry file identity, with the value being the actual
             registry itself.
         """
         standard = self._get_standard_message_registry_collection()
@@ -487,12 +489,19 @@ class Sushy(base.ResourceBase):
         if registry_col:
             provided = registry_col.get_members()
             for r in provided:
-                message_registry = r.get_message_registry(
+
+                # Check for Message and Attribute registries
+                registry = r.get_message_registry(
                     self._language,
                     self._public_connector)
-                registries[r.registry] = message_registry
-                if r.identity not in registries:
-                    registries[r.identity] = message_registry
+                if not registry:
+                    registry = r.get_attribute_registry(
+                        self._language,
+                        self._public_connector)
+                if registry:
+                    registries[r.registry] = registry
+                    if r.identity not in registries:
+                        registries[r.identity] = registry
 
         return registries
 

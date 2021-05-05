@@ -21,6 +21,7 @@ from dateutil import parser
 
 from sushy import exceptions
 from sushy.resources import constants as res_cons
+from sushy.resources.registry import attribute_registry
 from sushy.resources.registry import message_registry
 from sushy.resources import settings
 from sushy.resources.system import bios
@@ -42,16 +43,28 @@ class BiosTestCase(base.TestCase):
             self.bios_settings_json,
             self.bios_settings_json]
 
+        registries = {}
         conn = mock.Mock()
         with open('sushy/tests/unit/json_samples/message_registry.json') as f:
             conn.get.return_value.json.return_value = json.load(f)
-            registry = message_registry.MessageRegistry(
+            msg_reg = message_registry.MessageRegistry(
                 conn, '/redfish/v1/Registries/Test',
                 redfish_version='1.0.2')
 
+            registries['Test.1.0'] = msg_reg
+
+        with open('sushy/tests/unit/json_samples/'
+                  'bios_attribute_registry.json') as f:
+            conn.get.return_value.json.return_value = json.load(f)
+            bios_reg = attribute_registry.AttributeRegistry(
+                conn, '/redfish/v1/Registries/BiosRegistryTest',
+                redfish_version='1.0.2')
+
+            registries['BiosRegistry.1.0'] = bios_reg
+
         self.sys_bios = bios.Bios(
             self.conn, '/redfish/v1/Systems/437XR1138R2/BIOS',
-            registries={'Test.1.0': registry},
+            registries=registries,
             redfish_version='1.0.2')
 
     def test__parse_attributes(self):
@@ -333,3 +346,49 @@ class BiosTestCase(base.TestCase):
             data={'OldPassword': 'oldpassword',
                   'NewPassword': 'newpassword',
                   'PasswordName': 'adminpassword'})
+
+    def test_get_attribute_registry(self):
+
+        registry = self.sys_bios.get_attribute_registry()
+        self.assertEqual(registry.name, 'BIOS Attribute Registry')
+        self.assertEqual(registry.description, 'This is a test of BIOS '
+                         'Attribute Registry')
+        self.assertEqual(registry.registry_entries.attributes[0].name,
+                         'SystemModelName')
+        self.assertEqual(registry.registry_entries.attributes[0].display_name,
+                         'System Model Name')
+        self.assertEqual(registry.registry_entries.attributes[0].immutable,
+                         True)
+        self.assertEqual(registry.registry_entries.attributes[0].read_only,
+                         True)
+        self.assertEqual(registry.registry_entries.attributes[0].
+                         attribute_type, 'String')
+        self.assertEqual(registry.registry_entries.attributes[1].name,
+                         'ProcVirtualization')
+        self.assertEqual(registry.registry_entries.attributes[1].display_name,
+                         'Virtualization Technology')
+        self.assertEqual(registry.registry_entries.attributes[1].immutable,
+                         False)
+        self.assertEqual(registry.registry_entries.attributes[1].read_only,
+                         False)
+        self.assertEqual(registry.registry_entries.attributes[1].
+                         reset_required, True)
+        self.assertEqual(registry.registry_entries.attributes[1].
+                         attribute_type, 'Enumeration')
+        self.assertEqual(registry.registry_entries.attributes[1].
+                         allowable_values,
+                         [{'ValueDisplayName': 'Enabled',
+                           'ValueName': 'Enabled'},
+                          {'ValueDisplayName': 'Disabled',
+                           'ValueName': 'Disabled'}])
+
+    def test_get_attribute_registry_no_lang(self):
+
+        registry = self.sys_bios.get_attribute_registry(language='zh')
+        self.assertIsNone(registry)
+
+    def test_get_attribute_registry_not_found(self):
+
+        self.sys_bios._attribute_registry = "Unknown"
+        registry = self.sys_bios.get_attribute_registry()
+        self.assertIsNone(registry)

@@ -19,6 +19,7 @@ from unittest import mock
 
 from sushy.resources import base as sushy_base
 from sushy.resources import constants as res_cons
+from sushy.resources.registry import attribute_registry
 from sushy.resources.registry import message_registry
 from sushy.tests.unit import base
 
@@ -117,7 +118,7 @@ class MessageRegistryTestCase(base.TestCase):
         self.registry._parse_attributes(self.json_doc)
         self.assertEqual('warning', self.registry.messages['Success'].severity)
 
-    def test__parse_attribtues_unknown_param_type(self):
+    def test__parse_attributes_unknown_param_type(self):
         self.registry.json['Messages']['Failed']['ParamTypes'] = \
             ['unknown_type']
         self.assertRaisesRegex(KeyError,
@@ -291,3 +292,28 @@ class MessageRegistryTestCase(base.TestCase):
         self.assertEqual(res_cons.SEVERITY_WARNING, parsed_msg.severity)
         self.assertEqual('Property\'s arg1 value cannot be greater than '
                          'unknown.', parsed_msg.message)
+
+    def test_parse_message_multiple_registries(self):
+        conn = mock.Mock()
+        with open('sushy/tests/unit/json_samples/message_registry.json') as f:
+            conn.get.return_value.json.return_value = json.load(f)
+        msg_registry = message_registry.MessageRegistry(
+            conn, '/redfish/v1/Registries/Test',
+            redfish_version='1.0.2')
+        attr_registry = attribute_registry.AttributeRegistry(
+            self.conn, '/redfish/v1/Test/Bios/BiosRegistry',
+            redfish_version='1.0.2')
+        registries = {'Test.1.0.2': attr_registry,
+                      'Test.1.0.0': msg_registry}
+        message_field = sushy_base.MessageListField('Foo')
+        message_field.message_id = 'Test.1.0.0.TooBig'
+        message_field.message_args = ['arg1', 10]
+        message_field.severity = None
+        message_field.resolution = None
+
+        parsed_msg = message_registry.parse_message(registries, message_field)
+
+        self.assertEqual('Try again', parsed_msg.resolution)
+        self.assertEqual(res_cons.SEVERITY_WARNING, parsed_msg.severity)
+        self.assertEqual('Property\'s arg1 value cannot be greater than 10.',
+                         parsed_msg.message)

@@ -1,0 +1,29 @@
+{
+  "@odata.context": "/redfish/v1/$metadata#MessageRegistryFile.MessageRegistryFile",
+  "@odata.id": "/redfish/v1/Registries/BiosAttributeRegistry.v1_0",
+  "@odata.type": "#MessageRegistryFile.v1_0_4.MessageRegistryFile",
+  "Id": "BiosAttributeRegistry.v1_0",
+  "Description": "Registry Definition File for BiosAttributeRegistry.v1_0",
+  "Languages": [
+    "en",
+    "ja",
+    "zh"
+  ],
+  "Location": [
+    {
+      "Language": "en",
+      "Uri": "/redfish/v1/registrystore/registries/en/biosattributeregistry.v1_0"
+    },
+    {
+      "Language": "ja",
+      "Uri": "/redfish/v1/registrystore/registries/ja/biosattributeregistry.v1_0"
+    },
+    {
+      "Language": "zh",
+      "Uri": "/redfish/v1/registrystore/registries/zh/biosattributeregistry.v1_0"
+    }
+  ],
+  "Name": "BiosAttributeRegistry.v1_0 Message Registry File",
+  "Registry": "BiosAttributeRegistry.v1_0"
+}
+
