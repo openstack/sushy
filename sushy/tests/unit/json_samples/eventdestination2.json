@@ -1,0 +1,15 @@
+{
+  "@odata.context": "/redfish/v1/$metadata#EventDestination.EventDestination",
+  "@odata.id": "/redfish/v1/EventService/Subscriptions/2",
+  "@odata.type": "#EventDestination.v1_0_0.EventDestination",
+  "Id": "2",
+  "Context": "IronicContext",
+  "Description": "Event Subscription",
+  "Destination": "https://localhost/RedfishEvents/EventReceiver.php",
+  "EventTypes": [
+    "Alert"
+  ],
+  "HttpHeaders": [],
+  "Name": "Event Subscription",
+  "Protocol": "Redfish"
+}

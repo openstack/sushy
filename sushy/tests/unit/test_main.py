@@ -22,6 +22,7 @@ from sushy import exceptions
 from sushy import main
 from sushy.resources.chassis import chassis
 from sushy.resources.compositionservice import compositionservice
+from sushy.resources.eventservice import eventservice
 from sushy.resources.fabric import fabric
 from sushy.resources.manager import manager
 from sushy.resources.registry import message_registry_file
@@ -72,6 +73,8 @@ class MainTestCase(base.TestCase):
         self.assertEqual('/redfish/v1/Managers', self.root._managers_path)
         self.assertEqual('/redfish/v1/Chassis', self.root._chassis_path)
         self.assertEqual('/redfish/v1/Fabrics', self.root._fabrics_path)
+        self.assertEqual('/redfish/v1/EventService',
+                         self.root._event_service_path)
         self.assertEqual('/redfish/v1/SessionService',
                          self.root._session_service_path)
         self.assertEqual('/redfish/v1/CompositionService',
@@ -306,6 +309,13 @@ class MainTestCase(base.TestCase):
             self.root._conn, '/redfish/v1/CompositionService',
             self.root.redfish_version, self.root.lazy_registries)
 
+    @mock.patch.object(eventservice, 'EventService', autospec=True)
+    def test_get_event_service(self, mock_event_service):
+        self.root.get_event_service()
+        mock_event_service.assert_called_once_with(
+            self.root._conn, '/redfish/v1/EventService',
+            self.root.redfish_version, self.root.lazy_registries)
+
     def test__get_standard_message_registry_collection(self):
         registries = self.root._get_standard_message_registry_collection()
 
@@ -460,3 +470,9 @@ class BareMinimumMainTestCase(base.TestCase):
         self.assertRaisesRegex(
             exceptions.MissingAttributeError,
             'Links/Sessions/@data.id', self.root.get_sessions_path)
+
+    def test_get_event_service_when_eventservice_attr_absent(self):
+        self.assertRaisesRegex(
+            exceptions.MissingAttributeError,
+            'EventService/@odata.id', self.root.get_event_service
+        )

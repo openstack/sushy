@@ -19,6 +19,7 @@ import pbr.version
 from sushy.main import Sushy
 from sushy.resources.chassis.constants import *  # noqa
 from sushy.resources.constants import *  # noqa
+from sushy.resources.eventservice.constants import * # noqa
 from sushy.resources.fabric.constants import *  # noqa
 from sushy.resources.manager.constants import *  # noqa
 from sushy.resources.system.constants import *  # noqa

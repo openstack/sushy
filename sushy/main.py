@@ -24,6 +24,7 @@ from sushy import exceptions
 from sushy.resources import base
 from sushy.resources.chassis import chassis
 from sushy.resources.compositionservice import compositionservice
+from sushy.resources.eventservice import eventservice
 from sushy.resources.fabric import fabric
 from sushy.resources.manager import manager
 from sushy.resources.registry import message_registry
@@ -144,6 +145,9 @@ class Sushy(base.ResourceBase):
 
     _update_service_path = base.Field(['UpdateService', '@odata.id'])
     """UpdateService path"""
+
+    _event_service_path = base.Field(['EventService', '@odata.id'])
+    """EventService path"""
 
     def __init__(self, base_url, username=None, password=None,
                  root_prefix='/redfish/v1/', verify=True,
@@ -441,6 +445,21 @@ class Sushy(base.ResourceBase):
 
         return compositionservice.CompositionService(
             self._conn, self._composition_service_path,
+            redfish_version=self.redfish_version,
+            registries=self.lazy_registries)
+
+    def get_event_service(self):
+        """Get the EventService object
+
+        :raises: MissingAttributeError, if the EventService is not found
+        :returns: The EventService object
+        """
+        if not self._event_service_path:
+            raise exceptions.MissingAttributeError(
+                attribute='EventService/@odata.id',
+                resource=self._path)
+        return eventservice.EventService(
+            self._conn, self._event_service_path,
             redfish_version=self.redfish_version,
             registries=self.lazy_registries)
 
