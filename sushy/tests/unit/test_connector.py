@@ -387,8 +387,8 @@ class ConnectorOpTestCase(base.TestCase):
             'HTTP GET of SessionService failed %s, '
             'this is expected prior to authentication', 'HTTP GET '
             'http://redfish/v1/SessionService returned code '
-            'HTTPStatus.FORBIDDEN. unknown error Extended information: '
-            'none')
+            '%s. unknown error Extended information: '
+            'none' % http_client.FORBIDDEN)
         self.assertEqual(http_client.FORBIDDEN, exc.status_code)
 
     def test_blocking_no_location_header(self):

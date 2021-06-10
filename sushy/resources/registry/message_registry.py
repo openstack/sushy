@@ -118,8 +118,8 @@ def parse_message(message_registries, message_field):
 
     if not reg_msg:
         LOG.warning(
-            'Unable to find message for registry %(registry), '
-            'message ID %(msg_key)', {
+            'Unable to find message for registry %(registry)s, '
+            'message ID %(msg_key)s', {
                 'registry': registry,
                 'msg_key': msg_key})
         if message_field.message is None:
