@@ -40,6 +40,7 @@ class Connector(object):
         self._session = requests.Session()
         self._session.verify = self._verify
         self._response_callback = response_callback
+        self._auth = None
 
         # NOTE(etingof): field studies reveal that some BMCs choke at
         # long-running persistent HTTP connections (or TCP connections).
@@ -125,7 +126,7 @@ class Connector(object):
         try:
             exceptions.raise_for_response(method, url, response)
         except exceptions.AccessError as e:
-            if self._auth.can_refresh_session():
+            if self._auth is not None and self._auth.can_refresh_session():
                 try:
                     self._auth.refresh_session()
                 except exceptions.AccessError as refresh_exc:
