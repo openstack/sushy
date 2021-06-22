@@ -372,6 +372,18 @@ class ConnectorOpTestCase(base.TestCase):
         exc = cm.exception
         self.assertEqual(http_client.FORBIDDEN, exc.status_code)
 
+    def test_access_error_without_auth(self):
+        self.conn._auth = None
+
+        self.request.return_value.status_code = http_client.FORBIDDEN
+        self.request.return_value.json.side_effect = ValueError('no json')
+
+        with self.assertRaisesRegex(exceptions.AccessError,
+                                    'unknown error') as cm:
+            self.conn._op('GET', 'http://foo.bar')
+        exc = cm.exception
+        self.assertEqual(http_client.FORBIDDEN, exc.status_code)
+
     @mock.patch.object(connector.LOG, 'debug', autospec=True)
     def test_access_error_service_session(self, mock_log):
         self.conn._auth.can_refresh_session.return_value = False
