@@ -106,20 +106,20 @@ class Processor(base.ResourceBase):
         super(Processor, self).__init__(
             connector, identity, redfish_version, registries)
 
-    def _get_processor_collection_path(self):
-        """Helper function to find the ProcessorCollection path"""
-        pro_col = self.json.get('ProcessorCollection')
-        if not pro_col:
+    def _get_subprocessor_collection_path(self):
+        """Helper function to find the SubProcessors path"""
+        subproc_col = self.json.get('SubProcessors')
+        if not subproc_col:
             raise exceptions.MissingAttributeError(
-                attribute='ProcessorCollection', resource=self._path)
-        return pro_col.get('@odata.id')
+                attribute='SubProcessors', resource=self._path)
+        return subproc_col.get('@odata.id')
 
     @property
     @utils.cache_it
     def sub_processors(self):
         """A reference to the collection of Sub-Processors"""
         return ProcessorCollection(
-            self.conn, self._get_processor_collection_path,
+            self._conn, self._get_subprocessor_collection_path(),
             redfish_version=self.redfish_version)
 
 
