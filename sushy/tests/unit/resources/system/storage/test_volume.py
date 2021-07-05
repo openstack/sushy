@@ -218,7 +218,8 @@ class VolumeCollectionTestCase(base.TestCase):
         Volume_mock.assert_called_once_with(
             self.stor_vol_col._conn,
             '/redfish/v1/Systems/437XR1138R2/Storage/1/Volumes/1',
-            self.stor_vol_col.redfish_version, None)
+            redfish_version=self.stor_vol_col.redfish_version, registries=None,
+            root=self.stor_vol_col.root)
 
     @mock.patch.object(volume, 'Volume', autospec=True)
     def test_get_members(self, Volume_mock):
@@ -226,13 +227,16 @@ class VolumeCollectionTestCase(base.TestCase):
         calls = [
             mock.call(self.stor_vol_col._conn,
                       '/redfish/v1/Systems/437XR1138R2/Storage/1/Volumes/1',
-                      self.stor_vol_col.redfish_version, None),
+                      redfish_version=self.stor_vol_col.redfish_version,
+                      registries=None, root=self.stor_vol_col.root),
             mock.call(self.stor_vol_col._conn,
                       '/redfish/v1/Systems/437XR1138R2/Storage/1/Volumes/2',
-                      self.stor_vol_col.redfish_version, None),
+                      redfish_version=self.stor_vol_col.redfish_version,
+                      registries=None, root=self.stor_vol_col.root),
             mock.call(self.stor_vol_col._conn,
                       '/redfish/v1/Systems/437XR1138R2/Storage/1/Volumes/3',
-                      self.stor_vol_col.redfish_version, None),
+                      redfish_version=self.stor_vol_col.redfish_version,
+                      registries=None, root=self.stor_vol_col.root),
         ]
         Volume_mock.assert_has_calls(calls)
         self.assertIsInstance(members, list)

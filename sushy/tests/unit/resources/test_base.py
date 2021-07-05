@@ -183,7 +183,7 @@ class TestResource(resource_base.ResourceBase):
     """A concrete Test Resource to test against"""
 
     def __init__(self, connector, identity, redfish_version=None,
-                 registries=None):
+                 registries=None, root=None):
         """Ctor of TestResource
 
         :param connector: A Connector instance
@@ -194,7 +194,7 @@ class TestResource(resource_base.ResourceBase):
             used in any resource that needs registries to parse messages.
         """
         super(TestResource, self).__init__(connector, 'Fakes/%s' % identity,
-                                           redfish_version, registries)
+                                           redfish_version, registries, root)
         self.identity = identity
 
     def _parse_attributes(self, json_doc):
@@ -208,7 +208,8 @@ class TestResourceCollection(resource_base.ResourceCollectionBase):
     def _resource_type(self):
         return TestResource
 
-    def __init__(self, connector, redfish_version=None, registries=None):
+    def __init__(self, connector, redfish_version=None, registries=None,
+                 root=None):
         """Ctor of TestResourceCollection
 
         :param connector: A Connector instance
@@ -218,7 +219,7 @@ class TestResourceCollection(resource_base.ResourceCollectionBase):
             used in any resource that needs registries to parse messages.
         """
         super(TestResourceCollection, self).__init__(
-            connector, 'Fakes', redfish_version, registries)
+            connector, 'Fakes', redfish_version, registries, root)
 
 
 class ResourceCollectionBaseTestCase(base.TestCase):

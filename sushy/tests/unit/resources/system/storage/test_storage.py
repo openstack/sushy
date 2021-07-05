@@ -81,16 +81,20 @@ class StorageTestCase(base.TestCase):
         calls = [
             mock.call(self.storage._conn,
                       '/redfish/v1/Systems/437XR1138R2/Storage/1/Drives/35D38F11ACEF7BD3',  # noqa
-                      self.storage.redfish_version, None),
+                      redfish_version=self.storage.redfish_version,
+                      registries=None, root=None),
             mock.call(self.storage._conn,
                       '/redfish/v1/Systems/437XR1138R2/Storage/1/Drives/3F5A8C54207B7233',  # noqa
-                      self.storage.redfish_version, None),
+                      redfish_version=self.storage.redfish_version,
+                      registries=None, root=None),
             mock.call(self.storage._conn,
                       '/redfish/v1/Systems/437XR1138R2/Storage/1/Drives/32ADF365C6C1B7BD',  # noqa
-                      self.storage.redfish_version, None),
+                      redfish_version=self.storage.redfish_version,
+                      registries=None, root=None),
             mock.call(self.storage._conn,
                       '/redfish/v1/Systems/437XR1138R2/Storage/1/Drives/3D58ECBC375FD9F2',  # noqa
-                      self.storage.redfish_version, None)
+                      redfish_version=self.storage.redfish_version,
+                      registries=None, root=None)
         ]
         Drive_mock.assert_has_calls(calls)
         self.assertIsInstance(all_drives, list)
@@ -258,7 +262,8 @@ class StorageCollectionTestCase(base.TestCase):
         Storage_mock.assert_called_once_with(
             self.stor_col._conn,
             '/redfish/v1/Systems/437XR1138R2/Storage/1',
-            self.stor_col.redfish_version, None)
+            redfish_version=self.stor_col.redfish_version, registries=None,
+            root=self.stor_col.root)
 
     @mock.patch.object(storage, 'Storage', autospec=True)
     def test_get_members(self, Storage_mock):
@@ -266,7 +271,8 @@ class StorageCollectionTestCase(base.TestCase):
         Storage_mock.assert_called_once_with(
             self.stor_col._conn,
             '/redfish/v1/Systems/437XR1138R2/Storage/1',
-            self.stor_col.redfish_version, None)
+            redfish_version=self.stor_col.redfish_version, registries=None,
+            root=self.stor_col.root)
         self.assertIsInstance(members, list)
         self.assertEqual(1, len(members))
 

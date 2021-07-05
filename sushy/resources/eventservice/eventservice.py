@@ -64,7 +64,7 @@ class EventService(base.ResourceBase):
     _actions = ActionsField('Actions', required=True)
 
     def __init__(self, connector, identity, redfish_version=None,
-                 registries=None):
+                 registries=None, root=None):
         """A class representing a EventService
 
         :param connector: A Connector instance
@@ -73,9 +73,11 @@ class EventService(base.ResourceBase):
             the object according to schema of given version
         :param registries: Dict of registries to be used in any resource
             that needs registries to parse messages.
+        :param root: Sushy root object. Empty for Sushy root itself.
         """
         super(EventService, self).__init__(
-            connector, identity, redfish_version, registries)
+            connector, identity, redfish_version=redfish_version,
+            registries=registries, root=root)
 
     def _get_submit_test_event(self):
         submit_test_event_action = self._actions.submit_test_event
@@ -147,4 +149,5 @@ class EventService(base.ResourceBase):
         """Reference to a collection of Event Destination resources"""
         return eventdestination.EventDestinationCollection(
             self._conn, self._get_subscriptions_collection_path(),
-            self.redfish_version, self.registries)
+            redfish_version=self.redfish_version, registries=self.registries,
+            root=self.root)

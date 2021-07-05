@@ -118,7 +118,8 @@ class SecureBootDatabaseCollectionTestCase(base.TestCase):
             self.collection._conn,
             '/redfish/v1/Systems/437XR1138R2/SecureBoot'
             '/SecureBootDatabases/db',
-            self.collection.redfish_version, None)
+            redfish_version=self.collection.redfish_version, registries=None,
+            root=self.collection.root)
 
     @mock.patch.object(secure_boot_database, 'SecureBootDatabase',
                        autospec=True)
@@ -128,7 +129,9 @@ class SecureBootDatabaseCollectionTestCase(base.TestCase):
             mock.call(self.collection._conn,
                       '/redfish/v1/Systems/437XR1138R2/SecureBoot'
                       '/SecureBootDatabases/%s' % member,
-                      self.collection.redfish_version, None)
+                      redfish_version=self.collection.redfish_version,
+                      registries=None,
+                      root=self.collection.root)
             for member in ('PK', 'KEK', 'db', 'dbx',
                            'PKDefault', 'KEKDefault',
                            'dbDefault', 'dbxDefault')

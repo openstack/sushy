@@ -97,7 +97,8 @@ class ResourceBlockCollectionTestCase(base.TestCase):
         self.res_block_col.get_member(path)
         mock_resourceblock.assert_called_once_with(
             self.res_block_col._conn, path,
-            self.res_block_col.redfish_version, None)
+            redfish_version=self.res_block_col.redfish_version,
+            registries=None, root=self.res_block_col.root)
 
     @mock.patch.object(resourceblock, 'ResourceBlock', autospec=True)
     def test_get_members(self, mock_resourceblock):
@@ -105,6 +106,7 @@ class ResourceBlockCollectionTestCase(base.TestCase):
         members = self.res_block_col.get_members()
         mock_resourceblock.assert_called_once_with(
             self.res_block_col._conn, path,
-            self.res_block_col.redfish_version, None)
+            redfish_version=self.res_block_col.redfish_version,
+            registries=None, root=self.res_block_col.root)
         self.assertIsInstance(members, list)
         self.assertEqual(1, len(members))

@@ -54,7 +54,7 @@ class EventDestination(base.ResourceBase):
     This object will be null on a GET."""
 
     def __init__(self, connector, identity, redfish_version=None,
-                 registries=None):
+                 registries=None, root=None):
         """A class representing an EventDestination
 
         :param connector: A Connector instance
@@ -63,9 +63,11 @@ class EventDestination(base.ResourceBase):
             the object according to schema of given version.
         :param registries: Dict of registries to be used in any resource
             that needs registries to parse messages.
+        :param root: Sushy root object. Empty for Sushy root itself.
         """
         super(EventDestination, self).__init__(
-            connector, identity, redfish_version, registries)
+            connector, identity, redfish_version=redfish_version,
+            registries=registries, root=root)
 
     def delete(self):
         """Delete an EventDestination
@@ -89,7 +91,7 @@ class EventDestinationCollection(base.ResourceCollectionBase):
         return EventDestination
 
     def __init__(self, connector, identity, redfish_version=None,
-                 registries=None):
+                 registries=None, root=None):
         """A class representing a EventDestinationCollection
 
         :param connector: A Connector instance
@@ -98,9 +100,11 @@ class EventDestinationCollection(base.ResourceCollectionBase):
             the object according to schema of given version.
         :param registries: Dict of registries to be used in any resource
             that needs registries to parse messages.
+        :param root: Sushy root object. Empty for Sushy root itself.
         """
         super(EventDestinationCollection, self).__init__(
-            connector, identity, redfish_version, registries)
+            connector, identity, redfish_version=redfish_version,
+            registries=registries, root=root)
 
     def _create(self, payload):
         r = self._conn.post(self._path, data=payload)

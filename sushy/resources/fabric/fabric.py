@@ -52,7 +52,7 @@ class Fabric(base.ResourceBase):
     """The protocol being sent over this fabric"""
 
     def __init__(self, connector, identity, redfish_version=None,
-                 registries=None):
+                 registries=None, root=None):
         """A class representing a Fabric
 
         :param connector: A Connector instance
@@ -61,16 +61,19 @@ class Fabric(base.ResourceBase):
             the object according to schema of the given version.
         :param registries: Dict of Redfish Message Registry objects to be
             used in any resource that needs registries to parse messages
+        :param root: Sushy root object. Empty for Sushy root itself.
         """
         super(Fabric, self).__init__(
-            connector, identity, redfish_version, registries)
+            connector, identity, redfish_version=redfish_version,
+            registries=registries, root=root)
 
     @property
     @utils.cache_it
     def endpoints(self):
         return fab_endpoint.EndpointCollection(
             self._conn, utils.get_sub_resource_path_by(self, 'Endpoints'),
-            self.redfish_version, self.registries)
+            redfish_version=self.redfish_version, registries=self.registries,
+            root=self.root)
 
 
 class FabricCollection(base.ResourceCollectionBase):
@@ -79,7 +82,8 @@ class FabricCollection(base.ResourceCollectionBase):
     def _resource_type(self):
         return Fabric
 
-    def __init__(self, connector, path, redfish_version=None, registries=None):
+    def __init__(self, connector, path, redfish_version=None, registries=None,
+                 root=None):
         """A class representing a FabricCollection
 
         :param connector: A Connector instance
@@ -88,6 +92,8 @@ class FabricCollection(base.ResourceCollectionBase):
             the object according to schema of the given version.
         :param registries: Dict of Redfish Message Registry objects to be
             used in any resource that needs registries to parse messages
+        :param root: Sushy root object. Empty for Sushy root itself.
         """
         super(FabricCollection, self).__init__(
-            connector, path, redfish_version, registries)
+            connector, path, redfish_version=redfish_version,
+            registries=registries, root=root)

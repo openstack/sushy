@@ -51,7 +51,7 @@ class CompositionService(base.ResourceBase):
     """The status of composition service is enabled"""
 
     def __init__(self, connector, identity, redfish_version=None,
-                 registries=None):
+                 registries=None, root=None):
         """A class representing a CompositionService
 
         :param connector: A connector instance
@@ -60,9 +60,11 @@ class CompositionService(base.ResourceBase):
             the object according to schema of given version
         :param registries: Dict of Redfish Message Registry objects to be
             used in any resource that needs registries to parse messages
+        :param root: Sushy root object. Empty for Sushy root itself.
         """
         super(CompositionService, self).__init__(
-            connector, identity, redfish_version, registries)
+            connector, identity, redfish_version=redfish_version,
+            registries=registries, root=root)
 
     def _get_resource_blocks_collection_path(self):
         """Helper function to find the ResourceBlockCollections path"""
@@ -86,7 +88,8 @@ class CompositionService(base.ResourceBase):
         """Property to reference `ResourceBlockCollection` instance"""
         return resourceblock.ResourceBlockCollection(
             self._conn, self._get_resource_blocks_collection_path,
-            self.redfish_version, self.registries)
+            redfish_version=self.redfish_version, registries=self.registries,
+            root=self.root)
 
     @property
     @utils.cache_it
@@ -94,4 +97,5 @@ class CompositionService(base.ResourceBase):
         """Property to reference `ResourceZoneCollection` instance"""
         return resourcezone.ResourceZoneCollection(
             self._conn, self._get_resource_zones_collection_path,
-            self.redfish_version, self.registries)
+            redfish_version=self.redfish_version, registries=self.registries,
+            root=self.root)

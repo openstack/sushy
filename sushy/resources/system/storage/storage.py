@@ -88,7 +88,7 @@ class Storage(base.ResourceBase):
         """
         return drive.Drive(self._conn, drive_identity,
                            redfish_version=self.redfish_version,
-                           registries=self.registries)
+                           registries=self.registries, root=self.root)
 
     @property
     @utils.cache_it
@@ -131,7 +131,7 @@ class Storage(base.ResourceBase):
         """
         return volume.VolumeCollection(
             self._conn, utils.get_sub_resource_path_by(self, 'Volumes'),
-            redfish_version=self.redfish_version)
+            redfish_version=self.redfish_version, root=self.root)
 
     storage_controllers = StorageControllersListField('StorageControllers',
                                                       default=[])

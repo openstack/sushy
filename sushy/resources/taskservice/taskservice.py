@@ -48,7 +48,7 @@ class TaskService(base.ResourceBase):
     """Whether a task state change sends an event"""
 
     def __init__(self, connector, identity, redfish_version=None,
-                 registries=None):
+                 registries=None, root=None):
         """A class representing a TaskService
 
         :param connector: A Connector instance
@@ -57,9 +57,11 @@ class TaskService(base.ResourceBase):
             the object according to schema of given version
         :param registries: Dict of Redfish Message Registry objects to be
             used in any resource that needs registries to parse messages
+        :param root: Sushy root object. Empty for Sushy root itself.
         """
         super(TaskService, self).__init__(
-            connector, identity, redfish_version, registries)
+            connector, identity, redfish_version=redfish_version,
+            registries=registries, root=root)
 
     @property
     @utils.cache_it
@@ -73,4 +75,4 @@ class TaskService(base.ResourceBase):
         return task.TaskCollection(
             self._conn, utils.get_sub_resource_path_by(self, 'Tasks'),
             redfish_version=self.redfish_version,
-            registries=self.registries)
+            registries=self.registries, root=self.root)

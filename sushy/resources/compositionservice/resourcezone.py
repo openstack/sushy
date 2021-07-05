@@ -55,7 +55,7 @@ class ResourceZone(base.ResourceBase):
     """The resource zone status"""
 
     def __init__(self, connector, identity, redfish_version=None,
-                 registries=None):
+                 registries=None, root=None):
         """A class representing a ResourceZone
 
         :param connector: A Connector instance
@@ -64,9 +64,11 @@ class ResourceZone(base.ResourceBase):
             the object according to schema of given version.
         :param registries: Dict of Redfish Message Registry objects to be
             used in any resource that needs registries to parse messages
+        :param root: Sushy root object. Empty for Sushy root itself.
         """
         super(ResourceZone, self).__init__(
-            connector, identity, redfish_version, registries)
+            connector, identity, redfish_version=redfish_version,
+            registries=registries, root=root)
 
 
 class ResourceZoneCollection(base.ResourceCollectionBase):
@@ -82,7 +84,7 @@ class ResourceZoneCollection(base.ResourceCollectionBase):
         return ResourceZone
 
     def __init__(self, connector, identity, redfish_version=None,
-                 registries=None):
+                 registries=None, root=None):
         """A class representing a ResourceZoneCollection
 
         :param connector: A Connector instance
@@ -91,6 +93,8 @@ class ResourceZoneCollection(base.ResourceCollectionBase):
             the object according to schema of given version.
         :param registries: Dict of Redfish Message Registry objects to be
             used in any resource that needs registries to parse messages
+        :param root: Sushy root object. Empty for Sushy root itself.
         """
         super(ResourceZoneCollection, self).__init__(
-            connector, identity, redfish_version, registries)
+            connector, identity, redfish_version=redfish_version,
+            registries=registries, root=root)

@@ -75,7 +75,7 @@ class ResourceBlock(base.ResourceBase):
     """The status of resource block"""
 
     def __init__(self, connector, identity, redfish_version=None,
-                 registries=None):
+                 registries=None, root=None):
         """A class representing a ResourceBlock
 
         :param connector: A Connector instance
@@ -84,9 +84,11 @@ class ResourceBlock(base.ResourceBase):
             the object according to schema of given version.
         :param registries: Dict of Redfish Message Registry objects to be
             used in any resource that needs registries to parse messages
+        :param root: Sushy root object. Empty for Sushy root itself.
         """
         super(ResourceBlock, self).__init__(
-            connector, identity, redfish_version, registries)
+            connector, identity, redfish_version=redfish_version,
+            registries=registries, root=root)
 
 
 class ResourceBlockCollection(base.ResourceCollectionBase):
@@ -102,7 +104,7 @@ class ResourceBlockCollection(base.ResourceCollectionBase):
         return ResourceBlock
 
     def __init__(self, connector, identity, redfish_version=None,
-                 registries=None):
+                 registries=None, root=None):
         """A class representing a ResourceBlockCollection
 
         :param connector: A Connector instance
@@ -111,6 +113,8 @@ class ResourceBlockCollection(base.ResourceCollectionBase):
             the object according to schema of given version.
         :param registries: Dict of Redfish Message Registry objects to be
             used in any resource that needs registries to parse messages
+        :param root: Sushy root object. Empty for Sushy root itself.
         """
         super(ResourceBlockCollection, self).__init__(
-            connector, identity, redfish_version, registries)
+            connector, identity, redfish_version=redfish_version,
+            registries=registries, root=root)

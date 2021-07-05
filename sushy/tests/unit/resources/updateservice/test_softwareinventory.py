@@ -103,7 +103,7 @@ class SoftwareInventoryCollectionTestCase(base.TestCase):
         self.soft_inv_col.get_member(path)
         mock_softwareinventory.assert_called_once_with(
             self.soft_inv_col._conn, path,
-            self.soft_inv_col.redfish_version, None)
+            self.soft_inv_col.redfish_version, None, self.soft_inv_col.root)
 
     @mock.patch.object(
         softwareinventory, 'SoftwareInventory', autospec=True)
@@ -113,17 +113,23 @@ class SoftwareInventoryCollectionTestCase(base.TestCase):
             mock.call(self.soft_inv_col._conn,
                       ('/redfish/v1/UpdateService/FirmwareInventory/'
                        'Current-101560-25.5.6.0009'),
-                      self.soft_inv_col.redfish_version, None),
+                      redfish_version=self.soft_inv_col.redfish_version,
+                      registries=None,
+                      root=self.soft_inv_col.root),
 
             mock.call(self.soft_inv_col._conn,
                       ('/redfish/v1/UpdateService/FirmwareInventory/'
                        'Installed-101560-25.5.6.0009'),
-                      self.soft_inv_col.redfish_version, None),
+                      redfish_version=self.soft_inv_col.redfish_version,
+                      registries=None,
+                      root=self.soft_inv_col.root),
 
             mock.call(self.soft_inv_col._conn,
                       ('/redfish/v1/UpdateService/FirmwareInventory/'
                        'Previous-102302-18.8.9'),
-                      self.soft_inv_col.redfish_version, None)
+                      redfish_version=self.soft_inv_col.redfish_version,
+                      registries=None,
+                      root=self.soft_inv_col.root)
         ]
         mock_softwareinventory.assert_has_calls(calls)
         self.assertIsInstance(members, list)

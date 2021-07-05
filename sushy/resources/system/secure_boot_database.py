@@ -98,7 +98,8 @@ class SecureBootDatabaseCollection(base.ResourceCollectionBase):
     def _resource_type(self):
         return SecureBootDatabase
 
-    def __init__(self, connector, path, redfish_version=None, registries=None):
+    def __init__(self, connector, path, redfish_version=None, registries=None,
+                 root=None):
         """A class representing a ComputerSystemCollection
 
         :param connector: A Connector instance
@@ -107,6 +108,8 @@ class SecureBootDatabaseCollection(base.ResourceCollectionBase):
             the object according to schema of the given version.
         :param registries: Dict of Redfish Message Registry objects to be
             used in any resource that needs registries to parse messages
+        :param root: Sushy root object. Empty for Sushy root itself.
         """
         super(SecureBootDatabaseCollection, self).__init__(
-            connector, path, redfish_version, registries)
+            connector, path, redfish_version=redfish_version,
+            registries=registries, root=root)

@@ -58,7 +58,7 @@ class CompositionServiceTestCase(base.TestCase):
         mock_resourceblock_col.assert_called_once_with(
             self.comp_ser._conn,
             self.comp_ser._get_resource_blocks_collection_path,
-            self.comp_ser.redfish_version, None)
+            self.comp_ser.redfish_version, None, None)
 
     @mock.patch.object(resourcezone, 'ResourceZoneCollection', autospec=True)
     def test_get_resource_zones(self, mock_resourcezone_col):
@@ -66,4 +66,4 @@ class CompositionServiceTestCase(base.TestCase):
         mock_resourcezone_col.assert_called_once_with(
             self.comp_ser._conn,
             self.comp_ser._get_resource_zones_collection_path,
-            self.comp_ser.redfish_version, None)
+            self.comp_ser.redfish_version, None, None)

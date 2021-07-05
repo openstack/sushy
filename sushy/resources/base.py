@@ -500,7 +500,8 @@ class ResourceBase(object, metaclass=abc.ABCMeta):
                  redfish_version=None,
                  registries=None,
                  reader=None,
-                 json_doc=None):
+                 json_doc=None,
+                 root=None):
         """A class representing the base of any Redfish resource
 
         Invokes the ``refresh()`` method of resource for the first
@@ -513,6 +514,7 @@ class ResourceBase(object, metaclass=abc.ABCMeta):
             used in any resource that needs registries to parse messages
         :param reader: Reader to use to fetch JSON data.
         :param json_doc: parsed JSON document in form of Python types.
+        :param root: Sushy root object. Empty for Sushy root itself.
         """
         self._conn = connector
         self._path = path
@@ -525,7 +527,7 @@ class ResourceBase(object, metaclass=abc.ABCMeta):
         self._is_stale = True
 
         self._reader = get_reader(connector, path, reader)
-
+        self._root = root
         self.refresh(json_doc=json_doc)
 
     def _get_value(self, val):
@@ -694,7 +696,8 @@ class ResourceBase(object, metaclass=abc.ABCMeta):
         return new_resource(
             self._conn, path or self.path,
             redfish_version=self.redfish_version,
-            reader=self._reader)
+            reader=self._reader,
+            root=self.root)
 
     @property
     def resource_name(self):
@@ -716,6 +719,10 @@ class ResourceBase(object, metaclass=abc.ABCMeta):
     def registries(self):
         return self._registries
 
+    @property
+    def root(self):
+        return self._root
+
 
 class ResourceCollectionBase(ResourceBase, metaclass=abc.ABCMeta):
 
@@ -726,7 +733,8 @@ class ResourceCollectionBase(ResourceBase, metaclass=abc.ABCMeta):
                                adapter=utils.get_members_identities)
     """A tuple with the members identities"""
 
-    def __init__(self, connector, path, redfish_version=None, registries=None):
+    def __init__(self, connector, path, redfish_version=None, registries=None,
+                 root=None):
         """A class representing the base of any Redfish resource collection
 
         It gets inherited from ``ResourceBase`` and invokes the base class
@@ -737,9 +745,10 @@ class ResourceCollectionBase(ResourceBase, metaclass=abc.ABCMeta):
             the object according to schema of the given version.
         :param registries: Dict of Redfish Message Registry objects to be
             used in any resource that needs registries to parse messages.
+        :param root: Sushy root object. Empty for Sushy root itself.
         """
         super(ResourceCollectionBase, self).__init__(
-            connector, path, redfish_version, registries)
+            connector, path, redfish_version, registries, root=root)
         LOG.debug('Received %(count)d member(s) for %(type)s %(path)s',
                   {'count': len(self.members_identities),
                    'type': self.__class__.__name__, 'path': self._path})
@@ -761,7 +770,9 @@ class ResourceCollectionBase(ResourceBase, metaclass=abc.ABCMeta):
         :raises: ResourceNotFoundError
         """
         return self._resource_type(
-            self._conn, identity, self.redfish_version, self.registries)
+            self._conn, identity, redfish_version=self.redfish_version,
+            registries=self.registries,
+            root=self.root)
 
     @utils.cache_it
     def get_members(self):
