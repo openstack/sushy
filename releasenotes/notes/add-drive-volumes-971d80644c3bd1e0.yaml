@@ -1,0 +1,4 @@
+---
+features:
+  - |
+    Adds ``Drive.volumes`` property for list of volumes that drive is part of.

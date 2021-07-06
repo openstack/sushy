@@ -58,6 +58,29 @@ class DriveTestCase(base.TestCase):
         self.assertEqual(sushy.STATE_ENABLED, self.stor_drive.status.state)
         self.assertEqual(sushy.HEALTH_OK, self.stor_drive.status.health)
 
+    def test_volumes(self):
+        with open('sushy/tests/unit/json_samples/drive3.json') as f:
+            drive_json = json.load(f)
+        with open('sushy/tests/unit/json_samples/volume2.json') as f:
+            volume2_json = json.load(f)
+        with open('sushy/tests/unit/json_samples/volume3.json') as f:
+            volume3_json = json.load(f)
+
+        self.conn.get.return_value.json.side_effect = [drive_json,
+                                                       volume2_json,
+                                                       volume3_json]
+        stor_drive = drive.Drive(
+            self.conn,
+            '/redfish/v1/Systems/437XR1138R2/Storage/1/Drives/'
+            '3D58ECBC375FD9F2',
+            redfish_version='1.0.2')
+
+        volumes = stor_drive.volumes
+
+        self.assertEqual(2, len(volumes))
+        self.assertEqual('2', volumes[0].identity)
+        self.assertEqual('3', volumes[1].identity)
+
     def test_set_indicator_led(self):
         with mock.patch.object(
                 self.stor_drive, 'invalidate',
