@@ -1,0 +1,9 @@
+{
+    "@odata.id": "/redfish/v1/Systems/system/Processors/CPU1/SubProcessors/Core1",
+    "@odata.type": "#Processor.v1_3_0.Processor",
+    "Id": "Core1",
+    "Status": {
+        "State": "Enabled",
+        "Health": "OK"
+    }
+}

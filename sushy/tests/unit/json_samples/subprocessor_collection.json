@@ -1,0 +1,9 @@
+{
+    "@odata.id": "/redfish/v1/Systems/437XR1138R2Processors/CPU1/SubProcessors",
+    "@odata.type": "#ProcessorCollection.ProcessorCollection",
+    "Members": [
+      {
+        "@odata.id": "/redfish/v1/Systems/system/Processors/CPU1/SubProcessors/Core1"
+      }
+    ]
+}

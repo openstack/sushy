@@ -17,6 +17,7 @@ from unittest import mock
 
 
 import sushy
+from sushy import exceptions
 from sushy.resources import constants as res_cons
 from sushy.resources.system import processor
 from sushy.tests.unit import base
@@ -75,6 +76,28 @@ class ProcessorTestCase(base.TestCase):
         self.assertEqual(res_cons.HEALTH_OK, self.sys_processor.status.health)
         self.assertEqual(res_cons.HEALTH_OK,
                          self.sys_processor.status.health_rollup)
+
+    def test_sub_processors(self):
+        self.conn.get.return_value.json.reset_mock()
+        with open('sushy/tests/unit/json_samples/'
+                  'subprocessor_collection.json') as f:
+            subproc_col = json.load(f)
+        with open('sushy/tests/unit/json_samples/subprocessor.json') as f:
+            subproc1 = json.load(f)
+
+        self.conn.get.return_value.json.side_effect = [subproc_col, subproc1]
+
+        sub_processors = self.sys_processor.sub_processors
+        self.assertIsInstance(sub_processors,
+                              processor.ProcessorCollection)
+        self.assertEqual((0, None), sub_processors.summary)
+        self.assertEqual('Core1', sub_processors.get_members()[0].identity)
+
+    def test_sub_processors_missing(self):
+        self.sys_processor.json.pop('SubProcessors')
+        with self.assertRaisesRegex(
+                exceptions.MissingAttributeError, 'attribute SubProcessors'):
+            self.sys_processor.sub_processors
 
 
 class ProcessorCollectionTestCase(base.TestCase):
