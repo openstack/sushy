@@ -19,6 +19,7 @@ from sushy import exceptions
 from sushy.resources import base
 from sushy.resources import common
 from sushy.resources import mappings as res_maps
+from sushy.resources.system.storage import volume
 from sushy import utils
 
 LOG = logging.getLogger(__name__)
@@ -66,6 +67,24 @@ class Drive(base.ResourceBase):
 
     status = common.StatusField('Status')
     """This type describes the status and health of the drive"""
+
+    @property
+    @utils.cache_it
+    def volumes(self):
+        """A list of volumes that this drive is part of.
+
+        Volumes that this drive either wholly or only partially contains.
+
+        :raises: MissingAttributeError if '@odata.id' field is missing.
+        :returns: A list of `Volume` instances
+        """
+        paths = utils.get_sub_resource_path_by(
+            self, ["Links", "Volumes"], is_collection=True)
+
+        return [volume.Volume(self._conn, path,
+                              redfish_version=self.redfish_version,
+                              registries=self.registries)
+                for path in paths]
 
     def set_indicator_led(self, state):
         """Set IndicatorLED to the given state.
