@@ -1,0 +1,6 @@
+---
+fixes:
+  - |
+    Fixes OEM resource attribute parsing for OEM resources with required
+    fields. Before the fix an error such as "The attribute <attribute name> is
+    missing from the resource <resource path>" occurred.

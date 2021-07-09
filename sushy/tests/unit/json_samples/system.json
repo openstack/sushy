@@ -54,6 +54,7 @@
     "Oem": {
         "Contoso": {
             "@odata.type": "#Contoso.ComputerSystem",
+            "Name": "Contoso OEM system",
             "ProductionLocation": {
                 "FacilityName": "PacWest Production Facility",
                 "Country": "USA"
