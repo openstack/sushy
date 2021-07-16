@@ -123,3 +123,28 @@ class EventDestinationCollectionTestCase(base.TestCase):
             data=payload,
         )
         self.assertIsNone(new_subscription)
+
+    def test__create_subscription_with_empty_context(self):
+        payload = {
+            'Protocol': 'Redfish',
+            'Destination': 'https://localhost/RedfishEvents/EventReceiver.php',
+            'Context': '',
+            'EventTypes': ["Alert"]
+        }
+        with open('sushy/tests/unit/json_samples/eventdestination3.json') as f:
+            self.conn.get.return_value.json.return_value = json.load(f)
+        self.conn.post.return_value.status_code = 201
+        self.conn.post.return_value.headers.return_value = {
+            'Location': '/redfish/v1/EventService/Subscriptions/3'
+        }
+        new_subscription = self.eventdestination.create(payload)
+        self.eventdestination._conn.post.assert_called_once_with(
+            '/redfish/v1/EventService/Subscriptions',
+            data=payload,
+        )
+        self.assertIsNotNone(new_subscription)
+        self.assertEqual(new_subscription.identity, '3')
+        self.assertIsNone(new_subscription.context)
+        self.assertEqual(new_subscription.destination,
+                         'https://localhost/RedfishEvents/EventReceiver.php')
+        self.assertIn("Alert", new_subscription.event_types)

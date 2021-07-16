@@ -30,7 +30,7 @@ class EventDestination(base.ResourceBase):
     name = base.Field('Name', required=True)
     """The EventDestination resource name"""
 
-    context = base.Field('Context', required=True)
+    context = base.Field('Context')
     """A client-supplied string that is stored with the event destination
     subscription"""
 

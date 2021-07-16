@@ -1,0 +1,6 @@
+---
+fixes:
+  - |
+    Removes the requirement from `Context` to be present when requesting a
+    subscription, some BMCs do not report `Context` when the subscription is
+    created with empty string and would cause `MissingAttributeError`.
