@@ -144,7 +144,7 @@ class ConnectorMethodsTestCase(base.TestCase):
 
     def test_set_http_session_auth(self):
         self.conn.set_http_session_auth('hash-token')
-        self.assertTrue('X-Auth-Token' in self.conn._session.headers)
+        self.assertIn('X-Auth-Token', self.conn._session.headers)
         self.assertEqual(
             'hash-token', self.conn._session.headers['X-Auth-Token'])
 

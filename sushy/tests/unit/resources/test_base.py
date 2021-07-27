@@ -263,7 +263,7 @@ class ResourceCollectionBaseTestCase(base.TestCase):
         self.assertIsInstance(result, list)
         for val in result:
             self.assertIsInstance(val, TestResource)
-            self.assertTrue(val.identity in member_ids)
+            self.assertIn(val.identity, member_ids)
             self.assertEqual('1.0.x', val.redfish_version)
             self.assertFalse(val._is_stale)
 
