@@ -89,7 +89,18 @@ class VirtualMediaTestCase(base.TestCase):
             ("/redfish/v1/Managers/BMC/VirtualMedia/Floppy1/Actions"
              "/VirtualMedia.InsertMedia"),
             data={"Image": "https://www.dmtf.org/freeImages/Sardine.img",
-                  "Inserted": True, "WriteProtected": False}
+                  "WriteProtected": False}
+        )
+        self.assertTrue(self.sys_virtual_media._is_stale)
+
+    def test_insert_media_rf_default(self):
+        self.assertFalse(self.sys_virtual_media._is_stale)
+        self.sys_virtual_media.insert_media(
+            "https://www.dmtf.org/freeImages/Sardine.img", True, True)
+        self.sys_virtual_media._conn.post.assert_called_once_with(
+            ("/redfish/v1/Managers/BMC/VirtualMedia/Floppy1/Actions"
+             "/VirtualMedia.InsertMedia"),
+            data={"Image": "https://www.dmtf.org/freeImages/Sardine.img"}
         )
         self.assertTrue(self.sys_virtual_media._is_stale)
 
