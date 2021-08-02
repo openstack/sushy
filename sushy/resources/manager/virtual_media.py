@@ -102,15 +102,33 @@ class VirtualMedia(base.ResourceBase):
         :param write_protected: indicates the media is write protected
         """
         target_uri, use_patch = self._get_insert_media_uri()
-        payload = {"Image": image, "Inserted": inserted,
-                   "WriteProtected": write_protected}
+        # NOTE(janders) Inserted and WriteProtected attributes are optional
+        # as per Redfish schema 2021.1. However - some BMCs (e.g. Lenovo SD530
+        # which is using PATCH method as opposed to InsertMedia action) will
+        # not attach vMedia if Inserted is not specified.
+        # On the other hand, machines such as SuperMicro X11 will return
+        # an error if Inserted or WriteProtected are specified. In order to
+        # make both work, we remove Inserted and WriteProtected from payload
+        # for BMCs which don't use PATCH if their values are set to defaults
+        # as per the spec (True, True). We continue to set Inserted and
+        # WriteProtected in payload if PATCH method is used.
+        payload = {'Image': image}
         if use_patch:
+            payload['Inserted'] = inserted
+            payload['WriteProtected'] = write_protected
             headers = None
             etag = self._get_etag()
             if etag is not None:
                 headers = {"If-Match": etag}
             self._conn.patch(target_uri, data=payload, headers=headers)
         else:
+            # NOTE(janders) only include Inserted and WriteProtected
+            # in request payload if values other than defaults (True,True)
+            # are set (fix for SuperMicro X11/X12).
+            if not inserted:
+                payload['Inserted'] = False
+            if not write_protected:
+                payload['WriteProtected'] = False
             self._conn.post(target_uri, data=payload)
         self.invalidate()
 

@@ -1,0 +1,20 @@
+---
+upgrade:
+  - |
+    "Inserted" and "WriteProtected" optional attributes are no longer present
+    in the InsertMedia API call payload when default values {"Inserted": True,
+    "WriteProtected": True} are specified by the consumer (e.g. Ironic) and
+    PATCH method of configuring virtual media is not used.
+    Behaviour is unchanged if PATCH method is used.
+fixes:
+  - |
+    Removing "Inserted" and "WriteProtected" parameters from the Redfish
+    VirtualMedia::insert_media() API call payload when default values
+    {"Inserted": True, "WriteProtected": True} are set and PATCH method is not
+    used. Those parameters are optional as per Redfish schema 2021.1. Some
+    BMCs (e.g. SuperMicro X11/X12 platforms) treat these fields as read-only
+    and setting them causes vMedia insert failures. These attributes should
+    default to True on the BMC side.
+    Some BMCs using PATCH method of configuring virtual media (e.g. Lenovo
+    SD530) still require "Inserted" attribute, so only changing this for
+    non-PATCH methods of configuring virtual media such as InsertMedia action.
