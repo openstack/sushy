@@ -31,6 +31,7 @@ class ContosoActionsField(base.CompositeField):
 class FakeOEMSystemExtension(oem_base.OEMResourceBase):
 
     data_type = base.Field('@odata.type')
+    name = base.Field('Name', required=True)
     production_location = ProductionLocationField('ProductionLocation')
     _actions = ContosoActionsField('Actions')
 

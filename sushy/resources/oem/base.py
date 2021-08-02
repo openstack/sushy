@@ -55,6 +55,11 @@ class OEMResourceBase(base.ResourceBase):
 
         :param json_doc: parsed JSON document in form of Python types
         """
+        # Too early to parse, need to call set_parent_resource first that
+        # assigns vendor_id and re-parses attributes
+        if self._vendor_id is None:
+            return
+
         oem_json = json_doc.get(
             'Oem', {}).get(self._vendor_id, {})
 
