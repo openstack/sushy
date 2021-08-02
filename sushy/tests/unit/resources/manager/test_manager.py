@@ -311,13 +311,15 @@ class ManagerCollectionTestCase(base.TestCase):
         self.managers.get_member('/redfish/v1/Managers/BMC')
         Manager_mock.assert_called_once_with(
             self.managers._conn, '/redfish/v1/Managers/BMC',
-            self.managers.redfish_version, None)
+            redfish_version=self.managers.redfish_version, registries=None,
+            root=self.managers.root)
 
     @mock.patch.object(manager, 'Manager', autospec=True)
     def test_get_members(self, Manager_mock):
         members = self.managers.get_members()
         Manager_mock.assert_called_once_with(
             self.managers._conn, '/redfish/v1/Managers/BMC',
-            self.managers.redfish_version, None)
+            redfish_version=self.managers.redfish_version, registries=None,
+            root=self.managers.root)
         self.assertIsInstance(members, list)
         self.assertEqual(1, len(members))

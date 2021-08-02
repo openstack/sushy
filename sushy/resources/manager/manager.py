@@ -85,7 +85,7 @@ class Manager(base.ResourceBase):
     _actions = ActionsField('Actions')
 
     def __init__(self, connector, identity, redfish_version=None,
-                 registries=None):
+                 registries=None, root=None):
         """A class representing a Manager
 
         :param connector: A Connector instance
@@ -94,9 +94,11 @@ class Manager(base.ResourceBase):
             the object according to schema of the given version.
         :param registries: Dict of Redfish Message Registry objects to be
             used in any resource that needs registries to parse messages
+        :param root: Sushy root object. Empty for Sushy root itself.
         """
         super(Manager, self).__init__(
-            connector, identity, redfish_version, registries)
+            connector, identity, redfish_version=redfish_version,
+            registries=registries, root=root)
 
     def get_supported_graphical_console_types(self):
         """Get the supported values for Graphical Console connection types.
@@ -197,7 +199,8 @@ class Manager(base.ResourceBase):
     def virtual_media(self):
         return virtual_media.VirtualMediaCollection(
             self._conn, utils.get_sub_resource_path_by(self, 'VirtualMedia'),
-            self.redfish_version, self.registries)
+            redfish_version=self.redfish_version, registries=self.registries,
+            root=self.root)
 
     @property
     @utils.cache_it
@@ -215,7 +218,8 @@ class Manager(base.ResourceBase):
 
         from sushy.resources.system import system
         return [system.System(self._conn, path,
-                              self.redfish_version, self.registries)
+                              redfish_version=self.redfish_version,
+                              registries=self.registries, root=self.root)
                 for path in paths]
 
     @property
@@ -234,7 +238,8 @@ class Manager(base.ResourceBase):
 
         from sushy.resources.chassis import chassis
         return [chassis.Chassis(self._conn, path,
-                                self.redfish_version, self.registries)
+                                redfish_version=self.redfish_version,
+                                registries=self.registries, root=self.root)
                 for path in paths]
 
 
@@ -244,7 +249,8 @@ class ManagerCollection(base.ResourceCollectionBase):
     def _resource_type(self):
         return Manager
 
-    def __init__(self, connector, path, redfish_version=None, registries=None):
+    def __init__(self, connector, path, redfish_version=None, registries=None,
+                 root=None):
         """A class representing a ManagerCollection
 
         :param connector: A Connector instance
@@ -253,6 +259,8 @@ class ManagerCollection(base.ResourceCollectionBase):
             the object according to schema of the given version.
         :param registries: Dict of Redfish Message Registry objects to be
             used in any resource that needs registries to parse messages
+        :param root: Sushy root object. Empty for Sushy root itself.
         """
         super(ManagerCollection, self).__init__(
-            connector, path, redfish_version, registries)
+            connector, path, redfish_version=redfish_version,
+            registries=registries, root=root)

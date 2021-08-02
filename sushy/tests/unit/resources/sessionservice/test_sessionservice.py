@@ -68,7 +68,8 @@ class SessionServiceTestCase(base.TestCase):
         mock_sess_col.assert_called_once_with(
             self.sess_serv_inst._conn,
             '/redfish/v1/SessionService/Sessions',
-            self.sess_serv_inst.redfish_version, None)
+            self.sess_serv_inst.redfish_version, None,
+            self.sess_serv_inst.root)
 
     def test_create_session(self):
         with open('sushy/tests/unit/json_samples/'

@@ -84,7 +84,8 @@ class ResourceZoneCollectionTestCase(base.TestCase):
         self.res_zone_col.get_member(path)
         mock_resourcezone.assert_called_once_with(
             self.res_zone_col._conn, path,
-            self.res_zone_col.redfish_version, None)
+            redfish_version=self.res_zone_col.redfish_version, registries=None,
+            root=self.res_zone_col.root)
 
     @mock.patch.object(resourcezone, 'ResourceZone', autospec=True)
     def test_get_members(self, mock_resourcezone):
@@ -92,6 +93,7 @@ class ResourceZoneCollectionTestCase(base.TestCase):
         members = self.res_zone_col.get_members()
         mock_resourcezone.assert_called_once_with(
             self.res_zone_col._conn, path,
-            self.res_zone_col.redfish_version, None)
+            redfish_version=self.res_zone_col.redfish_version, registries=None,
+            root=self.res_zone_col.root)
         self.assertIsInstance(members, list)
         self.assertEqual(1, len(members))

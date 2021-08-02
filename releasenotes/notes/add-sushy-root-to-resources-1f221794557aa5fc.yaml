@@ -1,0 +1,5 @@
+---
+features:
+  - |
+    Adds ``root`` property to Sushy resources to link to main Sushy object.
+    Empty for Sushy root itself.

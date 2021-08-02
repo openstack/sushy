@@ -33,16 +33,19 @@ class ActionsField(base.CompositeField):
 
 class Bios(base.ResourceBase):
 
-    def __init__(self, connector, path, redfish_version=None, registries=None):
+    def __init__(self, connector, path, redfish_version=None, registries=None,
+                 root=None):
         """A class representing a Bios
 
         :param connector: A Connector instance
         :param path: Sub-URI path to the Bios resource
         :param registries: Dict of message registries to be used when
             parsing messages of attribute update status
+        :param root: Sushy root object. Empty for Sushy root itself.
         """
         super(Bios, self).__init__(
-            connector, path, redfish_version, registries)
+            connector, path, redfish_version=redfish_version,
+            registries=registries, root=root)
 
     identity = base.Field('Id', required=True)
     """The Bios resource identity string"""
@@ -84,7 +87,7 @@ class Bios(base.ResourceBase):
         return Bios(
             self._conn, self._settings.resource_uri,
             registries=None,
-            redfish_version=self.redfish_version)
+            redfish_version=self.redfish_version, root=self.root)
 
     @property
     def pending_attributes(self):

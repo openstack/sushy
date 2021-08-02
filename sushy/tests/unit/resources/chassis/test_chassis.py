@@ -194,22 +194,33 @@ class ChassisCollectionTestCase(base.TestCase):
         self.chassis.get_member('/redfish/v1/Chassis/MultiBladeEncl')
         chassis_mock.assert_called_once_with(
             self.chassis._conn, '/redfish/v1/Chassis/MultiBladeEncl',
-            self.chassis.redfish_version, None)
+            redfish_version=self.chassis.redfish_version, registries=None,
+            root=self.chassis.root)
 
     @mock.patch.object(chassis, 'Chassis', autospec=True)
     def test_get_members(self, chassis_mock):
         members = self.chassis.get_members()
         calls = [
             mock.call(self.chassis._conn, '/redfish/v1/Chassis/MultiBladeEncl',
-                      self.chassis.redfish_version, None),
+                      redfish_version=self.chassis.redfish_version,
+                      registries=None,
+                      root=self.chassis.root),
             mock.call(self.chassis._conn, '/redfish/v1/Chassis/Blade1',
-                      self.chassis.redfish_version, None),
+                      redfish_version=self.chassis.redfish_version,
+                      registries=None,
+                      root=self.chassis.root),
             mock.call(self.chassis._conn, '/redfish/v1/Chassis/Blade2',
-                      self.chassis.redfish_version, None),
+                      redfish_version=self.chassis.redfish_version,
+                      registries=None,
+                      root=self.chassis.root),
             mock.call(self.chassis._conn, '/redfish/v1/Chassis/Blade3',
-                      self.chassis.redfish_version, None),
+                      redfish_version=self.chassis.redfish_version,
+                      registries=None,
+                      root=self.chassis.root),
             mock.call(self.chassis._conn, '/redfish/v1/Chassis/Blade4',
-                      self.chassis.redfish_version, None)
+                      redfish_version=self.chassis.redfish_version,
+                      registries=None,
+                      root=self.chassis.root)
         ]
         chassis_mock.assert_has_calls(calls)
         self.assertIsInstance(members, list)

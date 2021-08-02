@@ -104,7 +104,8 @@ class TaskCollectionTestCase(base.TestCase):
         mock_task.assert_called_once_with(
             self.task_col._conn,
             '/redfish/v1/TaskService/Tasks/545',
-            self.task_col.redfish_version, None)
+            redfish_version=self.task_col.redfish_version, registries=None,
+            root=self.task_col.root)
 
     @mock.patch.object(task, 'Task', autospec=True)
     def test_get_members(self, mock_task):
@@ -112,10 +113,14 @@ class TaskCollectionTestCase(base.TestCase):
         calls = [
             mock.call(self.task_col._conn,
                       '/redfish/v1/TaskService/Tasks/545',
-                      self.task_col.redfish_version, None),
+                      redfish_version=self.task_col.redfish_version,
+                      registries=None,
+                      root=self.task_col.root),
             mock.call(self.task_col._conn,
                       '/redfish/v1/TaskService/Tasks/546',
-                      self.task_col.redfish_version, None),
+                      redfish_version=self.task_col.redfish_version,
+                      registries=None,
+                      root=self.task_col.root),
         ]
         mock_task.assert_has_calls(calls)
         self.assertIsInstance(members, list)

@@ -25,7 +25,8 @@ class OEMResourceBase(base.ResourceBase):
                  path='',
                  redfish_version=None,
                  registries=None,
-                 reader=None):
+                 reader=None,
+                 root=None):
         """Class representing an OEM vendor extension
 
         :param connector: A Connector instance
@@ -34,12 +35,15 @@ class OEMResourceBase(base.ResourceBase):
             the object according to schema of the given version.
         :param registries: Dict of Redfish Message Registry objects to be
             used in any resource that needs registries to parse messages
+        :param root: Sushy root object. Empty for Sushy root itself.
         """
         self._parent_resource = None
         self._vendor_id = None
 
         super(OEMResourceBase, self).__init__(
-            connector, path, redfish_version, registries, reader)
+            connector, path,
+            redfish_version=redfish_version, registries=registries,
+            reader=reader, root=root)
 
     def set_parent_resource(self, parent_resource, vendor_id):
         self._parent_resource = parent_resource

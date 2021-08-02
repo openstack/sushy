@@ -38,7 +38,7 @@ class Session(base.ResourceBase):
     """The UserName for the account for this session."""
 
     def __init__(self, connector, identity, redfish_version=None,
-                 registries=None):
+                 registries=None, root=None):
         """A class representing a Session
 
         :param connector: A Connector instance
@@ -47,9 +47,11 @@ class Session(base.ResourceBase):
             the object according to schema of given version.
         :param registries: Dict of Redfish Message Registry objects to be
             used in any resource that needs registries to parse messages
+        :param root: Sushy root object. Empty for Sushy root itself.
         """
         super(Session, self).__init__(
-            connector, identity, redfish_version, registries)
+            connector, identity, redfish_version=redfish_version,
+            registries=registries, root=root)
 
     def delete(self):
         """Method for deleting a Session.
@@ -72,7 +74,7 @@ class SessionCollection(base.ResourceCollectionBase):
         return Session
 
     def __init__(self, connector, identity, redfish_version=None,
-                 registries=None):
+                 registries=None, root=None):
         """A class representing a SessionCollection
 
         :param connector: A Connector instance
@@ -81,6 +83,8 @@ class SessionCollection(base.ResourceCollectionBase):
             the object according to schema of given version.
         :param registries: Dict of Redfish Message Registry objects to be
             used in any resource that needs registries to parse messages
+        :param root: Sushy root object. Empty for Sushy root itself.
         """
         super(SessionCollection, self).__init__(
-            connector, identity, redfish_version, registries)
+            connector, identity, redfish_version=redfish_version,
+            registries=registries, root=root)

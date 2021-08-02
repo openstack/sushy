@@ -66,7 +66,7 @@ class UpdateService(base.ResourceBase):
     _software_inventory_path = base.Field(['SoftwareInventory', '@odata.id'])
 
     def __init__(self, connector, identity, redfish_version=None,
-                 registries=None):
+                 registries=None, root=None):
         """A class representing a UpdateService
 
         :param connector: A Connector instance
@@ -75,9 +75,11 @@ class UpdateService(base.ResourceBase):
             the object according to schema of given version
         :param registries: Dict of Redfish Message Registry objects to be
             used in any resource that needs registries to parse messages
+        :param root: Sushy root object. Empty for Sushy root itself.
         """
         super(UpdateService, self).__init__(
-            connector, identity, redfish_version, registries)
+            connector, identity, redfish_version=redfish_version,
+            registries=registries, root=root)
 
     def _get_simple_update_element(self):
         simple_update_action = self._actions.simple_update
@@ -151,7 +153,8 @@ class UpdateService(base.ResourceBase):
         rsp = self._conn.post(target_uri, data=data)
 
         return taskmonitor.TaskMonitor.from_response(
-            self._conn, rsp, target_uri, self.redfish_version, self.registries)
+            self._conn, rsp, target_uri,
+            redfish_version=self.redfish_version, registries=self.registries)
 
     def get_task_monitor(self, task_monitor):
         """Used to retrieve a TaskMonitor.
@@ -163,7 +166,8 @@ class UpdateService(base.ResourceBase):
             self._conn,
             task_monitor,
             redfish_version=self.redfish_version,
-            registries=self.registries)
+            registries=self.registries,
+            root=self.root)
 
     @property
     @utils.cache_it
@@ -178,7 +182,7 @@ class UpdateService(base.ResourceBase):
             self._conn,
             self._software_inventory_path,
             redfish_version=self.redfish_version,
-            registries=self.registries)
+            registries=self.registries, root=self.root)
 
     @property
     @utils.cache_it
@@ -193,4 +197,4 @@ class UpdateService(base.ResourceBase):
             self._conn,
             self._firmware_inventory_path,
             redfish_version=self.redfish_version,
-            registries=self.registries)
+            registries=self.registries, root=self.root)

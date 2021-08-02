@@ -177,7 +177,8 @@ class UpdateServiceTestCase(base.TestCase):
         software_inventory_collection_mock.assert_called_once_with(
             self.conn, '/redfish/v1/UpdateService/SoftwareInventory',
             self.upd_serv.redfish_version,
-            self.upd_serv._registries)
+            self.upd_serv._registries,
+            self.upd_serv.root)
 
     @mock.patch.object(softwareinventory, 'SoftwareInventoryCollection',
                        autospec=True)
@@ -186,7 +187,7 @@ class UpdateServiceTestCase(base.TestCase):
         software_inventory_collection_mock.assert_called_once_with(
             self.conn, '/redfish/v1/UpdateService/FirmwareInventory',
             self.upd_serv.redfish_version,
-            self.upd_serv._registries)
+            self.upd_serv._registries, self.upd_serv.root)
 
 
 class UpdateServiceNoInvTestCase(base.TestCase):

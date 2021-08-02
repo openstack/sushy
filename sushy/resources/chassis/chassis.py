@@ -145,7 +145,7 @@ class Chassis(base.ResourceBase):
     _actions = ActionsField('Actions')
 
     def __init__(self, connector, identity, redfish_version=None,
-                 registries=None):
+                 registries=None, root=None):
         """A class representing a Chassis
 
         :param connector: A Connector instance
@@ -154,9 +154,11 @@ class Chassis(base.ResourceBase):
             the object according to schema of the given version.
         :param registries: Dict of Redfish Message Registry objects to be
             used in any resource that needs registries to parse messages
+        :param root: Sushy root object. Empty for Sushy root itself.
         """
         super(Chassis, self).__init__(
-            connector, identity, redfish_version, registries)
+            connector, identity, redfish_version=redfish_version,
+            registries=registries, root=root)
 
     def _get_reset_action_element(self):
         reset_action = self._actions.reset
@@ -238,7 +240,9 @@ class Chassis(base.ResourceBase):
             self, ["Links", "ManagedBy"], is_collection=True)
 
         return [manager.Manager(self._conn, path,
-                                self.redfish_version, self.registries)
+                                redfish_version=self.redfish_version,
+                                registries=self.registries,
+                                root=self.root)
                 for path in paths]
 
     @property
@@ -257,7 +261,9 @@ class Chassis(base.ResourceBase):
 
         from sushy.resources.system import system
         return [system.System(self._conn, path,
-                              self.redfish_version, self.registries)
+                              redfish_version=self.redfish_version,
+                              registries=self.registries,
+                              root=self.root)
                 for path in paths]
 
     @property
@@ -272,7 +278,8 @@ class Chassis(base.ResourceBase):
         return power.Power(
             self._conn,
             utils.get_sub_resource_path_by(self, 'Power'),
-            self.redfish_version, self.registries)
+            redfish_version=self.redfish_version, registries=self.registries,
+            root=self.root)
 
     @property
     @utils.cache_it
@@ -286,7 +293,8 @@ class Chassis(base.ResourceBase):
         return thermal.Thermal(
             self._conn,
             utils.get_sub_resource_path_by(self, 'Thermal'),
-            self.redfish_version, self.registries)
+            redfish_version=self.redfish_version, registries=self.registries,
+            root=self.root)
 
 
 class ChassisCollection(base.ResourceCollectionBase):
@@ -295,7 +303,8 @@ class ChassisCollection(base.ResourceCollectionBase):
     def _resource_type(self):
         return Chassis
 
-    def __init__(self, connector, path, redfish_version=None, registries=None):
+    def __init__(self, connector, path, redfish_version=None, registries=None,
+                 root=None):
         """A class representing a ChassisCollection
 
         :param connector: A Connector instance
@@ -304,6 +313,8 @@ class ChassisCollection(base.ResourceCollectionBase):
             the object according to schema of the given version.
         :param registries: Dict of Redfish Message Registry objects to be
             used in any resource that needs registries to parse messages
+        :param root: Sushy root object. Empty for Sushy root itself.
         """
         super(ChassisCollection, self).__init__(
-            connector, path, redfish_version, registries)
+            connector, path, redfish_version=redfish_version,
+            registries=registries, root=root)

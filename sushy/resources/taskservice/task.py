@@ -63,7 +63,7 @@ class Task(base.ResourceBase):
     """List of :class:`.MessageListField` with messages from the Task"""
 
     def __init__(self, connector, identity, redfish_version=None,
-                 registries=None, json_doc=None):
+                 registries=None, json_doc=None, root=None):
         """A class representing a Task
 
         :param connector: A Connector instance
@@ -73,10 +73,11 @@ class Task(base.ResourceBase):
         :param registries: Dict of Redfish Message Registry objects to be
             used in any resource that needs registries to parse messages
         :param field_data: the data to use populating the fields
+        :param root: Sushy root object. Empty for Sushy root itself.
         """
         super(Task, self).__init__(
             connector, identity, redfish_version, registries,
-            json_doc=json_doc)
+            json_doc=json_doc, root=root)
 
     @property
     def is_processing(self):

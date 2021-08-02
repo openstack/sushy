@@ -107,7 +107,8 @@ class MainTestCase(base.TestCase):
         mock_system_collection.assert_called_once_with(
             self.root._conn, '/redfish/v1/Systems',
             redfish_version=self.root.redfish_version,
-            registries=mock_lazy_registries
+            registries=mock_lazy_registries,
+            root=self.root
         )
 
     @mock.patch.object(system, 'System', autospec=True)
@@ -118,7 +119,8 @@ class MainTestCase(base.TestCase):
         mock_system.assert_called_once_with(
             self.root._conn, 'fake-system-id',
             redfish_version=self.root.redfish_version,
-            registries=mock_lazy_registries)
+            registries=mock_lazy_registries,
+            root=self.root)
 
     @mock.patch.object(system, 'SystemCollection', autospec=True)
     @mock.patch.object(system, 'System', autospec=True)
@@ -133,12 +135,14 @@ class MainTestCase(base.TestCase):
         mock_system_collection.assert_called_once_with(
             self.root._conn, '/redfish/v1/Systems',
             redfish_version=self.root.redfish_version,
-            registries=mock_lazy_registries
+            registries=mock_lazy_registries,
+            root=self.root
         )
         mock_system.assert_called_once_with(
             self.root._conn, 'fake-system-id',
             redfish_version=self.root.redfish_version,
-            registries=mock_lazy_registries)
+            registries=mock_lazy_registries,
+            root=self.root)
 
     @mock.patch.object(system, 'SystemCollection', autospec=True)
     @mock.patch.object(system, 'System', autospec=True)
@@ -152,7 +156,8 @@ class MainTestCase(base.TestCase):
         mock_system_collection.assert_called_once_with(
             self.root._conn, '/redfish/v1/Systems',
             redfish_version=self.root.redfish_version,
-            registries=mock_lazy_registries
+            registries=mock_lazy_registries,
+            root=self.root
         )
 
     @mock.patch.object(chassis, 'Chassis', autospec=True)
@@ -160,7 +165,7 @@ class MainTestCase(base.TestCase):
         self.root.get_chassis('fake-chassis-id')
         mock_chassis.assert_called_once_with(
             self.root._conn, 'fake-chassis-id',
-            self.root.redfish_version, self.root.lazy_registries)
+            self.root.redfish_version, self.root.lazy_registries, self.root)
 
     @mock.patch.object(chassis, 'ChassisCollection', autospec=True)
     @mock.patch.object(chassis, 'Chassis', autospec=True)
@@ -175,12 +180,12 @@ class MainTestCase(base.TestCase):
         mock_chassis_collection.assert_called_once_with(
             self.root._conn, '/redfish/v1/Chassis',
             redfish_version=self.root.redfish_version,
-            registries=mock_lazy_registries
+            registries=mock_lazy_registries, root=self.root
         )
         mock_chassis.assert_called_once_with(
             self.root._conn, 'fake-chassis-id',
             redfish_version=self.root.redfish_version,
-            registries=mock_lazy_registries
+            registries=mock_lazy_registries, root=self.root
         )
 
     @mock.patch.object(chassis, 'ChassisCollection', autospec=True)
@@ -196,7 +201,8 @@ class MainTestCase(base.TestCase):
         mock_chassis_collection.assert_called_once_with(
             self.root._conn, '/redfish/v1/Chassis',
             redfish_version=self.root.redfish_version,
-            registries=mock_lazy_registries
+            registries=mock_lazy_registries,
+            root=self.root
         )
 
     @mock.patch.object(chassis, 'ChassisCollection', autospec=True)
@@ -204,35 +210,35 @@ class MainTestCase(base.TestCase):
         self.root.get_chassis_collection()
         chassis_collection_mock.assert_called_once_with(
             self.root._conn, '/redfish/v1/Chassis',
-            self.root.redfish_version, self.root.lazy_registries)
+            self.root.redfish_version, self.root.lazy_registries, self.root)
 
     @mock.patch.object(fabric, 'Fabric', autospec=True)
     def test_get_fabric(self, mock_fabric):
         self.root.get_fabric('fake-fabric-id')
         mock_fabric.assert_called_once_with(
             self.root._conn, 'fake-fabric-id',
-            self.root.redfish_version, self.root.lazy_registries)
+            self.root.redfish_version, self.root.lazy_registries, self.root)
 
     @mock.patch.object(fabric, 'FabricCollection', autospec=True)
     def test_get_fabric_collection(self, fabric_collection_mock):
         self.root.get_fabric_collection()
         fabric_collection_mock.assert_called_once_with(
             self.root._conn, '/redfish/v1/Fabrics',
-            self.root.redfish_version, self.root.lazy_registries)
+            self.root.redfish_version, self.root.lazy_registries, self.root)
 
     @mock.patch.object(manager, 'ManagerCollection', autospec=True)
     def test_get_manager_collection(self, ManagerCollection_mock):
         self.root.get_manager_collection()
         ManagerCollection_mock.assert_called_once_with(
             self.root._conn, '/redfish/v1/Managers',
-            self.root.redfish_version, self.root.lazy_registries)
+            self.root.redfish_version, self.root.lazy_registries, self.root)
 
     @mock.patch.object(manager, 'Manager', autospec=True)
     def test_get_manager(self, Manager_mock):
         self.root.get_manager('fake-manager-id')
         Manager_mock.assert_called_once_with(
             self.root._conn, 'fake-manager-id',
-            self.root.redfish_version, self.root.lazy_registries)
+            self.root.redfish_version, self.root.lazy_registries, self.root)
 
     @mock.patch.object(manager, 'ManagerCollection', autospec=True)
     @mock.patch.object(manager, 'Manager', autospec=True)
@@ -247,12 +253,14 @@ class MainTestCase(base.TestCase):
         mock_manager_collection.assert_called_once_with(
             self.root._conn, '/redfish/v1/Managers',
             redfish_version=self.root.redfish_version,
-            registries=mock_lazy_registries
+            registries=mock_lazy_registries,
+            root=self.root
         )
         mock_manager.assert_called_once_with(
             self.root._conn, 'fake-manager-id',
             redfish_version=self.root.redfish_version,
-            registries=mock_lazy_registries)
+            registries=mock_lazy_registries,
+            root=self.root)
 
     @mock.patch.object(manager, 'ManagerCollection', autospec=True)
     @mock.patch.object(manager, 'Manager', autospec=True)
@@ -267,7 +275,7 @@ class MainTestCase(base.TestCase):
         mock_system_collection.assert_called_once_with(
             self.root._conn, '/redfish/v1/Managers',
             redfish_version=self.root.redfish_version,
-            registries=mock_lazy_registries
+            registries=mock_lazy_registries, root=self.root
         )
 
     @mock.patch.object(sessionservice, 'SessionService', autospec=True)
@@ -275,21 +283,21 @@ class MainTestCase(base.TestCase):
         self.root.get_session_service()
         mock_sess_serv.assert_called_once_with(
             self.root._conn, '/redfish/v1/SessionService',
-            self.root.redfish_version)
+            redfish_version=self.root.redfish_version, root=self.root)
 
     @mock.patch.object(session, 'Session', autospec=True)
     def test_get_session(self, mock_sess):
         self.root.get_session('asdf')
         mock_sess.assert_called_once_with(
             self.root._conn, 'asdf',
-            self.root.redfish_version, self.root.lazy_registries)
+            self.root.redfish_version, self.root.lazy_registries, self.root)
 
     @mock.patch.object(updateservice, 'UpdateService', autospec=True)
     def test_get_update_service(self, mock_upd_serv):
         self.root.get_update_service()
         mock_upd_serv.assert_called_once_with(
             self.root._conn, '/redfish/v1/UpdateService',
-            self.root.redfish_version, self.root.lazy_registries)
+            self.root.redfish_version, self.root.lazy_registries, self.root)
 
     @mock.patch.object(message_registry_file,
                        'MessageRegistryFileCollection',
@@ -299,7 +307,7 @@ class MainTestCase(base.TestCase):
         self.root._get_registry_collection()
         MessageRegistryFileCollection_mock.assert_called_once_with(
             self.root._conn, '/redfish/v1/Registries',
-            self.root.redfish_version)
+            redfish_version=self.root.redfish_version, root=self.root)
 
     @mock.patch.object(
         compositionservice, 'CompositionService', autospec=True)
@@ -307,14 +315,14 @@ class MainTestCase(base.TestCase):
         self.root.get_composition_service()
         mock_comp_ser.assert_called_once_with(
             self.root._conn, '/redfish/v1/CompositionService',
-            self.root.redfish_version, self.root.lazy_registries)
+            self.root.redfish_version, self.root.lazy_registries, self.root)
 
     @mock.patch.object(eventservice, 'EventService', autospec=True)
     def test_get_event_service(self, mock_event_service):
         self.root.get_event_service()
         mock_event_service.assert_called_once_with(
             self.root._conn, '/redfish/v1/EventService',
-            self.root.redfish_version, self.root.lazy_registries)
+            self.root.redfish_version, self.root.lazy_registries, self.root)
 
     def test__get_standard_message_registry_collection(self):
         registries = self.root._get_standard_message_registry_collection()

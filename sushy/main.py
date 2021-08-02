@@ -231,7 +231,7 @@ class Sushy(base.ResourceBase):
         return system.SystemCollection(
             self._conn, self._systems_path,
             redfish_version=self.redfish_version,
-            registries=self.lazy_registries)
+            registries=self.lazy_registries, root=self)
 
     def get_system(self, identity=None):
         """Given the identity return a System object
@@ -254,7 +254,7 @@ class Sushy(base.ResourceBase):
 
         return system.System(self._conn, identity,
                              redfish_version=self.redfish_version,
-                             registries=self.lazy_registries)
+                             registries=self.lazy_registries, root=self)
 
     def get_chassis_collection(self):
         """Get the ChassisCollection object
@@ -269,7 +269,8 @@ class Sushy(base.ResourceBase):
 
         return chassis.ChassisCollection(self._conn, self._chassis_path,
                                          redfish_version=self.redfish_version,
-                                         registries=self.lazy_registries)
+                                         registries=self.lazy_registries,
+                                         root=self)
 
     def get_chassis(self, identity=None):
         """Given the identity return a Chassis object
@@ -292,7 +293,7 @@ class Sushy(base.ResourceBase):
 
         return chassis.Chassis(self._conn, identity,
                                redfish_version=self.redfish_version,
-                               registries=self.lazy_registries)
+                               registries=self.lazy_registries, root=self)
 
     def get_fabric_collection(self):
         """Get the FabricCollection object
@@ -307,7 +308,8 @@ class Sushy(base.ResourceBase):
 
         return fabric.FabricCollection(self._conn, self._fabrics_path,
                                        redfish_version=self.redfish_version,
-                                       registries=self.lazy_registries)
+                                       registries=self.lazy_registries,
+                                       root=self)
 
     def get_fabric(self, identity):
         """Given the identity return a Fabric object
@@ -317,7 +319,7 @@ class Sushy(base.ResourceBase):
         """
         return fabric.Fabric(self._conn, identity,
                              redfish_version=self.redfish_version,
-                             registries=self.lazy_registries)
+                             registries=self.lazy_registries, root=self)
 
     def get_manager_collection(self):
         """Get the ManagerCollection object
@@ -332,7 +334,8 @@ class Sushy(base.ResourceBase):
 
         return manager.ManagerCollection(self._conn, self._managers_path,
                                          redfish_version=self.redfish_version,
-                                         registries=self.lazy_registries)
+                                         registries=self.lazy_registries,
+                                         root=self)
 
     def get_manager(self, identity=None):
         """Given the identity return a Manager object
@@ -354,7 +357,7 @@ class Sushy(base.ResourceBase):
 
         return manager.Manager(self._conn, identity,
                                redfish_version=self.redfish_version,
-                               registries=self.lazy_registries)
+                               registries=self.lazy_registries, root=self)
 
     def get_session_service(self):
         """Get the SessionService object
@@ -369,7 +372,7 @@ class Sushy(base.ResourceBase):
 
         return sessionservice.SessionService(
             self._conn, self._session_service_path,
-            redfish_version=self.redfish_version)
+            redfish_version=self.redfish_version, root=self)
 
     def get_sessions_path(self):
         """Returns the Sessions url"""
@@ -390,7 +393,7 @@ class Sushy(base.ResourceBase):
         return session.Session(
             self._conn, identity,
             redfish_version=self.redfish_version,
-            registries=self.lazy_registries)
+            registries=self.lazy_registries, root=self)
 
     def get_update_service(self):
         """Get the UpdateService object
@@ -404,7 +407,7 @@ class Sushy(base.ResourceBase):
         return updateservice.UpdateService(
             self._conn, self._update_service_path,
             redfish_version=self.redfish_version,
-            registries=self.lazy_registries)
+            registries=self.lazy_registries, root=self)
 
     def get_task_service(self):
         """Get the TaskService object
@@ -414,7 +417,7 @@ class Sushy(base.ResourceBase):
         return taskservice.TaskService(
             self._conn, utils.get_sub_resource_path_by(self, 'Tasks'),
             redfish_version=self.redfish_version,
-            registries=self.lazy_registries)
+            registries=self.lazy_registries, root=self)
 
     def _get_registry_collection(self):
         """Get MessageRegistryFileCollection object
@@ -429,7 +432,7 @@ class Sushy(base.ResourceBase):
             return message_registry_file.MessageRegistryFileCollection(
                 self._conn,
                 self._registries_path,
-                redfish_version=self.redfish_version)
+                redfish_version=self.redfish_version, root=self)
 
     def get_composition_service(self):
         """Get the CompositionService object
@@ -446,7 +449,7 @@ class Sushy(base.ResourceBase):
         return compositionservice.CompositionService(
             self._conn, self._composition_service_path,
             redfish_version=self.redfish_version,
-            registries=self.lazy_registries)
+            registries=self.lazy_registries, root=self)
 
     def get_event_service(self):
         """Get the EventService object
@@ -461,7 +464,7 @@ class Sushy(base.ResourceBase):
         return eventservice.EventService(
             self._conn, self._event_service_path,
             redfish_version=self.redfish_version,
-            registries=self.lazy_registries)
+            registries=self.lazy_registries, root=self)
 
     def _get_standard_message_registry_collection(self):
         """Load packaged standard message registries

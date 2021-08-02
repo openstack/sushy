@@ -51,4 +51,5 @@ class TaskServiceTestCase(base.TestCase):
         task_collection_mock.assert_called_once_with(
             self.conn, '/redfish/v1/TaskService/Tasks',
             self.tsk_serv.redfish_version,
-            self.tsk_serv._registries)
+            self.tsk_serv._registries,
+            self.tsk_serv.root)

@@ -65,15 +65,18 @@ class SecureBoot(base.ResourceBase):
 
     _actions = ActionsField('Actions')
 
-    def __init__(self, connector, path, redfish_version=None, registries=None):
+    def __init__(self, connector, path, redfish_version=None, registries=None,
+                 root=None):
         """A class representing secure boot settings.
 
         :param connector: A Connector instance
         :param path: Sub-URI path to the SecureBoot resource
         :param registries: Dict of message registries to be used when
             parsing messages of attribute update status
+        :param root: Sushy root object. Empty for Sushy root itself.
         """
-        super().__init__(connector, path, redfish_version, registries)
+        super().__init__(connector, path, redfish_version=redfish_version,
+                         registries=registries, root=root)
 
     @property
     @utils.cache_it
@@ -92,7 +95,7 @@ class SecureBoot(base.ResourceBase):
             self._conn, utils.get_sub_resource_path_by(
                 self, "SecureBootDatabases"),
             redfish_version=self.redfish_version,
-            registries=self.registries)
+            registries=self.registries, root=self.root)
 
     def _get_reset_action_element(self):
         reset_action = self._actions.reset_keys

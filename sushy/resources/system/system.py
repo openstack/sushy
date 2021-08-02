@@ -138,7 +138,7 @@ class System(base.ResourceBase):
     _actions = ActionsField('Actions', required=True)
 
     def __init__(self, connector, identity, redfish_version=None,
-                 registries=None):
+                 registries=None, root=None):
         """A class representing a ComputerSystem
 
         :param connector: A Connector instance
@@ -147,9 +147,13 @@ class System(base.ResourceBase):
             the object according to schema of the given version.
         :param registries: Dict of registries to be used in any resource
             that needs registries to parse messages.
+        :param root: Sushy root object. Empty for Sushy root itself.
         """
         super(System, self).__init__(
-            connector, identity, redfish_version, registries)
+            connector, identity,
+            redfish_version=redfish_version,
+            registries=registries,
+            root=root)
 
     def _get_reset_action_element(self):
         reset_action = self._actions.reset
@@ -322,7 +326,7 @@ class System(base.ResourceBase):
         return processor.ProcessorCollection(
             self._conn, self._get_processor_collection_path(),
             redfish_version=self.redfish_version,
-            registries=self.registries)
+            registries=self.registries, root=self.root)
 
     @property
     @utils.cache_it
@@ -337,7 +341,7 @@ class System(base.ResourceBase):
             self._conn,
             utils.get_sub_resource_path_by(self, "EthernetInterfaces"),
             redfish_version=self.redfish_version,
-            registries=self.registries)
+            registries=self.registries, root=self.root)
 
     @property
     @utils.cache_it
@@ -352,7 +356,7 @@ class System(base.ResourceBase):
             self._conn,
             utils.get_sub_resource_path_by(self, 'Bios'),
             redfish_version=self.redfish_version,
-            registries=self.registries)
+            registries=self.registries, root=self.root)
 
     @property
     @utils.cache_it
@@ -374,7 +378,7 @@ class System(base.ResourceBase):
         return sys_simple_storage.SimpleStorageCollection(
             self._conn, utils.get_sub_resource_path_by(self, "SimpleStorage"),
             redfish_version=self.redfish_version,
-            registries=self.registries)
+            registries=self.registries, root=self.root)
 
     @property
     @utils.cache_it
@@ -397,7 +401,7 @@ class System(base.ResourceBase):
         return sys_storage.StorageCollection(
             self._conn, utils.get_sub_resource_path_by(self, "Storage"),
             redfish_version=self.redfish_version,
-            registries=self.registries)
+            registries=self.registries, root=self.root)
 
     @property
     @utils.cache_it
@@ -415,7 +419,7 @@ class System(base.ResourceBase):
 
         return [manager.Manager(self._conn, path,
                                 redfish_version=self.redfish_version,
-                                registries=self.registries)
+                                registries=self.registries, root=self.root)
                 for path in paths]
 
     @property
@@ -434,7 +438,7 @@ class System(base.ResourceBase):
 
         return [chassis.Chassis(self._conn, path,
                                 redfish_version=self.redfish_version,
-                                registries=self.registries)
+                                registries=self.registries, root=self.root)
                 for path in paths]
 
     @property
@@ -450,7 +454,7 @@ class System(base.ResourceBase):
             self._conn,
             utils.get_sub_resource_path_by(self, 'SecureBoot'),
             redfish_version=self.redfish_version,
-            registries=self.registries)
+            registries=self.registries, root=self.root)
 
 
 class SystemCollection(base.ResourceCollectionBase):
@@ -459,7 +463,8 @@ class SystemCollection(base.ResourceCollectionBase):
     def _resource_type(self):
         return System
 
-    def __init__(self, connector, path, redfish_version=None, registries=None):
+    def __init__(self, connector, path, redfish_version=None, registries=None,
+                 root=None):
         """A class representing a ComputerSystemCollection
 
         :param connector: A Connector instance
@@ -468,6 +473,8 @@ class SystemCollection(base.ResourceCollectionBase):
             the object according to schema of the given version.
         :param registries: Dict of Redfish Message Registry objects to be
             used in any resource that needs registries to parse messages
+        :param root: Sushy root object. Empty for Sushy root itself.
         """
         super(SystemCollection, self).__init__(
-            connector, path, redfish_version, registries)
+            connector, path, redfish_version=redfish_version,
+            registries=registries, root=root)

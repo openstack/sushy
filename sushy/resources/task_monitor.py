@@ -31,17 +31,20 @@ class TaskMonitor(base.ResourceBase):
     def __init__(self,
                  connector,
                  path='',
-                 redfish_version=None):
+                 redfish_version=None, root=None):
         """A class representing a Redfish Task Monitor
 
         :param connector: A Connector instance
         :param path: sub-URI path to the resource.
         :param redfish_version: The version of Redfish. Used to construct
             the object according to schema of the given version.
+        :param root: Sushy root object. Empty for Sushy root itself.
         """
         LOG.warning('sushy.resources.task_monitor.TaskMonitor is deprecated. '
                     'Use sushy.taskmonitor.TaskMonitor')
-        super(TaskMonitor, self).__init__(connector, path, redfish_version)
+        super(TaskMonitor, self).__init__(connector, path,
+                                          redfish_version=redfish_version,
+                                          root=root)
         self._retry_after = None
         self._location_header = None
         self._in_progress = True

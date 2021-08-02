@@ -59,7 +59,7 @@ class SoftwareInventory(base.ResourceBase):
     """The version of the software"""
 
     def __init__(self, connector, identity,
-                 redfish_version=None, registries=None):
+                 redfish_version=None, registries=None, root=None):
         """A class representing a SoftwareInventory
 
         :param connector: A Connector instance
@@ -68,9 +68,11 @@ class SoftwareInventory(base.ResourceBase):
             the object according to schema of given version.
         :param registries: Dict of Redfish Message Registry objects to be
             used in any resource that needs registries to parse messages
+        :param root: Sushy root object. Empty for Sushy root itself.
         """
         super(SoftwareInventory, self).__init__(
-            connector, identity, redfish_version, registries)
+            connector, identity, redfish_version=redfish_version,
+            registries=registries, root=root)
 
 
 class SoftwareInventoryCollection(base.ResourceCollectionBase):
@@ -86,7 +88,7 @@ class SoftwareInventoryCollection(base.ResourceCollectionBase):
         return SoftwareInventory
 
     def __init__(self, connector, identity,
-                 redfish_version=None, registries=None):
+                 redfish_version=None, registries=None, root=None):
         """A class representing a SoftwareInventoryCollection
 
         :param connector: A Connector instance
@@ -95,6 +97,8 @@ class SoftwareInventoryCollection(base.ResourceCollectionBase):
             the object according to schema of given version.
         :param registries: Dict of Redfish Message Registry objects to be
             used in any resource that needs registries to parse messages
+        :param root: Sushy root object. Empty for Sushy root itself.
         """
         super(SoftwareInventoryCollection, self).__init__(
-            connector, identity, redfish_version, registries)
+            connector, identity, redfish_version=redfish_version,
+            registries=registries, root=root)

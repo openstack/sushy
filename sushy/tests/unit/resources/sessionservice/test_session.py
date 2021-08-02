@@ -89,7 +89,8 @@ class SessionCollectionTestCase(base.TestCase):
         self.sess_col.get_member(path)
         mock_session.assert_called_once_with(
             self.sess_col._conn, path,
-            self.sess_col.redfish_version, None)
+            redfish_version=self.sess_col.redfish_version, registries=None,
+            root=self.sess_col.root)
 
     @mock.patch.object(session, 'Session', autospec=True)
     def test_get_members(self, mock_session):
@@ -97,6 +98,7 @@ class SessionCollectionTestCase(base.TestCase):
         members = self.sess_col.get_members()
         mock_session.assert_called_once_with(
             self.sess_col._conn, path,
-            self.sess_col.redfish_version, None)
+            redfish_version=self.sess_col.redfish_version, registries=None,
+            root=self.sess_col.root)
         self.assertIsInstance(members, list)
         self.assertEqual(1, len(members))

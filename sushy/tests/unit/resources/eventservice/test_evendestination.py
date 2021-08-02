@@ -69,7 +69,8 @@ class EventDestinationCollectionTestCase(base.TestCase):
         subscription_mock.assert_called_once_with(
             self.eventdestination._conn,
             '/redfish/v1/EventService/Subscriptions/1',
-            self.eventdestination.redfish_version, None)
+            redfish_version=self.eventdestination.redfish_version,
+            registries=None, root=self.eventdestination.root)
 
     @mock.patch.object(eventdestination, 'EventDestination', autospec=True)
     def test_get_members(self, subscription_mock):
@@ -77,7 +78,9 @@ class EventDestinationCollectionTestCase(base.TestCase):
         calls = [
             mock.call(self.eventdestination._conn,
                       '/redfish/v1/EventService/Subscriptions/%s' % member,
-                      self.eventdestination.redfish_version, None)
+                      redfish_version=self.eventdestination.redfish_version,
+                      registries=None,
+                      root=self.eventdestination.root)
             for member in ('1', '2')
         ]
         subscription_mock.assert_has_calls(calls)
