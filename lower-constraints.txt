@@ -1,0 +1,9 @@
+cliff==3.3.0
+coverage==4.0
+dogpile.cache==0.9.2
+oslotest==3.2.0
+pbr==2.0.0
+python-dateutil==2.7.0
+requests==2.14.2
+stestr==2.0.0
+stevedore==1.29.0
