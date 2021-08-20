@@ -104,6 +104,20 @@ class VirtualMediaTestCase(base.TestCase):
         )
         self.assertTrue(self.sys_virtual_media._is_stale)
 
+    def test_insert_media_credentials(self):
+        self.assertFalse(self.sys_virtual_media._is_stale)
+        self.sys_virtual_media.insert_media(
+            "https://www.dmtf.org/freeImages/Sardine.img", True, False,
+            username="admin", password="pwd")
+        self.sys_virtual_media._conn.post.assert_called_once_with(
+            ("/redfish/v1/Managers/BMC/VirtualMedia/Floppy1/Actions"
+             "/VirtualMedia.InsertMedia"),
+            data={"Image": "https://www.dmtf.org/freeImages/Sardine.img",
+                  "WriteProtected": False,
+                  "UserName": "admin", "Password": "pwd"}
+        )
+        self.assertTrue(self.sys_virtual_media._is_stale)
+
     def test_insert_media_fallback(self):
         self.conn.get.return_value.headers = {'Allow': 'GET,HEAD,PATCH'}
         self.sys_virtual_media._actions.insert_media = None

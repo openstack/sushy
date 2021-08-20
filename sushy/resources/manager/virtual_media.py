@@ -93,13 +93,16 @@ class VirtualMedia(base.ResourceBase):
             eject_uri = eject_media.target_uri
         return eject_uri, use_patch
 
-    def insert_media(self, image, inserted=True, write_protected=True):
+    def insert_media(self, image, inserted=True, write_protected=True,
+                     username=None, password=None):
         """Attach remote media to virtual media
 
         :param image: a URI providing the location of the selected image
         :param inserted: specify if the image is to be treated as inserted upon
             completion of the action.
         :param write_protected: indicates the media is write protected
+        :param username: User name for the image URI.
+        :param password: Password for the image URI.
         """
         target_uri, use_patch = self._get_insert_media_uri()
         # NOTE(janders) Inserted and WriteProtected attributes are optional
@@ -113,6 +116,11 @@ class VirtualMedia(base.ResourceBase):
         # as per the spec (True, True). We continue to set Inserted and
         # WriteProtected in payload if PATCH method is used.
         payload = {'Image': image}
+        if username is not None:
+            payload['UserName'] = username
+        if password is not None:
+            payload['Password'] = password
+
         if use_patch:
             payload['Inserted'] = inserted
             payload['WriteProtected'] = write_protected
