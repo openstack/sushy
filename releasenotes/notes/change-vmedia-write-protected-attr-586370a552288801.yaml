@@ -1,0 +1,7 @@
+---
+fixes:
+  - |
+    Changes the default value of "WriteProtected" parameter in
+    in VirtualMedia::insert_media() from False to True. This is to match
+    Redfish schema 2021.1 and VirtualMedia.v1_3_0:
+    https://redfish.dmtf.org/schemas/v1/VirtualMedia.v1_3_0.json

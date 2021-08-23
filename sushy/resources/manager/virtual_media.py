@@ -93,7 +93,7 @@ class VirtualMedia(base.ResourceBase):
             eject_uri = eject_media.target_uri
         return eject_uri, use_patch
 
-    def insert_media(self, image, inserted=True, write_protected=False):
+    def insert_media(self, image, inserted=True, write_protected=True):
         """Attach remote media to virtual media
 
         :param image: a URI providing the location of the selected image
