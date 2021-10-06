@@ -62,6 +62,9 @@ class Drive(base.ResourceBase):
     protocol = base.MappedField('Protocol', res_maps.PROTOCOL_TYPE_VALUE_MAP)
     """Protocol this drive is using to communicate to the storage controller"""
 
+    revision = base.Field("Revision")
+    """The firmware/hardware version of the drive."""
+
     serial_number = base.Field('SerialNumber')
     """The serial number for this drive"""
 

@@ -1,0 +1,4 @@
+---
+features:
+  - |
+    Adds the ``Revision`` property to the ``Drive`` resource.
