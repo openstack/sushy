@@ -38,6 +38,9 @@
     "Thermal": {
         "@odata.id": "/redfish/v1/Chassis/Blade1/Thermal"
     },
+    "NetworkAdapters": {
+    "@odata.id": "/redfish/v1/Chassis/Blade1/NetworkAdapters"
+    },
     "Links": {
         "ComputerSystems": [
             {

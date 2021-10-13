@@ -1,0 +1,77 @@
+{
+  "@odata.context": "/redfish/v1/$metadata#NetworkAdapter.NetworkAdapter",
+  "@odata.id": "/redfish/v1/Chassis/System.Embedded.1/NetworkAdapters/NIC.Integrated.1",
+  "@odata.type": "#NetworkAdapter.v1_3_0.NetworkAdapter",
+  "Assembly": {
+    "@odata.id": "/redfish/v1/Chassis/System.Embedded.1/NetworkAdapters/NIC.Integrated.1/Assembly"
+  },
+  "Controllers": [
+    {
+      "ControllerCapabilities": {
+        "DataCenterBridging": {
+          "Capable": true
+        },
+        "NPAR": {
+          "NparCapable": false,
+          "NparEnabled": false
+        },
+        "NPIV": {
+          "MaxDeviceLogins": 0,
+          "MaxPortLogins": 0
+        },
+        "NetworkDeviceFunctionCount": 2,
+        "NetworkPortCount": 2,
+        "VirtualizationOffload": {
+          "SRIOV": {
+            "SRIOVVEPACapable": true
+          },
+          "VirtualFunction": {
+            "DeviceMaxCount": 254,
+            "MinAssignmentGroupSize": 8,
+            "NetworkPortMaxCount": 127
+          }
+        }
+      },
+      "FirmwarePackageVersion": "14.25.80.0",
+      "Links": {
+        "NetworkDeviceFunctions": [
+          {
+            "@odata.id": "/redfish/v1/Chassis/System.Embedded.1/NetworkAdapters/NIC.Integrated.1/NetworkDeviceFunctions/NIC.Integrated.1-2-1"
+          },
+          {
+            "@odata.id": "/redfish/v1/Chassis/System.Embedded.1/NetworkAdapters/NIC.Integrated.1/NetworkDeviceFunctions/NIC.Integrated.1-1-1"
+          }
+        ],
+        "NetworkDeviceFunctions@odata.count": 2,
+        "NetworkPorts": [
+          {
+            "@odata.id": "/redfish/v1/Chassis/System.Embedded.1/NetworkAdapters/NIC.Integrated.1/NetworkPorts/NIC.Integrated.1-2"
+          },
+          {
+            "@odata.id": "/redfish/v1/Chassis/System.Embedded.1/NetworkAdapters/NIC.Integrated.1/NetworkPorts/NIC.Integrated.1-1"
+          }
+        ],
+        "NetworkPorts@odata.count": 2
+      }
+    }
+  ],
+  "Controllers@odata.count": 1,
+  "Description": "Network Adapter View",
+  "Id": "NIC.Integrated.1",
+  "Manufacturer": "Mellanox Technologies",
+  "Model": "MLNX 25GbE 2P ConnectX4LX RNDC",
+  "Name": "Network Adapter View",
+  "NetworkDeviceFunctions": {
+    "@odata.id": "/redfish/v1/Chassis/System.Embedded.1/NetworkAdapters/NIC.Integrated.1/NetworkDeviceFunctions"
+  },
+  "NetworkPorts": {
+    "@odata.id": "/redfish/v1/Chassis/System.Embedded.1/NetworkAdapters/NIC.Integrated.1/NetworkPorts"
+  },
+  "PartNumber": "0R887V",
+  "SerialNumber": "IL7403101N00ZJ",
+  "Status": {
+    "Health": "OK",
+    "HealthRollup": "OK",
+    "State": "Enabled"
+  }
+}
