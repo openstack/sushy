@@ -16,6 +16,8 @@ from unittest import mock
 
 from sushy.resources import constants as res_cons
 from sushy.resources.system.network import adapter
+from sushy.resources.system.network import device_function
+from sushy.resources.system.network import port
 from sushy.tests.unit import base
 
 
@@ -47,6 +49,93 @@ class NetworkAdapterTestCase(base.TestCase):
         self.assertEqual(res_cons.STATE_ENABLED, self.adapter.status.state)
         self.assertEqual(res_cons.HEALTH_OK, self.adapter.status.health)
         self.assertEqual(res_cons.HEALTH_OK, self.adapter.status.health_rollup)
+
+    def test_network_ports(self):
+        self.conn.get.return_value.json.reset_mock()
+        with open('sushy/tests/unit/'
+                  'json_samples/network_port_collection.json') as f:
+            self.conn.get.return_value.json.return_value = json.load(f)
+        actual_network_ports = self.adapter.network_ports
+        self.assertIsInstance(actual_network_ports,
+                              port.NetworkPortCollection)
+        self.conn.get.return_value.json.assert_called_once_with()
+
+    def test_network_ports_cached(self):
+        self.conn.get.return_value.json.reset_mock()
+        with open('sushy/tests/unit/'
+                  'json_samples/network_port_collection.json') as f:
+            self.conn.get.return_value.json.return_value = json.load(f)
+        actual_ports = self.adapter.network_ports
+        self.conn.get.return_value.json.reset_mock()
+        self.assertIs(actual_ports,
+                      self.adapter.network_ports)
+        self.conn.get.return_value.json.assert_not_called()
+
+    def test_network_ports_refresh(self):
+        with open('sushy/tests/unit/'
+                  'json_samples/network_port_collection.json') as f:
+            self.conn.get.return_value.json.return_value = json.load(f)
+        ports = self.adapter.network_ports
+        self.assertIsInstance(ports, port.NetworkPortCollection)
+
+        with open('sushy/tests/unit/'
+                  'json_samples/network_adapter.json') as f:
+            self.conn.get.return_value.json.return_value = json.load(f)
+
+        self.adapter.invalidate()
+        self.adapter.refresh(force=False)
+
+        self.assertTrue(ports._is_stale)
+
+        with open('sushy/tests/unit/'
+                  'json_samples/network_port_collection.json') as f:
+            self.conn.get.return_value.json.return_value = json.load(f)
+        self.assertIsInstance(self.adapter.network_ports,
+                              port.NetworkPortCollection)
+
+    def test_network_device_functions(self):
+        self.conn.get.return_value.json.reset_mock()
+        with open('sushy/tests/unit/json_samples/'
+                  'network_device_function_collection.json') as f:
+            self.conn.get.return_value.json.return_value = json.load(f)
+        actual_functions = self.adapter.network_device_functions
+        self.assertIsInstance(actual_functions,
+                              device_function.NetworkDeviceFunctionCollection)
+        self.conn.get.return_value.json.assert_called_once_with()
+
+    def test_network_device_functions_cached(self):
+        self.conn.get.return_value.json.reset_mock()
+        with open('sushy/tests/unit/json_samples/'
+                  'network_device_function_collection.json') as f:
+            self.conn.get.return_value.json.return_value = json.load(f)
+        actual_functions = self.adapter.network_device_functions
+        self.conn.get.return_value.json.reset_mock()
+        self.assertIs(actual_functions,
+                      self.adapter.network_device_functions)
+        self.conn.get.return_value.json.assert_not_called()
+
+    def test_network_device_functions_refresh(self):
+        with open('sushy/tests/unit/json_samples/'
+                  'network_device_function_collection.json') as f:
+            self.conn.get.return_value.json.return_value = json.load(f)
+        functions = self.adapter.network_device_functions
+        self.assertIsInstance(functions,
+                              device_function.NetworkDeviceFunctionCollection)
+
+        with open('sushy/tests/unit/json_samples/'
+                  'network_adapter.json') as f:
+            self.conn.get.return_value.json.return_value = json.load(f)
+
+        self.adapter.invalidate()
+        self.adapter.refresh(force=False)
+
+        self.assertTrue(functions._is_stale)
+
+        with open('sushy/tests/unit/json_samples/'
+                  'network_device_function_collection.json') as f:
+            self.conn.get.return_value.json.return_value = json.load(f)
+        self.assertIsInstance(self.adapter.network_device_functions,
+                              device_function.NetworkDeviceFunctionCollection)
 
 
 class NetworkAdapterCollectionTestCase(base.TestCase):

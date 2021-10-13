@@ -1,0 +1,83 @@
+{
+  "@Redfish.Settings": {
+    "@odata.context": "/redfish/v1/$metadata#Settings.Settings",
+    "@odata.type": "#Settings.v1_3_0.Settings",
+    "SettingsObject": {
+      "@odata.id": "/redfish/v1/Systems/System.Embedded.1/NetworkAdapters/NIC.Integrated.1/NetworkDeviceFunctions/NIC.Integrated.1-2-1/Settings"
+    },
+    "SupportedApplyTimes": [
+      "OnReset",
+      "AtMaintenanceWindowStart",
+      "InMaintenanceWindowOnReset"
+    ]
+  },
+  "@odata.context": "/redfish/v1/$metadata#NetworkDeviceFunction.NetworkDeviceFunction",
+  "@odata.id": "/redfish/v1/Chassis/System.Embedded.1/NetworkAdapters/NIC.Integrated.1/NetworkDeviceFunctions/NIC.Integrated.1-2-1",
+  "@odata.type": "#NetworkDeviceFunction.v1_3_3.NetworkDeviceFunction",
+  "AssignablePhysicalPorts": [
+    {
+      "@odata.id": "/redfish/v1/Chassis/System.Embedded.1/NetworkAdapters/NIC.Integrated.1/NetworkPorts/NIC.Integrated.1-2"
+    }
+  ],
+  "AssignablePhysicalPorts@odata.count": 1,
+  "Description": "NetworkDeviceFunction",
+  "Ethernet": {
+    "MACAddress": "01:01:01:01:01:D1",
+    "MTUSize": 1234,
+    "PermanentMACAddress": "01:01:01:01:01:D1",
+    "VLAN": {
+      "VLANEnable": true,
+      "VLANId": 1
+    }
+  },
+  "FibreChannel": {
+    "BootTargets": [
+      {
+        "LUNID": "1234",
+        "WWPN": "ABCEDFG"
+      }
+    ],
+    "BootTargets@odata.count": 1
+  },
+  "Id": "NIC.Integrated.1-2-1",
+  "Links": {
+    "PhysicalPortAssignment": {
+      "@odata.id": "/redfish/v1/Chassis/System.Embedded.1/NetworkAdapters/NIC.Integrated.1/NetworkPorts/NIC.Integrated.1-2"
+    },
+    "Oem": {}
+  },
+  "MaxVirtualFunctions": 127,
+  "Name": "NetworkDeviceFunction",
+  "NetDevFuncCapabilities": [
+    "Disabled",
+    "Ethernet",
+    "iSCSI"
+  ],
+  "NetDevFuncCapabilities@odata.count": 3,
+  "NetDevFuncType": "Ethernet",
+  "Oem": {},
+  "PhysicalPortAssignment": {
+    "@odata.id": "/redfish/v1/Chassis/System.Embedded.1/NetworkAdapters/NIC.Integrated.1/NetworkPorts/NIC.Integrated.1-2"
+  },
+  "Status": {
+    "State": "Enabled",
+    "Health": "OK",
+    "HealthRollup": "OK"
+  },
+  "iSCSIBoot": {
+    "AuthenticationMethod": "None",
+    "IPAddressType": "IPv4",
+    "InitiatorDefaultGateway": "0.0.0.0",
+    "InitiatorIPAddress": "0.0.0.0",
+    "InitiatorNetmask": "0.0.0.0",
+    "PrimaryDNS": "0.0.0.0",
+    "PrimaryLUN": 0,
+    "PrimaryTargetIPAddress": "0.0.0.0",
+    "PrimaryTargetTCPPort": 3260,
+    "SecondaryTargetIPAddress": "127.0.0.1",
+    "SecondaryTargetTCPPort": 123,
+    "SecondaryVLANEnable": false,
+    "SecondaryVLANId": 1,
+    "TargetInfoViaDHCP": false
+  }
+}
