@@ -16,9 +16,9 @@ from http import client as http_client
 import json
 from unittest import mock
 
-
 import sushy
 from sushy import exceptions
+from sushy.resources.manager import constants as mgr_cons
 from sushy.resources.manager import virtual_media
 from sushy.tests.unit import base
 
@@ -117,6 +117,25 @@ class VirtualMediaTestCase(base.TestCase):
                   "UserName": "admin", "Password": "pwd"}
         )
         self.assertTrue(self.sys_virtual_media._is_stale)
+
+    def test_insert_media_transfer_method(self):
+        self.assertFalse(self.sys_virtual_media._is_stale)
+        self.sys_virtual_media.insert_media(
+            "https://www.dmtf.org/freeImages/Sardine.img", True, False,
+            transfer_method=mgr_cons.TransferMethod.UPLOAD)
+        self.sys_virtual_media._conn.post.assert_called_once_with(
+            ("/redfish/v1/Managers/BMC/VirtualMedia/Floppy1/Actions"
+             "/VirtualMedia.InsertMedia"),
+            data={"Image": "https://www.dmtf.org/freeImages/Sardine.img",
+                  "WriteProtected": False, "TransferMethod": "Upload"}
+        )
+        self.assertTrue(self.sys_virtual_media._is_stale)
+
+    def test_insert_media_transfer_method_wrong_input(self):
+        self.assertRaises(exceptions.InvalidParameterValueError,
+                          self.sys_virtual_media.insert_media,
+                          "https://www.dmtf.org/freeImages/Sardine.img",
+                          True, False, transfer_method='quickly!')
 
     def test_insert_media_fallback(self):
         self.conn.get.return_value.headers = {'Allow': 'GET,HEAD,PATCH'}
@@ -231,3 +250,18 @@ class VirtualMediaTestCase(base.TestCase):
             mock.call(target_uri, data={})]
         self.sys_virtual_media._conn.post.assert_has_calls(post_calls)
         self.assertTrue(self.sys_virtual_media._is_stale)
+
+    def test_set_verify_certificate(self):
+        with mock.patch.object(
+                self.sys_virtual_media, 'invalidate',
+                autospec=True) as invalidate_mock:
+            self.sys_virtual_media.set_verify_certificate(True)
+            self.sys_virtual_media._conn.patch.assert_called_once_with(
+                "/redfish/v1/Managers/BMC/VirtualMedia/Floppy1",
+                data={'VerifyCertificate': True})
+
+            invalidate_mock.assert_called_once_with()
+
+    def test_set_verify_certificate_wrong_input(self):
+        self.assertRaises(exceptions.InvalidParameterValueError,
+                          self.sys_virtual_media.set_verify_certificate, 'yes')

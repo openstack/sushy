@@ -13,6 +13,8 @@
 # Values comes from the Redfish System json-schema 1.0.0:
 # http://redfish.dmtf.org/schemas/v1/Manager.v1_0_0.json#/definitions/Manager  # noqa
 
+import enum
+
 from sushy.resources import constants as res_cons
 
 # Manager Reset action constants
@@ -95,3 +97,13 @@ CONNECTED_VIA_APPLET = 'applet'
 CONNECTED_VIA_NOT_CONNECTED = 'not_connected'
 CONNECTED_VIA_OEM = 'oem'
 CONNECTED_VIA_URI = 'uri'
+
+
+class TransferMethod(enum.Enum):
+    """Transfer methods"""
+
+    STREAM = 'Stream'
+    """Stream image file data from the source URI."""
+
+    UPLOAD = 'Upload'
+    """Upload the entire image file from the source URI to the service."""
