@@ -73,7 +73,7 @@ class UpdateServiceTestCase(base.TestCase):
             transfer_protocol=ups_cons.UPDATE_PROTOCOL_HTTPS)
 
         self.assertIsInstance(tm, taskmonitor.TaskMonitor)
-        self.assertEqual('/Task/545', tm.task_monitor)
+        self.assertEqual('/Task/545', tm.task_monitor_uri)
 
         self.upd_serv._conn.post.assert_called_once_with(
             '/redfish/v1/UpdateService/Actions/SimpleUpdate',
@@ -98,7 +98,8 @@ class UpdateServiceTestCase(base.TestCase):
             transfer_protocol=ups_cons.UPDATE_PROTOCOL_HTTPS)
 
         self.assertIsInstance(tm, taskmonitor.TaskMonitor)
-        self.assertEqual('/redfish/v1/TaskService/Tasks/545', tm.task_monitor)
+        self.assertEqual('/redfish/v1/TaskService/Tasks/545',
+                         tm.task_monitor_uri)
 
         self.upd_serv._conn.post.assert_called_once_with(
             '/redfish/v1/UpdateService/Actions/SimpleUpdate',

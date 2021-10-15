@@ -16,7 +16,6 @@ from unittest import mock
 from dateutil import parser
 
 import sushy
-from sushy import exceptions
 from sushy.resources import constants as res_cons
 from sushy.resources.system.storage import constants as store_cons
 from sushy.resources.system.storage import volume
@@ -57,34 +56,6 @@ class VolumeTestCase(base.TestCase):
                          identifier.durable_name)
         self.assertIsNone(self.stor_volume.block_size_bytes)
 
-    def test_initialize_volume_immediate(self):
-        target_uri = '/redfish/v1/Systems/3/Storage/RAIDIntegrated/' \
-                     'Volumes/1/Actions/Volume.Initialize'
-        self.stor_volume.initialize_volume(
-            store_cons.VOLUME_INIT_TYPE_FAST,
-            apply_time=res_cons.APPLY_TIME_IMMEDIATE)
-        self.stor_volume._conn.post.assert_called_once_with(
-            target_uri, data={'InitializeType': 'Fast',
-                              '@Redfish.OperationApplyTime': 'Immediate'},
-            blocking=True, timeout=500)
-
-    def test_initialize_volume_on_reset(self):
-        target_uri = '/redfish/v1/Systems/3/Storage/RAIDIntegrated/' \
-                     'Volumes/1/Actions/Volume.Initialize'
-        self.stor_volume.initialize_volume(
-            store_cons.VOLUME_INIT_TYPE_FAST,
-            apply_time=res_cons.APPLY_TIME_ON_RESET)
-        self.stor_volume._conn.post.assert_called_once_with(
-            target_uri, data={'InitializeType': 'Fast',
-                              '@Redfish.OperationApplyTime': 'OnReset'},
-            blocking=False, timeout=500)
-
-    def test_initialize_volume_bad_value(self):
-        self.assertRaisesRegex(
-            exceptions.InvalidParameterValueError,
-            'The parameter.*lazy.*invalid',
-            self.stor_volume.initialize_volume, 'lazy')
-
     def test_initialize_immediate(self):
         target_uri = '/redfish/v1/Systems/3/Storage/RAIDIntegrated/' \
                      'Volumes/1/Actions/Volume.Initialize'
@@ -106,42 +77,6 @@ class VolumeTestCase(base.TestCase):
             target_uri, data={'InitializeType': 'Fast',
                               '@Redfish.OperationApplyTime': 'OnReset'},
             blocking=False, timeout=500)
-
-    def test_delete_volume(self):
-        self.stor_volume.delete_volume()
-        self.stor_volume._conn.delete.assert_called_once_with(
-            self.stor_volume._path, data=None, blocking=False, timeout=500)
-
-    def test_delete_volume_with_payload(self):
-        payload = {'@Redfish.OperationApplyTime': 'Immediate'}
-        self.stor_volume.delete_volume(payload=payload)
-        self.stor_volume._conn.delete.assert_called_once_with(
-            self.stor_volume._path, data=payload, blocking=True, timeout=500)
-
-    def test_delete_volume_immediate(self):
-        payload = {}
-        self.conn.delete.return_value.status_code = 200
-        resource = self.stor_volume.delete_volume(
-            payload=payload, apply_time=res_cons.APPLY_TIME_IMMEDIATE)
-        self.stor_volume._conn.delete.assert_called_once_with(
-            self.stor_volume._path, data=payload, blocking=True, timeout=500)
-        self.assertIsNone(resource)
-
-    def test_delete_volume_on_reset(self):
-        payload = {}
-        self.conn.delete.return_value.status_code = 202
-        self.conn.delete.return_value.headers = {
-            'location': '/redfish/v1/taskmon/4608f7e6',
-            'retry-after': '120'
-        }
-        task_mon = self.stor_volume.delete_volume(
-            payload=payload, apply_time=res_cons.APPLY_TIME_ON_RESET,
-            timeout=250)
-        self.stor_volume._conn.delete.assert_called_once_with(
-            self.stor_volume._path, data=payload, blocking=False, timeout=250)
-        self.assertIsNotNone(task_mon)
-        self.assertEqual(task_mon.resource_name, 'task_monitor')
-        self.assertEqual(task_mon.path, '/redfish/v1/taskmon/4608f7e6')
 
     def test_delete_immediate(self):
         payload = {}
@@ -275,59 +210,6 @@ class VolumeCollectionTestCase(base.TestCase):
         self.conn.get.return_value.json.side_effect = successive_return_values
 
         self.assertEqual(1073741824000, self.stor_vol_col.max_size_bytes)
-
-    def test_create_volume_immediate(self):
-        payload = {
-            'Name': 'My Volume 4',
-            'VolumeType': 'Mirrored',
-            'RAIDType': 'RAID1',
-            'CapacityBytes': 107374182400
-        }
-        expected_payload = dict(payload)
-        expected_payload['@Redfish.OperationApplyTime'] = 'Immediate'
-        with open('sushy/tests/unit/json_samples/volume4.json') as f:
-            self.conn.get.return_value.json.return_value = json.load(f)
-        self.conn.post.return_value.status_code = 201
-        self.conn.post.return_value.headers.return_value = {
-            'Location': '/redfish/v1/Systems/437XR1138R2/Storage/1/Volumes/4'
-        }
-        new_vol = self.stor_vol_col.create_volume(
-            payload, apply_time=res_cons.APPLY_TIME_IMMEDIATE)
-        self.stor_vol_col._conn.post.assert_called_once_with(
-            '/redfish/v1/Systems/437XR1138R2/Storage/1/Volumes',
-            data=expected_payload, blocking=True, timeout=500)
-        self.stor_vol_col.refresh.assert_called_once()
-        self.assertIsNotNone(new_vol)
-        self.assertEqual('4', new_vol.identity)
-        self.assertEqual('My Volume 4', new_vol.name)
-        self.assertEqual(107374182400, new_vol.capacity_bytes)
-        self.assertEqual(sushy.VOLUME_TYPE_MIRRORED, new_vol.volume_type)
-        self.assertEqual(sushy.RAID_TYPE_RAID1, new_vol.raid_type)
-
-    def test_create_volume_on_reset(self):
-        payload = {
-            'Name': 'My Volume 4',
-            'VolumeType': 'Mirrored',
-            'RAIDType': 'RAID1',
-            'CapacityBytes': 107374182400
-        }
-        expected_payload = dict(payload)
-        expected_payload['@Redfish.OperationApplyTime'] = 'OnReset'
-        with open('sushy/tests/unit/json_samples/volume4.json') as f:
-            self.conn.get.return_value.json.return_value = json.load(f)
-        self.conn.post.return_value.status_code = 202
-        self.conn.post.return_value.headers = {
-            'Location': '/redfish/v1/taskmon/4608f7e6',
-            'retry-after': '120'
-        }
-        task_mon = self.stor_vol_col.create_volume(
-            payload, apply_time=res_cons.APPLY_TIME_ON_RESET)
-        self.stor_vol_col._conn.post.assert_called_once_with(
-            '/redfish/v1/Systems/437XR1138R2/Storage/1/Volumes',
-            data=expected_payload, blocking=False, timeout=500)
-        self.assertIsNotNone(task_mon)
-        self.assertEqual(task_mon.resource_name, 'task_monitor')
-        self.assertEqual(task_mon.path, '/redfish/v1/taskmon/4608f7e6')
 
     def test_create_immediate(self):
         payload = {

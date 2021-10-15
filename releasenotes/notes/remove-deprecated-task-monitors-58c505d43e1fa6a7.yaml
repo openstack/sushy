@@ -1,0 +1,10 @@
+---
+deprecations:
+  - |
+    ``resources.task_monitor.TaskMonitor`` and
+    ``resources.taskservice.taskmonitor.TaskMonitor`` that were deprecated in
+    Wallaby are now removed. Use ``taskmonitor.TaskMonitor`` instead.
+  - |
+    Methods ``create_volume``, ``delete_volume``, ``initialize_volume`` in
+    volume module that were deprecated in Wallaby are now removed. Use
+    ``create``, ``delete`` and ``initialize`` instead.

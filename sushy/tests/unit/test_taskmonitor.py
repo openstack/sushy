@@ -57,29 +57,6 @@ class TaskMonitorTestCase(base.TestCase):
             response=self.response
         )
 
-    @mock.patch.object(taskmonitor.LOG, 'warning', autospec=True)
-    def test_init_field_data(self, mock_log):
-        field_data = resource_base.FieldData(
-            http_client.ACCEPTED,
-            {'Location': '/Task/545',
-             'Retry-After': 20,
-             'Allow': 'DELETE'},
-            self.json_doc)
-
-        task_monitor = taskmonitor.TaskMonitor(
-            self.conn, '/Task/545',
-            field_data=field_data)
-
-        self.assertEqual(field_data.status_code,
-                         task_monitor.response.status_code)
-        self.assertEqual(field_data.headers,
-                         task_monitor.response.headers)
-        self.assertEqual(field_data.json_doc,
-                         task_monitor.response.json())
-        mock_log.assert_called_once_with(
-            'TaskMonitor field_data is deprecated in TaskMonitor. '
-            'Use response.')
-
     def test_init_accepted_no_content(self):
         response = mock.Mock()
         response.status_code = http_client.ACCEPTED
@@ -152,12 +129,6 @@ class TaskMonitorTestCase(base.TestCase):
         self.conn.get.assert_called_once_with(path='/Task/545')
         self.assertIsNone(self.task_monitor.task)
 
-    @mock.patch.object(taskmonitor.LOG, 'warning', autospec=True)
-    def test_task_monitor(self, mock_log):
-        self.assertEqual('/Task/545', self.task_monitor.task_monitor)
-        mock_log.assert_called_once_with(
-            'task_monitor is deprecated in TaskMonitor. Use task_monitor_uri.')
-
     def test_task_monitor_uri(self):
         self.assertEqual('/Task/545', self.task_monitor.task_monitor_uri)
 
@@ -185,12 +156,6 @@ class TaskMonitorTestCase(base.TestCase):
             self.conn, '/Task/545')
 
         self.assertEqual(True, task_monitor.check_is_processing)
-
-    @mock.patch.object(taskmonitor.LOG, 'warning', autospec=True)
-    def test_retry_after(self, mock_log):
-        self.assertEqual(20, self.task_monitor.retry_after)
-        mock_log.assert_called_once_with('TaskMonitor retry_after is '
-                                         'deprecated, use sleep_for.')
 
     def test_cancellable(self):
         self.assertTrue(self.task_monitor.cancellable)

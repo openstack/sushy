@@ -15,17 +15,14 @@
 
 from datetime import datetime
 from http import client as http_client
-import json
 import logging
 import time
 from urllib.parse import urljoin
 
 from dateutil import parser
-import requests
 
 from sushy import exceptions
 from sushy.resources.taskservice import task
-from sushy import utils
 
 LOG = logging.getLogger(__name__)
 
@@ -36,7 +33,6 @@ class TaskMonitor(object):
                  task_monitor_uri,
                  redfish_version=None,
                  registries=None,
-                 field_data=None,
                  response=None):
         """A class representing a task monitor
 
@@ -46,28 +42,14 @@ class TaskMonitor(object):
             the object according to schema of the given version.
         :param registries: Dict of Redfish Message Registry objects to be
             used in any resource that needs registries to parse messages.
-        :param field_data: the data to use populating the fields. Deprecated
-            use response.
         :param response: Raw response
         """
         self._connector = connector
         self._task_monitor_uri = task_monitor_uri
         self._redfish_version = redfish_version
         self._registries = registries
-        self._field_data = field_data
-        if self._field_data is not None:
-            LOG.warning('TaskMonitor field_data is deprecated in TaskMonitor. '
-                        'Use response.')
         self._task = None
         self._response = response
-
-        # Backward compability for deprecated field_data
-        if self._field_data and not self._response:
-            self._response = requests.Response()
-            self._response.status_code = self._field_data.status_code
-            self._response.headers = self._field_data.headers
-            self._response._content = json.dumps(
-                self._field_data.json_doc).encode('utf-8')
 
         if (self._response and self._response.content
                 and self._response.status_code == http_client.ACCEPTED):
@@ -106,18 +88,6 @@ class TaskMonitor(object):
             self._task = None
 
     @property
-    def task_monitor(self):
-        """The TaskMonitor URI
-
-        Deprecated: Use task_monitor_uri
-
-        :returns: The TaskMonitor URI.
-        """
-        LOG.warning('task_monitor is deprecated in TaskMonitor. '
-                    'Use task_monitor_uri.')
-        return self._task_monitor_uri
-
-    @property
     def task_monitor_uri(self):
         """The TaskMonitor URI
 
@@ -145,19 +115,6 @@ class TaskMonitor(object):
         self.refresh()
 
         return self.is_processing
-
-    @property
-    def retry_after(self):
-        """The amount of time to sleep before retrying
-
-        Deprecated: use sleep_for. This is not working with Retry-After header
-            in date format.
-
-        :returns: The amount of time in seconds to wait before calling
-            is_processing.
-        """
-        LOG.warning('TaskMonitor retry_after is deprecated, use sleep_for.')
-        return utils.int_or_none(self._response.headers.get('Retry-After'))
 
     @property
     def sleep_for(self):
