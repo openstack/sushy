@@ -14,6 +14,7 @@
 #    under the License.
 
 import copy
+import enum
 from http import client as http_client
 import io
 import json
@@ -332,7 +333,9 @@ TEST_JSON = {
     'Dictionary': {
         'key1': {'property_a': 'value1', 'property_b': 'value2'},
         'key2': {'property_a': 'value3', 'property_b': 'value4'}
-    }
+    },
+    'Enum': 'PROTOCOL_FIELD_2',
+    'EnumList': ['PROTOCOL_FIELD_2', 'PROTOCOL_FIELD_3'],
 }
 
 
@@ -341,6 +344,13 @@ MAPPING = {
     'raw1': 'real1',
     'raw2': 'real2'
 }
+
+
+class EnumMapping(enum.Enum):
+
+    FIELD1 = "PROTOCOL_FIELD_1"
+    FIELD2 = "PROTOCOL_FIELD_2"
+    FIELD3 = "PROTOCOL_FIELD_3"
 
 
 class NestedTestField(resource_base.CompositeField):
@@ -371,6 +381,10 @@ class ComplexResource(resource_base.ResourceBase):
     non_existing_nested = NestedTestField('NonExistingNested')
     non_existing_mapped = resource_base.MappedField('NonExistingMapped',
                                                     MAPPING)
+    enum_mapped = resource_base.MappedField('Enum', EnumMapping)
+    enum_mapped_list = resource_base.MappedListField('EnumList', EnumMapping)
+    non_existing_enum_mapped = resource_base.MappedField('NonExistingEnum',
+                                                         EnumMapping)
 
 
 class FieldTestCase(base.TestCase):
@@ -402,6 +416,10 @@ class FieldTestCase(base.TestCase):
                          self.test_resource.dictionary['key2'].property_b)
         self.assertIsNone(self.test_resource.non_existing_nested)
         self.assertIsNone(self.test_resource.non_existing_mapped)
+        self.assertEqual(EnumMapping.FIELD2, self.test_resource.enum_mapped)
+        self.assertEqual([EnumMapping.FIELD2, EnumMapping.FIELD3],
+                         self.test_resource.enum_mapped_list)
+        self.assertIsNone(self.test_resource.non_existing_enum_mapped)
 
     def test_missing_required(self):
         del self.json['String']
@@ -437,9 +455,11 @@ class FieldTestCase(base.TestCase):
 
     def test_mapping_missing(self):
         self.json['Nested']['Mapped'] = 'banana'
+        self.json['Enum'] = 'banana'
         self.test_resource.refresh(force=True)
 
         self.assertIsNone(self.test_resource.nested.mapped)
+        self.assertIsNone(self.test_resource.enum_mapped)
 
     def test_composite_field_as_mapping(self):
         field = self.test_resource.nested
@@ -457,6 +477,11 @@ class FieldTestCase(base.TestCase):
         # Regular attributes cannot be accessed via mapping
         self.assertRaisesRegex(KeyError, '_load', lambda: field['_load'])
         self.assertRaisesRegex(KeyError, '__init__', lambda: field['__init__'])
+
+    def test_invalid_mapping_definiton(self):
+        self.assertRaises(TypeError, resource_base.MappedField, 'Field', 42)
+        self.assertRaises(TypeError, resource_base.MappedListField,
+                          'Field', 42)
 
 
 class PartialKeyResource(resource_base.ResourceBase):

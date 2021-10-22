@@ -16,6 +16,7 @@
 import abc
 import collections
 import copy
+import enum
 import io
 import json
 import logging
@@ -269,18 +270,28 @@ class MappedField(Field):
         :param field: JSON field to fetch the value from. This can be either
             a string or a list of string. In the latter case, the value will
             be fetched from a nested object.
-        :param mapping: a mapping to take values from.
+        :param mapping: a mapping to take values from, a dictionary or
+            an enumeration.
         :param required: whether this field is required. Missing required,
             but not defaulted, fields result in MissingAttributeError.
         :param default: the default value to use when the field is missing.
             This value is not matched against the mapping.
         """
-        if not isinstance(mapping, collections.abc.Mapping):
-            raise TypeError("The mapping argument must be a mapping")
+        if isinstance(mapping, type) and issubclass(mapping, enum.Enum):
+            def adapter(value):
+                try:
+                    return mapping(value)
+                except ValueError:
+                    return None
+
+        elif isinstance(mapping, collections.abc.Mapping):
+            adapter = mapping.get
+        else:
+            raise TypeError("The mapping argument must be a mapping or "
+                            "an enumeration")
 
         super(MappedField, self).__init__(
-            field, required=required, default=default,
-            adapter=mapping.get)
+            field, required=required, default=default, adapter=adapter)
 
 
 class MappedListField(Field):
@@ -300,10 +311,20 @@ class MappedListField(Field):
             but not defaulted, fields result in MissingAttributeError.
         :param default: the default value to use when the field is missing.
         """
-        if not isinstance(mapping, collections.abc.Mapping):
-            raise TypeError("The mapping argument must be a mapping")
+        if isinstance(mapping, type) and issubclass(mapping, enum.Enum):
+            def adapter(value):
+                try:
+                    return mapping(value)
+                except ValueError:
+                    return None
 
-        self._mapping_adapter = mapping.get
+        elif isinstance(mapping, collections.abc.Mapping):
+            adapter = mapping.get
+        else:
+            raise TypeError("The mapping argument must be a mapping or "
+                            "an enumeration")
+
+        self._mapping_adapter = adapter
         super(MappedListField, self).__init__(
             field, required=required, default=default,
             adapter=lambda x: x)
