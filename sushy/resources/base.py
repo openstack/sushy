@@ -744,14 +744,7 @@ class ResourceBase(object, metaclass=abc.ABCMeta):
         return self._root
 
 
-class ResourceCollectionBase(ResourceBase, metaclass=abc.ABCMeta):
-
-    name = Field('Name')
-    """The name of the collection"""
-
-    members_identities = Field('Members', default=[],
-                               adapter=utils.get_members_identities)
-    """A tuple with the members identities"""
+class ResourceLinksBase(ResourceBase, metaclass=abc.ABCMeta):
 
     def __init__(self, connector, path, redfish_version=None, registries=None,
                  root=None):
@@ -767,11 +760,16 @@ class ResourceCollectionBase(ResourceBase, metaclass=abc.ABCMeta):
             used in any resource that needs registries to parse messages.
         :param root: Sushy root object. Empty for Sushy root itself.
         """
-        super(ResourceCollectionBase, self).__init__(
-            connector, path, redfish_version, registries, root=root)
+        super().__init__(connector, path, redfish_version, registries,
+                         root=root)
         LOG.debug('Received %(count)d member(s) for %(type)s %(path)s',
                   {'count': len(self.members_identities),
                    'type': self.__class__.__name__, 'path': self._path})
+
+    @property
+    @abc.abstractmethod
+    def members_identities(self):
+        """A sequence with members identities"""
 
     @property
     @abc.abstractmethod
@@ -801,3 +799,13 @@ class ResourceCollectionBase(ResourceBase, metaclass=abc.ABCMeta):
         :returns: A list of ``_resource_type`` objects
         """
         return [self.get_member(id_) for id_ in self.members_identities]
+
+
+class ResourceCollectionBase(ResourceLinksBase):
+
+    name = Field('Name')
+    """The name of the collection"""
+
+    members_identities = Field('Members', default=[],
+                               adapter=utils.get_members_identities)
+    """A tuple with the members identities"""

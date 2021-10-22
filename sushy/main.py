@@ -22,6 +22,7 @@ from sushy import auth as sushy_auth
 from sushy import connector as sushy_connector
 from sushy import exceptions
 from sushy.resources import base
+from sushy.resources.certificateservice import certificateservice
 from sushy.resources.chassis import chassis
 from sushy.resources.compositionservice import compositionservice
 from sushy.resources.eventservice import eventservice
@@ -148,6 +149,9 @@ class Sushy(base.ResourceBase):
 
     _event_service_path = base.Field(['EventService', '@odata.id'])
     """EventService path"""
+
+    _certificate_service_path = base.Field(['CertificateService', '@odata.id'])
+    """CertificateService path"""
 
     def __init__(self, base_url, username=None, password=None,
                  root_prefix='/redfish/v1/', verify=True,
@@ -448,6 +452,21 @@ class Sushy(base.ResourceBase):
 
         return compositionservice.CompositionService(
             self._conn, self._composition_service_path,
+            redfish_version=self.redfish_version,
+            registries=self.lazy_registries, root=self)
+
+    def get_certificate_service(self):
+        """Get the CertificateService object
+
+        :returns: The CertificateService object
+        """
+        if not self._certificate_service_path:
+            raise exceptions.MissingAttributeError(
+                attribute='CertificateService/@odata.id',
+                resource=self._path)
+
+        return certificateservice.CertificateService(
+            self._conn, self._certificate_service_path,
             redfish_version=self.redfish_version,
             registries=self.lazy_registries, root=self)
 

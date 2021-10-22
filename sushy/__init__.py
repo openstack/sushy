@@ -17,6 +17,7 @@ import logging
 import pbr.version
 
 from sushy.main import Sushy
+from sushy.resources.certificateservice.constants import * # noqa
 from sushy.resources.chassis.constants import *  # noqa
 from sushy.resources.constants import *  # noqa
 from sushy.resources.eventservice.constants import * # noqa
