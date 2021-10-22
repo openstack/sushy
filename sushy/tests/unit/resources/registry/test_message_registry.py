@@ -16,10 +16,11 @@
 import json
 from unittest import mock
 
-
+from sushy import exceptions
 from sushy.resources import base as sushy_base
 from sushy.resources import constants as res_cons
 from sushy.resources.registry import attribute_registry
+from sushy.resources.registry import constants as reg_cons
 from sushy.resources.registry import message_registry
 from sushy.tests.unit import base
 
@@ -53,18 +54,18 @@ class MessageRegistryTestCase(base.TestCase):
                          self.registry.messages['Success'].description)
         self.assertEqual('Everything done successfully.',
                          self.registry.messages['Success'].message)
-        self.assertEqual(res_cons.SEVERITY_OK,
+        self.assertEqual(res_cons.Severity.OK,
                          self.registry.messages['Success'].severity)
         self.assertEqual(0, self.registry.messages['Success'].number_of_args)
         self.assertEqual(2, len(self.registry.messages['TooBig'].param_types))
-        self.assertEqual(res_cons.PARAMTYPE_STRING,
+        self.assertEqual(reg_cons.MessageParamType.STRING,
                          self.registry.messages['TooBig'].param_types[0])
-        self.assertEqual(res_cons.PARAMTYPE_NUMBER,
+        self.assertEqual(reg_cons.MessageParamType.NUMBER,
                          self.registry.messages['TooBig'].param_types[1])
         self.assertEqual('Panic', self.registry.messages['Failed'].resolution)
         self.assertEqual(
             2, len(self.registry.messages['MissingThings'].param_types))
-        self.assertEqual(res_cons.SEVERITY_WARNING,
+        self.assertEqual(res_cons.Severity.WARNING,
                          self.registry.messages['MissingThings'].severity)
         self.assertEqual(
             res_cons.PARAMTYPE_STRING,
@@ -82,30 +83,33 @@ class MessageRegistryTestCase(base.TestCase):
                           {'description': 'Nothing is OK',
                            'message': 'The property %1 broke everything.',
                            'number_of_args': 1,
-                           'param_types': ['string'],
+                           'param_types': [reg_cons.MessageParamType.STRING],
                            'resolution': 'Panic',
-                           'severity': 'critical'},
+                           'severity': res_cons.Severity.CRITICAL},
                           'MissingThings':
                           {'description': '',
                            'message':
                            "Property's %1 value cannot be less than %2.",
                            'number_of_args': 2,
-                           'param_types': ['string', 'number'],
+                           'param_types': [reg_cons.MessageParamType.STRING,
+                                           reg_cons.MessageParamType.NUMBER],
                            'resolution': 'Try Later',
-                           'severity': 'warning'},
+                           'severity': res_cons.Severity.WARNING},
                           'Success':
                           {'description': 'Everything OK',
                            'message': 'Everything done successfully.',
                            'number_of_args': 0, 'param_types': None,
-                           'resolution': 'None', 'severity': 'ok'},
+                           'resolution': 'None',
+                           'severity': res_cons.Severity.OK},
                           'TooBig':
                           {'description': 'Value too big',
                            'message':
                            "Property's %1 value cannot be greater than %2.",
                            'number_of_args': 2,
-                           'param_types': ['string', 'number'],
+                           'param_types': [reg_cons.MessageParamType.STRING,
+                                           reg_cons.MessageParamType.NUMBER],
                            'resolution': 'Try again',
-                           'severity': 'warning'}},
+                           'severity': res_cons.Severity.WARNING}},
                          attributes.get('messages'))
 
     def test__parse_attributes_missing_msg_desc(self):
@@ -116,12 +120,13 @@ class MessageRegistryTestCase(base.TestCase):
     def test__parse_attributes_missing_msg_severity(self):
         self.json_doc['Messages']['Success'].pop('Severity')
         self.registry._parse_attributes(self.json_doc)
-        self.assertEqual('warning', self.registry.messages['Success'].severity)
+        self.assertEqual(res_cons.Severity.WARNING,
+                         self.registry.messages['Success'].severity)
 
     def test__parse_attributes_unknown_param_type(self):
         self.registry.json['Messages']['Failed']['ParamTypes'] = \
             ['unknown_type']
-        self.assertRaisesRegex(KeyError,
+        self.assertRaisesRegex(exceptions.MalformedAttributeError,
                                'unknown_type',
                                self.registry._parse_attributes, self.json_doc)
 
@@ -142,7 +147,7 @@ class MessageRegistryTestCase(base.TestCase):
         parsed_msg = message_registry.parse_message(registries, message_field)
 
         self.assertEqual('Try again', parsed_msg.resolution)
-        self.assertEqual(res_cons.SEVERITY_WARNING, parsed_msg.severity)
+        self.assertEqual(res_cons.Severity.WARNING, parsed_msg.severity)
         self.assertEqual('Property\'s arg1 value cannot be greater than 10.',
                          parsed_msg.message)
 
@@ -156,13 +161,13 @@ class MessageRegistryTestCase(base.TestCase):
         registries = {'Test.1.0.0': registry}
         message_field = sushy_base.MessageListField('Foo')
         message_field.message_id = 'Test.1.0.0.Success'
-        message_field.severity = res_cons.SEVERITY_OK
+        message_field.severity = res_cons.Severity.OK
         message_field.resolution = 'Do nothing'
 
         parsed_msg = message_registry.parse_message(registries, message_field)
 
         self.assertEqual('Do nothing', parsed_msg.resolution)
-        self.assertEqual(res_cons.SEVERITY_OK, parsed_msg.severity)
+        self.assertEqual(res_cons.Severity.OK, parsed_msg.severity)
         self.assertEqual('Everything done successfully.',
                          parsed_msg.message)
 
@@ -225,13 +230,13 @@ class MessageRegistryTestCase(base.TestCase):
         registries = {'Messages': registry}
         message_field = sushy_base.MessageListField('Foo')
         message_field.message_id = 'Success'
-        message_field.severity = res_cons.SEVERITY_OK
+        message_field.severity = res_cons.Severity.OK
         message_field.resolution = 'Do nothing'
 
         parsed_msg = message_registry.parse_message(registries, message_field)
 
         self.assertEqual('Do nothing', parsed_msg.resolution)
-        self.assertEqual(res_cons.SEVERITY_OK, parsed_msg.severity)
+        self.assertEqual(res_cons.Severity.OK, parsed_msg.severity)
         self.assertEqual('Everything done successfully.',
                          parsed_msg.message)
 
@@ -245,13 +250,13 @@ class MessageRegistryTestCase(base.TestCase):
         registries = {'BaseMessages': registry}
         message_field = sushy_base.MessageListField('Foo')
         message_field.message_id = 'Success'
-        message_field.severity = res_cons.SEVERITY_OK
+        message_field.severity = res_cons.Severity.OK
         message_field.resolution = 'Do nothing'
 
         parsed_msg = message_registry.parse_message(registries, message_field)
 
         self.assertEqual('Do nothing', parsed_msg.resolution)
-        self.assertEqual(res_cons.SEVERITY_OK, parsed_msg.severity)
+        self.assertEqual(res_cons.Severity.OK, parsed_msg.severity)
         self.assertEqual('Everything done successfully.',
                          parsed_msg.message)
 
@@ -289,7 +294,7 @@ class MessageRegistryTestCase(base.TestCase):
         parsed_msg = message_registry.parse_message(registries, message_field)
 
         self.assertEqual('Try again', parsed_msg.resolution)
-        self.assertEqual(res_cons.SEVERITY_WARNING, parsed_msg.severity)
+        self.assertEqual(res_cons.Severity.WARNING, parsed_msg.severity)
         self.assertEqual('Property\'s arg1 value cannot be greater than '
                          'unknown.', parsed_msg.message)
 
@@ -314,6 +319,6 @@ class MessageRegistryTestCase(base.TestCase):
         parsed_msg = message_registry.parse_message(registries, message_field)
 
         self.assertEqual('Try again', parsed_msg.resolution)
-        self.assertEqual(res_cons.SEVERITY_WARNING, parsed_msg.severity)
+        self.assertEqual(res_cons.Severity.WARNING, parsed_msg.severity)
         self.assertEqual('Property\'s arg1 value cannot be greater than 10.',
                          parsed_msg.message)

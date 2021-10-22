@@ -53,7 +53,7 @@ class SettingsFieldTestCase(base.TestCase):
                          instance.messages[0].message_id)
         self.assertEqual('Settings %1 update failed due to invalid value',
                          instance.messages[0].message)
-        self.assertEqual(res_cons.SEVERITY_CRITICAL,
+        self.assertEqual(res_cons.Severity.CRITICAL,
                          instance.messages[0].severity)
         self.assertEqual('Fix the value and try again',
                          instance.messages[0].resolution)
@@ -63,8 +63,8 @@ class SettingsFieldTestCase(base.TestCase):
                          instance.messages[0]._related_properties[0])
         self.assertEqual('/redfish/v1/Systems/437XR1138R2/BIOS/Settings',
                          instance._settings_object_idref.resource_uri)
-        self.assertEqual([res_cons.APPLY_TIME_ON_RESET,
-                          res_cons.APPLY_TIME_MAINT_RESET],
+        self.assertEqual([res_cons.ApplyTime.ON_RESET,
+                          res_cons.ApplyTime.IN_MAINTENANCE_WINDOW_ON_RESET],
                          instance._supported_apply_times)
         self.assertIsNone(instance.maintenance_window)
         mock_LOG.warning.assert_called_once()
@@ -87,18 +87,18 @@ class SettingsFieldTestCase(base.TestCase):
         self.assertEqual(status.status,
                          settings.UPDATE_FAILURE)
         self.assertEqual(status.messages[0].severity,
-                         res_cons.SEVERITY_CRITICAL)
+                         res_cons.Severity.CRITICAL)
         self.assertEqual(status.messages[0].message,
                          'The property arg1 broke everything.')
 
     def test_get_status_success(self):
         instance = self.settings._load(self.json, mock.Mock())
         instance.messages[0].message_id = 'Test.1.0.Success'
-        instance.messages[0].severity = res_cons.SEVERITY_OK
+        instance.messages[0].severity = res_cons.Severity.OK
         status = instance.get_status(self.registries)
         self.assertEqual(status.status,
                          settings.UPDATE_SUCCESS)
-        self.assertEqual(status.messages[0].severity, res_cons.SEVERITY_OK)
+        self.assertEqual(status.messages[0].severity, res_cons.Severity.OK)
         self.assertEqual(status.messages[0].message,
                          'Everything done successfully.')
 

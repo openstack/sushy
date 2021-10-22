@@ -13,26 +13,8 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from sushy.resources import constants as res_cons
 from sushy.resources.taskservice import constants as ts_cons
 from sushy import utils
-
-
-TASK_STATE_VALUE_MAP = {
-    'New': res_cons.TASK_STATE_NEW,
-    'Starting': res_cons.TASK_STATE_STARTING,
-    'Running': res_cons.TASK_STATE_RUNNING,
-    'Suspended': res_cons.TASK_STATE_SUSPENDED,
-    'Interrupted': res_cons.TASK_STATE_INTERRUPTED,
-    'Pending': res_cons.TASK_STATE_PENDING,
-    'Stopping': res_cons.TASK_STATE_STOPPING,
-    'Completed': res_cons.TASK_STATE_COMPLETED,
-    'Killed': res_cons.TASK_STATE_KILLED,
-    'Exception': res_cons.TASK_STATE_EXCEPTION,
-    'Service': res_cons.TASK_STATE_SERVICE,
-    'Cancelling': res_cons.TASK_STATE_CANCELLING,
-    'Cancelled': res_cons.TASK_STATE_CANCELLED
-}
 
 OVERWRITE_POLICY_VALUE_MAP = {
     'Oldest': ts_cons.OVERWRITE_POLICY_OLDEST,

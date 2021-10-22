@@ -20,14 +20,14 @@ from sushy.resources import constants as res_cons
 
 # Reset action constants
 
-RESET_ON = res_cons.RESET_TYPE_ON
-RESET_FORCE_OFF = res_cons.RESET_TYPE_FORCE_OFF
-RESET_GRACEFUL_SHUTDOWN = res_cons.RESET_TYPE_GRACEFUL_SHUTDOWN
-RESET_GRACEFUL_RESTART = res_cons.RESET_TYPE_GRACEFUL_RESTART
-RESET_FORCE_RESTART = res_cons.RESET_TYPE_FORCE_RESTART
-RESET_NMI = res_cons.RESET_TYPE_NMI
-RESET_FORCE_ON = res_cons.RESET_TYPE_FORCE_ON
-RESET_PUSH_POWER_BUTTON = res_cons.RESET_TYPE_PUSH_POWER_BUTTON
+RESET_ON = res_cons.ResetType.ON
+RESET_FORCE_OFF = res_cons.ResetType.FORCE_OFF
+RESET_GRACEFUL_SHUTDOWN = res_cons.ResetType.GRACEFUL_SHUTDOWN
+RESET_GRACEFUL_RESTART = res_cons.ResetType.GRACEFUL_RESTART
+RESET_FORCE_RESTART = res_cons.ResetType.FORCE_RESTART
+RESET_NMI = res_cons.ResetType.NMI
+RESET_FORCE_ON = res_cons.ResetType.FORCE_ON
+RESET_PUSH_POWER_BUTTON = res_cons.ResetType.PUSH_POWER_BUTTON
 
 # System' PowerState constants
 
@@ -45,32 +45,6 @@ SYSTEM_POWER_STATE_POWERING_ON = res_cons.POWER_STATE_POWERING_ON
 SYSTEM_POWER_STATE_POWERING_OFF = res_cons.POWER_STATE_POWERING_OFF
 """A temporary state between On and Off. The power off action can take
    time while the OS is in the shutdown process"""
-
-# Indicator LED Constants
-
-SYSTEM_INDICATOR_LED_LIT = res_cons.INDICATOR_LED_LIT
-"""The Indicator LED is lit
-
-Deprecated: Use `sushy.resources.constants.INDICATOR_LED_LIT`.
-"""
-
-SYSTEM_INDICATOR_LED_BLINKING = res_cons.INDICATOR_LED_BLINKING
-"""The Indicator LED is blinking
-
-Deprecated: Use `sushy.resources.constants.INDICATOR_LED_BLINKING`.
-"""
-
-SYSTEM_INDICATOR_LED_OFF = res_cons.INDICATOR_LED_OFF
-"""The Indicator LED is off
-
-Deprecated: Use `sushy.resources.constants.INDICATOR_LED_OFF`.
-"""
-
-SYSTEM_INDICATOR_LED_UNKNOWN = res_cons.INDICATOR_LED_UNKNOWN
-"""The state of the Indicator LED cannot be determine
-
-Deprecated: Use `sushy.resources.constants.INDICATOR_LED_UNKNOWN`.
-"""
 
 # Boot source target constants
 

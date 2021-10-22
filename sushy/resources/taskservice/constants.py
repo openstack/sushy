@@ -13,6 +13,28 @@
 # Values come from the Redfish UpdateService json-schema.
 # https://redfish.dmtf.org/schemas/v1/TaskService.v1_1_5.json#/definitions/OverWritePolicy
 
+import enum
+
+
+class TaskState(enum.Enum):
+    """Task state related constants."""
+    CANCELLED = 'Cancelled'
+    CANCELLING = 'Cancelling'
+    COMPLETED = 'Completed'
+    EXCEPTION = 'Exception'
+    INTERRUPTED = 'Interrupted'
+    NEW = 'New'
+    PENDING = 'Pending'
+    RUNNING = 'Running'
+    SERVICE = 'Service'
+    STARTING = 'Starting'
+    STOPPING = 'Stopping'
+    SUSPENDED = 'Suspended'
+
+    # Deprecated in 1.2.0
+    KILLED = 'Killed'
+
+
 # Overwrite Policy constants
 
 OVERWRITE_POLICY_OLDEST = 'oldest completed'

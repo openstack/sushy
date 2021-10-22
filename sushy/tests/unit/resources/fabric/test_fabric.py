@@ -46,8 +46,8 @@ class FabricTestCase(base.TestCase):
                          self.fabric.description)
         self.assertEqual(sushy.PROTOCOL_TYPE_SAS,
                          self.fabric.fabric_type)
-        self.assertEqual(sushy.STATE_ENABLED, self.fabric.status.state)
-        self.assertEqual(sushy.HEALTH_OK, self.fabric.status.health)
+        self.assertEqual(sushy.State.ENABLED, self.fabric.status.state)
+        self.assertEqual(sushy.Health.OK, self.fabric.status.health)
 
     def test_endpoints(self):
         # | GIVEN |

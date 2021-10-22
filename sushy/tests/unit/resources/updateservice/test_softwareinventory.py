@@ -46,9 +46,9 @@ class SoftwareInventoryTestCase(base.TestCase):
         self.assertEqual('Contoso BMC Firmware', self.soft_inv.name)
         self.assertEqual('2017-08-22T12:00:00', self.soft_inv.release_date)
         self.assertEqual(
-            res_cons.STATE_ENABLED,
+            res_cons.State.ENABLED,
             self.soft_inv.status.state)
-        self.assertEqual(res_cons.HEALTH_OK, self.soft_inv.status.health)
+        self.assertEqual(res_cons.Health.OK, self.soft_inv.status.health)
         self.assertEqual(
             '1624A9DF-5E13-47FC-874A-DF3AFF143089',
             self.soft_inv.software_id)
@@ -60,9 +60,9 @@ class SoftwareInventoryTestCase(base.TestCase):
 
         # Test that various types are returned correctly
         self.assertEqual('BMC', attributes.get('identity'))
-        self.assertEqual({'health': res_cons.HEALTH_OK,
+        self.assertEqual({'health': res_cons.Health.OK,
                           'health_rollup': None,
-                          'state': res_cons.STATE_ENABLED},
+                          'state': res_cons.State.ENABLED},
                          attributes.get('status'))
         self.assertEqual(True, attributes.get('updateable'))
 

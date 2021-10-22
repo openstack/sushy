@@ -40,8 +40,8 @@ class TaskServiceTestCase(base.TestCase):
         self.assertEqual('TaskService', self.tsk_serv.identity)
         self.assertTrue(self.tsk_serv.service_enabled)
         self.assertTrue(self.tsk_serv.event_on_task_state_change)
-        self.assertEqual(res_cons.STATE_ENABLED, self.tsk_serv.status.state)
-        self.assertEqual(res_cons.HEALTH_OK, self.tsk_serv.status.health)
+        self.assertEqual(res_cons.State.ENABLED, self.tsk_serv.status.state)
+        self.assertEqual(res_cons.Health.OK, self.tsk_serv.status.health)
         self.assertEqual(self.tsk_serv.overwrite_policy,
                          ts_cons.OVERWRITE_POLICY_MANUAL)
 

@@ -64,12 +64,12 @@ class EthernetInterfaceCollection(base.ResourceCollectionBase):
         are returned.
 
         :returns: dictionary in the format
-            {'aa:bb:cc:dd:ee:ff': sushy.STATE_ENABLED,
-            'aa:bb:aa:aa:aa:aa': sushy.STATE_DISABLED}
+            {'aa:bb:cc:dd:ee:ff': sushy.State.ENABLED,
+            'aa:bb:aa:aa:aa:aa': sushy.State.DISABLED}
         """
         mac_dict = {}
         for eth in self.get_members():
             if eth.mac_address is not None and eth.status is not None:
-                if eth.status.health == res_cons.HEALTH_OK:
+                if eth.status.health == res_cons.Health.OK:
                     mac_dict[eth.mac_address] = eth.status.state
         return mac_dict

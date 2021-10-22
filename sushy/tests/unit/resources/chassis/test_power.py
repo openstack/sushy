@@ -15,8 +15,8 @@
 import json
 from unittest import mock
 
-
 from sushy.resources.chassis.power import power
+from sushy.resources import constants as res_cons
 from sushy.tests.unit import base
 
 
@@ -42,8 +42,10 @@ class PowerTestCase(base.TestCase):
 
         self.assertEqual('0', self.power.power_supplies[0].identity)
         self.assertEqual('Power Supply 0', self.power.power_supplies[0].name)
-        self.assertEqual('enabled', self.power.power_supplies[0].status.state)
-        self.assertEqual('ok', self.power.power_supplies[0].status.health)
+        self.assertEqual(res_cons.State.ENABLED,
+                         self.power.power_supplies[0].status.state)
+        self.assertEqual(res_cons.Health.OK,
+                         self.power.power_supplies[0].status.health)
         self.assertEqual('ac', self.power.power_supplies[0].power_supply_type)
         self.assertEqual('ac240v',
                          self.power.power_supplies[0].line_input_voltage_type)
@@ -90,8 +92,10 @@ class PowerTestCase(base.TestCase):
 
         self.assertEqual('1', self.power.power_supplies[1].identity)
         self.assertEqual('Power Supply 1', self.power.power_supplies[1].name)
-        self.assertEqual('enabled', self.power.power_supplies[1].status.state)
-        self.assertEqual('ok', self.power.power_supplies[1].status.health)
+        self.assertEqual(res_cons.State.ENABLED,
+                         self.power.power_supplies[1].status.state)
+        self.assertEqual(res_cons.Health.OK,
+                         self.power.power_supplies[1].status.health)
         self.assertEqual('ac', self.power.power_supplies[1].power_supply_type)
         self.assertEqual('ac240v',
                          self.power.power_supplies[1].line_input_voltage_type)
@@ -162,8 +166,9 @@ class PowerTestCase(base.TestCase):
                            'power_supply_type': 'ac',
                            'serial_number': '1S0000523',
                            'spare_part_number': '425-591-654',
-                           'status': {'health': 'ok', 'health_rollup': None,
-                                      'state': 'enabled'}},
+                           'status': {'health': res_cons.Health.OK,
+                                      'health_rollup': None,
+                                      'state': res_cons.State.ENABLED}},
                           {'firmware_version': '2.20',
                            'identity': '1',
                            'indicator_led': None,
@@ -185,6 +190,7 @@ class PowerTestCase(base.TestCase):
                            'power_supply_type': 'ac',
                            'serial_number': '1S0000524',
                            'spare_part_number': '425-591-654',
-                           'status': {'health': 'ok', 'health_rollup': None,
-                                      'state': 'enabled'}}],
+                           'status': {'health': res_cons.Health.OK,
+                                      'health_rollup': None,
+                                      'state': res_cons.State.ENABLED}}],
                          attributes.get('power_supplies'))

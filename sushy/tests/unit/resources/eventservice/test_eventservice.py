@@ -15,6 +15,7 @@ from unittest import mock
 
 import sushy
 from sushy import exceptions
+from sushy.resources import constants as res_cons
 from sushy.resources.eventservice import eventservice
 from sushy.tests.unit import base
 
@@ -41,9 +42,11 @@ class EventServiceTestCase(base.TestCase):
         self.assertEqual(self.eventservice.delivery_retry_attempts, 3)
         self.assertEqual(self.eventservice.delivery_retry_interval, 30)
         self.assertEqual(self.eventservice.service_enabled, True)
-        self.assertEqual(self.eventservice.status.health, 'ok')
-        self.assertEqual(self.eventservice.status.health_rollup, 'ok')
-        self.assertEqual(self.eventservice.status.state, 'enabled')
+        self.assertEqual(self.eventservice.status.health, res_cons.Health.OK)
+        self.assertEqual(self.eventservice.status.health_rollup,
+                         res_cons.Health.OK)
+        self.assertEqual(self.eventservice.status.state,
+                         res_cons.State.ENABLED)
         self.assertEqual(self.eventservice.subscriptions._path,
                          '/redfish/v1/EventService/Subscriptions/')
 

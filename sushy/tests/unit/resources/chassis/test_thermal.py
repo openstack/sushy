@@ -15,8 +15,8 @@
 import json
 from unittest import mock
 
-
 from sushy.resources.chassis.thermal import thermal
+from sushy.resources import constants as res_cons
 from sushy.tests.unit import base
 
 
@@ -43,8 +43,10 @@ class ThermalTestCase(base.TestCase):
         self.assertEqual('0', self.thermal.fans[0].identity)
         self.assertEqual('CPU Fan', self.thermal.fans[0].name)
         self.assertEqual('CPU', self.thermal.fans[0].physical_context)
-        self.assertEqual('enabled', self.thermal.fans[0].status.state)
-        self.assertEqual('ok', self.thermal.fans[0].status.health)
+        self.assertEqual(res_cons.State.ENABLED,
+                         self.thermal.fans[0].status.state)
+        self.assertEqual(res_cons.Health.OK,
+                         self.thermal.fans[0].status.health)
         self.assertEqual(6000, self.thermal.fans[0].reading)
         self.assertEqual('RPM', self.thermal.fans[0].reading_units)
         self.assertEqual(2000, self.thermal.fans[0].lower_threshold_fatal)
@@ -53,8 +55,10 @@ class ThermalTestCase(base.TestCase):
 
         self.assertEqual('0', self.thermal.temperatures[0].identity)
         self.assertEqual('CPU Temp', self.thermal.temperatures[0].name)
-        self.assertEqual('enabled', self.thermal.temperatures[0].status.state)
-        self.assertEqual('ok', self.thermal.temperatures[0].status.health)
+        self.assertEqual(res_cons.State.ENABLED,
+                         self.thermal.temperatures[0].status.state)
+        self.assertEqual(res_cons.Health.OK,
+                         self.thermal.temperatures[0].status.health)
         self.assertEqual(62, self.thermal.temperatures[0].reading_celsius)
         self.assertEqual(
             75,
@@ -94,8 +98,9 @@ class ThermalTestCase(base.TestCase):
                            'reading_units': 'RPM',
                            'serial_number': None,
                            'status':
-                           {'health': 'ok', 'health_rollup': None,
-                            'state': 'enabled'},
+                           {'health': res_cons.Health.OK,
+                            'health_rollup': None,
+                            'state': res_cons.State.ENABLED},
                            'upper_threshold_critical': None,
                            'upper_threshold_fatal': None,
                            'upper_threshold_non_critical': None}],
@@ -112,8 +117,9 @@ class ThermalTestCase(base.TestCase):
                            'physical_context': 'CPU',
                            'reading_celsius': 62,
                            'sensor_number': None,
-                           'status': {'health': 'ok', 'health_rollup': None,
-                                      'state': 'enabled'},
+                           'status': {'health': res_cons.Health.OK,
+                                      'health_rollup': None,
+                                      'state': res_cons.State.ENABLED},
                            'upper_threshold_critical': 90,
                            'upper_threshold_fatal': 95,
                            'upper_threshold_non_critical': 75}],

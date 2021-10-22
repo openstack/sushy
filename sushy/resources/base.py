@@ -26,7 +26,7 @@ import zipfile
 import pkg_resources
 
 from sushy import exceptions
-from sushy.resources import mappings as res_maps
+from sushy.resources import constants
 from sushy.resources import oem
 from sushy import utils
 
@@ -360,8 +360,7 @@ class MessageListField(ListField):
     message = Field('Message')
     """Human readable message, if provided"""
 
-    severity = MappedField('Severity',
-                           res_maps.SEVERITY_VALUE_MAP)
+    severity = MappedField('Severity', constants.Severity)
     """Severity of the error"""
 
     resolution = Field('Resolution')

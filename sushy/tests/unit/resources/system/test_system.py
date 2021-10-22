@@ -55,7 +55,7 @@ class SystemTestCase(base.TestCase):
         self.assertEqual('Web Front End node', self.sys_inst.description)
         self.assertEqual('web483', self.sys_inst.hostname)
         self.assertEqual('437XR1138R2', self.sys_inst.identity)
-        self.assertEqual(sushy.INDICATOR_LED_OFF,
+        self.assertEqual(sushy.IndicatorLED.OFF,
                          self.sys_inst.indicator_led)
         self.assertEqual('Contoso', self.sys_inst.manufacturer)
         self.assertEqual('WebFrontEnd483', self.sys_inst.name)
@@ -66,9 +66,9 @@ class SystemTestCase(base.TestCase):
                          self.sys_inst.system_type)
         self.assertEqual('38947555-7742-3448-3784-823347823834',
                          self.sys_inst.uuid)
-        self.assertEqual(res_cons.STATE_ENABLED, self.sys_inst.status.state)
-        self.assertEqual(res_cons.HEALTH_OK, self.sys_inst.status.health)
-        self.assertEqual(res_cons.HEALTH_OK,
+        self.assertEqual(res_cons.State.ENABLED, self.sys_inst.status.state)
+        self.assertEqual(res_cons.Health.OK, self.sys_inst.status.health)
+        self.assertEqual(res_cons.Health.OK,
                          self.sys_inst.status.health_rollup)
         self.assertEqual(sushy.SYSTEM_POWER_STATE_ON,
                          self.sys_inst.power_state)
@@ -88,36 +88,37 @@ class SystemTestCase(base.TestCase):
 
         # Test that various types are returned correctly
         self.assertEqual('Chicago-45Z-2381', attributes.get('asset_tag'))
-        self.assertEqual(sushy.INDICATOR_LED_OFF,
+        self.assertEqual(sushy.IndicatorLED.OFF,
                          attributes.get('indicator_led'))
-        self.assertEqual({'health': res_cons.HEALTH_OK,
-                          'health_rollup': res_cons.HEALTH_OK,
-                          'state': res_cons.STATE_ENABLED},
+        self.assertEqual({'health': res_cons.Health.OK,
+                          'health_rollup': res_cons.Health.OK,
+                          'state': res_cons.State.ENABLED},
                          attributes.get('status'))
         self.assertEqual({'maintenance_window_duration_in_seconds': 1,
                           'maintenance_window_start_time':
                           parser.parse('2016-03-07T14:44:30-05:05')},
                          attributes.get('maintenance_window'))
-        self.assertEqual({'reset': {'allowed_values':
-                         ['On', 'ForceOff', 'GracefulShutdown',
-                             'GracefulRestart', 'ForceRestart', 'Nmi',
-                             'ForceOn', 'PushPowerButton'],
-                         'operation_apply_time_support':
-                         {'_maintenance_window_resource':
-                             {'resource_uri':
-                                 '/redfish/v1/Systems/437XR1138R2'},
-                          'maintenance_window_duration_in_seconds': 600,
-                          'maintenance_window_start_time':
-                              parser.parse('2017-05-03T23:12:37-05:00'),
-                          'supported_values':
-                              ['Immediate', 'AtMaintenanceWindowStart'],
-                          'mapped_supported_values':
-                              [res_cons.APPLY_TIME_IMMEDIATE,
-                               res_cons.APPLY_TIME_MAINT_START]},
-                         'target_uri':
-                         '/redfish/v1/Systems/437XR1138R2/Actions/'
-                         'ComputerSystem.Reset'}},
-                         attributes.get('_actions'))
+        self.assertEqual(
+            {'reset': {'allowed_values':
+                       ['On', 'ForceOff', 'GracefulShutdown',
+                        'GracefulRestart', 'ForceRestart', 'Nmi',
+                        'ForceOn', 'PushPowerButton'],
+                       'operation_apply_time_support':
+                       {'_maintenance_window_resource':
+                        {'resource_uri':
+                         '/redfish/v1/Systems/437XR1138R2'},
+                        'maintenance_window_duration_in_seconds': 600,
+                        'maintenance_window_start_time':
+                        parser.parse('2017-05-03T23:12:37-05:00'),
+                        'supported_values':
+                        ['Immediate', 'AtMaintenanceWindowStart'],
+                        'mapped_supported_values':
+                        [res_cons.ApplyTime.IMMEDIATE,
+                         res_cons.ApplyTime.AT_MAINTENANCE_WINDOW_START]},
+                       'target_uri':
+                       '/redfish/v1/Systems/437XR1138R2/Actions/'
+                       'ComputerSystem.Reset'}},
+            attributes.get('_actions'))
 
     def test__parse_attributes_missing_actions(self):
         self.sys_inst.json.pop('Actions')
@@ -176,14 +177,14 @@ class SystemTestCase(base.TestCase):
 
     def test_get_allowed_reset_system_values(self):
         values = self.sys_inst.get_allowed_reset_system_values()
-        expected = set([sushy.RESET_GRACEFUL_SHUTDOWN,
-                        sushy.RESET_GRACEFUL_RESTART,
-                        sushy.RESET_FORCE_RESTART,
-                        sushy.RESET_FORCE_OFF,
-                        sushy.RESET_FORCE_ON,
-                        sushy.RESET_ON,
-                        sushy.RESET_NMI,
-                        sushy.RESET_PUSH_POWER_BUTTON])
+        expected = set([sushy.ResetType.GRACEFUL_SHUTDOWN,
+                        sushy.ResetType.GRACEFUL_RESTART,
+                        sushy.ResetType.FORCE_RESTART,
+                        sushy.ResetType.FORCE_OFF,
+                        sushy.ResetType.FORCE_ON,
+                        sushy.ResetType.ON,
+                        sushy.ResetType.NMI,
+                        sushy.ResetType.PUSH_POWER_BUTTON])
         self.assertEqual(expected, values)
         self.assertIsInstance(values, set)
 
@@ -193,14 +194,18 @@ class SystemTestCase(base.TestCase):
         self.sys_inst._actions.reset.allowed_values = {}
         values = self.sys_inst.get_allowed_reset_system_values()
         # Assert it returns all values if it can't get the specific ones
-        expected = set([sushy.RESET_GRACEFUL_SHUTDOWN,
-                        sushy.RESET_GRACEFUL_RESTART,
-                        sushy.RESET_FORCE_RESTART,
-                        sushy.RESET_FORCE_OFF,
-                        sushy.RESET_FORCE_ON,
-                        sushy.RESET_ON,
-                        sushy.RESET_NMI,
-                        sushy.RESET_PUSH_POWER_BUTTON])
+        expected = set([sushy.ResetType.GRACEFUL_SHUTDOWN,
+                        sushy.ResetType.GRACEFUL_RESTART,
+                        sushy.ResetType.FORCE_RESTART,
+                        sushy.ResetType.FORCE_OFF,
+                        sushy.ResetType.FORCE_ON,
+                        sushy.ResetType.ON,
+                        sushy.ResetType.NMI,
+                        sushy.ResetType.PUSH_POWER_BUTTON,
+                        sushy.ResetType.POWER_CYCLE,
+                        sushy.ResetType.SUSPEND,
+                        sushy.ResetType.RESUME,
+                        sushy.ResetType.PAUSE])
         self.assertEqual(expected, values)
         self.assertIsInstance(values, set)
         self.assertEqual(1, mock_log.call_count)
@@ -210,8 +215,8 @@ class SystemTestCase(base.TestCase):
         self.assertIsNotNone(support)
         self.assertEqual(['Immediate', 'AtMaintenanceWindowStart'],
                          support.supported_values)
-        self.assertEqual([res_cons.APPLY_TIME_IMMEDIATE,
-                          res_cons.APPLY_TIME_MAINT_START],
+        self.assertEqual([res_cons.ApplyTime.IMMEDIATE,
+                          res_cons.ApplyTime.AT_MAINTENANCE_WINDOW_START],
                          support.mapped_supported_values)
         self.assertEqual(parser.parse('2017-05-03T23:12:37-05:00'),
                          support.maintenance_window_start_time)
@@ -220,7 +225,7 @@ class SystemTestCase(base.TestCase):
                          support._maintenance_window_resource.resource_uri)
 
     def test_reset_system(self):
-        self.sys_inst.reset_system(sushy.RESET_FORCE_OFF)
+        self.sys_inst.reset_system(sushy.ResetType.FORCE_OFF)
         self.sys_inst._conn.post.assert_called_once_with(
             '/redfish/v1/Systems/437XR1138R2/Actions/ComputerSystem.Reset',
             data={'ResetType': 'ForceOff'})
@@ -363,7 +368,7 @@ class SystemTestCase(base.TestCase):
     def test_set_indicator_led(self):
         with mock.patch.object(
                 self.sys_inst, 'invalidate', autospec=True) as invalidate_mock:
-            self.sys_inst.set_indicator_led(sushy.INDICATOR_LED_BLINKING)
+            self.sys_inst.set_indicator_led(sushy.IndicatorLED.BLINKING)
             self.sys_inst._conn.patch.assert_called_once_with(
                 '/redfish/v1/Systems/437XR1138R2',
                 data={'IndicatorLED': 'Blinking'})
@@ -513,7 +518,7 @@ class SystemTestCase(base.TestCase):
 
         actual_macs = self.sys_inst.ethernet_interfaces.summary
         expected_macs = (
-            {'12:44:6A:3B:04:11': res_cons.STATE_ENABLED})
+            {'12:44:6A:3B:04:11': res_cons.State.ENABLED})
         self.assertEqual(expected_macs, actual_macs)
 
     def test_bios(self):

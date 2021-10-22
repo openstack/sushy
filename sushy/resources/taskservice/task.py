@@ -20,9 +20,9 @@ from http import client as http_client
 import logging
 
 from sushy.resources import base
-from sushy.resources import mappings as res_maps
+from sushy.resources import constants as res_cons
 from sushy.resources.registry import message_registry
-from sushy.resources.taskservice import mappings as task_maps
+from sushy.resources.taskservice import constants as ts_cons
 from sushy import utils
 
 
@@ -53,10 +53,10 @@ class Task(base.ResourceBase):
     percent_complete = base.Field('PercentComplete', adapter=utils.int_or_none)
     """Percentage complete of the Task"""
 
-    task_state = base.MappedField('TaskState', task_maps.TASK_STATE_VALUE_MAP)
+    task_state = base.MappedField('TaskState', ts_cons.TaskState)
     """The Task state"""
 
-    task_status = base.MappedField('TaskStatus', res_maps.HEALTH_VALUE_MAP)
+    task_status = base.MappedField('TaskStatus', res_cons.Health)
     """The Task status"""
 
     messages = base.MessageListField("Messages")
@@ -102,8 +102,8 @@ class TaskCollection(base.ResourceCollectionBase):
         """Summary of task ids and corresponding state
 
         :returns: dictionary in the format
-            {'jid_123456789': sushy.TASK_STATE_NEW,
-            'jid_123454321': sushy.TASK_STATE_RUNNING}
+            {'jid_123456789': sushy.TaskState.NEW,
+            'jid_123454321': sushy.TaskState.RUNNING}
         """
         task_dict = {}
         for task in self.get_members():

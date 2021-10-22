@@ -10,112 +10,226 @@
 #    License for the specific language governing permissions and limitations
 #    under the License.
 
-# Values comes from the Redfish System json-schema 1.0.0:
-# http://redfish.dmtf.org/schemas/v1/Resource.json or
-# https://redfish.dmtf.org/schemas/v1/MessageRegistry.v1_1_1.json
+# Values comes from the Redfish System json-schema:
+# http://redfish.dmtf.org/schemas/v1/Resource.json and
+# https://redfish.dmtf.org/schemas/v1/Settings.v1_3_3.json
 
-# Health related constants.
-HEALTH_OK = 'ok'
-HEALTH_WARNING = 'warning'
-HEALTH_CRITICAL = 'critical'
+import enum
 
-# State related constants.
-STATE_ENABLED = 'enabled'
-STATE_DISABLED = 'disabled'
-STATE_STANDBYOFFLINE = 'standby offline'
-STATE_STANDBYSPARE = 'standby spare'
-STATE_INTEST = 'in test'
-STATE_STARTING = 'starting'
-STATE_ABSENT = 'absent'
-STATE_UNAVAILABLEOFFLINE = 'unavailable offline'
-STATE_DEFERRING = 'deferring'
-STATE_QUIESCED = 'quiesced'
-STATE_UPDATING = 'updating'
+from sushy.resources.registry import constants as reg_cons
+from sushy.resources.taskservice import constants as ts_cons
 
-# Task state related constants
-TASK_STATE_NEW = 'new'
-TASK_STATE_STARTING = 'starting'
-TASK_STATE_RUNNING = 'running'
-TASK_STATE_SUSPENDED = 'suspended'
-TASK_STATE_INTERRUPTED = 'interrupted'
-TASK_STATE_PENDING = 'pending'
-TASK_STATE_STOPPING = 'stopping'
-TASK_STATE_COMPLETED = 'completed'
-TASK_STATE_KILLED = 'killed'
-TASK_STATE_EXCEPTION = 'exception'
-TASK_STATE_SERVICE = 'service'
-TASK_STATE_CANCELLING = 'cancelling'
-TASK_STATE_CANCELLED = 'cancelled'
 
-# Message Registry message parameter type related constants.
-PARAMTYPE_STRING = 'string'
-PARAMTYPE_NUMBER = 'number'
+class Health(enum.Enum):
+    """Health related constants."""
+    OK = 'OK'
+    """Normal."""
 
-# Severity related constants
-SEVERITY_OK = 'ok'
-SEVERITY_WARNING = 'warning'
-SEVERITY_CRITICAL = 'critical'
+    WARNING = 'Warning'
+    """A condition requires attention."""
 
-# Indicator LED Constants
+    CRITICAL = 'Critical'
+    """A critical condition requires immediate attention."""
 
-INDICATOR_LED_LIT = 'indicator led lit'
-"""The Indicator LED is lit"""
 
-INDICATOR_LED_BLINKING = 'indicator led blinking'
-"""The Indicator LED is blinking"""
+# Backward compatibility
+HEALTH_OK = Health.OK
+HEALTH_WARNING = Health.WARNING
+HEALTH_CRITICAL = Health.CRITICAL
 
-INDICATOR_LED_OFF = 'indicator led off'
-"""The Indicator LED is off"""
 
-INDICATOR_LED_UNKNOWN = 'indicator led unknown'
-"""The state of the Indicator LED cannot be determine"""
+class State(enum.Enum):
+    """State related constants."""
+    ENABLED = 'Enabled'
+    """This function or resource is enabled."""
 
-# System' PowerState constants
+    DISABLED = 'Disabled'
+    """This function or resource is disabled."""
 
-POWER_STATE_ON = 'on'
-"""The resource is powered on"""
+    STANDBY_OFFLINE = 'StandbyOffline'
+    """This function or resource is enabled but awaits an external action to
+    activate it."""
 
-POWER_STATE_OFF = 'off'
-"""The resource is powered off, although some components may continue to
-   have AUX power such as management controller"""
+    STANDBY_SPARE = 'StandbySpare'
+    """This function or resource is part of a redundancy set and awaits a
+    failover or other external action to activate it."""
 
-POWER_STATE_POWERING_ON = 'powering on'
-"""A temporary state between Off and On. This temporary state can
-   be very short"""
+    IN_TEST = 'InTest'
+    """This function or resource is undergoing testing, or is in the process
+    of capturing information for debugging."""
 
-POWER_STATE_POWERING_OFF = 'powering off'
-"""A temporary state between On and Off. The power off action can take
-   time while the OS is in the shutdown process"""
+    STARTING = 'Starting'
+    """This function or resource is starting."""
 
-# Reset action constants
+    ABSENT = 'Absent'
+    """This function or resource is either not present or detected."""
 
-RESET_TYPE_ON = 'on'
-"""Turn the unit on"""
+    UNAVAILABLE_OFFLINE = 'UnavailableOffline'
+    """This function or resource is present but cannot be used."""
 
-RESET_TYPE_FORCE_ON = 'force on'
-"""Turn the unit on immediately"""
+    DEFERRING = 'Deferring'
+    """The element does not process any commands but queues new requests."""
 
-RESET_TYPE_FORCE_OFF = 'force off'
-"""Turn the unit off immediately (non-graceful shutdown)"""
+    QUIESCED = 'Quiesced'
+    """The element is enabled but only processes a restricted set of
+    commands."""
 
-RESET_TYPE_GRACEFUL_SHUTDOWN = 'graceful shutdown'
-"""Perform a graceful shutdown and power off"""
+    UPDATING = 'Updating'
+    """The element is updating and might be unavailable or degraded."""
 
-RESET_TYPE_GRACEFUL_RESTART = 'graceful restart'
-"""Perform a graceful shutdown followed by a restart of the system"""
+    QUALIFIED = 'Qualified'
+    """The element quality is within the acceptable range of operation."""
 
-RESET_TYPE_FORCE_RESTART = 'force restart'
-"""Perform an immediate (non-graceful) shutdown, followed by a restart"""
 
-RESET_TYPE_NMI = 'nmi'
-"""Generate a Diagnostic Interrupt (usually an NMI on x86 systems) to cease
-normal operations, perform diagnostic actions and typically halt the system"""
+# Backward compatibility
+STATE_ENABLED = State.ENABLED
+STATE_DISABLED = State.DISABLED
+STATE_ABSENT = State.ABSENT
+STATE_STANDBYOFFLINE = State.STANDBY_OFFLINE
+STATE_STANDBYSPARE = State.STANDBY_SPARE
+STATE_INTEST = State.IN_TEST
+STATE_STARTING = State.STARTING
+STATE_UNAVAILABLEOFFLINE = State.UNAVAILABLE_OFFLINE
+STATE_DEFERRING = State.DEFERRING
+STATE_QUIESCED = State.QUIESCED
+STATE_UPDATING = State.UPDATING
 
-RESET_TYPE_PUSH_POWER_BUTTON = 'push power button'
-"""Simulate the pressing of the physical power button on this unit"""
 
-RESET_TYPE_POWER_CYCLE = 'power cycle'
-"""Perform a power cycle of the unit"""
+# Backward compatibility, the type moved to taskservice.constants
+TASK_STATE_NEW = ts_cons.TaskState.NEW
+TASK_STATE_STARTING = ts_cons.TaskState.STARTING
+TASK_STATE_RUNNING = ts_cons.TaskState.RUNNING
+TASK_STATE_SUSPENDED = ts_cons.TaskState.SUSPENDED
+TASK_STATE_INTERRUPTED = ts_cons.TaskState.INTERRUPTED
+TASK_STATE_PENDING = ts_cons.TaskState.PENDING
+TASK_STATE_STOPPING = ts_cons.TaskState.STOPPING
+TASK_STATE_COMPLETED = ts_cons.TaskState.COMPLETED
+TASK_STATE_KILLED = ts_cons.TaskState.KILLED
+TASK_STATE_EXCEPTION = ts_cons.TaskState.EXCEPTION
+TASK_STATE_SERVICE = ts_cons.TaskState.SERVICE
+TASK_STATE_CANCELLING = ts_cons.TaskState.CANCELLING
+TASK_STATE_CANCELLED = ts_cons.TaskState.CANCELLED
+
+
+# Backward compatibility, the type moved to registry.constants
+PARAMTYPE_STRING = reg_cons.MessageParamType.STRING
+PARAMTYPE_NUMBER = reg_cons.MessageParamType.NUMBER
+
+
+# Backward compatibility (Severity is an alias of Health after 1.1.0)
+Severity = Health
+SEVERITY_OK = Severity.OK
+SEVERITY_WARNING = Severity.WARNING
+SEVERITY_CRITICAL = Severity.CRITICAL
+
+
+class IndicatorLED(enum.Enum):
+    """Indicator LED Constants"""
+
+    LIT = 'Lit'
+    """The Indicator LED is lit"""
+
+    BLINKING = 'Blinking'
+    """The Indicator LED is blinking"""
+
+    OFF = 'Off'
+    """The Indicator LED is off"""
+
+    UNKNOWN = 'Unknown'
+    """The state of the Indicator LED cannot be determine"""
+
+
+# Backward compatibility
+INDICATOR_LED_LIT = IndicatorLED.LIT
+INDICATOR_LED_BLINKING = IndicatorLED.BLINKING
+INDICATOR_LED_OFF = IndicatorLED.OFF
+INDICATOR_LED_UNKNOWN = IndicatorLED.UNKNOWN
+
+
+class PowerState(enum.Enum):
+    """System PowerState constants"""
+
+    ON = 'On'
+    """The resource is powered on"""
+
+    OFF = 'Off'
+    """The resource is powered off, although some components may continue to
+    have AUX power such as management controller"""
+
+    POWERING_ON = 'PoweringOn'
+    """A temporary state between Off and On. This temporary state can
+    be very short"""
+
+    POWERING_OFF = 'PoweringOff'
+    """A temporary state between On and Off. The power off action can take
+    time while the OS is in the shutdown process"""
+
+    PAUSED = 'Paused'
+    """The resource is paused."""
+
+
+# Backward compatibility
+POWER_STATE_ON = PowerState.ON
+POWER_STATE_OFF = PowerState.OFF
+POWER_STATE_POWERING_ON = PowerState.POWERING_ON
+POWER_STATE_POWERING_OFF = PowerState.POWERING_OFF
+
+
+class ResetType(enum.Enum):
+    """Reset action constants"""
+    ON = 'On'
+    """Turn on the unit."""
+
+    FORCE_OFF = 'ForceOff'
+    """Turn off the unit immediately (non-graceful shutdown)."""
+
+    GRACEFUL_SHUTDOWN = 'GracefulShutdown'
+    """Shut down gracefully and power off."""
+
+    GRACEFUL_RESTART = 'GracefulRestart'
+    """Shut down gracefully and restart the system."""
+
+    FORCE_RESTART = 'ForceRestart'
+    """Shut down immediately and non-gracefully and restart the system."""
+
+    NMI = 'Nmi'
+    """Generate a diagnostic interrupt, which is usually an NMI on x86
+    systems, to stop normal operations, complete diagnostic actions, and,
+    typically, halt the system."""
+
+    FORCE_ON = 'ForceOn'
+    """Turn on the unit immediately."""
+
+    PUSH_POWER_BUTTON = 'PushPowerButton'
+    """Simulate the pressing of the physical power button on this unit."""
+
+    POWER_CYCLE = 'PowerCycle'
+    """Power cycle the unit.  Behaves like a full power removal, followed by
+    a power restore to the resource."""
+
+    SUSPEND = 'Suspend'
+    """Write the state of the unit to disk before powering off.  This allows
+    for the state to be restored when powered back on."""
+
+    PAUSE = 'Pause'
+    """Pause execution on the unit but do not remove power.  This is
+    typically a feature of virtual machine hypervisors."""
+
+    RESUME = 'Resume'
+    """Resume execution on the paused unit.  This is typically a feature of
+    virtual machine hypervisors."""
+
+
+# Backward compatibility
+RESET_TYPE_ON = ResetType.ON
+RESET_TYPE_FORCE_OFF = ResetType.FORCE_OFF
+RESET_TYPE_GRACEFUL_SHUTDOWN = ResetType.GRACEFUL_SHUTDOWN
+RESET_TYPE_GRACEFUL_RESTART = ResetType.GRACEFUL_RESTART
+RESET_TYPE_FORCE_RESTART = ResetType.FORCE_RESTART
+RESET_TYPE_NMI = ResetType.NMI
+RESET_TYPE_FORCE_ON = ResetType.FORCE_ON
+RESET_TYPE_PUSH_POWER_BUTTON = ResetType.PUSH_POWER_BUTTON
+RESET_TYPE_POWER_CYCLE = ResetType.POWER_CYCLE
 
 # Protocol type constants
 
@@ -149,19 +263,63 @@ PROTOCOL_TYPE_USB = 'Universal Serial Bus'
 PROTOCOL_TYPE_iSCSI = 'Internet SCSI'
 PROTOCOL_TYPE_iWARP = 'Internet Wide Area Remote Direct Memory Access Protocol'
 
-# Durable name format constants
 
-DURABLE_NAME_FORMAT_EUI = 'IEEE-defined 64-bit Extended Unique Identifier'
-DURABLE_NAME_FORMAT_FC_WWN = 'Fibre Channel World Wide Name'
-DURABLE_NAME_FORMAT_NAA = 'Name Address Authority Format'
-DURABLE_NAME_FORMAT_NQN = 'NVMe Qualified Name'
-DURABLE_NAME_FORMAT_NSID = 'NVM Namespace Identifier'
-DURABLE_NAME_FORMAT_UUID = 'Universally Unique Identifier'
-DURABLE_NAME_FORMAT_iQN = 'iSCSI Qualified Name'
+class DurableNameFormat(enum.Enum):
+    """Durable name format constants"""
+    NAA = 'NAA'
+    """The Name Address Authority (NAA) format."""
 
-# Apply time constants
+    iQN = 'iQN'
+    """The iSCSI Qualified Name (iQN)."""
 
-APPLY_TIME_IMMEDIATE = 'immediate'
-APPLY_TIME_ON_RESET = 'on reset'
-APPLY_TIME_MAINT_START = 'at maintenance window start'
-APPLY_TIME_MAINT_RESET = 'in maintenance window on reset'
+    FC_WWN = 'FC_WWN'
+    """The Fibre Channel (FC) World Wide Name (WWN)."""
+
+    UUID = 'UUID'
+    """The Universally Unique Identifier (UUID)."""
+
+    EUI = 'EUI'
+    """The IEEE-defined 64-bit Extended Unique Identifier (EUI)."""
+
+    NQN = 'NQN'
+    """The NVMe Qualified Name (NQN)."""
+
+    NSID = 'NSID'
+    """The NVM Namespace Identifier (NSID)."""
+
+    NGUID = 'NGUID'
+    """The Namespace Globally Unique Identifier (NGUID)."""
+
+
+# Backward compatibility
+DURABLE_NAME_FORMAT_NAA = DurableNameFormat.NAA
+DURABLE_NAME_FORMAT_iQN = DurableNameFormat.iQN
+DURABLE_NAME_FORMAT_FC_WWN = DurableNameFormat.FC_WWN
+DURABLE_NAME_FORMAT_UUID = DurableNameFormat.UUID
+DURABLE_NAME_FORMAT_EUI = DurableNameFormat.EUI
+DURABLE_NAME_FORMAT_NQN = DurableNameFormat.NQN
+DURABLE_NAME_FORMAT_NSID = DurableNameFormat.NSID
+
+
+class ApplyTime(enum.Enum):
+    """Apply time constants"""
+
+    IMMEDIATE = 'Immediate'
+    """Apply immediately."""
+
+    ON_RESET = 'OnReset'
+    """Apply on a reset."""
+
+    AT_MAINTENANCE_WINDOW_START = 'AtMaintenanceWindowStart'
+    """Apply during a maintenance window as specified by an administrator."""
+
+    IN_MAINTENANCE_WINDOW_ON_RESET = 'InMaintenanceWindowOnReset'
+    """Apply after a reset but within maintenance window as specified by an
+    administrator."""
+
+
+# Backward compatibility
+APPLY_TIME_IMMEDIATE = ApplyTime.IMMEDIATE
+APPLY_TIME_ON_RESET = ApplyTime.ON_RESET
+APPLY_TIME_MAINT_START = ApplyTime.AT_MAINTENANCE_WINDOW_START
+APPLY_TIME_MAINT_RESET = ApplyTime.IN_MAINTENANCE_WINDOW_ON_RESET

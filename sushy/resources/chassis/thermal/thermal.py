@@ -16,7 +16,7 @@
 from sushy.resources import base
 from sushy.resources.chassis.thermal import mappings as the_maps
 from sushy.resources import common
-from sushy.resources import mappings as res_maps
+from sushy.resources import constants as res_cons
 from sushy import utils
 
 
@@ -63,8 +63,7 @@ class Sensor(base.ListField):
 class FansListField(Sensor):
     """The Fan device/s associated with Thermal."""
 
-    indicator_led = base.MappedField('IndicatorLED',
-                                     res_maps.INDICATOR_LED_VALUE_MAP)
+    indicator_led = base.MappedField('IndicatorLED', res_cons.IndicatorLED)
     """The state of the indicator LED, used to identify the fan"""
 
     manufacturer = base.Field('Manufacturer')

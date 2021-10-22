@@ -20,7 +20,6 @@ from dateutil import parser
 from sushy.resources import base
 from sushy.resources import common
 from sushy.resources import constants as res_cons
-from sushy.resources import mappings as res_maps
 from sushy.resources.registry import message_registry
 
 # Settings update statuses
@@ -127,7 +126,7 @@ class SettingsField(base.CompositeField):
 
     _supported_apply_times = base.MappedListField(
         'SupportedApplyTimes',
-        res_maps.APPLY_TIME_VALUE_MAP)
+        res_cons.ApplyTime)
     """List of supported apply times"""
 
     @property
@@ -194,7 +193,7 @@ class SettingsField(base.CompositeField):
             parsed_msgs.append(
                 message_registry.parse_message(registries, m))
         any_errors = any(m for m in parsed_msgs
-                         if not m.severity == res_cons.SEVERITY_OK)
+                         if m.severity != res_cons.Severity.OK)
 
         if any_errors:
             status = UPDATE_FAILURE

@@ -13,7 +13,7 @@
 from dateutil import parser
 
 from sushy.resources import base
-from sushy.resources import mappings as res_maps
+from sushy.resources import constants
 
 
 class IdRefField(base.CompositeField):
@@ -50,7 +50,7 @@ class OperationApplyTimeSupportField(base.CompositeField):
     """
 
     mapped_supported_values = base.MappedListField(
-        'SupportedValues', res_maps.APPLY_TIME_VALUE_MAP, required=True)
+        'SupportedValues', constants.ApplyTime, required=True)
     """The types of apply times that the client is allowed request when
     performing a create, delete, or action operation returned as a mapped
     list"""
@@ -76,13 +76,13 @@ class StatusField(base.CompositeField):
 
     This field shall contain any state or health properties of a resource.
     """
-    health = base.MappedField('Health', res_maps.HEALTH_VALUE_MAP)
+    health = base.MappedField('Health', constants.Health)
     """Represents health of resource w/o considering its dependent resources"""
 
-    health_rollup = base.MappedField('HealthRollup', res_maps.HEALTH_VALUE_MAP)
+    health_rollup = base.MappedField('HealthRollup', constants.Health)
     """Represents health state of resource and its dependent resources"""
 
-    state = base.MappedField('State', res_maps.STATE_VALUE_MAP)
+    state = base.MappedField('State', constants.State)
     """Indicates the known state of the resource, such as if it is enabled."""
 
 
@@ -93,5 +93,5 @@ class IdentifiersListField(base.ListField):
     """This indicates the world wide, persistent name of the resource."""
 
     durable_name_format = base.MappedField('DurableNameFormat',
-                                           res_maps.DUR_NAME_FORMAT_VALUE_MAP)
+                                           constants.DurableNameFormat)
     """This represents the format of the DurableName property."""

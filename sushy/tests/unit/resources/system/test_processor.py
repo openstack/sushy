@@ -71,10 +71,10 @@ class ProcessorTestCase(base.TestCase):
         self.assertEqual(3700, self.sys_processor.max_speed_mhz)
         self.assertEqual(8, self.sys_processor.total_cores)
         self.assertEqual(16, self.sys_processor.total_threads)
-        self.assertEqual(res_cons.STATE_ENABLED,
+        self.assertEqual(res_cons.State.ENABLED,
                          self.sys_processor.status.state)
-        self.assertEqual(res_cons.HEALTH_OK, self.sys_processor.status.health)
-        self.assertEqual(res_cons.HEALTH_OK,
+        self.assertEqual(res_cons.Health.OK, self.sys_processor.status.health)
+        self.assertEqual(res_cons.Health.OK,
                          self.sys_processor.status.health_rollup)
 
     def test_sub_processors(self):

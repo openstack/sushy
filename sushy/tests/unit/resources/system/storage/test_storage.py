@@ -15,6 +15,7 @@ from unittest import mock
 
 
 import sushy
+from sushy.resources import constants as res_cons
 from sushy.resources.system.storage import drive
 from sushy.resources.system.storage import storage
 from sushy.resources.system.storage import volume
@@ -54,9 +55,9 @@ class StorageTestCase(base.TestCase):
         self.assertEqual('1.0.2', self.storage.redfish_version)
         self.assertEqual('1', self.storage.identity)
         self.assertEqual('Local Storage Controller', self.storage.name)
-        self.assertEqual('ok', self.storage.status.health)
-        self.assertEqual('ok', self.storage.status.health_rollup)
-        self.assertEqual('enabled', self.storage.status.state)
+        self.assertEqual(res_cons.Health.OK, self.storage.status.health)
+        self.assertEqual(res_cons.Health.OK, self.storage.status.health_rollup)
+        self.assertEqual(res_cons.State.ENABLED, self.storage.status.state)
         self.assertEqual(
             ('/redfish/v1/Systems/437XR1138R2/Storage/1/Drives/35D38F11ACEF7BD3',  # noqa
              '/redfish/v1/Systems/437XR1138R2/Storage/1/Drives/3F5A8C54207B7233',  # noqa
@@ -118,8 +119,8 @@ class StorageTestCase(base.TestCase):
         controller = controllers[0]
         self.assertEqual('0', controller.member_id)
         self.assertEqual('Contoso Integrated RAID', controller.name)
-        self.assertEqual('ok', controller.status.health)
-        self.assertEqual('enabled', controller.status.state)
+        self.assertEqual(res_cons.Health.OK, controller.status.health)
+        self.assertEqual(res_cons.State.ENABLED, controller.status.state)
         identifiers = controller.identifiers
         self.assertIsInstance(identifiers, list)
         self.assertEqual(1, len(identifiers))

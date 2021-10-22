@@ -16,7 +16,7 @@
 from sushy.resources import base
 from sushy.resources.chassis.power import mappings as pow_maps
 from sushy.resources import common
-from sushy.resources import mappings as res_maps
+from sushy.resources import constants as res_cons
 from sushy import utils
 
 
@@ -59,8 +59,7 @@ class PowerSupplyListField(base.ListField):
     identity = base.Field('MemberId')
     """Identifier of the Power Supply"""
 
-    indicator_led = base.MappedField('IndicatorLed',
-                                     res_maps.INDICATOR_LED_VALUE_MAP)
+    indicator_led = base.MappedField('IndicatorLed', res_cons.IndicatorLED)
     """The state of the indicator LED, used to identify the power supply"""
 
     input_ranges = InputRangeListField('InputRanges', default=[])

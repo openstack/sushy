@@ -17,10 +17,10 @@ from sushy.resources import constants as res_cons
 
 # Manager Reset action constants
 
-RESET_MANAGER_GRACEFUL_RESTART = res_cons.RESET_TYPE_GRACEFUL_RESTART
+RESET_MANAGER_GRACEFUL_RESTART = res_cons.ResetType.GRACEFUL_RESTART
 """Perform a graceful shutdown followed by a restart of the system"""
 
-RESET_MANAGER_FORCE_RESTART = res_cons.RESET_TYPE_FORCE_RESTART
+RESET_MANAGER_FORCE_RESTART = res_cons.ResetType.FORCE_RESTART
 """Perform an immediate (non-graceful) shutdown, followed by a restart"""
 
 # Manager Type constants

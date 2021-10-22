@@ -43,11 +43,11 @@ class SimpleStorageTestCase(base.TestCase):
                          self.simpl_stor.devices[0].capacity_bytes)
         self.assertEqual(4000000000000,
                          self.simpl_stor.devices[1].capacity_bytes)
-        self.assertEqual(res_cons.STATE_ENABLED,
+        self.assertEqual(res_cons.State.ENABLED,
                          self.simpl_stor.devices[0].status.state)
-        self.assertEqual(res_cons.STATE_ABSENT,
+        self.assertEqual(res_cons.State.ABSENT,
                          self.simpl_stor.devices[2].status.state)
-        self.assertEqual(res_cons.HEALTH_OK,
+        self.assertEqual(res_cons.Health.OK,
                          self.simpl_stor.devices[0].status.health)
 
 

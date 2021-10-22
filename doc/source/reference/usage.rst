@@ -105,7 +105,7 @@ Creating and using a sushy system object
 
 
   # Power the system ON
-  sys_inst.reset_system(sushy.RESET_ON)
+  sys_inst.reset_system(sushy.ResetType.ON)
 
   # Get a list of allowed reset values
   print(sys_inst.get_allowed_reset_system_values())

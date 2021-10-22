@@ -41,10 +41,10 @@ class ResourceZoneTestCase(base.TestCase):
         self.assertEqual('1', self.res_zone.identity)
         self.assertEqual('Resource Zone 1', self.res_zone.name)
         self.assertEqual(
-            res_cons.STATE_ENABLED,
+            res_cons.State.ENABLED,
             self.res_zone.status.state)
         self.assertEqual(
-            res_cons.HEALTH_OK,
+            res_cons.Health.OK,
             self.res_zone.status.health)
         exp_path = '/redfish/v1/CompositionService/ResourceZones/1'
         self.assertEqual(exp_path, self.res_zone.path)

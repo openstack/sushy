@@ -18,6 +18,7 @@ import logging
 from sushy import exceptions
 from sushy.resources import base
 from sushy.resources import common
+from sushy.resources import constants as res_cons
 from sushy.resources import mappings as res_maps
 from sushy.resources.system.storage import volume
 from sushy import utils
@@ -40,8 +41,7 @@ class Drive(base.ResourceBase):
     identity = base.Field('Id', required=True)
     """The Drive identity string"""
 
-    indicator_led = base.MappedField('IndicatorLED',
-                                     res_maps.INDICATOR_LED_VALUE_MAP)
+    indicator_led = base.MappedField('IndicatorLED', res_cons.IndicatorLED)
     """Whether the indicator LED is lit or off"""
 
     manufacturer = base.Field('Manufacturer')
@@ -92,19 +92,18 @@ class Drive(base.ResourceBase):
     def set_indicator_led(self, state):
         """Set IndicatorLED to the given state.
 
-        :param state: Desired LED state, lit (INDICATOR_LED_LIT), blinking
-            (INDICATOR_LED_BLINKING), off (INDICATOR_LED_OFF)
+        :param state: Desired LED state, an IndicatorLED value.
         :raises: InvalidParameterValueError, if any information passed is
             invalid.
         """
-        if state not in res_maps.INDICATOR_LED_VALUE_MAP_REV:
+        try:
+            state = res_cons.IndicatorLED(state).value
+        except ValueError:
             raise exceptions.InvalidParameterValueError(
                 parameter='state', value=state,
-                valid_values=list(res_maps.INDICATOR_LED_VALUE_MAP_REV))
+                valid_values=' ,'.join(i.value for i in res_cons.IndicatorLED))
 
-        data = {
-            'IndicatorLED': res_maps.INDICATOR_LED_VALUE_MAP_REV[state]
-        }
+        data = {'IndicatorLED': state}
 
         self._conn.patch(self.path, data=data)
         self.invalidate()

@@ -45,10 +45,10 @@ class UpdateServiceTestCase(base.TestCase):
         self.assertFalse(self.upd_serv.http_push_uri_targets_busy)
         self.assertEqual('Update service', self.upd_serv.name)
         self.assertTrue(self.upd_serv.service_enabled)
-        self.assertEqual(res_cons.STATE_ENABLED, self.upd_serv.status.state)
-        self.assertEqual(res_cons.HEALTH_OK, self.upd_serv.status.health)
+        self.assertEqual(res_cons.State.ENABLED, self.upd_serv.status.state)
+        self.assertEqual(res_cons.Health.OK, self.upd_serv.status.health)
         self.assertEqual(
-            res_cons.HEALTH_OK,
+            res_cons.Health.OK,
             self.upd_serv.status.health_rollup)
 
     def test__parse_attributes_missing_actions(self):

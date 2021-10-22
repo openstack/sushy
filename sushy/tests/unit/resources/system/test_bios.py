@@ -79,8 +79,8 @@ class BiosTestCase(base.TestCase):
         self.assertEqual('', self.sys_bios.attributes['AdminPhone'])
         self.assertEqual('Uefi', self.sys_bios.attributes['BootMode'])
         self.assertEqual(0, self.sys_bios.attributes['ProcCoreDisable'])
-        self.assertEqual([res_cons.APPLY_TIME_ON_RESET,
-                          res_cons.APPLY_TIME_MAINT_RESET],
+        self.assertEqual([res_cons.ApplyTime.ON_RESET,
+                          res_cons.ApplyTime.IN_MAINTENANCE_WINDOW_ON_RESET],
                          self.sys_bios.supported_apply_times)
         self.assertEqual(600, self.sys_bios.maintenance_window
                          .maintenance_window_duration_in_seconds)
@@ -126,7 +126,7 @@ class BiosTestCase(base.TestCase):
 
     def test_set_attribute_apply_time(self):
         self.sys_bios.set_attribute('ProcTurboMode', 'Disabled',
-                                    res_cons.APPLY_TIME_ON_RESET)
+                                    res_cons.ApplyTime.ON_RESET)
         self.sys_bios._conn.patch.assert_called_once_with(
             '/redfish/v1/Systems/437XR1138R2/BIOS/Settings',
             data={'Attributes': {'ProcTurboMode': 'Disabled'},
@@ -135,10 +135,11 @@ class BiosTestCase(base.TestCase):
                       'ApplyTime': 'OnReset'}})
 
     def test_set_attribute_apply_time_with_maintenance_window(self):
-        self.sys_bios.set_attribute('ProcTurboMode', 'Disabled',
-                                    res_cons.APPLY_TIME_MAINT_RESET,
-                                    datetime.datetime(2020, 9, 1, 4, 30, 0),
-                                    600)
+        self.sys_bios.set_attribute(
+            'ProcTurboMode', 'Disabled',
+            res_cons.ApplyTime.IN_MAINTENANCE_WINDOW_ON_RESET,
+            datetime.datetime(2020, 9, 1, 4, 30, 0),
+            600)
         self.sys_bios._conn.patch.assert_called_once_with(
             '/redfish/v1/Systems/437XR1138R2/BIOS/Settings',
             data={'Attributes': {'ProcTurboMode': 'Disabled'},
@@ -175,7 +176,7 @@ class BiosTestCase(base.TestCase):
     def test_set_attributes_apply_time(self):
         self.sys_bios.set_attributes({'ProcTurboMode': 'Disabled',
                                       'UsbControl': 'UsbDisabled'},
-                                     res_cons.APPLY_TIME_IMMEDIATE)
+                                     res_cons.ApplyTime.IMMEDIATE)
         self.sys_bios._conn.patch.assert_called_once_with(
             '/redfish/v1/Systems/437XR1138R2/BIOS/Settings',
             data={'Attributes': {'ProcTurboMode': 'Disabled',
@@ -185,11 +186,11 @@ class BiosTestCase(base.TestCase):
                       'ApplyTime': 'Immediate'}})
 
     def test_set_attributes_apply_time_with_maintenance_window(self):
-        self.sys_bios.set_attributes({'ProcTurboMode': 'Disabled',
-                                      'UsbControl': 'UsbDisabled'},
-                                     res_cons.APPLY_TIME_MAINT_START,
-                                     datetime.datetime(2020, 9, 1, 4, 30, 0),
-                                     600)
+        self.sys_bios.set_attributes(
+            {'ProcTurboMode': 'Disabled', 'UsbControl': 'UsbDisabled'},
+            res_cons.ApplyTime.AT_MAINTENANCE_WINDOW_START,
+            datetime.datetime(2020, 9, 1, 4, 30, 0),
+            600)
         self.sys_bios._conn.patch.assert_called_once_with(
             '/redfish/v1/Systems/437XR1138R2/BIOS/Settings',
             data={'Attributes': {'ProcTurboMode': 'Disabled',
@@ -213,7 +214,7 @@ class BiosTestCase(base.TestCase):
                           self.sys_bios.set_attributes,
                           {'ProcTurboMode': 'Disabled',
                            'UsbControl': 'UsbDisabled'},
-                          res_cons.APPLY_TIME_MAINT_START,
+                          res_cons.ApplyTime.AT_MAINTENANCE_WINDOW_START,
                           maint_window_duration=600)
 
     def test_set_attributes_maint_window_duration_missing(self):
@@ -221,7 +222,7 @@ class BiosTestCase(base.TestCase):
                           self.sys_bios.set_attributes,
                           {'ProcTurboMode': 'Disabled',
                            'UsbControl': 'UsbDisabled'},
-                          res_cons.APPLY_TIME_MAINT_START,
+                          res_cons.ApplyTime.AT_MAINTENANCE_WINDOW_START,
                           datetime.datetime.now())
 
     def test_set_attributes_on_refresh(self):

@@ -19,7 +19,7 @@ import logging
 from sushy import exceptions
 from sushy.resources import base
 from sushy.resources import common
-from sushy.resources import mappings as res_maps
+from sushy.resources import constants as res_cons
 from sushy.resources import settings
 from sushy import utils
 
@@ -114,10 +114,7 @@ class Bios(base.ResourceBase):
         :param key: Attribute name
         :param value: Attribute value
         :param apply_time: When to update the attribute. Optional.
-            APPLY_TIME_IMMEDIATE - Immediate,
-            APPLY_TIME_ON_RESET - On reset,
-            APPLY_TIME_MAINT_START - During specified maintenance time
-            APPLY_TIME_MAINT_RESET - On reset during specified maintenance time
+            An :py:class:`sushy.ApplyTime` value.
         :param maint_window_start_time: The start time of a maintenance window,
             datetime. Required when updating during maintenance window and
             default maintenance window not set by the system.
@@ -140,10 +137,7 @@ class Bios(base.ResourceBase):
 
         :param value: Key-value pairs for attribute name and value
         :param apply_time: When to update the attributes. Optional.
-            APPLY_TIME_IMMEDIATE - Immediate,
-            APPLY_TIME_ON_RESET - On reset,
-            APPLY_TIME_MAINT_START - During specified maintenance time
-            APPLY_TIME_MAINT_RESET - On reset during specified maintenance time
+            An :py:class:`sushy.ApplyTime` value.
         :param maint_window_start_time: The start time of a maintenance window,
             datetime. Required when updating during maintenance window and
             default maintenance window not set by the system.
@@ -161,7 +155,7 @@ class Bios(base.ResourceBase):
             prop = '@Redfish.SettingsApplyTime'
             payload[prop] = {
                 '@odata.type': '#Settings.v1_0_0.PreferredApplyTime',
-                'ApplyTime': res_maps.APPLY_TIME_VALUE_MAP_REV[apply_time]
+                'ApplyTime': res_cons.ApplyTime(apply_time).value,
             }
             if maint_window_start_time and not maint_window_duration:
                 raise ValueError('"maint_window_duration" missing')

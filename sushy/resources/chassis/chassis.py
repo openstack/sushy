@@ -21,8 +21,8 @@ from sushy.resources.chassis import mappings as cha_maps
 from sushy.resources.chassis.power import power
 from sushy.resources.chassis.thermal import thermal
 from sushy.resources import common
+from sushy.resources import constants as res_cons
 from sushy.resources.manager import manager
-from sushy.resources import mappings as res_maps
 from sushy import utils
 
 
@@ -89,8 +89,7 @@ class Chassis(base.ResourceBase):
     manufacturer.
     """
 
-    indicator_led = base.MappedField('IndicatorLED',
-                                     res_maps.INDICATOR_LED_VALUE_MAP)
+    indicator_led = base.MappedField('IndicatorLED', res_cons.IndicatorLED)
     """The state of the indicator LED, used to identify the chassis"""
 
     manufacturer = base.Field('Manufacturer')
@@ -108,8 +107,7 @@ class Chassis(base.ResourceBase):
     security.
     """
 
-    power_state = base.MappedField('PowerState',
-                                   res_maps.POWER_STATE_VALUE_MAP)
+    power_state = base.MappedField('PowerState', res_cons.PowerState)
     """The current power state of the chassis"""
 
     serial_number = base.Field('SerialNumber')
@@ -180,11 +178,10 @@ class Chassis(base.ResourceBase):
         if not reset_action.allowed_values:
             LOG.warning('Could not figure out the allowed values for the '
                         'reset chassis action for Chassis %s', self.identity)
-            return set(res_maps.RESET_TYPE_VALUE_MAP_REV)
+            return set(res_cons.ResetType)
 
-        return set([res_maps.RESET_TYPE_VALUE_MAP[v] for v in
-                    set(res_maps.RESET_TYPE_VALUE_MAP).
-                    intersection(reset_action.allowed_values)])
+        return {v for v in res_cons.ResetType
+                if v.value in reset_action.allowed_values}
 
     def reset_chassis(self, value):
         """Reset the chassis.
@@ -198,7 +195,7 @@ class Chassis(base.ResourceBase):
             raise exceptions.InvalidParameterValueError(
                 parameter='value', value=value, valid_values=valid_resets)
 
-        value = res_maps.RESET_TYPE_VALUE_MAP_REV[value]
+        value = res_cons.ResetType(value).value
         target_uri = self._get_reset_action_element().target_uri
 
         LOG.debug('Resetting the Chassis %s ...', self.identity)
@@ -208,19 +205,18 @@ class Chassis(base.ResourceBase):
     def set_indicator_led(self, state):
         """Set IndicatorLED to the given state.
 
-        :param state: Desired LED state, lit (INDICATOR_LED_LIT), blinking
-            (INDICATOR_LED_BLINKING), off (INDICATOR_LED_OFF)
+        :param state: Desired LED state, an IndicatorLED value.
         :raises: InvalidParameterValueError, if any information passed is
             invalid.
         """
-        if state not in res_maps.INDICATOR_LED_VALUE_MAP_REV:
+        try:
+            state = res_cons.IndicatorLED(state).value
+        except ValueError:
             raise exceptions.InvalidParameterValueError(
                 parameter='state', value=state,
-                valid_values=list(res_maps.INDICATOR_LED_VALUE_MAP_REV))
+                valid_values=' ,'.join(i.value for i in res_cons.IndicatorLED))
 
-        data = {
-            'IndicatorLED': res_maps.INDICATOR_LED_VALUE_MAP_REV[state]
-        }
+        data = {'IndicatorLED': state}
 
         self._conn.patch(self.path, data=data)
         self.invalidate()

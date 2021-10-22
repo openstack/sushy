@@ -56,8 +56,8 @@ class DriveTestCase(base.TestCase):
         self.assertEqual(sushy.PROTOCOL_TYPE_SAS, self.stor_drive.protocol)
         self.assertEqual('1234570', self.stor_drive.serial_number)
         self.assertEqual('100A', self.stor_drive.revision)
-        self.assertEqual(sushy.STATE_ENABLED, self.stor_drive.status.state)
-        self.assertEqual(sushy.HEALTH_OK, self.stor_drive.status.health)
+        self.assertEqual(sushy.State.ENABLED, self.stor_drive.status.state)
+        self.assertEqual(sushy.Health.OK, self.stor_drive.status.health)
 
     def test_volumes(self):
         with open('sushy/tests/unit/json_samples/drive3.json') as f:
@@ -86,7 +86,7 @@ class DriveTestCase(base.TestCase):
         with mock.patch.object(
                 self.stor_drive, 'invalidate',
                 autospec=True) as invalidate_mock:
-            self.stor_drive.set_indicator_led(sushy.INDICATOR_LED_BLINKING)
+            self.stor_drive.set_indicator_led(sushy.IndicatorLED.BLINKING)
             self.stor_drive._conn.patch.assert_called_once_with(
                 '/redfish/v1/Systems/437XR1138/Storage/1/Drives/'
                 '32ADF365C6C1B7BD', data={'IndicatorLED': 'Blinking'})

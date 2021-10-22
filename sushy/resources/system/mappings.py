@@ -16,20 +16,6 @@
 from sushy.resources.system import constants as sys_cons
 from sushy import utils
 
-
-RESET_SYSTEM_VALUE_MAP = {
-    'On': sys_cons.RESET_ON,
-    'ForceOff': sys_cons.RESET_FORCE_OFF,
-    'GracefulShutdown': sys_cons.RESET_GRACEFUL_SHUTDOWN,
-    'GracefulRestart': sys_cons.RESET_GRACEFUL_RESTART,
-    'ForceRestart': sys_cons.RESET_FORCE_RESTART,
-    'Nmi': sys_cons.RESET_NMI,
-    'ForceOn': sys_cons.RESET_FORCE_ON,
-    'PushPowerButton': sys_cons.RESET_PUSH_POWER_BUTTON,
-}
-
-RESET_SYSTEM_VALUE_MAP_REV = utils.revert_dictionary(RESET_SYSTEM_VALUE_MAP)
-
 BOOT_SOURCE_TARGET_MAP = {
     'None': sys_cons.BOOT_SOURCE_TARGET_NONE,
     'Pxe': sys_cons.BOOT_SOURCE_TARGET_PXE,

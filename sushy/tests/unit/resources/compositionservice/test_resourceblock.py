@@ -54,9 +54,9 @@ class ResourceBlockTestCase(base.TestCase):
             res_block_cons.RESOURCE_BLOCK_TYPE_STORAGE,
             self.res_block.resource_block_type)
         self.assertEqual(
-            res_cons.STATE_ENABLED,
+            res_cons.State.ENABLED,
             self.res_block.status.state)
-        self.assertEqual(res_cons.HEALTH_OK, self.res_block.status.health)
+        self.assertEqual(res_cons.Health.OK, self.res_block.status.health)
         exp_path = '/redfish/v1/CompositionService/ResourceBlocks/DriveBlock3'
         self.assertEqual(exp_path, self.res_block.path)
 

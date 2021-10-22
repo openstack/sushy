@@ -19,13 +19,14 @@ from sushy import exceptions
 from sushy.resources import base
 from sushy.resources import common
 from sushy.resources import constants as res_cons
-from sushy.resources import mappings as res_maps
 from sushy.resources.system.storage import constants as store_cons
 from sushy.resources.system.storage import mappings as store_maps
 from sushy.taskmonitor import TaskMonitor
 from sushy import utils
 
 LOG = logging.getLogger(__name__)
+
+_OAT_PROP = '@Redfish.OperationApplyTime'
 
 
 class ActionsField(base.CompositeField):
@@ -99,11 +100,10 @@ class Volume(base.ResourceBase):
         value = store_maps.VOLUME_INIT_TYPE_MAP_REV[value]
         payload = {'InitializeType': value}
         blocking = False
-        oat_prop = '@Redfish.OperationApplyTime'
         if apply_time:
-            payload[oat_prop] = res_maps.APPLY_TIME_VALUE_MAP_REV[apply_time]
-        if (payload and payload.get(oat_prop) == res_maps.
-                APPLY_TIME_VALUE_MAP_REV[res_cons.APPLY_TIME_IMMEDIATE]):
+            payload[_OAT_PROP] = res_cons.ApplyTime(apply_time).value
+        if (payload and payload.get(_OAT_PROP)
+                == res_cons.ApplyTime.IMMEDIATE.value):
             blocking = True
         target_uri = self._get_initialize_action_element().target_uri
         r = self._conn.post(target_uri, data=payload, blocking=blocking,
@@ -116,10 +116,7 @@ class Volume(base.ResourceBase):
 
         :param value: The InitializeType value.
         :param apply_time: When to update the attributes. Optional.
-            APPLY_TIME_IMMEDIATE - Immediate,
-            APPLY_TIME_ON_RESET - On reset,
-            APPLY_TIME_MAINT_START - During specified maintenance time
-            APPLY_TIME_MAINT_RESET - On reset during specified maintenance time
+            An :py:class:`sushy.ApplyTime` value.
         :param timeout: Max time in seconds to wait for blocking async call.
         :raises: InvalidParameterValueError, if the target value is not
             allowed.
@@ -135,13 +132,12 @@ class Volume(base.ResourceBase):
 
     def _delete(self, payload=None, apply_time=None, timeout=500):
         blocking = False
-        oat_prop = '@Redfish.OperationApplyTime'
         if apply_time:
             if payload is None:
                 payload = {}
-            payload[oat_prop] = res_maps.APPLY_TIME_VALUE_MAP_REV[apply_time]
-        if (payload and payload.get(oat_prop) == res_maps.
-                APPLY_TIME_VALUE_MAP_REV[res_cons.APPLY_TIME_IMMEDIATE]):
+            payload[_OAT_PROP] = res_cons.ApplyTime(apply_time).value
+        if (payload and payload.get(_OAT_PROP)
+                == res_cons.ApplyTime.IMMEDIATE.value):
             blocking = True
         r = self._conn.delete(self._path, data=payload, blocking=blocking,
                               timeout=timeout)
@@ -152,10 +148,7 @@ class Volume(base.ResourceBase):
 
         :param payload: May contain @Redfish.OperationApplyTime property
         :param apply_time: When to update the attributes. Optional.
-            APPLY_TIME_IMMEDIATE - Immediate,
-            APPLY_TIME_ON_RESET - On reset,
-            APPLY_TIME_MAINT_START - During specified maintenance time
-            APPLY_TIME_MAINT_RESET - On reset during specified maintenance time
+            An :py:class:`sushy.ApplyTime` value.
         :param timeout: Max time in seconds to wait for blocking async call.
         :raises: ConnectionError
         :raises: HTTPError
@@ -203,13 +196,12 @@ class VolumeCollection(base.ResourceCollectionBase):
 
     def _create(self, payload, apply_time=None, timeout=500):
         blocking = False
-        oat_prop = '@Redfish.OperationApplyTime'
         if apply_time:
             if payload is None:
                 payload = {}
-            payload[oat_prop] = res_maps.APPLY_TIME_VALUE_MAP_REV[apply_time]
-        if (payload and payload.get(oat_prop) == res_maps.
-                APPLY_TIME_VALUE_MAP_REV[res_cons.APPLY_TIME_IMMEDIATE]):
+            payload[_OAT_PROP] = res_cons.ApplyTime(apply_time).value
+        if (payload and payload.get(_OAT_PROP)
+                == res_cons.ApplyTime.IMMEDIATE.value):
             blocking = True
         r = self._conn.post(self._path, data=payload, blocking=blocking,
                             timeout=timeout)
@@ -221,10 +213,7 @@ class VolumeCollection(base.ResourceCollectionBase):
 
         :param payload: The payload representing the new volume to create.
         :param apply_time: When to update the attributes. Optional.
-            APPLY_TIME_IMMEDIATE - Immediate,
-            APPLY_TIME_ON_RESET - On reset,
-            APPLY_TIME_MAINT_START - During specified maintenance time
-            APPLY_TIME_MAINT_RESET - On reset during specified maintenance time
+            An :py:class:`sushy.ApplyTime` value.
         :param timeout: Max time in seconds to wait for blocking async call.
         :raises: ConnectionError
         :raises: HTTPError

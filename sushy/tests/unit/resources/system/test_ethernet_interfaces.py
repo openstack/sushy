@@ -44,8 +44,8 @@ class EthernetInterfaceTestCase(base.TestCase):
         self.assertEqual(
             '12:44:6A:3B:04:11', self.sys_eth.permanent_mac_address)
         self.assertEqual('12:44:6A:3B:04:11', self.sys_eth.mac_address)
-        self.assertEqual(res_cons.STATE_ENABLED, self.sys_eth.status.state)
-        self.assertEqual(res_cons.HEALTH_OK, self.sys_eth.status.health)
+        self.assertEqual(res_cons.State.ENABLED, self.sys_eth.status.state)
+        self.assertEqual(res_cons.Health.OK, self.sys_eth.status.health)
         self.assertEqual(1000, self.sys_eth.speed_mbps)
 
 
@@ -105,6 +105,6 @@ class EthernetInterfaceCollectionTestCase(base.TestCase):
         with open('sushy/tests/unit/json_samples/'
                   'ethernet_interfaces.json') as f:
             self.conn.get.return_value.json.return_value = json.load(f)
-        expected_summary = {'12:44:6A:3B:04:11': res_cons.STATE_ENABLED}
+        expected_summary = {'12:44:6A:3B:04:11': res_cons.State.ENABLED}
         actual_summary = self.sys_eth_col.summary
         self.assertEqual(expected_summary, actual_summary)

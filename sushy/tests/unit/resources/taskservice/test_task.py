@@ -16,6 +16,7 @@ import json
 from unittest import mock
 
 from sushy.resources import constants as res_cons
+from sushy.resources.taskservice import constants as ts_cons
 from sushy.resources.taskservice import task
 from sushy.tests.unit import base
 
@@ -50,14 +51,14 @@ class TaskTestCase(base.TestCase):
         self.assertEqual('2012-03-07T14:44+06:00', self.task.start_time)
         self.assertEqual('2012-03-07T14:45+06:00', self.task.end_time)
         self.assertEqual(100, self.task.percent_complete)
-        self.assertEqual(res_cons.TASK_STATE_COMPLETED, self.task.task_state)
-        self.assertEqual(res_cons.HEALTH_OK, self.task.task_status)
+        self.assertEqual(ts_cons.TaskState.COMPLETED, self.task.task_state)
+        self.assertEqual(res_cons.Health.OK, self.task.task_status)
         self.assertEqual(1, len(self.task.messages))
         self.assertEqual('Base.1.0.PropertyNotWriteable',
                          self.task.messages[0].message_id)
         self.assertEqual('Property %1 is read only.',
                          self.task.messages[0].message)
-        self.assertEqual(res_cons.SEVERITY_WARNING,
+        self.assertEqual(res_cons.Severity.WARNING,
                          self.task.messages[0].severity)
 
     def test_is_processing_true(self):
@@ -143,7 +144,8 @@ class TaskCollectionTestCase(base.TestCase):
         # | WHEN |
         actual_summary = self.task_col.summary
         # | THEN |
-        self.assertEqual({'545': 'completed', '546': 'pending'},
+        self.assertEqual({'545': ts_cons.TaskState.COMPLETED,
+                          '546': ts_cons.TaskState.PENDING},
                          actual_summary)
 
         # reset mock
@@ -159,7 +161,8 @@ class TaskCollectionTestCase(base.TestCase):
         # | GIVEN |
         self._setUp_task_summary()
         # | WHEN & THEN |
-        self.assertEqual({'545': 'completed', '546': 'pending'},
+        self.assertEqual({'545': ts_cons.TaskState.COMPLETED,
+                          '546': ts_cons.TaskState.PENDING},
                          self.task_col.summary)
 
         self.conn.get.return_value.json.side_effect = None
@@ -173,5 +176,6 @@ class TaskCollectionTestCase(base.TestCase):
         # | GIVEN |
         self._setUp_task_summary()
         # | WHEN & THEN |
-        self.assertEqual({'545': 'completed', '546': 'pending'},
+        self.assertEqual({'545': ts_cons.TaskState.COMPLETED,
+                          '546': ts_cons.TaskState.PENDING},
                          self.task_col.summary)

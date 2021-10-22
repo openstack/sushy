@@ -17,7 +17,7 @@ import logging
 
 from sushy.resources import base
 from sushy.resources import constants as res_cons
-from sushy.resources import mappings as res_maps
+from sushy.resources.registry import constants as reg_cons
 
 LOG = logging.getLogger(__name__)
 
@@ -41,7 +41,7 @@ class MessageDictionaryField(base.DictionaryField):
 
     param_types = base.Field('ParamTypes',
                              adapter=lambda x:
-                                 [res_maps.PARAMTYPE_VALUE_MAP[v.lower()]
+                                 [reg_cons.MessageParamType(v.lower())
                                   for v in x])
     """Mapped MessageArg types, in order, for the message"""
 
@@ -49,9 +49,9 @@ class MessageDictionaryField(base.DictionaryField):
     """Suggestions on how to resolve the situation that caused the error"""
 
     severity = base.MappedField('Severity',
-                                res_maps.SEVERITY_VALUE_MAP,
+                                res_cons.Severity,
                                 required=True,
-                                default=res_cons.SEVERITY_WARNING)
+                                default=res_cons.Severity.WARNING)
     """Mapped severity of the message"""
 
 

@@ -61,7 +61,7 @@ class VolumeTestCase(base.TestCase):
                      'Volumes/1/Actions/Volume.Initialize'
         self.stor_volume.initialize(
             store_cons.VOLUME_INIT_TYPE_FAST,
-            apply_time=res_cons.APPLY_TIME_IMMEDIATE)
+            apply_time=res_cons.ApplyTime.IMMEDIATE)
         self.stor_volume._conn.post.assert_called_once_with(
             target_uri, data={'InitializeType': 'Fast',
                               '@Redfish.OperationApplyTime': 'Immediate'},
@@ -72,7 +72,7 @@ class VolumeTestCase(base.TestCase):
                      'Volumes/1/Actions/Volume.Initialize'
         self.stor_volume.initialize(
             store_cons.VOLUME_INIT_TYPE_FAST,
-            apply_time=res_cons.APPLY_TIME_ON_RESET)
+            apply_time=res_cons.ApplyTime.ON_RESET)
         self.stor_volume._conn.post.assert_called_once_with(
             target_uri, data={'InitializeType': 'Fast',
                               '@Redfish.OperationApplyTime': 'OnReset'},
@@ -82,7 +82,7 @@ class VolumeTestCase(base.TestCase):
         payload = {}
         self.conn.delete.return_value.status_code = 200
         resource = self.stor_volume.delete(
-            payload=payload, apply_time=res_cons.APPLY_TIME_IMMEDIATE)
+            payload=payload, apply_time=res_cons.ApplyTime.IMMEDIATE)
         self.stor_volume._conn.delete.assert_called_once_with(
             self.stor_volume._path, data=payload, blocking=True, timeout=500)
         self.assertIsNone(resource)
@@ -97,7 +97,7 @@ class VolumeTestCase(base.TestCase):
         self.conn.delete.return_value.json.return_value = {'Id': 3,
                                                            'Name': 'Test'}
         task_mon = self.stor_volume.delete(
-            payload=payload, apply_time=res_cons.APPLY_TIME_ON_RESET,
+            payload=payload, apply_time=res_cons.ApplyTime.ON_RESET,
             timeout=250)
         self.stor_volume._conn.delete.assert_called_once_with(
             self.stor_volume._path, data=payload, blocking=False, timeout=250)
@@ -141,9 +141,9 @@ class VolumeCollectionTestCase(base.TestCase):
                          support._maintenance_window_resource.resource_uri)
         self.assertEqual(['Immediate', 'OnReset', 'AtMaintenanceWindowStart'],
                          support.supported_values)
-        self.assertEqual([res_cons.APPLY_TIME_IMMEDIATE,
-                          res_cons.APPLY_TIME_ON_RESET,
-                          res_cons.APPLY_TIME_MAINT_START],
+        self.assertEqual([res_cons.ApplyTime.IMMEDIATE,
+                          res_cons.ApplyTime.ON_RESET,
+                          res_cons.ApplyTime.AT_MAINTENANCE_WINDOW_START],
                          support.mapped_supported_values)
 
     @mock.patch.object(volume, 'Volume', autospec=True)
@@ -227,7 +227,7 @@ class VolumeCollectionTestCase(base.TestCase):
             'Location': '/redfish/v1/Systems/437XR1138R2/Storage/1/Volumes/4'
         }
         new_vol = self.stor_vol_col.create(
-            payload, apply_time=res_cons.APPLY_TIME_IMMEDIATE)
+            payload, apply_time=res_cons.ApplyTime.IMMEDIATE)
         self.stor_vol_col._conn.post.assert_called_once_with(
             '/redfish/v1/Systems/437XR1138R2/Storage/1/Volumes',
             data=expected_payload, blocking=True, timeout=500)
@@ -258,7 +258,7 @@ class VolumeCollectionTestCase(base.TestCase):
             'Retry-After': '120'
         }
         task_mon = self.stor_vol_col.create(
-            payload, apply_time=res_cons.APPLY_TIME_ON_RESET)
+            payload, apply_time=res_cons.ApplyTime.ON_RESET)
         self.stor_vol_col._conn.post.assert_called_once_with(
             '/redfish/v1/Systems/437XR1138R2/Storage/1/Volumes',
             data=expected_payload, blocking=False, timeout=500)

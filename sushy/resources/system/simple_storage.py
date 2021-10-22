@@ -73,7 +73,7 @@ class SimpleStorageCollection(base.ResourceCollectionBase):
         return sorted(device.capacity_bytes
                       for simpl_stor in self.get_members()
                       for device in simpl_stor.devices
-                      if (device.status.state == res_cons.STATE_ENABLED
+                      if (device.status.state == res_cons.State.ENABLED
                           and device.capacity_bytes is not None))
 
     @property

@@ -48,8 +48,8 @@ class CompositionServiceTestCase(base.TestCase):
         self.assertEqual(
             'Composition Service',
             self.comp_ser.name)
-        self.assertEqual(res_cons.STATE_ENABLED, self.comp_ser.status.state)
-        self.assertEqual(res_cons.HEALTH_OK, self.comp_ser.status.health)
+        self.assertEqual(res_cons.State.ENABLED, self.comp_ser.status.state)
+        self.assertEqual(res_cons.Health.OK, self.comp_ser.status.health)
         self.assertTrue(self.comp_ser.service_enabled)
 
     @mock.patch.object(resourceblock, 'ResourceBlockCollection', autospec=True)
