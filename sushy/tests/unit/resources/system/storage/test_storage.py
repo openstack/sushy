@@ -129,9 +129,9 @@ class StorageTestCase(base.TestCase):
                          identifier.durable_name_format)
         self.assertEqual('345C59DBD970859C', identifier.durable_name)
         self.assertEqual(12, controller.speed_gbps)
-        self.assertEqual([sushy.PROTOCOL_TYPE_PCIe],
+        self.assertEqual([sushy.Protocol.PCIe],
                          controller.controller_protocols)
-        self.assertEqual([sushy.PROTOCOL_TYPE_SAS, sushy.PROTOCOL_TYPE_SATA],
+        self.assertEqual([sushy.Protocol.SAS, sushy.Protocol.SATA],
                          controller.device_protocols)
         self.assertEqual([sushy.RAID_TYPE_RAID0, sushy.RAID_TYPE_RAID1],
                          controller.raid_types)

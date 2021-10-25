@@ -13,16 +13,51 @@
 # Values come from the Redfish UpdateService json-schema.
 # https://redfish.dmtf.org/schemas/UpdateService.v1_2_2.json#/definitions/TransferProtocolType
 
-from sushy.resources import constants as res_cons
+import enum
 
-# Transfer Protocol Type constants
 
-UPDATE_PROTOCOL_CIFS = res_cons.PROTOCOL_TYPE_CIFS
-UPDATE_PROTOCOL_FTP = res_cons.PROTOCOL_TYPE_FTP
-UPDATE_PROTOCOL_SFTP = res_cons.PROTOCOL_TYPE_SFTP
-UPDATE_PROTOCOL_HTTP = res_cons.PROTOCOL_TYPE_HTTP
-UPDATE_PROTOCOL_HTTPS = res_cons.PROTOCOL_TYPE_HTTPS
-UPDATE_PROTOCOL_SCP = res_cons.PROTOCOL_TYPE_SCP
-UPDATE_PROTOCOL_TFTP = res_cons.PROTOCOL_TYPE_TFTP
-UPDATE_PROTOCOL_OEM = res_cons.PROTOCOL_TYPE_OEM
-UPDATE_PROTOCOL_NFS = res_cons.PROTOCOL_TYPE_NFS
+class UpdateTransferProtocolType(enum.Enum):
+    """Transfer Protocol Type constants"""
+
+    CIFS = 'CIFS'
+    """Common Internet File System (CIFS)."""
+
+    FTP = 'FTP'
+    """File Transfer Protocol (FTP)."""
+
+    SFTP = 'SFTP'
+    """Secure File Transfer Protocol (SFTP)."""
+
+    HTTP = 'HTTP'
+    """Hypertext Transfer Protocol (HTTP)."""
+
+    HTTPS = 'HTTPS'
+    """Hypertext Transfer Protocol Secure (HTTPS)."""
+
+    SCP = 'SCP'
+    """Secure Copy Protocol (SCP)."""
+
+    TFTP = 'TFTP'
+    """Trivial File Transfer Protocol (TFTP)."""
+
+    OEM = 'OEM'
+    """A manufacturer-defined protocol."""
+
+    NFS = 'NFS'
+    """Network File System (NFS)."""
+
+    # Deprecated alias:
+
+    NSF = 'NFS'
+    """Network File System (NFS)."""
+
+
+UPDATE_PROTOCOL_CIFS = UpdateTransferProtocolType.CIFS
+UPDATE_PROTOCOL_FTP = UpdateTransferProtocolType.FTP
+UPDATE_PROTOCOL_SFTP = UpdateTransferProtocolType.SFTP
+UPDATE_PROTOCOL_HTTP = UpdateTransferProtocolType.HTTP
+UPDATE_PROTOCOL_HTTPS = UpdateTransferProtocolType.HTTPS
+UPDATE_PROTOCOL_SCP = UpdateTransferProtocolType.SCP
+UPDATE_PROTOCOL_TFTP = UpdateTransferProtocolType.TFTP
+UPDATE_PROTOCOL_OEM = UpdateTransferProtocolType.OEM
+UPDATE_PROTOCOL_NFS = UpdateTransferProtocolType.NFS

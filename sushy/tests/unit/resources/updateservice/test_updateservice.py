@@ -70,7 +70,7 @@ class UpdateServiceTestCase(base.TestCase):
         tm = self.upd_serv.simple_update(
             image_uri='local.server/update.exe',
             targets=['/redfish/v1/UpdateService/FirmwareInventory/BMC'],
-            transfer_protocol=ups_cons.UPDATE_PROTOCOL_HTTPS)
+            transfer_protocol=ups_cons.UpdateTransferProtocolType.HTTPS)
 
         self.assertIsInstance(tm, taskmonitor.TaskMonitor)
         self.assertEqual('/Task/545', tm.task_monitor_uri)
@@ -95,7 +95,7 @@ class UpdateServiceTestCase(base.TestCase):
         tm = self.upd_serv.simple_update(
             image_uri='local.server/update.exe',
             targets=['/redfish/v1/UpdateService/FirmwareInventory/BMC'],
-            transfer_protocol=ups_cons.UPDATE_PROTOCOL_HTTPS)
+            transfer_protocol=ups_cons.UpdateTransferProtocolType.HTTPS)
 
         self.assertIsInstance(tm, taskmonitor.TaskMonitor)
         self.assertEqual('/redfish/v1/TaskService/Tasks/545',

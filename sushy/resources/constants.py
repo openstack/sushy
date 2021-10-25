@@ -12,7 +12,8 @@
 
 # Values comes from the Redfish System json-schema:
 # http://redfish.dmtf.org/schemas/v1/Resource.json and
-# https://redfish.dmtf.org/schemas/v1/Settings.v1_3_3.json
+# https://redfish.dmtf.org/schemas/v1/Settings.v1_3_3.json and
+# https://redfish.dmtf.org/schemas/v1/Protocol.json
 
 import enum
 
@@ -231,37 +232,156 @@ RESET_TYPE_FORCE_ON = ResetType.FORCE_ON
 RESET_TYPE_PUSH_POWER_BUTTON = ResetType.PUSH_POWER_BUTTON
 RESET_TYPE_POWER_CYCLE = ResetType.POWER_CYCLE
 
-# Protocol type constants
 
-PROTOCOL_TYPE_AHCI = 'Advanced Host Controller Interface'
-PROTOCOL_TYPE_CIFS = 'Common Internet File System Protocol'
-PROTOCOL_TYPE_FC = 'Fibre Channel'
-PROTOCOL_TYPE_FCP = 'Fibre Channel Protocol for SCSI'
-PROTOCOL_TYPE_FCoE = 'Fibre Channel over Ethernet'
-PROTOCOL_TYPE_FICON = 'FIbre CONnection (FICON)'
-PROTOCOL_TYPE_FTP = 'File Transfer Protocol'
-PROTOCOL_TYPE_HTTP = 'Hypertext Transport Protocol'
-PROTOCOL_TYPE_HTTPS = 'Secure Hypertext Transport Protocol'
-PROTOCOL_TYPE_I2C = 'Inter-Integrated Circuit Bus'
-PROTOCOL_TYPE_NFS = 'Network File System Protocol'
-PROTOCOL_TYPE_NFSv3 = 'Network File System version 3'
-PROTOCOL_TYPE_NFSv4 = 'Network File System version 4'
-PROTOCOL_TYPE_NVMe = 'Non-Volatile Memory Express'
-PROTOCOL_TYPE_NVMeOverFabrics = 'NVMe over Fabrics'
-PROTOCOL_TYPE_OEM = 'OEM specific'
-PROTOCOL_TYPE_PCIe = 'PCI Express'
-PROTOCOL_TYPE_RoCE = 'RDMA over Converged Ethernet Protocol'
-PROTOCOL_TYPE_RoCEv2 = 'RDMA over Converged Ethernet Protocol Version 2'
-PROTOCOL_TYPE_SAS = 'Serial Attached SCSI'
-PROTOCOL_TYPE_SATA = 'Serial AT Attachment'
-PROTOCOL_TYPE_SCP = 'Secure File Copy Protocol'
-PROTOCOL_TYPE_SFTP = 'Secure File Transfer Protocol'
-PROTOCOL_TYPE_SMB = 'Server Message Block (CIFS Common Internet File System)'
-PROTOCOL_TYPE_TFTP = 'Trivial File Transfer Protocol'
-PROTOCOL_TYPE_UHCI = 'Universal Host Controller Interface'
-PROTOCOL_TYPE_USB = 'Universal Serial Bus'
-PROTOCOL_TYPE_iSCSI = 'Internet SCSI'
-PROTOCOL_TYPE_iWARP = 'Internet Wide Area Remote Direct Memory Access Protocol'
+class Protocol(enum.Enum):
+    """Protocol type constants"""
+
+    PCIe = 'PCIe'
+    """PCI Express."""
+
+    AHCI = 'AHCI'
+    """Advanced Host Controller Interface (AHCI)."""
+
+    UHCI = 'UHCI'
+    """Universal Host Controller Interface (UHCI)."""
+
+    SAS = 'SAS'
+    """Serial Attached SCSI."""
+
+    SATA = 'SATA'
+    """Serial AT Attachment."""
+
+    USB = 'USB'
+    """Universal Serial Bus (USB)."""
+
+    NVMe = 'NVMe'
+    """Non-Volatile Memory Express (NVMe)."""
+
+    FC = 'FC'
+    """Fibre Channel."""
+
+    iSCSI = 'iSCSI'
+    """Internet SCSI."""
+
+    FCoE = 'FCoE'
+    """Fibre Channel over Ethernet (FCoE)."""
+
+    FCP = 'FCP'
+    """Fibre Channel Protocol for SCSI."""
+
+    FICON = 'FICON'
+    """FIbre CONnection (FICON)."""
+
+    NVMe_OVER_FABRICS = 'NVMeOverFabrics'
+    """NVMe over Fabrics."""
+
+    SMB = 'SMB'
+    """Server Message Block (SMB).  Also known as the Common Internet File
+    System (CIFS)."""
+
+    NFSv3 = 'NFSv3'
+    """Network File System (NFS) version 3."""
+
+    NFSv4 = 'NFSv4'
+    """Network File System (NFS) version 4."""
+
+    HTTP = 'HTTP'
+    """Hypertext Transport Protocol (HTTP)."""
+
+    HTTPS = 'HTTPS'
+    """Hypertext Transfer Protocol Secure (HTTPS)."""
+
+    FTP = 'FTP'
+    """File Transfer Protocol (FTP)."""
+
+    SFTP = 'SFTP'
+    """SSH File Transfer Protocol (SFTP)."""
+
+    iWARP = 'iWARP'
+    """Internet Wide Area RDMA Protocol (iWARP)."""
+
+    RoCE = 'RoCE'
+    """RDMA over Converged Ethernet Protocol."""
+
+    RoCEv2 = 'RoCEv2'
+    """RDMA over Converged Ethernet Protocol Version 2."""
+
+    I2C = 'I2C'
+    """Inter-Integrated Circuit Bus."""
+
+    TCP = 'TCP'
+    """Transmission Control Protocol (TCP)."""
+
+    UDP = 'UDP'
+    """User Datagram Protocol (UDP)."""
+
+    TFTP = 'TFTP'
+    """Trivial File Transfer Protocol (TFTP)."""
+
+    GEN_Z = 'GenZ'
+    """GenZ."""
+
+    MULTI_PROTOCOL = 'MultiProtocol'
+    """Multiple Protocols."""
+
+    INFINI_BAND = 'InfiniBand'
+    """InfiniBand."""
+
+    ETHERNET = 'Ethernet'
+    """Ethernet."""
+
+    NVLINK = 'NVLink'
+    """NVLink."""
+
+    OEM = 'OEM'
+    """OEM-specific."""
+
+    DISPLAY_PORT = 'DisplayPort'
+    """DisplayPort."""
+
+    HDMI = 'HDMI'
+    """HDMI."""
+
+    VGA = 'VGA'
+    """VGA."""
+
+    DVI = 'DVI'
+    """DVI."""
+
+
+# Backward compatibility
+
+PROTOCOL_TYPE_AHCI = Protocol.AHCI
+PROTOCOL_TYPE_FC = Protocol.FC
+PROTOCOL_TYPE_FCP = Protocol.FCP
+PROTOCOL_TYPE_FCoE = Protocol.FCoE
+PROTOCOL_TYPE_FICON = Protocol.FICON
+PROTOCOL_TYPE_FTP = Protocol.FTP
+PROTOCOL_TYPE_HTTP = Protocol.HTTP
+PROTOCOL_TYPE_HTTPS = Protocol.HTTPS
+PROTOCOL_TYPE_I2C = Protocol.I2C
+PROTOCOL_TYPE_NFSv3 = Protocol.NFSv3
+PROTOCOL_TYPE_NFSv4 = Protocol.NFSv4
+PROTOCOL_TYPE_NVMe = Protocol.NVMe
+PROTOCOL_TYPE_NVMeOverFabrics = Protocol.NVMe_OVER_FABRICS
+PROTOCOL_TYPE_OEM = Protocol.OEM
+PROTOCOL_TYPE_PCIe = Protocol.PCIe
+PROTOCOL_TYPE_RoCE = Protocol.RoCE
+PROTOCOL_TYPE_RoCEv2 = Protocol.RoCEv2
+PROTOCOL_TYPE_SAS = Protocol.SAS
+PROTOCOL_TYPE_SATA = Protocol.SATA
+PROTOCOL_TYPE_SFTP = Protocol.SFTP
+PROTOCOL_TYPE_SMB = Protocol.SMB
+PROTOCOL_TYPE_TFTP = Protocol.TFTP
+PROTOCOL_TYPE_UHCI = Protocol.UHCI
+PROTOCOL_TYPE_USB = Protocol.USB
+PROTOCOL_TYPE_iSCSI = Protocol.iSCSI
+PROTOCOL_TYPE_iWARP = Protocol.iWARP
+
+# These values are not in the Protocol enum, using them is probably wrong!
+PROTOCOL_TYPE_CIFS = Protocol.SMB
+PROTOCOL_TYPE_NFS = Protocol.NFSv4
+PROTOCOL_TYPE_SCP = Protocol.SFTP
 
 
 class DurableNameFormat(enum.Enum):

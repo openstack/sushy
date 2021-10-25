@@ -38,7 +38,7 @@ class EndpointTestCase(base.TestCase):
         self.fab_endpoint._parse_attributes(self.json_doc)
         self.assertEqual('Drive1', self.fab_endpoint.identity)
         self.assertEqual('SAS Drive', self.fab_endpoint.name)
-        self.assertEqual(sushy.PROTOCOL_TYPE_SAS,
+        self.assertEqual(sushy.Protocol.SAS,
                          self.fab_endpoint.endpoint_protocol)
         self.assertEqual(sushy.ENTITY_TYPE_DRIVE,
                          self.fab_endpoint.connected_entities[0].entity_type)

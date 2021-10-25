@@ -53,7 +53,7 @@ class DriveTestCase(base.TestCase):
         self.assertEqual('HDD', self.stor_drive.media_type)
         self.assertEqual('C123', self.stor_drive.model)
         self.assertEqual('C123-1111', self.stor_drive.part_number)
-        self.assertEqual(sushy.PROTOCOL_TYPE_SAS, self.stor_drive.protocol)
+        self.assertEqual(sushy.Protocol.SAS, self.stor_drive.protocol)
         self.assertEqual('1234570', self.stor_drive.serial_number)
         self.assertEqual('100A', self.stor_drive.revision)
         self.assertEqual(sushy.State.ENABLED, self.stor_drive.status.state)

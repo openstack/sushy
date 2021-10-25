@@ -17,8 +17,8 @@ import logging
 
 from sushy.resources import base
 from sushy.resources import common
+from sushy.resources import constants as res_cons
 from sushy.resources.fabric import mappings as fab_maps
-from sushy.resources import mappings as res_maps
 from sushy import utils
 
 LOG = logging.getLogger(__name__)
@@ -69,7 +69,7 @@ class IPTransportDetailsListField(base.ListField):
     """The UDP or TCP port number used by the Endpoint."""
 
     transport_protocol = base.MappedField('TransportProtocol',
-                                          res_maps.PROTOCOL_TYPE_VALUE_MAP)
+                                          res_cons.Protocol)
     """The protocol used by the connection entity."""
 
     ipv4_address = IPv4AddressField('IPv4Address')
@@ -145,8 +145,7 @@ class Endpoint(base.ResourceBase):
     to this endpoint.
     """
 
-    endpoint_protocol = base.MappedField('EndpointProtocol',
-                                         res_maps.PROTOCOL_TYPE_VALUE_MAP)
+    endpoint_protocol = base.MappedField('EndpointProtocol', res_cons.Protocol)
     """The protocol supported by this endpoint."""
 
     pci_id = PciIdField('PciId')

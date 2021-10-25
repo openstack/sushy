@@ -20,7 +20,6 @@ from sushy import exceptions
 from sushy.resources import base
 from sushy.resources import common
 from sushy.resources.updateservice import constants as up_cons
-from sushy.resources.updateservice import mappings as up_maps
 from sushy.resources.updateservice import softwareinventory
 from sushy import taskmonitor
 from sushy import utils
@@ -97,7 +96,7 @@ class UpdateService(base.ResourceBase):
         LOG.warning(
             'Could not figure out the allowed values for the simple '
             'update action for UpdateService %s', self.identity)
-        return set(up_maps.TRANSFER_PROTOCOL_TYPE_VALUE_MAP)
+        return {x.value for x in up_cons.UpdateTransferProtocolType}
 
     def get_allowed_transfer_protocols(self):
         """Get the allowed values for transfer protocol.
@@ -112,7 +111,7 @@ class UpdateService(base.ResourceBase):
             LOG.debug(
                 'Server does not constrain allowed transfer protocols for '
                 'simple update action of UpdateService %s', self.identity)
-            return set(up_maps.TRANSFER_PROTOCOL_TYPE_VALUE_MAP_REV)
+            return set(up_cons.UpdateTransferProtocolType)
 
         return {simple_update_action.transfer_protocol}
 
@@ -125,8 +124,8 @@ class UpdateService(base.ResourceBase):
         valid_transfer_protocols = self.get_allowed_transfer_protocols()
 
         if transfer_protocol in valid_transfer_protocols:
-            transfer_protocol = up_maps.TRANSFER_PROTOCOL_TYPE_VALUE_MAP_REV[
-                transfer_protocol]
+            transfer_protocol = up_cons.UpdateTransferProtocolType(
+                transfer_protocol).value
 
         else:
             legacy_transfer_protocols = self._get_legacy_transfer_protocols()
@@ -139,7 +138,7 @@ class UpdateService(base.ResourceBase):
             LOG.warning(
                 'Legacy transfer protocol constant %s is being used. '
                 'Consider migrating to any of: %s', transfer_protocol,
-                ', '.join(up_maps.TRANSFER_PROTOCOL_TYPE_VALUE_MAP_REV))
+                ', '.join(x.value for x in up_cons.UpdateTransferProtocolType))
 
         target_uri = self._get_simple_update_element().target_uri
 

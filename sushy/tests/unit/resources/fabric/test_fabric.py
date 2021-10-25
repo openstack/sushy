@@ -44,7 +44,7 @@ class FabricTestCase(base.TestCase):
         self.assertEqual('SAS Fabric', self.fabric.name)
         self.assertEqual('A SAS Fabric with redundant switches.',
                          self.fabric.description)
-        self.assertEqual(sushy.PROTOCOL_TYPE_SAS,
+        self.assertEqual(sushy.Protocol.SAS,
                          self.fabric.fabric_type)
         self.assertEqual(sushy.State.ENABLED, self.fabric.status.state)
         self.assertEqual(sushy.Health.OK, self.fabric.status.health)
@@ -74,7 +74,7 @@ class FabricTestCase(base.TestCase):
             '/redfish/v1/Fabrics/SAS/Endpoints/Drive1')
 
         self.assertEqual(member.name, "SAS Drive")
-        self.assertEqual(member.endpoint_protocol, sushy.PROTOCOL_TYPE_SAS)
+        self.assertEqual(member.endpoint_protocol, sushy.Protocol.SAS)
 
     def test_endpoints_on_refresh(self):
         # | GIVEN |

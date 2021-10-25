@@ -17,7 +17,7 @@ import logging
 
 from sushy.resources import base
 from sushy.resources import common
-from sushy.resources import mappings as res_maps
+from sushy.resources import constants as res_cons
 from sushy.resources.system.storage import drive
 from sushy.resources.system.storage import mappings
 from sushy.resources.system.storage import volume
@@ -46,11 +46,11 @@ class StorageControllersListField(base.ListField):
     """The maximum speed of the storage controller's device interface."""
 
     controller_protocols = base.MappedListField(
-        'SupportedControllerProtocols', res_maps.PROTOCOL_TYPE_VALUE_MAP)
+        'SupportedControllerProtocols', res_cons.Protocol)
     """The protocols by which this storage controller can be communicated to"""
 
     device_protocols = base.MappedListField('SupportedDeviceProtocols',
-                                            res_maps.PROTOCOL_TYPE_VALUE_MAP)
+                                            res_cons.Protocol)
     """The protocols which the controller can use tocommunicate with devices"""
 
     raid_types = base.MappedListField('SupportedRAIDTypes',

@@ -19,7 +19,6 @@ from sushy import exceptions
 from sushy.resources import base
 from sushy.resources import common
 from sushy.resources import constants as res_cons
-from sushy.resources import mappings as res_maps
 from sushy.resources.system.storage import volume
 from sushy import utils
 
@@ -59,7 +58,7 @@ class Drive(base.ResourceBase):
     part_number = base.Field('PartNumber')
     """The part number for this drive"""
 
-    protocol = base.MappedField('Protocol', res_maps.PROTOCOL_TYPE_VALUE_MAP)
+    protocol = base.MappedField('Protocol', res_cons.Protocol)
     """Protocol this drive is using to communicate to the storage controller"""
 
     revision = base.Field("Revision")

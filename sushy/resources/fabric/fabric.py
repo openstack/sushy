@@ -17,8 +17,8 @@ import logging
 
 from sushy.resources import base
 from sushy.resources import common
+from sushy.resources import constants as res_cons
 from sushy.resources.fabric import endpoint as fab_endpoint
-from sushy.resources import mappings as res_maps
 from sushy import utils
 
 
@@ -47,8 +47,7 @@ class Fabric(base.ResourceBase):
     status = common.StatusField('Status')
     """The fabric status"""
 
-    fabric_type = base.MappedField('FabricType',
-                                   res_maps.PROTOCOL_TYPE_VALUE_MAP)
+    fabric_type = base.MappedField('FabricType', res_cons.Protocol)
     """The protocol being sent over this fabric"""
 
     def __init__(self, connector, identity, redfish_version=None,
