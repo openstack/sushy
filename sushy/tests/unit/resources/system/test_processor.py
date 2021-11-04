@@ -43,13 +43,12 @@ class ProcessorTestCase(base.TestCase):
         self.assertEqual('CPU1', self.sys_processor.identity)
         self.assertEqual('CPU 1', self.sys_processor.socket)
         self.assertEqual(
-            sushy.PROCESSOR_TYPE_CPU,
+            sushy.ProcessorType.CPU,
             self.sys_processor.processor_type)
-        self.assertEqual(sushy.PROCESSOR_ARCH_x86,
+        self.assertEqual(sushy.ProcessorArchitecture.X86,
                          self.sys_processor.processor_architecture)
-        self.assertEqual(
-            sushy.PROCESSOR_INSTRUCTIONSET_x86_64,
-            self.sys_processor.instruction_set)
+        self.assertEqual(sushy.InstructionSet.X86_64,
+                         self.sys_processor.instruction_set)
         self.assertEqual('Intel(R) Corporation',
                          self.sys_processor.manufacturer)
         self.assertEqual('Multi-Core Intel(R) Xeon(R) processor 7xxx Series',
@@ -167,10 +166,10 @@ class ProcessorCollectionTestCase(base.TestCase):
         # | WHEN |
         actual_summary = self.sys_processor_col.summary
         # | THEN |
-        self.assertEqual((16, sushy.PROCESSOR_ARCH_x86),
+        self.assertEqual((16, sushy.ProcessorArchitecture.X86),
                          actual_summary)
         self.assertEqual(16, actual_summary.count)
-        self.assertEqual(sushy.PROCESSOR_ARCH_x86,
+        self.assertEqual(sushy.ProcessorArchitecture.X86,
                          actual_summary.architecture)
 
         # reset mock
@@ -186,7 +185,7 @@ class ProcessorCollectionTestCase(base.TestCase):
         # | GIVEN |
         self._setUp_processor_summary()
         # | WHEN & THEN |
-        self.assertEqual((16, sushy.PROCESSOR_ARCH_x86),
+        self.assertEqual((16, sushy.ProcessorArchitecture.X86),
                          self.sys_processor_col.summary)
 
         self.conn.get.return_value.json.side_effect = None
@@ -200,5 +199,5 @@ class ProcessorCollectionTestCase(base.TestCase):
         # | GIVEN |
         self._setUp_processor_summary()
         # | WHEN & THEN |
-        self.assertEqual((16, sushy.PROCESSOR_ARCH_x86),
+        self.assertEqual((16, sushy.ProcessorArchitecture.X86),
                          self.sys_processor_col.summary)

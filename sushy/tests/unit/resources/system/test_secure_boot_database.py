@@ -44,17 +44,19 @@ class SecureBootDatabaseTestCase(base.TestCase):
 
     @mock.patch.object(secure_boot_database.LOG, 'warning', autospec=True)
     def test_get_allowed_reset_keys_values(self, mock_log):
-        self.assertEqual({constants.SECURE_BOOT_RESET_KEYS_TO_DEFAULT,
-                          constants.SECURE_BOOT_RESET_KEYS_DELETE_ALL},
-                         self.secure_boot.get_allowed_reset_keys_values())
+        self.assertEqual({
+            constants.SecureBootResetKeysType.RESET_ALL_KEYS_TO_DEFAULT,
+            constants.SecureBootResetKeysType.DELETE_ALL_KEYS
+        }, self.secure_boot.get_allowed_reset_keys_values())
         self.assertFalse(mock_log.called)
 
     @mock.patch.object(secure_boot_database.LOG, 'warning', autospec=True)
     def test_get_allowed_reset_keys_values_no_values(self, mock_log):
         self.secure_boot._actions.reset_keys.allowed_values = None
-        self.assertEqual({constants.SECURE_BOOT_RESET_KEYS_TO_DEFAULT,
-                          constants.SECURE_BOOT_RESET_KEYS_DELETE_ALL},
-                         self.secure_boot.get_allowed_reset_keys_values())
+        self.assertEqual({
+            constants.SecureBootResetKeysType.RESET_ALL_KEYS_TO_DEFAULT,
+            constants.SecureBootResetKeysType.DELETE_ALL_KEYS
+        }, self.secure_boot.get_allowed_reset_keys_values())
         self.assertTrue(mock_log.called)
 
     @mock.patch.object(secure_boot_database.LOG, 'warning', autospec=True)
@@ -63,13 +65,14 @@ class SecureBootDatabaseTestCase(base.TestCase):
             'ResetAllKeysToDefault',
             'IamNotRedfishCompatible',
         ]
-        self.assertEqual({constants.SECURE_BOOT_RESET_KEYS_TO_DEFAULT},
-                         self.secure_boot.get_allowed_reset_keys_values())
+        self.assertEqual(
+            {constants.SecureBootResetKeysType.RESET_ALL_KEYS_TO_DEFAULT},
+            self.secure_boot.get_allowed_reset_keys_values())
         self.assertFalse(mock_log.called)
 
     def test_reset_keys(self):
         self.secure_boot.reset_keys(
-            constants.SECURE_BOOT_RESET_KEYS_TO_DEFAULT)
+            constants.SecureBootResetKeysType.RESET_ALL_KEYS_TO_DEFAULT)
         self.conn.post.assert_called_once_with(
             '/redfish/v1/Systems/437XR1138R2/SecureBoot/SecureBootDatabases/db'
             '/Actions/SecureBootDatabase.ResetKeys',

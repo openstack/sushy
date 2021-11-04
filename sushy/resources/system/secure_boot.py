@@ -18,7 +18,7 @@ import logging
 from sushy import exceptions
 from sushy.resources import base
 from sushy.resources import common
-from sushy.resources.system import mappings
+from sushy.resources.system import constants
 from sushy.resources.system import secure_boot_database
 from sushy import utils
 
@@ -49,7 +49,7 @@ class SecureBoot(base.ResourceBase):
     """Human-readable description of the BIOS resource"""
 
     current_boot = base.MappedField('SecureBootCurrentBoot',
-                                    mappings.SECURE_BOOT_STATE)
+                                    constants.SecureBootCurrentBoot)
     """The UEFI Secure Boot state during the current boot cycle."""
 
     enabled = base.Field('SecureBootEnable')
@@ -58,7 +58,7 @@ class SecureBoot(base.ResourceBase):
     This property can be enabled in UEFI boot mode only.
     """
 
-    mode = base.MappedField('SecureBootMode', mappings.SECURE_BOOT_MODE)
+    mode = base.MappedField('SecureBootMode', constants.SecureBootMode)
     """The current UEFI Secure Boot Mode."""
 
     # TODO(dtantsur): SecureBootDatabases
@@ -114,11 +114,10 @@ class SecureBoot(base.ResourceBase):
         if not reset_action.allowed_values:
             LOG.warning('Could not figure out the allowed values for the '
                         'reset keys action for %s', self.identity)
-            return set(mappings.SECURE_BOOT_RESET_KEYS_REV)
+            return set(constants.SecureBootResetKeysType)
 
-        return set([mappings.SECURE_BOOT_RESET_KEYS[v] for v in
-                    set(mappings.SECURE_BOOT_RESET_KEYS).
-                    intersection(reset_action.allowed_values)])
+        return {v for v in constants.SecureBootResetKeysType
+                if v.value in reset_action.allowed_values}
 
     def reset_keys(self, reset_type):
         """Reset secure boot keys.
@@ -132,6 +131,7 @@ class SecureBoot(base.ResourceBase):
                 parameter='reset_type', value=reset_type,
                 valid_values=valid_resets)
 
+        reset_type = constants.SecureBootResetKeysType(reset_type).value
         target_uri = self._get_reset_action_element().target_uri
         self._conn.post(target_uri, data={'ResetKeysType': reset_type})
 

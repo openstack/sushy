@@ -21,7 +21,7 @@ import logging
 from sushy import exceptions
 from sushy.resources import base
 from sushy.resources import common
-from sushy.resources.system import mappings as sys_maps
+from sushy.resources.system import constants as sys_cons
 from sushy import utils
 
 # Representation of Summary of Processor information
@@ -59,16 +59,15 @@ class Processor(base.ResourceBase):
     socket = base.Field('Socket')
     """The socket or location of the processor"""
 
-    processor_type = base.MappedField(
-        'ProcessorType', sys_maps.PROCESSOR_TYPE_VALUE_MAP)
+    processor_type = base.MappedField('ProcessorType', sys_cons.ProcessorType)
     """The type of processor"""
 
-    processor_architecture = base.MappedField(
-        'ProcessorArchitecture', sys_maps.PROCESSOR_ARCH_VALUE_MAP)
+    processor_architecture = base.MappedField('ProcessorArchitecture',
+                                              sys_cons.ProcessorArchitecture)
     """The architecture of the processor"""
 
-    instruction_set = base.MappedField(
-        'InstructionSet', sys_maps.PROCESSOR_INSTRUCTIONSET_VALUE_MAP)
+    instruction_set = base.MappedField('InstructionSet',
+                                       sys_cons.InstructionSet)
     """The instruction set of the processor"""
 
     manufacturer = base.Field('Manufacturer')

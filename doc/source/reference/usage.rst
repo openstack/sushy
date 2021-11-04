@@ -126,9 +126,9 @@ Creating and using a sushy system object
   print(sys_inst.power_state)
 
   # Set the next boot device to boot once from PXE in UEFI mode
-  sys_inst.set_system_boot_source(sushy.BOOT_SOURCE_TARGET_PXE,
-                                  enabled=sushy.BOOT_SOURCE_ENABLED_ONCE,
-                                  mode=sushy.BOOT_SOURCE_MODE_UEFI)
+  sys_inst.set_system_boot_source(sushy.BootSource.PXE,
+                                  enabled=sushy.BootSourceOverrideEnabled.ONCE,
+                                  mode=sushy.BootSourceOverrideMode.UEFI)
 
   # Get the current boot source information
   print(sys_inst.boot)

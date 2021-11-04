@@ -25,7 +25,6 @@ from sushy.resources import constants as res_cons
 from sushy.resources.manager import manager
 from sushy.resources.oem import fake
 from sushy.resources.system import bios
-from sushy.resources.system import mappings as sys_map
 from sushy.resources.system import processor
 from sushy.resources.system import secure_boot
 from sushy.resources.system import simple_storage
@@ -62,8 +61,7 @@ class SystemTestCase(base.TestCase):
         self.assertEqual('224071-J23', self.sys_inst.part_number)
         self.assertEqual('437XR1138R2', self.sys_inst.serial_number)
         self.assertEqual('8675309', self.sys_inst.sku)
-        self.assertEqual(sushy.SYSTEM_TYPE_PHYSICAL,
-                         self.sys_inst.system_type)
+        self.assertEqual(sushy.SystemType.PHYSICAL, self.sys_inst.system_type)
         self.assertEqual('38947555-7742-3448-3784-823347823834',
                          self.sys_inst.uuid)
         self.assertEqual(res_cons.State.ENABLED, self.sys_inst.status.state)
@@ -236,16 +234,16 @@ class SystemTestCase(base.TestCase):
 
     def test_get_allowed_system_boot_source_values(self):
         values = self.sys_inst.get_allowed_system_boot_source_values()
-        expected = set([sushy.BOOT_SOURCE_TARGET_NONE,
-                        sushy.BOOT_SOURCE_TARGET_PXE,
-                        sushy.BOOT_SOURCE_TARGET_CD,
-                        sushy.BOOT_SOURCE_TARGET_USB,
-                        sushy.BOOT_SOURCE_TARGET_HDD,
-                        sushy.BOOT_SOURCE_TARGET_BIOS_SETUP,
-                        sushy.BOOT_SOURCE_TARGET_UTILITIES,
-                        sushy.BOOT_SOURCE_TARGET_DIAGS,
-                        sushy.BOOT_SOURCE_TARGET_SD_CARD,
-                        sushy.BOOT_SOURCE_TARGET_UEFI_TARGET])
+        expected = set([sushy.BootSource.NONE,
+                        sushy.BootSource.PXE,
+                        sushy.BootSource.CD,
+                        sushy.BootSource.USB,
+                        sushy.BootSource.HDD,
+                        sushy.BootSource.BIOS_SETUP,
+                        sushy.BootSource.UTILITIES,
+                        sushy.BootSource.DIAGS,
+                        sushy.BootSource.SD_CARD,
+                        sushy.BootSource.UEFI_TARGET])
         self.assertEqual(expected, values)
         self.assertIsInstance(values, set)
 
@@ -255,29 +253,31 @@ class SystemTestCase(base.TestCase):
         self.sys_inst.boot.allowed_values = None
         values = self.sys_inst.get_allowed_system_boot_source_values()
         # Assert it returns all values if it can't get the specific ones
-        expected = set([sushy.BOOT_SOURCE_TARGET_NONE,
-                        sushy.BOOT_SOURCE_TARGET_PXE,
-                        sushy.BOOT_SOURCE_TARGET_CD,
-                        sushy.BOOT_SOURCE_TARGET_USB,
-                        sushy.BOOT_SOURCE_TARGET_USB_CD,
-                        sushy.BOOT_SOURCE_TARGET_HDD,
-                        sushy.BOOT_SOURCE_TARGET_BIOS_SETUP,
-                        sushy.BOOT_SOURCE_TARGET_UTILITIES,
-                        sushy.BOOT_SOURCE_TARGET_DIAGS,
-                        sushy.BOOT_SOURCE_TARGET_SD_CARD,
-                        sushy.BOOT_SOURCE_TARGET_FLOPPY,
-                        sushy.BOOT_SOURCE_TARGET_UEFI_TARGET,
-                        sushy.BOOT_SOURCE_TARGET_UEFI_SHELL,
-                        sushy.BOOT_SOURCE_TARGET_UEFI_HTTP])
+        expected = set([sushy.BootSource.NONE,
+                        sushy.BootSource.PXE,
+                        sushy.BootSource.CD,
+                        sushy.BootSource.USB,
+                        sushy.BootSource.HDD,
+                        sushy.BootSource.BIOS_SETUP,
+                        sushy.BootSource.UTILITIES,
+                        sushy.BootSource.DIAGS,
+                        sushy.BootSource.SD_CARD,
+                        sushy.BootSource.FLOPPY,
+                        sushy.BootSource.UEFI_TARGET,
+                        sushy.BootSource.UEFI_SHELL,
+                        sushy.BootSource.UEFI_HTTP,
+                        sushy.BootSource.REMOTE_DRIVE,
+                        sushy.BootSource.UEFI_BOOT_NEXT,
+                        sushy.BootSource.USB_CD])
         self.assertEqual(expected, values)
         self.assertIsInstance(values, set)
         self.assertEqual(1, mock_log.call_count)
 
     def test_set_system_boot_options(self):
         self.sys_inst.set_system_boot_options(
-            sushy.BOOT_SOURCE_TARGET_PXE,
-            enabled=sushy.BOOT_SOURCE_ENABLED_CONTINUOUS,
-            mode=sushy.BOOT_SOURCE_MODE_UEFI)
+            sushy.BootSource.PXE,
+            enabled=sushy.BootSourceOverrideEnabled.CONTINUOUS,
+            mode=sushy.BootSourceOverrideMode.UEFI)
         self.sys_inst._conn.patch.assert_called_once_with(
             '/redfish/v1/Systems/437XR1138R2',
             data={'Boot': {'BootSourceOverrideEnabled': 'Continuous',
@@ -286,8 +286,8 @@ class SystemTestCase(base.TestCase):
 
     def test_set_system_boot_options_no_mode_specified(self):
         self.sys_inst.set_system_boot_options(
-            sushy.BOOT_SOURCE_TARGET_HDD,
-            enabled=sushy.BOOT_SOURCE_ENABLED_ONCE)
+            sushy.BootSource.HDD,
+            enabled=sushy.BootSourceOverrideEnabled.ONCE)
         self.sys_inst._conn.patch.assert_called_once_with(
             '/redfish/v1/Systems/437XR1138R2',
             data={'Boot': {'BootSourceOverrideEnabled': 'Once',
@@ -295,8 +295,8 @@ class SystemTestCase(base.TestCase):
 
     def test_set_system_boot_options_no_target_specified(self):
         self.sys_inst.set_system_boot_options(
-            enabled=sushy.BOOT_SOURCE_ENABLED_CONTINUOUS,
-            mode=sushy.BOOT_SOURCE_MODE_UEFI)
+            enabled=sushy.BootSourceOverrideEnabled.CONTINUOUS,
+            mode=sushy.BootSourceOverrideMode.UEFI)
         self.sys_inst._conn.patch.assert_called_once_with(
             '/redfish/v1/Systems/437XR1138R2',
             data={'Boot': {'BootSourceOverrideEnabled': 'Continuous',
@@ -304,8 +304,8 @@ class SystemTestCase(base.TestCase):
 
     def test_set_system_boot_options_no_freq_specified(self):
         self.sys_inst.set_system_boot_options(
-            target=sushy.BOOT_SOURCE_TARGET_PXE,
-            mode=sushy.BOOT_SOURCE_MODE_UEFI)
+            target=sushy.BootSource.PXE,
+            mode=sushy.BootSourceOverrideMode.UEFI)
         self.sys_inst._conn.patch.assert_called_once_with(
             '/redfish/v1/Systems/437XR1138R2',
             data={'Boot': {'BootSourceOverrideTarget': 'Pxe',
@@ -325,10 +325,10 @@ class SystemTestCase(base.TestCase):
         with self.assertRaisesRegex(
             exceptions.InvalidParameterValueError,
             '"enabled" value.*{0}'.format(
-                list(sys_map.BOOT_SOURCE_ENABLED_MAP_REV))):
+                list(sushy.BootSourceOverrideEnabled))):
 
             self.sys_inst.set_system_boot_options(
-                sushy.BOOT_SOURCE_TARGET_HDD,
+                sushy.BootSource.HDD,
                 enabled='invalid-enabled')
 
     def test_set_system_boot_options_supermicro_usb_cd_boot(self):
@@ -338,8 +338,8 @@ class SystemTestCase(base.TestCase):
 
         self.sys_inst.manufacturer = "supermicro"
         self.sys_inst.set_system_boot_options(
-            target=sushy.BOOT_SOURCE_TARGET_CD,
-            enabled=sushy.BOOT_SOURCE_ENABLED_ONCE)
+            target=sushy.BootSource.CD,
+            enabled=sushy.BootSourceOverrideEnabled.ONCE)
 
         self.sys_inst._conn.patch.assert_called_once_with(
             '/redfish/v1/Systems/437XR1138R2',
@@ -350,8 +350,8 @@ class SystemTestCase(base.TestCase):
 
         self.sys_inst.manufacturer = "supermicro"
         self.sys_inst.set_system_boot_options(
-            target=sushy.BOOT_SOURCE_TARGET_CD,
-            enabled=sushy.BOOT_SOURCE_ENABLED_ONCE)
+            target=sushy.BootSource.CD,
+            enabled=sushy.BootSourceOverrideEnabled.ONCE)
 
         self.sys_inst._conn.patch.assert_called_once_with(
             '/redfish/v1/Systems/437XR1138R2',
@@ -360,9 +360,9 @@ class SystemTestCase(base.TestCase):
 
     def test_set_system_boot_source(self):
         self.sys_inst.set_system_boot_source(
-            sushy.BOOT_SOURCE_TARGET_PXE,
-            enabled=sushy.BOOT_SOURCE_ENABLED_CONTINUOUS,
-            mode=sushy.BOOT_SOURCE_MODE_UEFI)
+            sushy.BootSource.PXE,
+            enabled=sushy.BootSourceOverrideEnabled.CONTINUOUS,
+            mode=sushy.BootSourceOverrideMode.UEFI)
         self.sys_inst._conn.patch.assert_called_once_with(
             '/redfish/v1/Systems/437XR1138R2',
             data={'Boot': {'BootSourceOverrideEnabled': 'Continuous',
@@ -371,8 +371,8 @@ class SystemTestCase(base.TestCase):
 
     def test_set_system_boot_source_no_mode_specified(self):
         self.sys_inst.set_system_boot_source(
-            sushy.BOOT_SOURCE_TARGET_HDD,
-            enabled=sushy.BOOT_SOURCE_ENABLED_ONCE)
+            sushy.BootSource.HDD,
+            enabled=sushy.BootSourceOverrideEnabled.ONCE)
         self.sys_inst._conn.patch.assert_called_once_with(
             '/redfish/v1/Systems/437XR1138R2',
             data={'Boot': {'BootSourceOverrideEnabled': 'Once',
@@ -387,10 +387,10 @@ class SystemTestCase(base.TestCase):
         with self.assertRaisesRegex(
             exceptions.InvalidParameterValueError,
             '"enabled" value.*{0}'.format(
-                list(sys_map.BOOT_SOURCE_ENABLED_MAP_REV))):
+                list(sushy.BootSourceOverrideEnabled))):
 
             self.sys_inst.set_system_boot_source(
-                sushy.BOOT_SOURCE_TARGET_HDD,
+                sushy.BootSource.HDD,
                 enabled='invalid-enabled')
 
     def test_set_indicator_led(self):
@@ -515,10 +515,10 @@ class SystemTestCase(base.TestCase):
         # | WHEN |
         actual_processor_summary = self.sys_inst.processors.summary
         # | THEN |
-        self.assertEqual((16, sushy.PROCESSOR_ARCH_x86),
+        self.assertEqual((16, sushy.ProcessorArchitecture.X86),
                          actual_processor_summary)
         self.assertEqual(16, actual_processor_summary.count)
-        self.assertEqual(sushy.PROCESSOR_ARCH_x86,
+        self.assertEqual(sushy.ProcessorArchitecture.X86,
                          actual_processor_summary.architecture)
 
         # reset mock

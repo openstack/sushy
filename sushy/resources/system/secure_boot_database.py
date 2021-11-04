@@ -15,7 +15,7 @@ import logging
 from sushy import exceptions
 from sushy.resources import base
 from sushy.resources import common
-from sushy.resources.system import mappings
+from sushy.resources.system import constants
 
 LOG = logging.getLogger(__name__)
 
@@ -37,7 +37,7 @@ class SecureBootDatabase(base.ResourceBase):
     # TODO(dtantsur): certificates
 
     database_id = base.MappedField('DatabaseId',
-                                   mappings.SECURE_BOOT_DATABASE_TYPE)
+                                   constants.SecureBootDatabaseId)
     """Standard UEFI database type."""
 
     description = base.Field('Description')
@@ -70,11 +70,10 @@ class SecureBootDatabase(base.ResourceBase):
         if not reset_action.allowed_values:
             LOG.warning('Could not figure out the allowed values for the '
                         'reset keys action for %s', self.identity)
-            return set(mappings.SECURE_BOOT_DATABASE_RESET_KEYS_REV)
+            return constants._SECURE_BOOT_DATABASE_RESET_KEYS
 
-        return set([mappings.SECURE_BOOT_DATABASE_RESET_KEYS[v] for v in
-                    set(mappings.SECURE_BOOT_DATABASE_RESET_KEYS).
-                    intersection(reset_action.allowed_values)])
+        return {v for v in constants._SECURE_BOOT_DATABASE_RESET_KEYS
+                if v.value in reset_action.allowed_values}
 
     def reset_keys(self, reset_type):
         """Reset secure boot keys.
@@ -88,6 +87,7 @@ class SecureBootDatabase(base.ResourceBase):
                 parameter='reset_type', value=reset_type,
                 valid_values=valid_resets)
 
+        reset_type = constants.SecureBootResetKeysType(reset_type).value
         target_uri = self._get_reset_action_element().target_uri
         self._conn.post(target_uri, data={'ResetKeysType': reset_type})
 

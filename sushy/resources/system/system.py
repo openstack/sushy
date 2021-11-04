@@ -29,7 +29,6 @@ from sushy.resources import settings
 from sushy.resources.system import bios
 from sushy.resources.system import constants as sys_cons
 from sushy.resources.system import ethernet_interface
-from sushy.resources.system import mappings as sys_maps
 from sushy.resources.system import processor
 from sushy.resources.system import secure_boot
 from sushy.resources.system import simple_storage as sys_simple_storage
@@ -50,13 +49,12 @@ class BootField(base.CompositeField):
         adapter=list)
 
     enabled = base.MappedField('BootSourceOverrideEnabled',
-                               sys_maps.BOOT_SOURCE_ENABLED_MAP)
+                               sys_cons.BootSourceOverrideEnabled)
 
     mode = base.MappedField('BootSourceOverrideMode',
-                            sys_maps.BOOT_SOURCE_MODE_MAP)
+                            sys_cons.BootSourceOverrideMode)
 
-    target = base.MappedField('BootSourceOverrideTarget',
-                              sys_maps.BOOT_SOURCE_TARGET_MAP)
+    target = base.MappedField('BootSourceOverrideTarget', sys_cons.BootSource)
 
 
 class MemorySummaryField(base.CompositeField):
@@ -118,8 +116,7 @@ class System(base.ResourceBase):
     status = common.StatusField('Status')
     """The system status"""
 
-    system_type = base.MappedField('SystemType',
-                                   sys_maps.SYSTEM_TYPE_VALUE_MAP)
+    system_type = base.MappedField('SystemType', sys_cons.SystemType)
     """The system type"""
 
     uuid = base.Field('UUID')
@@ -204,11 +201,10 @@ class System(base.ResourceBase):
             LOG.warning('Could not figure out the allowed values for '
                         'configuring the boot source for System %s',
                         self.identity)
-            return set(sys_maps.BOOT_SOURCE_TARGET_MAP_REV)
+            return set(sys_cons.BootSource)
 
-        return set([sys_maps.BOOT_SOURCE_TARGET_MAP[v] for v in
-                    set(sys_maps.BOOT_SOURCE_TARGET_MAP).
-                    intersection(self.boot.allowed_values)])
+        return {v for v in sys_cons.BootSource
+                if v.value in self.boot.allowed_values}
 
     def set_system_boot_options(self, target=None, enabled=None, mode=None):
         """Set boot source and/or boot frequency and/or boot mode.
@@ -216,13 +212,12 @@ class System(base.ResourceBase):
         Set the boot source and/or boot frequency and/or boot mode to use
         on next reboot of the System.
 
-        :param target: The target boot source, optional.
-        :param enabled: The frequency, whether to set it for the next
-            reboot only (BOOT_SOURCE_ENABLED_ONCE) or persistent to all
-            future reboots (BOOT_SOURCE_ENABLED_CONTINUOUS) or disabled
-            (BOOT_SOURCE_ENABLED_DISABLED), optional.
-        :param mode: The boot mode (UEFI: BOOT_SOURCE_MODE_UEFI or
-            BIOS: BOOT_SOURCE_MODE_BIOS), optional.
+        :param target: The target boot source,
+            a :py:class:`sushy.BootSource` value. Optional.
+        :param enabled: How long the override be enabled,
+            a :py:class:`sushy.BootSourceOverrideEnabled` value. Optional.
+        :param mode: The boot mode,
+            a :py:class:`sushy.BootSourceOverrideMode` value. Optional.
         :raises: InvalidParameterValueError, if any information passed is
             invalid.
         """
@@ -235,7 +230,7 @@ class System(base.ResourceBase):
                     parameter='target', value=target,
                     valid_values=valid_targets)
 
-            fishy_target = sys_maps.BOOT_SOURCE_TARGET_MAP_REV[target]
+            target = sys_cons.BootSource(target)
             # NOTE(janders) on SuperMicro X11 and X12 machines, virtual media
             # is presented as an "USB CD" drive as opposed to a CD drive. Both
             # are present in the list of boot devices, however only selecting
@@ -245,37 +240,33 @@ class System(base.ResourceBase):
             # about to attempt boot from CD and overrides the boot device to
             # UsbCd instead which makes boot from vMedia work as expected.
             if (self.manufacturer and self.manufacturer.lower() == 'supermicro'
-                    and fishy_target == sys_maps.BOOT_SOURCE_TARGET_MAP_REV[
-                        sys_cons.BOOT_SOURCE_TARGET_CD]
-                    and sys_maps.BOOT_SOURCE_TARGET_MAP_REV[
-                        sys_cons.BOOT_SOURCE_TARGET_USB_CD]
+                    and target == sys_cons.BootSource.CD
+                    and sys_cons.BootSource.USB_CD.value
                     in self.boot.allowed_values):
-                fishy_target = sys_maps.BOOT_SOURCE_TARGET_MAP_REV[
-                    sys_cons.BOOT_SOURCE_TARGET_USB_CD]
                 LOG.debug('Boot from vMedia was requested on a SuperMicro'
                           'machine. Overriding boot device from %s to %s.',
-                          sys_cons.BOOT_SOURCE_TARGET_CD,
-                          fishy_target)
+                          target, sys_cons.BootSource.USB_CD)
+                target = sys_cons.BootSource.USB_CD
 
-            data['Boot']['BootSourceOverrideTarget'] = fishy_target
+            data['Boot']['BootSourceOverrideTarget'] = target.value
 
         if enabled is not None:
-            if enabled not in sys_maps.BOOT_SOURCE_ENABLED_MAP_REV:
+            try:
+                fishy_freq = sys_cons.BootSourceOverrideEnabled(enabled).value
+            except ValueError:
                 raise exceptions.InvalidParameterValueError(
                     parameter='enabled', value=enabled,
-                    valid_values=list(sys_maps.BOOT_SOURCE_ENABLED_MAP_REV))
-
-            fishy_freq = sys_maps.BOOT_SOURCE_ENABLED_MAP_REV[enabled]
+                    valid_values=list(sys_cons.BootSourceOverrideEnabled))
 
             data['Boot']['BootSourceOverrideEnabled'] = fishy_freq
 
         if mode is not None:
-            if mode not in sys_maps.BOOT_SOURCE_MODE_MAP_REV:
+            try:
+                fishy_mode = sys_cons.BootSourceOverrideMode(mode).value
+            except ValueError:
                 raise exceptions.InvalidParameterValueError(
                     parameter='mode', value=mode,
-                    valid_values=list(sys_maps.BOOT_SOURCE_MODE_MAP_REV))
-
-            fishy_mode = sys_maps.BOOT_SOURCE_MODE_MAP_REV[mode]
+                    valid_values=list(sys_cons.BootSourceOverrideMode))
 
             data['Boot']['BootSourceOverrideMode'] = fishy_mode
 
@@ -285,7 +276,7 @@ class System(base.ResourceBase):
 
     # TODO(etingof): we should remove this method, eventually
     def set_system_boot_source(
-            self, target, enabled=sys_cons.BOOT_SOURCE_ENABLED_ONCE,
+            self, target, enabled=sys_cons.BootSourceOverrideEnabled.ONCE,
             mode=None):
         """Set boot source and/or boot frequency and/or boot mode.
 
@@ -294,14 +285,13 @@ class System(base.ResourceBase):
 
         This method is obsoleted by `set_system_boot_options`.
 
-        :param target: The target boot source.
+        :param target: The target boot source,
+            a :py:class:`sushy.BootSource` value.
         :param enabled: The frequency, whether to set it for the next
-            reboot only (BOOT_SOURCE_ENABLED_ONCE) or persistent to all
-            future reboots (BOOT_SOURCE_ENABLED_CONTINUOUS) or disabled
-            (BOOT_SOURCE_ENABLED_DISABLED).
-            Default is `BOOT_SOURCE_ENABLED_ONCE`.
-        :param mode: The boot mode (UEFI: BOOT_SOURCE_MODE_UEFI or
-            BIOS: BOOT_SOURCE_MODE_BIOS), optional.
+            a :py:class:`sushy.BootSourceOverrideEnabled` value.
+            Default is `ONCE`.
+        :param mode: The boot mode,
+            a :py:class:`sushy.BootSourceOverrideMode` value.
         :raises: InvalidParameterValueError, if any information passed is
             invalid.
         """
