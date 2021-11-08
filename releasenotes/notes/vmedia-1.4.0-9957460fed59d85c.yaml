@@ -1,0 +1,7 @@
+---
+features:
+  - |
+    Allows reading and changing the virtual media fields ``TransferMethod``
+    and ``VerifyCertificate``.
+  - |
+    Allows reading the virtual media field ``UserName``.

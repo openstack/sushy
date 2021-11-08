@@ -18,6 +18,7 @@ from http import client as http_client
 from sushy import exceptions
 from sushy.resources import base
 from sushy.resources import common
+from sushy.resources.manager import constants as mgr_cons
 from sushy.resources.manager import mappings as mgr_maps
 
 
@@ -35,25 +36,6 @@ class VirtualMedia(base.ResourceBase):
     name = base.Field('Name', required=True)
     """The name of resource"""
 
-    image = base.Field('Image')
-    """A URI providing the location of the selected image"""
-
-    image_name = base.Field('ImageName')
-    """The image name"""
-
-    inserted = base.Field('Inserted')
-    """Indicates if virtual media is inserted in the virtual device"""
-
-    write_protected = base.Field('WriteProtected')
-    """Indicates the media is write protected"""
-
-    media_types = base.Field(
-        'MediaTypes', adapter=(
-            lambda x: [mgr_maps.MEDIA_TYPE_VALUE_MAP[v] for v in x
-                       if v in mgr_maps.MEDIA_TYPE_VALUE_MAP]),
-        default=[])
-    """List of supported media types as virtual media"""
-
     connected_via = base.MappedField('ConnectedVia',
                                      mgr_maps.CONNECTED_VIA_VALUE_MAP)
     """Current virtual media connection methods
@@ -63,6 +45,38 @@ class VirtualMedia(base.ResourceBase):
     Oem: Connected via an OEM-defined method
     URI: Connected to a URI location
     """
+
+    image = base.Field('Image')
+    """A URI providing the location of the selected image"""
+
+    image_name = base.Field('ImageName')
+    """The image name"""
+
+    inserted = base.Field('Inserted')
+    """Indicates if virtual media is inserted in the virtual device"""
+
+    media_types = base.Field(
+        'MediaTypes', adapter=(
+            lambda x: [mgr_maps.MEDIA_TYPE_VALUE_MAP[v] for v in x
+                       if v in mgr_maps.MEDIA_TYPE_VALUE_MAP]),
+        default=[])
+    """List of supported media types as virtual media"""
+
+    status = common.StatusField('Status')
+    """The virtual media status"""
+
+    transfer_method = base.MappedField('TransferMethod',
+                                       mgr_cons.TransferMethod)
+    """The transfer method to use with the Image"""
+
+    user_name = base.Field('UserName')
+    """The user name to access the Image parameter-specified URI"""
+
+    verify_certificate = base.Field('VerifyCertificate', adapter=bool)
+    """Whether to verify the certificate of the server for the Image"""
+
+    write_protected = base.Field('WriteProtected')
+    """Indicates the media is write protected"""
 
     _actions = ActionsField('Actions')
     """Insert/eject action for virtual media"""
@@ -94,7 +108,7 @@ class VirtualMedia(base.ResourceBase):
         return eject_uri, use_patch
 
     def insert_media(self, image, inserted=True, write_protected=True,
-                     username=None, password=None):
+                     username=None, password=None, transfer_method=None):
         """Attach remote media to virtual media
 
         :param image: a URI providing the location of the selected image
@@ -103,6 +117,8 @@ class VirtualMedia(base.ResourceBase):
         :param write_protected: indicates the media is write protected
         :param username: User name for the image URI.
         :param password: Password for the image URI.
+        :param transfer_method: Transfer method (stream or upload) to use
+            for the image.
         """
         target_uri, use_patch = self._get_insert_media_uri()
         # NOTE(janders) Inserted and WriteProtected attributes are optional
@@ -120,6 +136,15 @@ class VirtualMedia(base.ResourceBase):
             payload['UserName'] = username
         if password is not None:
             payload['Password'] = password
+        if transfer_method is not None:
+            try:
+                payload['TransferMethod'] = \
+                    mgr_cons.TransferMethod(transfer_method).value
+            except ValueError:
+                raise exceptions.InvalidParameterValueError(
+                    parameter='transfer_method',
+                    value=transfer_method,
+                    valid_values=', '.join(map(str, mgr_cons.TransferMethod)))
 
         if use_patch:
             payload['Inserted'] = inserted
@@ -167,6 +192,17 @@ class VirtualMedia(base.ResourceBase):
                     http_client.UNSUPPORTED_MEDIA_TYPE,
                     http_client.BAD_REQUEST):
                 self._conn.post(target_uri, data={})
+        self.invalidate()
+
+    def set_verify_certificate(self, verify_certificate):
+        """Enable or disable certificate validation."""
+        if not isinstance(verify_certificate, bool):
+            raise exceptions.InvalidParameterValueError(
+                parameter='verify_certificate', value=verify_certificate,
+                valid_values='boolean (True, False)')
+
+        self._conn.patch(self.path,
+                         data={'VerifyCertificate': verify_certificate})
         self.invalidate()
 
 
