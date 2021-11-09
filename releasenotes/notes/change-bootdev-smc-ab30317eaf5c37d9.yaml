@@ -1,0 +1,5 @@
+---
+fixes:
+  - |
+    Changing boot device string for virtual media from "Cd" to "UsbCd" on
+    SuperMicro machines to match their specific naming convention.
