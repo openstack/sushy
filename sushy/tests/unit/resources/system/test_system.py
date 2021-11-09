@@ -259,6 +259,7 @@ class SystemTestCase(base.TestCase):
                         sushy.BOOT_SOURCE_TARGET_PXE,
                         sushy.BOOT_SOURCE_TARGET_CD,
                         sushy.BOOT_SOURCE_TARGET_USB,
+                        sushy.BOOT_SOURCE_TARGET_USB_CD,
                         sushy.BOOT_SOURCE_TARGET_HDD,
                         sushy.BOOT_SOURCE_TARGET_BIOS_SETUP,
                         sushy.BOOT_SOURCE_TARGET_UTILITIES,
@@ -329,6 +330,33 @@ class SystemTestCase(base.TestCase):
             self.sys_inst.set_system_boot_options(
                 sushy.BOOT_SOURCE_TARGET_HDD,
                 enabled='invalid-enabled')
+
+    def test_set_system_boot_options_supermicro_usb_cd_boot(self):
+        (self.json_doc["Boot"]
+         ["BootSourceOverrideTarget@Redfish.AllowableValues"]).append("UsbCd")
+        self.sys_inst._parse_attributes(self.json_doc)
+
+        self.sys_inst.manufacturer = "supermicro"
+        self.sys_inst.set_system_boot_options(
+            target=sushy.BOOT_SOURCE_TARGET_CD,
+            enabled=sushy.BOOT_SOURCE_ENABLED_ONCE)
+
+        self.sys_inst._conn.patch.assert_called_once_with(
+            '/redfish/v1/Systems/437XR1138R2',
+            data={'Boot': {'BootSourceOverrideEnabled': 'Once',
+                           'BootSourceOverrideTarget': 'UsbCd'}})
+
+    def test_set_system_boot_options_supermicro_no_usb_cd_boot(self):
+
+        self.sys_inst.manufacturer = "supermicro"
+        self.sys_inst.set_system_boot_options(
+            target=sushy.BOOT_SOURCE_TARGET_CD,
+            enabled=sushy.BOOT_SOURCE_ENABLED_ONCE)
+
+        self.sys_inst._conn.patch.assert_called_once_with(
+            '/redfish/v1/Systems/437XR1138R2',
+            data={'Boot': {'BootSourceOverrideEnabled': 'Once',
+                           'BootSourceOverrideTarget': 'Cd'}})
 
     def test_set_system_boot_source(self):
         self.sys_inst.set_system_boot_source(

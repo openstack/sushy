@@ -88,6 +88,15 @@ BOOT_SOURCE_TARGET_UEFI_SHELL = 'uefi shell'
 BOOT_SOURCE_TARGET_UEFI_HTTP = 'uefi http'
 """Boot from a UEFI HTTP network location"""
 
+BOOT_SOURCE_TARGET_USB_CD = 'usb cd'
+"""Boot from a USB CD device as specified by the system BIOS.
+   NOTE(janders): This is NOT a standard value.
+   On SuperMicro X11 and X12 machines, virtual media is presented as an USB CD
+   drive as opposed to a CD drive. Both are present in the list of boot
+   devices, however only selecting UsbCd as the boot source results in a
+   successful boot from vMedia. If CD is selected, boot fails even if vMedia
+   is inserted."""
+
 # Boot source mode constants
 
 BOOT_SOURCE_MODE_BIOS = 'bios'
