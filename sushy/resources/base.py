@@ -809,3 +809,30 @@ class ResourceCollectionBase(ResourceLinksBase):
     members_identities = Field('Members', default=[],
                                adapter=utils.get_members_identities)
     """A tuple with the members identities"""
+
+
+class MutableResourceCollectionBase(ResourceCollectionBase):
+
+    def _create_member(self, values):
+        """Create a new member of this collection.
+
+        :param values: Fields to set on creation.
+        :return: Created resource or None if it was not returned by the server.
+        """
+        response = self._conn.post(self._path, data=values)
+        self.invalidate(force_refresh=True)
+
+        location = response.headers.get('Location')
+        if location is None:
+            return None
+
+        return self._resource_type(
+            self._conn, location,
+            redfish_version=self.redfish_version,
+            registries=self.registries,
+            root=self.root)
+
+    def delete_member(self, identity):
+        """Delete the given member of the collection."""
+        self._conn.delete(identity)
+        self.invalidate(force_refresh=True)
