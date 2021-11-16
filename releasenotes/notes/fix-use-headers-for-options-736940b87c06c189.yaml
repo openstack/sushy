@@ -1,0 +1,4 @@
+---
+fixes:
+  - |
+    If available, uses headers with an Etag to set the boot options.
