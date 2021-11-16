@@ -1,0 +1,6 @@
+---
+fixes:
+  - |
+    Makes the unstripped version of an Etag available in addition to
+    the stripped one in order to support vendor implementations which
+    require one or the other.

@@ -576,11 +576,21 @@ class ResourceBase(object, metaclass=abc.ABCMeta):
 
         :returns ETag or None
         """
-        pattern = re.compile(r'^(W\/)?("\w*")$')
-        match = pattern.match(self._get_headers().get('ETag', ''))
+        etag = self._get_headers().get('ETag')
+        if not etag:
+            return None
+
+        # Note (arne_wiebalck): in case there is a weak Etag,
+        # return it with and without the qualifier to handle
+        # vendor implementations which may require one or the
+        # other (but should actually not use weak tags in the
+        # first place).
+        pattern = re.compile(r'^(W\/)("\w*")$')
+        match = pattern.match(etag)
         if match:
-            return match.group(2)
-        return None
+            return etag + ',' + match.group(2)
+
+        return etag
 
     def _get_headers(self):
         """Returns the HTTP headers of the request for the resource.
