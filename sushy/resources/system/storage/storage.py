@@ -18,8 +18,8 @@ import logging
 from sushy.resources import base
 from sushy.resources import common
 from sushy.resources import constants as res_cons
+from sushy.resources.system.storage import constants
 from sushy.resources.system.storage import drive
-from sushy.resources.system.storage import mappings
 from sushy.resources.system.storage import volume
 from sushy import utils
 
@@ -53,8 +53,7 @@ class StorageControllersListField(base.ListField):
                                             res_cons.Protocol)
     """The protocols which the controller can use tocommunicate with devices"""
 
-    raid_types = base.MappedListField('SupportedRAIDTypes',
-                                      mappings.RAID_TYPE_TYPE_MAP)
+    raid_types = base.MappedListField('SupportedRAIDTypes', constants.RAIDType)
     """The set of RAID types supported by the storage controller."""
 
 

@@ -20,7 +20,6 @@ from sushy.resources import base
 from sushy.resources import common
 from sushy.resources import constants as res_cons
 from sushy.resources.system.storage import constants as store_cons
-from sushy.resources.system.storage import mappings as store_maps
 from sushy.taskmonitor import TaskMonitor
 from sushy import utils
 
@@ -45,11 +44,10 @@ class Volume(base.ResourceBase):
     capacity_bytes = base.Field('CapacityBytes', adapter=utils.int_or_none)
     """The size in bytes of this Volume."""
 
-    volume_type = base.MappedField('VolumeType',
-                                   store_maps.VOLUME_TYPE_TYPE_MAP)
+    volume_type = base.MappedField('VolumeType', store_cons.VolumeType)
     """The type of this volume."""
 
-    raid_type = base.MappedField('RAIDType', store_maps.RAID_TYPE_TYPE_MAP)
+    raid_type = base.MappedField('RAIDType', store_cons.RAIDType)
     """The RAID type of this volume."""
 
     encrypted = base.Field('Encrypted', adapter=bool)
@@ -85,20 +83,19 @@ class Volume(base.ResourceBase):
             LOG.warning('Could not figure out the allowed values for the '
                         'initialize volume action for Volume %s',
                         self.identity)
-            return set(store_maps.VOLUME_INIT_TYPE_MAP_REV)
+            return set(store_cons.VolumeInitializeType)
 
-        return set([store_maps.VOLUME_INIT_TYPE_MAP[v] for v in
-                    set(store_maps.VOLUME_INIT_TYPE_MAP).
-                    intersection(action.allowed_values)])
+        return {v for v in store_cons.VolumeInitializeType
+                if v.value in action.allowed_values}
 
-    def _initialize(self, value=store_cons.VOLUME_INIT_TYPE_FAST,
+    def _initialize(self, value=store_cons.VolumeInitializeType.FAST,
                     apply_time=None, timeout=500):
         valid_values = self.get_allowed_initialize_volume_values()
+        value = store_cons.VolumeInitializeType(value)
         if value not in valid_values:
             raise exceptions.InvalidParameterValueError(
                 parameter='value', value=value, valid_values=valid_values)
-        value = store_maps.VOLUME_INIT_TYPE_MAP_REV[value]
-        payload = {'InitializeType': value}
+        payload = {'InitializeType': value.value}
         blocking = False
         if apply_time:
             payload[_OAT_PROP] = res_cons.ApplyTime(apply_time).value
@@ -110,7 +107,7 @@ class Volume(base.ResourceBase):
                             timeout=timeout)
         return r, target_uri
 
-    def initialize(self, value=store_cons.VOLUME_INIT_TYPE_FAST,
+    def initialize(self, value=store_cons.VolumeInitializeType.FAST,
                    apply_time=None, timeout=500):
         """Initialize the volume.
 

@@ -133,7 +133,7 @@ class StorageTestCase(base.TestCase):
                          controller.controller_protocols)
         self.assertEqual([sushy.Protocol.SAS, sushy.Protocol.SATA],
                          controller.device_protocols)
-        self.assertEqual([sushy.RAID_TYPE_RAID0, sushy.RAID_TYPE_RAID1],
+        self.assertEqual([sushy.RAIDType.RAID0, sushy.RAIDType.RAID1],
                          controller.raid_types)
 
     def test_drives_after_refresh(self):
