@@ -236,6 +236,26 @@ class System(base.ResourceBase):
                     valid_values=valid_targets)
 
             fishy_target = sys_maps.BOOT_SOURCE_TARGET_MAP_REV[target]
+            # NOTE(janders) on SuperMicro X11 and X12 machines, virtual media
+            # is presented as an "USB CD" drive as opposed to a CD drive. Both
+            # are present in the list of boot devices, however only selecting
+            # UsbCd as the boot source results in a successful boot from
+            # vMedia. If "CD" is selected, boot fails even if vMedia is
+            # inserted. This code detects a case where a SuperMicro machine is
+            # about to attempt boot from CD and overrides the boot device to
+            # UsbCd instead which makes boot from vMedia work as expected.
+            if (self.manufacturer and self.manufacturer.lower() == 'supermicro'
+                    and fishy_target == sys_maps.BOOT_SOURCE_TARGET_MAP_REV[
+                        sys_cons.BOOT_SOURCE_TARGET_CD]
+                    and sys_maps.BOOT_SOURCE_TARGET_MAP_REV[
+                        sys_cons.BOOT_SOURCE_TARGET_USB_CD]
+                    in self.boot.allowed_values):
+                fishy_target = sys_maps.BOOT_SOURCE_TARGET_MAP_REV[
+                    sys_cons.BOOT_SOURCE_TARGET_USB_CD]
+                LOG.debug('Boot from vMedia was requested on a SuperMicro'
+                          'machine. Overriding boot device from %s to %s.',
+                          sys_cons.BOOT_SOURCE_TARGET_CD,
+                          fishy_target)
 
             data['Boot']['BootSourceOverrideTarget'] = fishy_target
 

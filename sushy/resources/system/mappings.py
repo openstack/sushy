@@ -30,6 +30,7 @@ BOOT_SOURCE_TARGET_MAP = {
     'UefiTarget': sys_cons.BOOT_SOURCE_TARGET_UEFI_TARGET,
     'UefiShell': sys_cons.BOOT_SOURCE_TARGET_UEFI_SHELL,
     'UefiHttp': sys_cons.BOOT_SOURCE_TARGET_UEFI_HTTP,
+    'UsbCd': sys_cons.BOOT_SOURCE_TARGET_USB_CD,
 }
 
 BOOT_SOURCE_TARGET_MAP_REV = utils.revert_dictionary(BOOT_SOURCE_TARGET_MAP)
