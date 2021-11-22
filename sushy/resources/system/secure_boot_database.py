@@ -78,7 +78,7 @@ class SecureBootDatabase(base.ResourceBase):
     def reset_keys(self, reset_type):
         """Reset secure boot keys.
 
-        :param reset_type: Reset type, one of `SECORE_BOOT_RESET_KEYS_*`
+        :param reset_type: Reset type, one of `SECURE_BOOT_RESET_KEYS_*`
             constants.
         """
         valid_resets = self.get_allowed_reset_keys_values()
