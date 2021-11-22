@@ -18,7 +18,7 @@ import logging
 
 from sushy.resources import base
 from sushy.resources import common
-from sushy.resources.compositionservice import mappings as res_maps
+from sushy.resources.compositionservice import constants
 
 LOG = logging.getLogger(__name__)
 
@@ -27,7 +27,7 @@ class CompositionStatusField(base.CompositeField):
 
     composition_state = base.MappedField(
         'CompositionState',
-        res_maps.COMPOSITION_STATE_VALUE_MAP,
+        constants.CompositionState,
         required=True)
     """Inform the client, state of the resource block"""
 
@@ -67,7 +67,7 @@ class ResourceBlock(base.ResourceBase):
 
     resource_block_type = base.MappedField(
         'ResourceBlockType',
-        res_maps.RESOURCE_BLOCK_TYPE_VALUE_MAP,
+        constants.ResourceBlockType,
         required=True)
     """The type of resource block"""
 

@@ -20,8 +20,8 @@ import logging
 from sushy import exceptions
 from sushy.resources import base
 from sushy.resources import common
+from sushy.resources.eventservice import constants
 from sushy.resources.eventservice import eventdestination
-from sushy.resources.eventservice import mappings as evs_maps
 
 LOG = logging.getLogger(__name__)
 
@@ -130,11 +130,10 @@ class EventService(base.ResourceBase):
         if not self.event_types_for_subscription:
             LOG.warning('Could not figure out the Event types supported by '
                         'the EventService %s', self.identity)
-            return set(evs_maps.EVENT_TYPE_VALUE_MAP.values())
+            return set(constants.EventType)
 
-        return set([evs_maps.EVENT_TYPE_VALUE_MAP[v] for v in
-                    set(evs_maps.EVENT_TYPE_VALUE_MAP).
-                    intersection(self.event_types_for_subscription)])
+        return {v for v in constants.EventType
+                if v.value in self.event_types_for_subscription}
 
     def _get_subscriptions_collection_path(self):
         """Helper function to find the EventDestinationCollections path"""
