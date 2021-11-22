@@ -19,7 +19,6 @@ from sushy import exceptions
 from sushy.resources import base
 from sushy.resources import common
 from sushy.resources.manager import constants as mgr_cons
-from sushy.resources.manager import mappings as mgr_maps
 
 
 class ActionsField(base.CompositeField):
@@ -36,8 +35,7 @@ class VirtualMedia(base.ResourceBase):
     name = base.Field('Name', required=True)
     """The name of resource"""
 
-    connected_via = base.MappedField('ConnectedVia',
-                                     mgr_maps.CONNECTED_VIA_VALUE_MAP)
+    connected_via = base.MappedField('ConnectedVia', mgr_cons.ConnectedVia)
     """Current virtual media connection methods
 
     Applet: Connected to a client application
@@ -55,11 +53,8 @@ class VirtualMedia(base.ResourceBase):
     inserted = base.Field('Inserted')
     """Indicates if virtual media is inserted in the virtual device"""
 
-    media_types = base.Field(
-        'MediaTypes', adapter=(
-            lambda x: [mgr_maps.MEDIA_TYPE_VALUE_MAP[v] for v in x
-                       if v in mgr_maps.MEDIA_TYPE_VALUE_MAP]),
-        default=[])
+    media_types = base.MappedListField(
+        'MediaTypes', mgr_cons.VirtualMediaType, default=[])
     """List of supported media types as virtual media"""
 
     status = common.StatusField('Status')

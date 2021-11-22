@@ -18,7 +18,8 @@ import logging
 from sushy import exceptions
 from sushy.resources import base
 from sushy.resources import common
-from sushy.resources.manager import mappings as mgr_maps
+from sushy.resources import constants as res_cons
+from sushy.resources.manager import constants as mgr_cons
 from sushy.resources.manager import virtual_media
 from sushy import utils
 
@@ -75,8 +76,7 @@ class Manager(base.ResourceBase):
     model = base.Field('Model')
     """The manager model"""
 
-    manager_type = base.MappedField('ManagerType',
-                                    mgr_maps.MANAGER_TYPE_VALUE_MAP)
+    manager_type = base.MappedField('ManagerType', mgr_cons.ManagerType)
     """The manager type"""
 
     uuid = base.Field('UUID')
@@ -110,12 +110,10 @@ class Manager(base.ResourceBase):
             LOG.warning('Could not figure out the supported values for '
                         'remote access via graphical console for Manager %s',
                         self.identity)
-            return set(mgr_maps.GRAPHICAL_CONSOLE_VALUE_MAP_REV)
+            return set(mgr_cons.GraphicalConnectType)
 
-        return set([mgr_maps.GRAPHICAL_CONSOLE_VALUE_MAP[v] for v in
-                    set(mgr_maps.GRAPHICAL_CONSOLE_VALUE_MAP).
-                    intersection(self.graphical_console.
-                                 connect_types_supported)])
+        return {v for v in mgr_cons.GraphicalConnectType
+                if v.value in self.graphical_console.connect_types_supported}
 
     def get_supported_serial_console_types(self):
         """Get the supported values for Serial Console connection types.
@@ -127,11 +125,10 @@ class Manager(base.ResourceBase):
             LOG.warning('Could not figure out the supported values for '
                         'remote access via serial console for Manager %s',
                         self.identity)
-            return set(mgr_maps.SERIAL_CONSOLE_VALUE_MAP_REV)
+            return set(mgr_cons.SerialConnectType)
 
-        return set([mgr_maps.SERIAL_CONSOLE_VALUE_MAP[v] for v in
-                    set(mgr_maps.SERIAL_CONSOLE_VALUE_MAP).
-                    intersection(self.serial_console.connect_types_supported)])
+        return {v for v in mgr_cons.SerialConnectType
+                if v.value in self.serial_console.connect_types_supported}
 
     def get_supported_command_shell_types(self):
         """Get the supported values for Command Shell connection types.
@@ -143,11 +140,10 @@ class Manager(base.ResourceBase):
             LOG.warning('Could not figure out the supported values for '
                         'remote access via command shell for Manager %s',
                         self.identity)
-            return set(mgr_maps.COMMAND_SHELL_VALUE_MAP_REV)
+            return set(mgr_cons.CommandConnectType)
 
-        return set([mgr_maps.COMMAND_SHELL_VALUE_MAP[v] for v in
-                    set(mgr_maps.COMMAND_SHELL_VALUE_MAP).
-                    intersection(self.command_shell.connect_types_supported)])
+        return {v for v in mgr_cons.CommandConnectType
+                if v.value in self.command_shell.connect_types_supported}
 
     def _get_reset_action_element(self):
         reset_action = self._actions.reset
@@ -169,11 +165,10 @@ class Manager(base.ResourceBase):
         if not reset_action.allowed_values:
             LOG.warning('Could not figure out the allowed values for the '
                         'reset manager action for Manager %s', self.identity)
-            return set(mgr_maps.RESET_MANAGER_VALUE_MAP_REV)
+            return set(res_cons.ResetType)
 
-        return set([mgr_maps.RESET_MANAGER_VALUE_MAP[v] for v in
-                    set(mgr_maps.RESET_MANAGER_VALUE_MAP).
-                    intersection(reset_action.allowed_values)])
+        return {v for v in res_cons.ResetType
+                if v.value in reset_action.allowed_values}
 
     def reset_manager(self, value):
         """Reset the manager.
@@ -187,7 +182,7 @@ class Manager(base.ResourceBase):
             raise exceptions.InvalidParameterValueError(
                 parameter='value', value=value, valid_values=valid_resets)
 
-        value = mgr_maps.RESET_MANAGER_VALUE_MAP_REV[value]
+        value = res_cons.ResetType(value).value
         target_uri = self._get_reset_action_element().target_uri
 
         LOG.debug('Resetting the Manager %s ...', self.identity)
