@@ -14,7 +14,7 @@
 # http://redfish.dmtf.org/schemas/v1/Power.v1_3_0.json
 
 from sushy.resources import base
-from sushy.resources.chassis.power import mappings as pow_maps
+from sushy.resources.chassis.power import constants as pow_cons
 from sushy.resources import common
 from sushy.resources import constants as res_cons
 from sushy import utils
@@ -23,8 +23,7 @@ from sushy import utils
 class InputRangeListField(base.ListField):
     """This type describes an input range for a power supply"""
 
-    input_type = base.MappedField('InputType',
-                                  pow_maps.POWER_SUPPLY_INPUT_TYPE_MAP)
+    input_type = base.MappedField('InputType', pow_cons.PowerInputType)
     """The Input type (AC or DC)"""
 
     maximum_frequency_hz = base.Field('MaximumFrequencyHz',
@@ -73,9 +72,8 @@ class PowerSupplyListField(base.ListField):
                                     adapter=utils.int_or_none)
     """The line input voltage at which the Power Supply is operating"""
 
-    line_input_voltage_type = base.MappedField(
-        'LineInputVoltageType',
-        pow_maps.LINE_INPUT_VOLTAGE_TYPE_MAP)
+    line_input_voltage_type = base.MappedField('LineInputVoltageType',
+                                               pow_cons.LineInputVoltageType)
     """The line voltage type supported as an input to this Power Supply"""
 
     manufacturer = base.Field('Manufacturer')
@@ -95,7 +93,7 @@ class PowerSupplyListField(base.ListField):
     """The maximum capacity of this Power Supply"""
 
     power_supply_type = base.MappedField('PowerSupplyType',
-                                         pow_maps.POWER_SUPPLY_TYPE_MAP)
+                                         pow_cons.PowerSupplyType)
     """The Power Supply type (AC or DC)"""
 
     serial_number = base.Field('SerialNumber')

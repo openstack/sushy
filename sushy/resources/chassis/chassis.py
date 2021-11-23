@@ -17,7 +17,7 @@ import logging
 
 from sushy import exceptions
 from sushy.resources import base
-from sushy.resources.chassis import mappings as cha_maps
+from sushy.resources.chassis import constants as cha_cons
 from sushy.resources.chassis.power import power
 from sushy.resources.chassis.thermal import thermal
 from sushy.resources import common
@@ -35,7 +35,7 @@ class ActionsField(base.CompositeField):
 
 class PhysicalSecurity(base.CompositeField):
     intrusion_sensor = base.MappedField('IntrusionSensor',
-                                        cha_maps.CHASSIS_INTRUSION_SENSOR_MAP)
+                                        cha_cons.IntrusionSensor)
     """IntrusionSensor
     This indicates the known state of the physical security sensor, such as if
     it is hardware intrusion detected.
@@ -44,9 +44,8 @@ class PhysicalSecurity(base.CompositeField):
     intrusion_sensor_number = base.Field('IntrusionSensorNumber')
     """A numerical identifier to represent the physical security sensor"""
 
-    intrusion_sensor_re_arm = (
-        base.MappedField('IntrusionSensorReArm',
-                         cha_maps.CHASSIS_INTRUSION_SENSOR_RE_ARM_MAP))
+    intrusion_sensor_re_arm = base.MappedField('IntrusionSensorReArm',
+                                               cha_cons.IntrusionSensorReArm)
     """This indicates how the Normal state to be restored"""
 
 
@@ -58,8 +57,7 @@ class Chassis(base.ResourceBase):
     such as racks, enclosures, chassis and all other containers.
     """
 
-    chassis_type = base.MappedField('ChassisType',
-                                    cha_maps.CHASSIS_TYPE_VALUE_MAP,
+    chassis_type = base.MappedField('ChassisType', cha_cons.ChassisType,
                                     required=True)
     """The type of physical form factor of the chassis"""
 

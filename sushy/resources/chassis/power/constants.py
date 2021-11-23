@@ -10,60 +10,94 @@
 #    License for the specific language governing permissions and limitations
 #    under the License.
 
+# Values comes from the Redfish Chassis json-schema:
+# https://redfish.dmtf.org/schemas/v1/Power.v1_7_1.json
 
-# Power Supply Types
-POWER_SUPPLY_TYPE_UNKNOWN = 'unknown'
-"""The power supply type cannot be determined."""
+import enum
 
-POWER_SUPPLY_TYPE_AC = 'ac'
-"""Alternating Current (AC) power supply."""
 
-POWER_SUPPLY_TYPE_DC = 'dc'
-"""Direct Current (DC) power supply."""
+class PowerSupplyType(enum.Enum):
+    UNKNOWN = 'Unknown'
+    """The power supply type cannot be determined."""
 
-POWER_SUPPLY_TYPE_ACDC = 'acdc'
-"""Power Supply supports both DC or AC."""
+    AC = 'AC'
+    """Alternating Current (AC) power supply."""
 
-# Line Input Voltage Types
-LINE_INPUT_VOLTAGE_TYPE_UNKNOWN = 'unknown'
-"""The power supply line input voltage tpye cannot be determined."""
+    DC = 'DC'
+    """Direct Current (DC) power supply."""
 
-LINE_INPUT_VOLTAGE_TYPE_ACLOW = 'aclowline'
-"""100-127V AC input."""
+    AC_OR_DC = 'ACorDC'
+    """The power supply supports both DC or AC."""
 
-LINE_INPUT_VOLTAGE_TYPE_ACMID = 'acmidline'
-"""200-240V AC input."""
 
-LINE_INPUT_VOLTAGE_TYPE_ACHIGH = 'achighline'
-"""277V AC input."""
+# Backward compatibility
+POWER_SUPPLY_TYPE_UNKNOWN = PowerSupplyType.UNKNOWN
+POWER_SUPPLY_TYPE_AC = PowerSupplyType.AC
+POWER_SUPPLY_TYPE_DC = PowerSupplyType.DC
+POWER_SUPPLY_TYPE_ACDC = PowerSupplyType.AC_OR_DC
 
-LINE_INPUT_VOLTAGE_TYPE_DCNEG48 = 'dcneg48v'
-"""-48V DC input."""
 
-LINE_INPUT_VOLTAGE_TYPE_DC380 = 'dc380v'
-"""High Voltage DC input (380V)."""
+class LineInputVoltageType(enum.Enum):
+    UNKNOWN = 'Unknown'
+    """The power supply line input voltage type cannot be determined."""
 
-LINE_INPUT_VOLTAGE_TYPE_AC120 = 'ac120v'
-"""AC 120V nominal input."""
+    AC_LOW_LINE = 'ACLowLine'
+    """100-127V AC input."""
 
-LINE_INPUT_VOLTAGE_TYPE_AC240 = 'ac240v'
-"""AC 240V nominal input."""
+    AC_MID_LINE = 'ACMidLine'
+    """200-240V AC input."""
 
-LINE_INPUT_VOLTAGE_TYPE_AC277 = 'ac277v'
-"""AC 277V nominal input."""
+    AC_HIGH_LINE = 'ACHighLine'
+    """277V AC input."""
 
-LINE_INPUT_VOLTAGE_TYPE_ACDCWIDE = 'acdcwiderange'
-"""Wide range AC or DC input."""
+    DC_NEG48V = 'DCNeg48V'
+    """-48V DC input."""
 
-LINE_INPUT_VOLTAGE_TYPE_ACWIDE = 'acwiderange'
-"""Wide range AC input."""
+    DC_380V = 'DC380V'
+    """High Voltage DC input (380V)."""
 
-LINE_INPUT_VOLTAGE_TYPE_DC240 = 'dc240v'
-"""DC 240V nominal input."""
+    AC_120V = 'AC120V'
+    """AC 120V nominal input."""
 
-# Input Types
-INPUT_TYPE_AC = 'ac'
-"""Alternating Current (AC) input range."""
+    AC_240V = 'AC240V'
+    """AC 240V nominal input."""
 
-INPUT_TYPE_DC = 'dc'
-"""Direct Current (DC) input range."""
+    AC_277V = 'AC277V'
+    """AC 277V nominal input."""
+
+    AC_AND_DC_WIDE_RANGE = 'ACandDCWideRange'
+    """Wide range AC or DC input."""
+
+    AC_WIDE_RANGE = 'ACWideRange'
+    """Wide range AC input."""
+
+    DC_240V = 'DC240V'
+    """DC 240V nominal input."""
+
+
+# Backward compatibility
+LINE_INPUT_VOLTAGE_TYPE_UNKNOWN = LineInputVoltageType.UNKNOWN
+LINE_INPUT_VOLTAGE_TYPE_ACLOW = LineInputVoltageType.AC_LOW_LINE
+LINE_INPUT_VOLTAGE_TYPE_ACMID = LineInputVoltageType.AC_MID_LINE
+LINE_INPUT_VOLTAGE_TYPE_ACHIGH = LineInputVoltageType.AC_HIGH_LINE
+LINE_INPUT_VOLTAGE_TYPE_DCNEG48 = LineInputVoltageType.DC_NEG48V
+LINE_INPUT_VOLTAGE_TYPE_DC380V = LineInputVoltageType.DC_380V
+LINE_INPUT_VOLTAGE_TYPE_AC120V = LineInputVoltageType.AC_120V
+LINE_INPUT_VOLTAGE_TYPE_AC240V = LineInputVoltageType.AC_240V
+LINE_INPUT_VOLTAGE_TYPE_AC277V = LineInputVoltageType.AC_277V
+LINE_INPUT_VOLTAGE_TYPE_ACDCWIDE = LineInputVoltageType.AC_AND_DC_WIDE_RANGE
+LINE_INPUT_VOLTAGE_TYPE_ACWIDE = LineInputVoltageType.AC_WIDE_RANGE
+LINE_INPUT_VOLTAGE_TYPE_DC240V = LineInputVoltageType.DC_240V
+
+
+class PowerInputType(enum.Enum):
+    AC = 'AC'
+    """Alternating Current (AC) input range."""
+
+    DC = 'DC'
+    """Direct Current (DC) input range."""
+
+
+# Backward compatibility
+INPUT_TYPE_AC = PowerInputType.AC
+INPUT_TYPE_DC = PowerInputType.DC

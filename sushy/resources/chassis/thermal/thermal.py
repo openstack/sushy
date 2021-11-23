@@ -14,7 +14,7 @@
 # http://redfish.dmtf.org/schemas/v1/Thermal.v1_3_0.json
 
 from sushy.resources import base
-from sushy.resources.chassis.thermal import mappings as the_maps
+from sushy.resources.chassis.thermal import constants as the_cons
 from sushy.resources import common
 from sushy.resources import constants as res_cons
 from sushy import utils
@@ -86,8 +86,7 @@ class FansListField(Sensor):
     reading = base.Field('Reading', adapter=utils.int_or_none)
     """Current Fan Speed"""
 
-    reading_units = base.MappedField('ReadingUnits',
-                                     the_maps.FAN_READING_UNITS_MAP)
+    reading_units = base.MappedField('ReadingUnits', the_cons.FanReadingUnit)
     """Units in which the reading and thresholds are measured"""
 
     serial_number = base.Field('SerialNumber')

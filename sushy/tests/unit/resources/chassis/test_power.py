@@ -15,6 +15,7 @@
 import json
 from unittest import mock
 
+from sushy.resources.chassis.power import constants as pow_cons
 from sushy.resources.chassis.power import power
 from sushy.resources import constants as res_cons
 from sushy.tests.unit import base
@@ -46,14 +47,15 @@ class PowerTestCase(base.TestCase):
                          self.power.power_supplies[0].status.state)
         self.assertEqual(res_cons.Health.OK,
                          self.power.power_supplies[0].status.health)
-        self.assertEqual('ac', self.power.power_supplies[0].power_supply_type)
-        self.assertEqual('ac240v',
+        self.assertEqual(pow_cons.PowerSupplyType.AC,
+                         self.power.power_supplies[0].power_supply_type)
+        self.assertEqual(pow_cons.LineInputVoltageType.AC_240V,
                          self.power.power_supplies[0].line_input_voltage_type)
         self.assertEqual(220, self.power.power_supplies[0].line_input_voltage)
         self.assertEqual(1450,
                          self.power.power_supplies[0].power_capacity_watts)
         self.assertEqual(
-            'ac',
+            pow_cons.PowerInputType.AC,
             self.power.power_supplies[0].input_ranges[0].input_type
         )
         self.assertEqual(
@@ -96,14 +98,15 @@ class PowerTestCase(base.TestCase):
                          self.power.power_supplies[1].status.state)
         self.assertEqual(res_cons.Health.OK,
                          self.power.power_supplies[1].status.health)
-        self.assertEqual('ac', self.power.power_supplies[1].power_supply_type)
-        self.assertEqual('ac240v',
+        self.assertEqual(pow_cons.PowerSupplyType.AC,
+                         self.power.power_supplies[1].power_supply_type)
+        self.assertEqual(pow_cons.LineInputVoltageType.AC_240V,
                          self.power.power_supplies[1].line_input_voltage_type)
         self.assertEqual(222, self.power.power_supplies[1].line_input_voltage)
         self.assertEqual(1450,
                          self.power.power_supplies[1].power_capacity_watts)
         self.assertEqual(
-            'ac',
+            pow_cons.PowerInputType.AC,
             self.power.power_supplies[1].input_ranges[0].input_type
         )
         self.assertEqual(
@@ -149,7 +152,7 @@ class PowerTestCase(base.TestCase):
                            'identity': '0',
                            'indicator_led': None,
                            'input_ranges':
-                           [{'input_type': 'ac',
+                           [{'input_type': pow_cons.PowerInputType.AC,
                              'maximum_frequency_hz': 63,
                              'maximum_voltage': 250,
                              'minimum_frequency_hz': 47,
@@ -157,13 +160,14 @@ class PowerTestCase(base.TestCase):
                              'output_wattage': 1450}],
                            'last_power_output_watts': 650,
                            'line_input_voltage': 220,
-                           'line_input_voltage_type': 'ac240v',
+                           'line_input_voltage_type':
+                           pow_cons.LineInputVoltageType.AC_240V,
                            'manufacturer': 'Cyberdyne',
                            'model': '325457-A06',
                            'name': 'Power Supply 0',
                            'part_number': '425-591-654',
                            'power_capacity_watts': 1450,
-                           'power_supply_type': 'ac',
+                           'power_supply_type': pow_cons.PowerSupplyType.AC,
                            'serial_number': '1S0000523',
                            'spare_part_number': '425-591-654',
                            'status': {'health': res_cons.Health.OK,
@@ -173,7 +177,7 @@ class PowerTestCase(base.TestCase):
                            'identity': '1',
                            'indicator_led': None,
                            'input_ranges':
-                           [{'input_type': 'ac',
+                           [{'input_type': pow_cons.PowerInputType.AC,
                              'maximum_frequency_hz': 63,
                              'maximum_voltage': 250,
                              'minimum_frequency_hz': 47,
@@ -181,13 +185,14 @@ class PowerTestCase(base.TestCase):
                              'output_wattage': 1450}],
                            'last_power_output_watts': 635,
                            'line_input_voltage': 222,
-                           'line_input_voltage_type': 'ac240v',
+                           'line_input_voltage_type':
+                           pow_cons.LineInputVoltageType.AC_240V,
                            'manufacturer': 'Cyberdyne',
                            'model': '325457-A06',
                            'name': 'Power Supply 1',
                            'part_number': '425-591-654',
                            'power_capacity_watts': 1450,
-                           'power_supply_type': 'ac',
+                           'power_supply_type': pow_cons.PowerSupplyType.AC,
                            'serial_number': '1S0000524',
                            'spare_part_number': '425-591-654',
                            'status': {'health': res_cons.Health.OK,

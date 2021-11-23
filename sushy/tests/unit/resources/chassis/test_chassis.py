@@ -47,8 +47,7 @@ class ChassisTestCase(base.TestCase):
         self.assertEqual('Blade', self.chassis.name)
         self.assertEqual('Test description', self.chassis.description)
         self.assertEqual('45Z-2381', self.chassis.asset_tag)
-        self.assertEqual(sushy.CHASSIS_TYPE_BLADE,
-                         self.chassis.chassis_type)
+        self.assertEqual(sushy.ChassisType.BLADE, self.chassis.chassis_type)
         self.assertEqual('Contoso', self.chassis.manufacturer)
         self.assertEqual('SX1000', self.chassis.model)
         self.assertEqual('529QB9450R6', self.chassis.serial_number)
@@ -66,12 +65,12 @@ class ChassisTestCase(base.TestCase):
         self.assertEqual(711, self.chassis.depth_mm)
         self.assertEqual(15.31, self.chassis.weight_kg)
         self.assertEqual(sushy.Health.OK, self.chassis.status.health)
-        self.assertEqual(sushy.CHASSIS_INTRUSION_SENSOR_NORMAL,
+        self.assertEqual(sushy.IntrusionSensor.NORMAL,
                          self.chassis.physical_security.intrusion_sensor)
         self.assertEqual(123,
                          self.chassis.physical_security.intrusion_sensor_number
                          )
-        self.assertEqual(sushy.CHASSIS_INTRUSION_SENSOR_RE_ARM_MANUAL,
+        self.assertEqual(sushy.IntrusionSensorReArm.MANUAL,
                          self.chassis.physical_security.intrusion_sensor_re_arm
                          )
 
@@ -83,12 +82,10 @@ class ChassisTestCase(base.TestCase):
         self.assertEqual(sushy.IndicatorLED.OFF,
                          attributes.get('indicator_led'))
         self.assertEqual(sushy.POWER_STATE_ON, attributes.get('power_state'))
-        self.assertEqual({'intrusion_sensor':
-                          sushy.CHASSIS_INTRUSION_SENSOR_NORMAL,
-                          'intrusion_sensor_number':
-                          123,
+        self.assertEqual({'intrusion_sensor': sushy.IntrusionSensor.NORMAL,
+                          'intrusion_sensor_number': 123,
                           'intrusion_sensor_re_arm':
-                          'manual re arm chassis intrusion sensor'},
+                          sushy.IntrusionSensorReArm.MANUAL},
                          attributes.get('physical_security'))
 
     def test_get_allowed_reset_chasis_values(self):

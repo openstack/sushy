@@ -15,6 +15,7 @@
 import json
 from unittest import mock
 
+from sushy.resources.chassis.thermal import constants as the_cons
 from sushy.resources.chassis.thermal import thermal
 from sushy.resources import constants as res_cons
 from sushy.tests.unit import base
@@ -48,7 +49,8 @@ class ThermalTestCase(base.TestCase):
         self.assertEqual(res_cons.Health.OK,
                          self.thermal.fans[0].status.health)
         self.assertEqual(6000, self.thermal.fans[0].reading)
-        self.assertEqual('RPM', self.thermal.fans[0].reading_units)
+        self.assertEqual(the_cons.FanReadingUnit.RPM,
+                         self.thermal.fans[0].reading_units)
         self.assertEqual(2000, self.thermal.fans[0].lower_threshold_fatal)
         self.assertEqual(0, self.thermal.fans[0].min_reading_range)
         self.assertEqual(10000, self.thermal.fans[0].max_reading_range)
@@ -95,7 +97,7 @@ class ThermalTestCase(base.TestCase):
                            'part_number': None,
                            'physical_context': 'CPU',
                            'reading': 6000,
-                           'reading_units': 'RPM',
+                           'reading_units': the_cons.FanReadingUnit.RPM,
                            'serial_number': None,
                            'status':
                            {'health': res_cons.Health.OK,

@@ -10,9 +10,22 @@
 #    License for the specific language governing permissions and limitations
 #    under the License.
 
-FAN_READING_UNIT_PERCENTAGE = 'Percentage'
-"""Indicates that the fan reading and thresholds are measured in percentage"""
+# Values comes from the Redfish Chassis json-schema:
+# https://redfish.dmtf.org/schemas/v1/Thermal.v1_7_1.json
 
-FAN_READING_UNIT_RPM = 'RPM'
-"""Indicates that the fan reading and thresholds
-are measured in rotations per minute."""
+import enum
+
+
+class FanReadingUnit(enum.Enum):
+
+    RPM = 'RPM'
+    """The fan reading and thresholds are measured in revolutions per
+    minute."""
+
+    PERCENT = 'Percent'
+    """The fan reading and thresholds are measured as a percentage."""
+
+
+# Backward compatibility
+FAN_READING_UNIT_PERCENTAGE = FanReadingUnit.PERCENT
+FAN_READING_UNIT_RPM = FanReadingUnit.RPM
