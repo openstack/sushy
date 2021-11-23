@@ -23,8 +23,8 @@ from sushy.resources.chassis.thermal import thermal
 from sushy.resources import common
 from sushy.resources import constants as res_cons
 from sushy.resources.manager import manager
+from sushy.resources.system.network import adapter
 from sushy import utils
-
 
 LOG = logging.getLogger(__name__)
 
@@ -291,6 +291,21 @@ class Chassis(base.ResourceBase):
             utils.get_sub_resource_path_by(self, 'Thermal'),
             redfish_version=self.redfish_version, registries=self.registries,
             root=self.root)
+
+    @property
+    @utils.cache_it
+    def network_adapters(self):
+        """Property to reference `NetworkAdapterCollection` instance
+
+        It is set once when the first time it is queried. On refresh,
+        this property is marked as stale (greedy-refresh not done).
+        Here the actual refresh of the sub-resource happens, if stale.
+        """
+        return adapter.NetworkAdapterCollection(
+            self._conn,
+            utils.get_sub_resource_path_by(self, "NetworkAdapters"),
+            redfish_version=self.redfish_version,
+            registries=self.registries, root=self.root)
 
 
 class ChassisCollection(base.ResourceCollectionBase):

@@ -20,6 +20,7 @@ import sushy
 from sushy import exceptions
 from sushy.resources.chassis import chassis
 from sushy.resources.manager import manager
+from sushy.resources.system.network import adapter
 from sushy.resources.system import system
 from sushy.tests.unit import base
 
@@ -179,6 +180,49 @@ class ChassisTestCase(base.TestCase):
         self.assertIsInstance(actual_systems[0], system.System)
         self.assertEqual(
             '/redfish/v1/Systems/529QB9450R6', actual_systems[0].path)
+
+    def test_network_adapters(self):
+        self.conn.get.return_value.json.reset_mock()
+        with open('sushy/tests/unit/'
+                  'json_samples/network_adapter_collection.json') as f:
+            self.conn.get.return_value.json.return_value = json.load(f)
+        actual_adapters = self.chassis.network_adapters
+        self.assertIsInstance(actual_adapters,
+                              adapter.NetworkAdapterCollection)
+        self.conn.get.return_value.json.assert_called_once_with()
+
+    def test_network_adapters_cached(self):
+        self.conn.get.return_value.json.reset_mock()
+        with open('sushy/tests/unit/'
+                  'json_samples/network_adapter_collection.json') as f:
+            self.conn.get.return_value.json.return_value = json.load(f)
+        actual_adapters = self.chassis.network_adapters
+        self.conn.get.return_value.json.reset_mock()
+        self.assertIs(actual_adapters,
+                      self.chassis.network_adapters)
+        self.conn.get.return_value.json.assert_not_called()
+
+    def test_network_adapters_refresh(self):
+        with open('sushy/tests/unit/'
+                  'json_samples/network_adapter_collection.json') as f:
+            self.conn.get.return_value.json.return_value = json.load(f)
+        adapters = self.chassis.network_adapters
+        self.assertIsInstance(adapters, adapter.NetworkAdapterCollection)
+
+        with open('sushy/tests/unit/'
+                  'json_samples/chassis.json') as f:
+            self.conn.get.return_value.json.return_value = json.load(f)
+
+        self.chassis.invalidate()
+        self.chassis.refresh(force=False)
+
+        self.assertTrue(adapters._is_stale)
+
+        with open('sushy/tests/unit/'
+                  'json_samples/network_adapter_collection.json') as f:
+            self.conn.get.return_value.json.return_value = json.load(f)
+        self.assertIsInstance(self.chassis.network_adapters,
+                              adapter.NetworkAdapterCollection)
 
 
 class ChassisCollectionTestCase(base.TestCase):
