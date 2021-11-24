@@ -43,7 +43,7 @@ class VolumeTestCase(base.TestCase):
         self.assertEqual('1', self.stor_volume.identity)
         self.assertEqual('Virtual Disk 1', self.stor_volume.name)
         self.assertEqual(899527000000, self.stor_volume.capacity_bytes)
-        self.assertEqual(sushy.VOLUME_TYPE_MIRRORED,
+        self.assertEqual(sushy.VolumeType.MIRRORED,
                          self.stor_volume.volume_type)
         self.assertFalse(self.stor_volume.encrypted)
         identifiers = self.stor_volume.identifiers
@@ -60,7 +60,7 @@ class VolumeTestCase(base.TestCase):
         target_uri = '/redfish/v1/Systems/3/Storage/RAIDIntegrated/' \
                      'Volumes/1/Actions/Volume.Initialize'
         self.stor_volume.initialize(
-            store_cons.VOLUME_INIT_TYPE_FAST,
+            store_cons.VolumeInitializeType.FAST,
             apply_time=res_cons.ApplyTime.IMMEDIATE)
         self.stor_volume._conn.post.assert_called_once_with(
             target_uri, data={'InitializeType': 'Fast',
@@ -71,10 +71,10 @@ class VolumeTestCase(base.TestCase):
         target_uri = '/redfish/v1/Systems/3/Storage/RAIDIntegrated/' \
                      'Volumes/1/Actions/Volume.Initialize'
         self.stor_volume.initialize(
-            store_cons.VOLUME_INIT_TYPE_FAST,
+            store_cons.VolumeInitializeType.SLOW,
             apply_time=res_cons.ApplyTime.ON_RESET)
         self.stor_volume._conn.post.assert_called_once_with(
-            target_uri, data={'InitializeType': 'Fast',
+            target_uri, data={'InitializeType': 'Slow',
                               '@Redfish.OperationApplyTime': 'OnReset'},
             blocking=False, timeout=500)
 
@@ -236,8 +236,8 @@ class VolumeCollectionTestCase(base.TestCase):
         self.assertEqual('4', new_vol.identity)
         self.assertEqual('My Volume 4', new_vol.name)
         self.assertEqual(107374182400, new_vol.capacity_bytes)
-        self.assertEqual(sushy.VOLUME_TYPE_MIRRORED, new_vol.volume_type)
-        self.assertEqual(sushy.RAID_TYPE_RAID1, new_vol.raid_type)
+        self.assertEqual(sushy.VolumeType.MIRRORED, new_vol.volume_type)
+        self.assertEqual(sushy.RAIDType.RAID1, new_vol.raid_type)
 
     def test_create_on_reset(self):
         payload = {
