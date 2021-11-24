@@ -51,24 +51,24 @@ class EventServiceTestCase(base.TestCase):
                          '/redfish/v1/EventService/Subscriptions/')
 
     def test__get_event_types_for_subscription(self):
-        expected = set([sushy.EVENT_TYPE_STATUS_CHANGE,
-                        sushy.EVENT_TYPE_RESOURCE_ADDED,
-                        sushy.EVENT_TYPE_RESOURCE_REMOVED,
-                        sushy.EVENT_TYPE_RESOURCE_UPDATED,
-                        sushy.EVENT_TYPE_ALERT])
+        expected = set([sushy.EventType.STATUS_CHANGE,
+                        sushy.EventType.RESOURCE_ADDED,
+                        sushy.EventType.RESOURCE_REMOVED,
+                        sushy.EventType.RESOURCE_UPDATED,
+                        sushy.EventType.ALERT])
 
         values = self.eventservice.get_event_types_for_subscription()
         self.assertEqual(expected, values)
         self.assertIsInstance(values, set)
 
     def test__no_event_types_for_subscription(self):
-        expected = set([sushy.EVENT_TYPE_STATUS_CHANGE,
-                        sushy.EVENT_TYPE_RESOURCE_ADDED,
-                        sushy.EVENT_TYPE_RESOURCE_REMOVED,
-                        sushy.EVENT_TYPE_RESOURCE_UPDATED,
-                        sushy.EVENT_TYPE_ALERT,
-                        sushy.EVENT_TYPE_METRIC_REPORT,
-                        sushy.EVENT_TYPE_OTHER])
+        expected = set([sushy.EventType.STATUS_CHANGE,
+                        sushy.EventType.RESOURCE_ADDED,
+                        sushy.EventType.RESOURCE_REMOVED,
+                        sushy.EventType.RESOURCE_UPDATED,
+                        sushy.EventType.ALERT,
+                        sushy.EventType.METRIC_REPORT,
+                        sushy.EventType.OTHER])
         self.eventservice.event_types_for_subscription = []
 
         values = self.eventservice.get_event_types_for_subscription()

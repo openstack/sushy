@@ -43,7 +43,7 @@ class TaskServiceTestCase(base.TestCase):
         self.assertEqual(res_cons.State.ENABLED, self.tsk_serv.status.state)
         self.assertEqual(res_cons.Health.OK, self.tsk_serv.status.health)
         self.assertEqual(self.tsk_serv.overwrite_policy,
-                         ts_cons.OVERWRITE_POLICY_MANUAL)
+                         ts_cons.OverWritePolicy.MANUAL)
 
     @mock.patch.object(task, 'TaskCollection', autospec=True)
     def test_tasks(self, task_collection_mock):

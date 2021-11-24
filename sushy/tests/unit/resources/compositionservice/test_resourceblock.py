@@ -39,7 +39,7 @@ class ResourceBlockTestCase(base.TestCase):
     def test__parse_attributes(self):
         self.res_block._parse_attributes(self.json_doc)
         self.assertEqual(
-            res_block_cons.COMPOSITION_STATE_COMPOSED,
+            res_block_cons.CompositionState.COMPOSED,
             self.res_block.composition_status.composition_state)
         self.assertEqual(1, self.res_block.composition_status.max_compositions)
         self.assertEqual(
@@ -51,7 +51,7 @@ class ResourceBlockTestCase(base.TestCase):
         self.assertEqual('DriveBlock3', self.res_block.identity)
         self.assertEqual('Drive Block 3', self.res_block.name)
         self.assertEqual(
-            res_block_cons.RESOURCE_BLOCK_TYPE_STORAGE,
+            res_block_cons.ResourceBlockType.STORAGE,
             self.res_block.resource_block_type)
         self.assertEqual(
             res_cons.State.ENABLED,

@@ -35,7 +35,16 @@ class TaskState(enum.Enum):
     KILLED = 'Killed'
 
 
-# Overwrite Policy constants
+class OverWritePolicy(enum.Enum):
+    """Overwrite Policy constants"""
 
-OVERWRITE_POLICY_OLDEST = 'oldest completed'
-OVERWRITE_POLICY_MANUAL = 'manual only'
+    MANUAL = 'Manual'
+    """Completed tasks are not automatically overwritten."""
+
+    OLDEST = 'Oldest'
+    """Oldest completed tasks are overwritten."""
+
+
+# Backward compatibility
+OVERWRITE_POLICY_MANUAL = OverWritePolicy.MANUAL
+OVERWRITE_POLICY_OLDEST = OverWritePolicy.OLDEST

@@ -15,24 +15,39 @@
 # http://redfish.dmtf.org/schemas/v1/Event.json#/definitions/EventType
 # https://redfish.dmtf.org/schemas/v1/EventService.v1_0_6.json
 
-EVENT_TYPE_STATUS_CHANGE = "Status Change"
-"""The status of a resource has changed"""
+import enum
 
-EVENT_TYPE_RESOURCE_ADDED = "Resource Added"
-"""A resource has been added."""
 
-EVENT_TYPE_RESOURCE_REMOVED = "Resource Removed"
-"""A resource has been removed"""
+class EventType(enum.Enum):
 
-EVENT_TYPE_RESOURCE_UPDATED = "Resource Updated"
-"""A resource has been updated"""
+    STATUS_CHANGE = 'StatusChange'
+    """The status of a resource has changed."""
 
-EVENT_TYPE_ALERT = "Alert"
-"""A condition requires attention"""
+    RESOURCE_UPDATED = 'ResourceUpdated'
+    """A resource has been updated."""
 
-EVENT_TYPE_METRIC_REPORT = "Metric Report"
-"""The telemetry service is sending a metric report"""
+    RESOURCE_ADDED = 'ResourceAdded'
+    """A resource has been added."""
 
-EVENT_TYPE_OTHER = "Other"
-"""Because EventType is deprecated as of Redfish Specification v1.6,
-the event is based on a registry or resource but not an EventType."""
+    RESOURCE_REMOVED = 'ResourceRemoved'
+    """A resource has been removed."""
+
+    ALERT = 'Alert'
+    """A condition requires attention."""
+
+    METRIC_REPORT = 'MetricReport'
+    """The telemetry service is sending a metric report."""
+
+    OTHER = 'Other'
+    """Because EventType is deprecated as of Redfish Specification v1.6, the
+    event is based on a registry or resource but not an EventType."""
+
+
+# Backward compatibility
+EVENT_TYPE_STATUS_CHANGE = EventType.STATUS_CHANGE
+EVENT_TYPE_RESOURCE_UPDATED = EventType.RESOURCE_UPDATED
+EVENT_TYPE_RESOURCE_ADDED = EventType.RESOURCE_ADDED
+EVENT_TYPE_RESOURCE_REMOVED = EventType.RESOURCE_REMOVED
+EVENT_TYPE_ALERT = EventType.ALERT
+EVENT_TYPE_METRIC_REPORT = EventType.METRIC_REPORT
+EVENT_TYPE_OTHER = EventType.OTHER

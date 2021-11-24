@@ -18,7 +18,7 @@ import logging
 
 from sushy.resources import base
 from sushy.resources import common
-from sushy.resources.taskservice import mappings as ts_maps
+from sushy.resources.taskservice import constants as ts_cons
 from sushy.resources.taskservice import task
 from sushy import utils
 
@@ -40,7 +40,7 @@ class TaskService(base.ResourceBase):
     """The status of the task service"""
 
     overwrite_policy = base.MappedField(
-        'CompletedTaskOverWritePolicy', ts_maps.OVERWRITE_POLICY_VALUE_MAP)
+        'CompletedTaskOverWritePolicy', ts_cons.OverWritePolicy)
     """The overwrite policy for completed tasks"""
 
     event_on_task_state_change = base.Field(
