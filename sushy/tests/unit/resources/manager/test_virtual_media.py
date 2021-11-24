@@ -48,10 +48,10 @@ class VirtualMediaTestCase(base.TestCase):
                          self.sys_virtual_media.image)
         self.assertEqual('Sardine2.1.43.35.6a',
                          self.sys_virtual_media.image_name)
-        self.assertEqual(sushy.CONNECTED_VIA_URI,
+        self.assertEqual(sushy.ConnectedVia.URI,
                          self.sys_virtual_media.connected_via)
-        self.assertEqual([sushy.VIRTUAL_MEDIA_FLOPPY,
-                          sushy.VIRTUAL_MEDIA_USBSTICK],
+        self.assertEqual([sushy.VirtualMediaType.FLOPPY,
+                          sushy.VirtualMediaType.USB_STICK],
                          self.sys_virtual_media.media_types)
         self.assertEqual(True, self.sys_virtual_media.inserted)
         self.assertEqual(False, self.sys_virtual_media.write_protected)
@@ -62,10 +62,10 @@ class VirtualMediaTestCase(base.TestCase):
         # Test that various types are returned correctly
         self.assertEqual('https://www.dmtf.org/freeImages/Sardine.img',
                          attributes.get('image'))
-        self.assertEqual(sushy.CONNECTED_VIA_URI,
+        self.assertEqual(sushy.ConnectedVia.URI,
                          attributes.get('connected_via'))
-        self.assertEqual([sushy.VIRTUAL_MEDIA_FLOPPY,
-                          sushy.VIRTUAL_MEDIA_USBSTICK],
+        self.assertEqual([sushy.VirtualMediaType.FLOPPY,
+                          sushy.VirtualMediaType.USB_STICK],
                          attributes.get('media_types'))
 
     def test_insert_media_none(self):

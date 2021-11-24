@@ -56,13 +56,13 @@ class ManagerTestCase(base.TestCase):
         self.assertEqual('BMC', self.manager.identity)
         self.assertEqual('Manager', self.manager.name)
         self.assertEqual('Joo Janta 200', self.manager.model)
-        self.assertEqual(sushy.MANAGER_TYPE_BMC, self.manager.manager_type)
+        self.assertEqual(sushy.ManagerType.BMC, self.manager.manager_type)
         self.assertEqual('58893887-8974-2487-2389-841168418919',
                          self.manager.uuid)
 
     def test_get_supported_graphical_console_types(self):
         # | GIVEN |
-        expected = set([sushy.GRAPHICAL_CONSOLE_KVMIP])
+        expected = set([sushy.GraphicalConnectType.KVMIP])
         # | WHEN |
         values = self.manager.get_supported_graphical_console_types()
         # | THEN |
@@ -72,8 +72,8 @@ class ManagerTestCase(base.TestCase):
     def test_get_supported_graphical_console_types_for_no_connect_types(self):
         # | GIVEN |
         graphical_console = self.manager.graphical_console
-        expected = set([sushy.GRAPHICAL_CONSOLE_KVMIP,
-                        sushy.GRAPHICAL_CONSOLE_OEM])
+        expected = set([sushy.GraphicalConnectType.KVMIP,
+                        sushy.GraphicalConnectType.OEM])
 
         for val in [None, []]:
             graphical_console.connect_types_supported = val
@@ -86,8 +86,8 @@ class ManagerTestCase(base.TestCase):
     def test_get_supported_graphical_console_types_missing_graphcon_attr(self):
         # | GIVEN |
         self.manager.graphical_console = None
-        expected = set([sushy.GRAPHICAL_CONSOLE_KVMIP,
-                        sushy.GRAPHICAL_CONSOLE_OEM])
+        expected = set([sushy.GraphicalConnectType.KVMIP,
+                        sushy.GraphicalConnectType.OEM])
         # | WHEN |
         values = self.manager.get_supported_graphical_console_types()
         # | THEN |
@@ -96,9 +96,9 @@ class ManagerTestCase(base.TestCase):
 
     def test_get_supported_serial_console_types(self):
         # | GIVEN |
-        expected = set([sushy.SERIAL_CONSOLE_SSH,
-                        sushy.SERIAL_CONSOLE_TELNET,
-                        sushy.SERIAL_CONSOLE_IPMI])
+        expected = set([sushy.SerialConnectType.SSH,
+                        sushy.SerialConnectType.TELNET,
+                        sushy.SerialConnectType.IPMI])
         # | WHEN |
         values = self.manager.get_supported_serial_console_types()
         # | THEN |
@@ -108,10 +108,10 @@ class ManagerTestCase(base.TestCase):
     def test_get_supported_serial_console_types_for_no_connect_types(self):
         # | GIVEN |
         serial_console = self.manager.serial_console
-        expected = set([sushy.SERIAL_CONSOLE_SSH,
-                        sushy.SERIAL_CONSOLE_TELNET,
-                        sushy.SERIAL_CONSOLE_IPMI,
-                        sushy.SERIAL_CONSOLE_OEM])
+        expected = set([sushy.SerialConnectType.SSH,
+                        sushy.SerialConnectType.TELNET,
+                        sushy.SerialConnectType.IPMI,
+                        sushy.SerialConnectType.OEM])
 
         for val in [None, []]:
             serial_console.connect_types_supported = val
@@ -124,10 +124,10 @@ class ManagerTestCase(base.TestCase):
     def test_get_supported_serial_console_types_missing_serialcon_attr(self):
         # | GIVEN |
         self.manager.serial_console = None
-        expected = set([sushy.SERIAL_CONSOLE_SSH,
-                        sushy.SERIAL_CONSOLE_TELNET,
-                        sushy.SERIAL_CONSOLE_IPMI,
-                        sushy.SERIAL_CONSOLE_OEM])
+        expected = set([sushy.SerialConnectType.SSH,
+                        sushy.SerialConnectType.TELNET,
+                        sushy.SerialConnectType.IPMI,
+                        sushy.SerialConnectType.OEM])
         # | WHEN |
         values = self.manager.get_supported_serial_console_types()
         # | THEN |
@@ -136,8 +136,8 @@ class ManagerTestCase(base.TestCase):
 
     def test_get_supported_command_shell_types(self):
         # | GIVEN |
-        expected = set([sushy.COMMAND_SHELL_SSH,
-                        sushy.COMMAND_SHELL_TELNET])
+        expected = set([sushy.CommandConnectType.SSH,
+                        sushy.CommandConnectType.TELNET])
         # | WHEN |
         values = self.manager.get_supported_command_shell_types()
         # | THEN |
@@ -147,10 +147,10 @@ class ManagerTestCase(base.TestCase):
     def test_get_supported_command_shell_types_for_no_connect_types(self):
         # | GIVEN |
         command_shell = self.manager.command_shell
-        expected = set([sushy.COMMAND_SHELL_SSH,
-                        sushy.COMMAND_SHELL_TELNET,
-                        sushy.COMMAND_SHELL_IPMI,
-                        sushy.COMMAND_SHELL_OEM])
+        expected = set([sushy.CommandConnectType.SSH,
+                        sushy.CommandConnectType.TELNET,
+                        sushy.CommandConnectType.IPMI,
+                        sushy.CommandConnectType.OEM])
 
         for val in [None, []]:
             command_shell.connect_types_supported = val
@@ -163,10 +163,10 @@ class ManagerTestCase(base.TestCase):
     def test_get_supported_command_shell_types_missing_cmdshell_attr(self):
         # | GIVEN |
         self.manager.command_shell = None
-        expected = set([sushy.COMMAND_SHELL_SSH,
-                        sushy.COMMAND_SHELL_TELNET,
-                        sushy.COMMAND_SHELL_IPMI,
-                        sushy.COMMAND_SHELL_OEM])
+        expected = set([sushy.CommandConnectType.SSH,
+                        sushy.CommandConnectType.TELNET,
+                        sushy.CommandConnectType.IPMI,
+                        sushy.CommandConnectType.OEM])
         # | WHEN |
         values = self.manager.get_supported_command_shell_types()
         # | THEN |
@@ -175,8 +175,8 @@ class ManagerTestCase(base.TestCase):
 
     def test_get_allowed_reset_manager_values(self):
         # | GIVEN |
-        expected = set([sushy.RESET_MANAGER_GRACEFUL_RESTART,
-                        sushy.RESET_MANAGER_FORCE_RESTART])
+        expected = set([sushy.ResetType.GRACEFUL_RESTART,
+                        sushy.ResetType.FORCE_RESTART])
         # | WHEN |
         values = self.manager.get_allowed_reset_manager_values()
         # | THEN |
@@ -186,8 +186,18 @@ class ManagerTestCase(base.TestCase):
     def test_get_allowed_reset_manager_values_for_no_values_set(self):
         # | GIVEN |
         self.manager._actions.reset.allowed_values = []
-        expected = set([sushy.RESET_MANAGER_GRACEFUL_RESTART,
-                        sushy.RESET_MANAGER_FORCE_RESTART])
+        expected = set([sushy.ResetType.GRACEFUL_SHUTDOWN,
+                        sushy.ResetType.GRACEFUL_RESTART,
+                        sushy.ResetType.FORCE_RESTART,
+                        sushy.ResetType.FORCE_OFF,
+                        sushy.ResetType.FORCE_ON,
+                        sushy.ResetType.ON,
+                        sushy.ResetType.NMI,
+                        sushy.ResetType.PUSH_POWER_BUTTON,
+                        sushy.ResetType.POWER_CYCLE,
+                        sushy.ResetType.SUSPEND,
+                        sushy.ResetType.RESUME,
+                        sushy.ResetType.PAUSE])
         # | WHEN |
         values = self.manager.get_allowed_reset_manager_values()
         # | THEN |
@@ -203,7 +213,7 @@ class ManagerTestCase(base.TestCase):
             self.manager.get_allowed_reset_manager_values)
 
     def test_reset_manager(self):
-        self.manager.reset_manager(sushy.RESET_MANAGER_GRACEFUL_RESTART)
+        self.manager.reset_manager(sushy.ResetType.GRACEFUL_RESTART)
         self.manager._conn.post.assert_called_once_with(
             '/redfish/v1/Managers/BMC/Actions/Manager.Reset',
             data={'ResetType': 'GracefulRestart'})

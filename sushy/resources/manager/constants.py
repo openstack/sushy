@@ -25,78 +25,157 @@ RESET_MANAGER_GRACEFUL_RESTART = res_cons.ResetType.GRACEFUL_RESTART
 RESET_MANAGER_FORCE_RESTART = res_cons.ResetType.FORCE_RESTART
 """Perform an immediate (non-graceful) shutdown, followed by a restart"""
 
-# Manager Type constants
 
-MANAGER_TYPE_MANAGEMENT_CONTROLLER = 'management controller'
-"""A controller used primarily to monitor or manage the operation of
-   a device or system"""
+class ManagerType(enum.Enum):
+    """Manager Type constants"""
 
-MANAGER_TYPE_ENCLOSURE_MANAGER = 'enclosure manager'
-"""A controller which provides management functions for a chassis
-   or group of devices or systems"""
+    MANAGEMENT_CONTROLLER = 'ManagementController'
+    """A controller that primarily monitors or manages the operation of a
+    device or system."""
 
-MANAGER_TYPE_BMC = 'bmc'
-"""A controller which provides management functions for a single
-   computer system"""
+    ENCLOSURE_MANAGER = 'EnclosureManager'
+    """A controller that provides management functions for a chassis or
+    group of devices or systems."""
 
-MANAGER_TYPE_RACK_MANAGER = 'rack manager'
-"""A controller which provides management functions for a whole or part
-   of a rack"""
+    BMC = 'BMC'
+    """A controller that provides management functions for a single computer
+    system."""
 
-MANAGER_TYPE_AUXILIARY_CONTROLLER = 'auxiliary controller'
-"""A controller which provides management functions for a particular
-   subsystem or group of devices"""
+    RACK_MANAGER = 'RackManager'
+    """A controller that provides management functions for a whole or part
+    of a rack."""
 
-# Graphical Console constants
+    AUXILIARY_CONTROLLER = 'AuxiliaryController'
+    """A controller that provides management functions for a particular
+    subsystem or group of devices."""
 
-GRAPHICAL_CONSOLE_KVMIP = 'graphical console kvmip'
-"""Graphical Console connection using a KVM-IP (redirection of Keyboard,
-   Video, Mouse over IP) protocol"""
+    SERVICE = 'Service'
+    """A software-based service that provides management functions."""
 
-GRAPHICAL_CONSOLE_OEM = 'graphical console oem'
-"""Graphical Console connection using an OEM-specific protocol"""
 
-# Serial Console constants
+# Backward compatibility
+MANAGER_TYPE_MANAGEMENT_CONTROLLER = ManagerType.MANAGEMENT_CONTROLLER
+MANAGER_TYPE_ENCLOSURE_MANAGER = ManagerType.ENCLOSURE_MANAGER
+MANAGER_TYPE_BMC = ManagerType.BMC
+MANAGER_TYPE_RACK_MANAGER = ManagerType.RACK_MANAGER
+MANAGER_TYPE_AUXILIARY_CONTROLLER = ManagerType.AUXILIARY_CONTROLLER
 
-SERIAL_CONSOLE_SSH = 'serial console ssh'
-"""Serial Console connection using the SSH protocol"""
 
-SERIAL_CONSOLE_TELNET = 'serial console telnet'
-"""Serial Console connection using the Telnet protocol"""
+class GraphicalConnectType(enum.Enum):
+    """Graphical Console constants"""
 
-SERIAL_CONSOLE_IPMI = 'serial console ipmi'
-"""Serial Console connection using the IPMI Serial-over-LAN (SOL) protocol"""
+    KVMIP = 'KVMIP'
+    """The controller supports a graphical console connection through a KVM-
+    IP (redirection of Keyboard, Video, Mouse over IP) protocol."""
 
-SERIAL_CONSOLE_OEM = 'serial console oem'
-"""Serial Console connection using an OEM-specific protocol"""
+    OEM = 'Oem'
+    """The controller supports a graphical console connection through an
+    OEM-specific protocol."""
 
-# Command Shell constants
 
-COMMAND_SHELL_SSH = 'command shell ssh'
-"""Command Shell connection using the SSH protocol"""
+# Backward compatibility
+GRAPHICAL_CONSOLE_KVMIP = GraphicalConnectType.KVMIP
+GRAPHICAL_CONSOLE_OEM = GraphicalConnectType.OEM
 
-COMMAND_SHELL_TELNET = 'command shell telnet'
-"""Command Shell connection using the Telnet protocol"""
 
-COMMAND_SHELL_IPMI = 'command shell ipmi'
-"""Command Shell connection using the IPMI Serial-over-LAN (SOL) protocol"""
+class SerialConnectType(enum.Enum):
+    """Serial Console constants"""
 
-COMMAND_SHELL_OEM = 'command shell oem'
-"""Command Shell connection using an OEM-specific protocol"""
+    SSH = 'SSH'
+    """The controller supports a serial console connection through the SSH
+    protocol."""
 
-# Supported Virtual Media Type constants
+    TELNET = 'Telnet'
+    """The controller supports a serial console connection through the
+    Telnet protocol."""
 
-VIRTUAL_MEDIA_CD = 'cd'
-VIRTUAL_MEDIA_DVD = 'dvd'
-VIRTUAL_MEDIA_FLOPPY = 'floppy'
-VIRTUAL_MEDIA_USBSTICK = 'usb'
+    IPMI = 'IPMI'
+    """The controller supports a serial console connection through the IPMI
+    Serial Over LAN (SOL) protocol."""
 
-# Connected Via constants
+    OEM = 'Oem'
+    """The controller supports a serial console connection through an OEM-
+    specific protocol."""
 
-CONNECTED_VIA_APPLET = 'applet'
-CONNECTED_VIA_NOT_CONNECTED = 'not_connected'
-CONNECTED_VIA_OEM = 'oem'
-CONNECTED_VIA_URI = 'uri'
+
+# Backward compatibility
+SERIAL_CONSOLE_SSH = SerialConnectType.SSH
+SERIAL_CONSOLE_TELNET = SerialConnectType.TELNET
+SERIAL_CONSOLE_IPMI = SerialConnectType.IPMI
+SERIAL_CONSOLE_OEM = SerialConnectType.OEM
+
+
+class CommandConnectType(enum.Enum):
+    """Command Shell constants"""
+
+    SSH = 'SSH'
+    """The controller supports a command shell connection through the SSH
+    protocol."""
+
+    TELNET = 'Telnet'
+    """The controller supports a command shell connection through the Telnet
+    protocol."""
+
+    IPMI = 'IPMI'
+    """The controller supports a command shell connection through the IPMI
+    Serial Over LAN (SOL) protocol."""
+
+    OEM = 'Oem'
+    """The controller supports a command shell connection through an OEM-
+    specific protocol."""
+
+
+# Backward compatibility
+COMMAND_SHELL_SSH = CommandConnectType.SSH
+COMMAND_SHELL_TELNET = CommandConnectType.TELNET
+COMMAND_SHELL_IPMI = CommandConnectType.IPMI
+COMMAND_SHELL_OEM = CommandConnectType.OEM
+
+
+class VirtualMediaType(enum.Enum):
+    """Supported Virtual Media Type constants"""
+
+    CD = 'CD'
+    """A CD-ROM format (ISO) image."""
+
+    FLOPPY = 'Floppy'
+    """A floppy disk image."""
+
+    USB_STICK = 'USBStick'
+    """An emulation of a USB storage device."""
+
+    DVD = 'DVD'
+    """A DVD-ROM format image."""
+
+
+# Backward compatibility
+VIRTUAL_MEDIA_CD = VirtualMediaType.CD
+VIRTUAL_MEDIA_DVD = VirtualMediaType.DVD
+VIRTUAL_MEDIA_FLOPPY = VirtualMediaType.FLOPPY
+VIRTUAL_MEDIA_USBSTICK = VirtualMediaType.USB_STICK
+
+
+class ConnectedVia(enum.Enum):
+    """Connected Via constants"""
+
+    NOT_CONNECTED = 'NotConnected'
+    """No current connection."""
+
+    URI = 'URI'
+    """Connected to a URI location."""
+
+    APPLET = 'Applet'
+    """Connected to a client application."""
+
+    OEM = 'Oem'
+    """Connected through an OEM-defined method."""
+
+
+# Backward compatibility
+CONNECTED_VIA_NOT_CONNECTED = ConnectedVia.NOT_CONNECTED
+CONNECTED_VIA_URI = ConnectedVia.URI
+CONNECTED_VIA_APPLET = ConnectedVia.APPLET
+CONNECTED_VIA_OEM = ConnectedVia.OEM
 
 
 class TransferMethod(enum.Enum):
