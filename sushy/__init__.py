@@ -25,6 +25,7 @@ from sushy.resources.fabric.constants import *  # noqa
 from sushy.resources.manager.constants import *  # noqa
 from sushy.resources.registry.constants import *  # noqa
 from sushy.resources.system.constants import *  # noqa
+from sushy.resources.system.network.constants import *  # noqa
 from sushy.resources.system.storage.constants import *  # noqa
 from sushy.resources.updateservice.constants import *  # noqa
 from sushy.resources.taskservice.constants import *  # noqa

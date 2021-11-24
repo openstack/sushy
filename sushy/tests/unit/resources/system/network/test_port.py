@@ -40,17 +40,17 @@ class NetworkPortTestCase(base.TestCase):
         self.assertEqual('NIC.Integrated.1-1', self.port.identity)
         self.assertEqual('Network Port View', self.port.name)
         self.assertEqual('Network Port View', self.port.description)
-        self.assertEqual(res_cons.STATE_ENABLED, self.port.status.state)
-        self.assertEqual(res_cons.HEALTH_OK, self.port.status.health)
-        self.assertEqual(res_cons.HEALTH_OK, self.port.status.health_rollup)
+        self.assertEqual(res_cons.State.ENABLED, self.port.status.state)
+        self.assertEqual(res_cons.Health.OK, self.port.status.health)
+        self.assertEqual(res_cons.Health.OK, self.port.status.health_rollup)
         self.assertEqual(['01:02:03:04:05:06'],
                          self.port.associated_network_addresses)
         self.assertEqual(10000, self.port.current_link_speed_mbps)
-        self.assertEqual(net_cons.FLOW_CONTROL_NONE,
+        self.assertEqual(net_cons.FlowControl.NONE,
                          self.port.flow_control_configuration)
-        self.assertEqual(net_cons.FLOW_CONTROL_NONE,
+        self.assertEqual(net_cons.FlowControl.NONE,
                          self.port.flow_control_status)
-        self.assertEqual(net_cons.LINK_STATUS_UP, self.port.link_status)
+        self.assertEqual(net_cons.LinkStatus.UP, self.port.link_status)
 
 
 class NetworkPortCollectionTestCase(base.TestCase):

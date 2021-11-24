@@ -42,17 +42,16 @@ class NetworkDeviceFunctionTestCase(base.TestCase):
         self.assertEqual('NIC.Integrated.1-2-1', self.function.identity)
         self.assertEqual('NetworkDeviceFunction', self.function.name)
         self.assertEqual('NetworkDeviceFunction', self.function.description)
-        self.assertEqual(res_cons.STATE_ENABLED, self.function.status.state)
-        self.assertEqual(res_cons.HEALTH_OK,
-                         self.function.status.health)
-        self.assertEqual(res_cons.HEALTH_OK,
+        self.assertEqual(res_cons.State.ENABLED, self.function.status.state)
+        self.assertEqual(res_cons.Health.OK, self.function.status.health)
+        self.assertEqual(res_cons.Health.OK,
                          self.function.status.health_rollup)
         self.assertEqual(self.function.type,
-                         net_cons.NETWORK_DEVICE_TECHNOLOGY_ETHERNET)
+                         net_cons.NetworkDeviceTechnology.ETHERNET)
         self.assertEqual([
-            net_cons.NETWORK_DEVICE_TECHNOLOGY_DISABLED,
-            net_cons.NETWORK_DEVICE_TECHNOLOGY_ETHERNET,
-            net_cons.NETWORK_DEVICE_TECHNOLOGY_ISCSI,
+            net_cons.NetworkDeviceTechnology.DISABLED,
+            net_cons.NetworkDeviceTechnology.ETHERNET,
+            net_cons.NetworkDeviceTechnology.iSCSI,
         ], self.function.capabilities)
         self.assertEqual(1,
                          len(self.function.fibre_channel.boot_targets))
@@ -73,9 +72,9 @@ class NetworkDeviceFunctionTestCase(base.TestCase):
         self.assertEqual(1,
                          self.function.ethernet.vlan.vlan_id)
         self.assertTrue(self.function.ethernet.vlan.vlan_enabled)
-        self.assertEqual(net_cons.AUTHENTICATION_METHOD_NONE,
+        self.assertEqual(net_cons.NetworkAuthenticationMethod.NONE,
                          self.function.iscsi_boot.authentication_method)
-        self.assertEqual(net_cons.IP_ADDRESS_TYPE_IPV4,
+        self.assertEqual(net_cons.IPAddressType.IPV4,
                          self.function.iscsi_boot.ip_address_type)
         self.assertEqual('0.0.0.0',
                          self.function.iscsi_boot.initiator_ip_address)

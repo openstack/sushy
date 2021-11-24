@@ -16,7 +16,7 @@
 
 from sushy.resources import base
 from sushy.resources import common
-from sushy.resources.system.network import mappings as net_maps
+from sushy.resources.system.network import constants
 from sushy.resources.system.network import port
 from sushy import utils
 
@@ -39,7 +39,7 @@ class VLANField(base.CompositeField):
 
 class ISCSIBootField(base.CompositeField):
     authentication_method = base.MappedField(
-        'AuthenticationMethod', net_maps.AUTHENTICATION_METHOD_TYPE_MAP)
+        'AuthenticationMethod', constants.NetworkAuthenticationMethod)
     """The configured capability of this network device function."""
 
     initiator_default_gateway = base.Field('InitiatorDefaultGateway')
@@ -52,7 +52,7 @@ class ISCSIBootField(base.CompositeField):
     """The IPv6 or IPv4 netmask of the iSCSI boot initiator."""
 
     ip_address_type = base.MappedField(
-        'IPAddressType', net_maps.IP_ADDRESS_TYPE_MAP)
+        'IPAddressType', constants.IPAddressType)
     """The type of IP address being populated IP address fields."""
 
     primary_dns = base.Field('PrimaryDNS')
@@ -120,11 +120,11 @@ class FibreChannelField(base.CompositeField):
 
 class NetworkDeviceFunction(base.ResourceBase):
     capabilities = base.MappedListField(
-        'NetDevFuncCapabilities', net_maps.NETWORK_TECHNOLOGY_TYPE_MAP)
+        'NetDevFuncCapabilities', constants.NetworkDeviceTechnology)
     """An array of capabilities for this network device function."""
 
     type = base.MappedField(
-        'NetDevFuncType', net_maps.NETWORK_TECHNOLOGY_TYPE_MAP)
+        'NetDevFuncType', constants.NetworkDeviceTechnology)
     """The configured capability of this network device function."""
 
     description = base.Field('Description')

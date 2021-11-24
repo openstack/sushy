@@ -11,79 +11,110 @@
 #    License for the specific language governing permissions and limitations
 #    under the License.
 
-# AuthenticationMethod Types
+# Values comes from the Redfish System json-schema:
+# https://redfish.dmtf.org/schemas/v1/NetworkDeviceFunction.v1_7_0.json
+# https://redfish.dmtf.org/schemas/v1/NetworkPort.v1_4_1.json
+# Using Network prefix since some names are too generic.
 
-AUTHENTICATION_METHOD_CHAP = 'iSCSI Challenge Handshake'\
-                             'Authentication Protocol'
-"""
-iSCSI Challenge Handshake Authentication Protocol (CHAP)
-authentication is used.
-"""
+import enum
 
-AUTHENTICATION_METHOD_MUTUAL_CHAP = 'iSCSI Mutual Challenge Handshake'\
-                                    'Authentication Protocol'
-"""
-iSCSI Mutual Challenge Handshake Authentication Protocol (CHAP)
-authentication is used.
-"""
 
-AUTHENTICATION_METHOD_NONE = 'none'
-"""No iSCSI authentication is used."""
+class NetworkAuthenticationMethod(enum.Enum):
 
-# BootMode Types
+    NONE = 'None'
+    """No iSCSI authentication is used."""
 
-BOOT_MODE_DISABLED = 'disabled'
-"""Do not indicate to UEFI/BIOS that this device is bootable."""
+    CHAP = 'CHAP'
+    """iSCSI Challenge Handshake Authentication Protocol (CHAP)
+    authentication is used."""
 
-BOOT_MODE_PXE = 'pxe'
-"""Boot this device by PXE"""
+    MUTUAL_CHAP = 'MutualCHAP'
+    """iSCSI Mutual Challenge Handshake Authentication Protocol (CHAP)
+    authentication is used."""
 
-# IP Address Types
 
-IP_ADDRESS_TYPE_IPV4 = 'IPv4'
-"""IPv4 addressing is used for all IP-fields in this object."""
+class NetworkBootMode(enum.Enum):
 
-IP_ADDRESS_TYPE_IPV6 = 'IPv6'
-"""IPv6 addressing is used for all IP-fields in this object."""
+    DISABLED = 'Disabled'
+    """Do not indicate to UEFI/BIOS that this device is bootable."""
 
-# FlowControl Types
+    PXE = 'PXE'
+    """Boot this device by using the embedded PXE support.  Only applicable
+    if the NetDevFuncType is `Ethernet` or `InfiniBand`."""
 
-FLOW_CONTROL_NONE = 'none'
-"""No IEEE 802.3x flow control is enabled on this port."""
+    SCSI = 'iSCSI'
+    """Boot this device by using the embedded iSCSI boot support and
+    configuration.  Only applicable if the NetDevFuncType is `iSCSI` or
+    `Ethernet`."""
 
-FLOW_CONTROL_RX = 'rx'
-"""IEEE 802.3x flow control may be initiated by the link partner."""
+    FIBRE_CHANNEL = 'FibreChannel'
+    """Boot this device by using the embedded Fibre Channel support and
+    configuration.  Only applicable if the NetDevFuncType is
+    `FibreChannel`."""
 
-FLOW_CONTROL_TX = 'tx'
-"""IEEE 802.3x flow control may be initiated by this station."""
+    FIBRE_CHANNEL_OVER_ETHERNET = 'FibreChannelOverEthernet'
+    """Boot this device by using the embedded Fibre Channel over Ethernet
+    (FCoE) boot support and configuration.  Only applicable if the
+    NetDevFuncType is `FibreChannelOverEthernet`."""
 
-FLOW_CONTROL_TX_RX = 'tx/rx'
-"""
-IEEE 802.3x flow control may be initiated
-by this station or the link partner.
-"""
 
-# NetworkDeviceTechnology Types
+class IPAddressType(enum.Enum):
 
-NETWORK_DEVICE_TECHNOLOGY_DISABLED = 'disabled'
-"""Neither enumerated nor visible to the operating system."""
+    IPV4 = 'IPv4'
+    """IPv4 addressing is used for all IP-fields in this object."""
 
-NETWORK_DEVICE_TECHNOLOGY_ETHERNET = 'ethernet'
-"""Appears to the operating system as an Ethernet device."""
+    IPV6 = 'IPv6'
+    """IPv6 addressing is used for all IP-fields in this object."""
 
-NETWORK_DEVICE_TECHNOLOGY_FIBRE_CHANNEL = 'fibre channel'
-"""Appears to the operating system as a Fibre Channel device."""
 
-NETWORK_DEVICE_TECHNOLOGY_FCOE = 'fibre channel over ethernet'
-"""Appears to the operating system as an FCoE device."""
+class FlowControl(enum.Enum):
 
-NETWORK_DEVICE_TECHNOLOGY_ISCSI = 'Internet SCSI'
-"""Appears to the operating system as an iSCSI device."""
+    NONE = 'None'
+    """No IEEE 802.3x flow control is enabled on this port."""
 
-# LinkStatus Types
+    TX = 'TX'
+    """This station can initiate IEEE 802.3x flow control."""
 
-LINK_STATUS_DOWN = 'down'
-"""The port is enabled but link is down."""
+    RX = 'RX'
+    """The link partner can initiate IEEE 802.3x flow control."""
 
-LINK_STATUS_UP = 'up'
-"""The port is enabled and link is good (up)."""
+    TX_RX = 'TX_RX'
+    """This station or the link partner can initiate IEEE 802.3x flow
+    control."""
+
+
+class NetworkDeviceTechnology(enum.Enum):
+
+    DISABLED = 'Disabled'
+    """Neither enumerated nor visible to the operating system."""
+
+    ETHERNET = 'Ethernet'
+    """Appears to the operating system as an Ethernet device."""
+
+    FIBRE_CHANNEL = 'FibreChannel'
+    """Appears to the operating system as a Fibre Channel device."""
+
+    iSCSI = 'iSCSI'
+    """Appears to the operating system as an iSCSI device."""
+
+    FIBRE_CHANNEL_OVER_ETHERNET = 'FibreChannelOverEthernet'
+    """Appears to the operating system as an FCoE device."""
+
+    INFINI_BAND = 'InfiniBand'
+    """Appears to the operating system as an InfiniBand device."""
+
+
+class LinkStatus(enum.Enum):
+
+    DOWN = 'Down'
+    """The port is enabled but link is down."""
+
+    UP = 'Up'
+    """The port is enabled and link is good (up)."""
+
+    STARTING = 'Starting'
+    """This link on this interface is starting.  A physical link has been
+    established, but the port is not able to transfer data."""
+
+    TRAINING = 'Training'
+    """This physical link on this interface is training."""
