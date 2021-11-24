@@ -1,0 +1,55 @@
+{
+  "@odata.context": "/redfish/v1/$metadata#NetworkPort.NetworkPort",
+  "@odata.id": "/redfish/v1/Chassis/System.Embedded.1/NetworkAdapters/NIC.Integrated.1/NetworkPorts/NIC.Integrated.1-1",
+  "@odata.type": "#NetworkPort.v1_2_3.NetworkPort",
+  "ActiveLinkTechnology": "Ethernet",
+  "AssociatedNetworkAddresses": [
+    "01:02:03:04:05:06"
+  ],
+  "CurrentLinkSpeedMbps": 10000,
+  "Description": "Network Port View",
+  "FlowControlConfiguration": "None",
+  "FlowControlStatus": "None",
+  "Id": "NIC.Integrated.1-1",
+  "LinkStatus": "Up",
+  "Name": "Network Port View",
+  "NetDevFuncMaxBWAlloc": [
+    {
+      "MaxBWAllocPercent": 100,
+      "NetworkDeviceFunction": {
+        "@odata.id": "/redfish/v1/Chassis/System.Embedded.1/NetworkAdapters/NIC.Integrated.1/NetworkDeviceFunctions/NIC.Integrated.1-1-1"
+      }
+    }
+  ],
+  "NetDevFuncMaxBWAlloc@odata.count": 1,
+  "NetDevFuncMinBWAlloc": [
+    {
+      "MinBWAllocPercent": 100,
+      "NetworkDeviceFunction": {
+        "@odata.id": "/redfish/v1/Chassis/System.Embedded.1/NetworkAdapters/NIC.Integrated.1/NetworkDeviceFunctions/NIC.Integrated.1-1-1"
+      }
+    }
+  ],
+  "NetDevFuncMinBWAlloc@odata.count": 1,
+  "Oem": {},
+  "PhysicalPortNumber": "1",
+  "Status": {
+    "State": "Enabled",
+    "Health": "OK",
+    "HealthRollup": "OK"
+  },
+  "SupportedEthernetCapabilities": [
+    "WakeOnLAN"
+  ],
+  "SupportedEthernetCapabilities@odata.count": 1,
+  "SupportedLinkCapabilities": [
+    {
+      "AutoSpeedNegotiation": true,
+      "LinkNetworkTechnology": "Ethernet",
+      "LinkSpeedMbps": 10000
+    }
+  ],
+  "SupportedLinkCapabilities@odata.count": 1,
+  "VendorId": "15b3",
+  "WakeOnLANEnabled": false
+}
