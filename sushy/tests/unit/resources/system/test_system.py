@@ -68,8 +68,7 @@ class SystemTestCase(base.TestCase):
         self.assertEqual(res_cons.Health.OK, self.sys_inst.status.health)
         self.assertEqual(res_cons.Health.OK,
                          self.sys_inst.status.health_rollup)
-        self.assertEqual(sushy.SYSTEM_POWER_STATE_ON,
-                         self.sys_inst.power_state)
+        self.assertEqual(sushy.PowerState.ON, self.sys_inst.power_state)
         self.assertEqual(96, self.sys_inst.memory_summary.size_gib)
         self.assertEqual("OK", self.sys_inst.memory_summary.health)
         self.assertIsNotNone(self.sys_inst.maintenance_window)

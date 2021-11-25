@@ -46,7 +46,7 @@ class DriveTestCase(base.TestCase):
         self.assertIsInstance(identifiers, list)
         self.assertEqual(1, len(identifiers))
         identifier = identifiers[0]
-        self.assertEqual(sushy.DURABLE_NAME_FORMAT_NAA,
+        self.assertEqual(sushy.DurableNameFormat.NAA,
                          identifier.durable_name_format)
         self.assertEqual('32ADF365C6C1B7BD', identifier.durable_name)
         self.assertEqual('Contoso', self.stor_drive.manufacturer)

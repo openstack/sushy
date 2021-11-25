@@ -1,0 +1,21 @@
+---
+prelude: |
+    Sushy now exposes Python enums instead of simple string constants. Please
+    check the upgrade notes before updating to this version.
+upgrade:
+  - |
+    Python `enumerations <https://docs.python.org/3/library/enum.html>`_ are
+    now used instead of strings for all Sushy constants. The old names are
+    kept but now point to enumerated values, so e.g. ``sushy.POWER_STATE_ON``
+    is an alias for ``sushy.PowerState.ON``. Consumers of the library may see
+    breakages in two cases:
+
+    * Relying on literal values of the old constants. Use constants instead.
+    * Relying on the fact that Sushy constants are strings (e.g. storing them
+      in a database). You can either use the ``value`` attribute to get the
+      underlying string or create your own mapping.
+deprecations:
+  - |
+    The old constant names (not based on enumerations) are now deprecated.
+    For example, use ``sushy.PowerState.ON`` instead of
+    ``sushy.POWER_STATE_ON``.

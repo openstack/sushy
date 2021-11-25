@@ -50,7 +50,7 @@ class VolumeTestCase(base.TestCase):
         self.assertIsInstance(identifiers, list)
         self.assertEqual(1, len(identifiers))
         identifier = identifiers[0]
-        self.assertEqual(sushy.DURABLE_NAME_FORMAT_UUID,
+        self.assertEqual(sushy.DurableNameFormat.UUID,
                          identifier.durable_name_format)
         self.assertEqual('38f1818b-111e-463a-aa19-fa54f792e468',
                          identifier.durable_name)

@@ -125,7 +125,7 @@ class StorageTestCase(base.TestCase):
         self.assertIsInstance(identifiers, list)
         self.assertEqual(1, len(identifiers))
         identifier = identifiers[0]
-        self.assertEqual(sushy.DURABLE_NAME_FORMAT_NAA,
+        self.assertEqual(sushy.DurableNameFormat.NAA,
                          identifier.durable_name_format)
         self.assertEqual('345C59DBD970859C', identifier.durable_name)
         self.assertEqual(12, controller.speed_gbps)

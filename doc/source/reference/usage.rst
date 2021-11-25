@@ -206,7 +206,7 @@ Creating and using a sushy manager object
   print(mgr_inst.get_allowed_reset_manager_values())
 
   # Reset the manager
-  mgr_inst.reset_manager(sushy.RESET_MANAGER_FORCE_RESTART)
+  mgr_inst.reset_manager(sushy.ResetType.FORCE_RESTART)
 
   # Refresh the manager object (with all its sub-resources)
   mgr_inst.refresh(force=True)
@@ -345,7 +345,7 @@ Manager resource.
              % (manager_oem.get_extension(), manager.identity))
 
       # set boot device to a virtual media device image
-      manager_oem.set_virtual_boot_device(sushy.VIRTUAL_MEDIA_CD,
+      manager_oem.set_virtual_boot_device(sushy.VirtualMediaType.CD,
                                           manager=manager)
 
 

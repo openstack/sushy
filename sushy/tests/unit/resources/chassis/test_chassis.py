@@ -57,8 +57,7 @@ class ChassisTestCase(base.TestCase):
                          self.chassis.uuid)
         self.assertEqual(sushy.IndicatorLED.OFF,
                          self.chassis.indicator_led)
-        self.assertEqual(sushy.POWER_STATE_ON,
-                         self.chassis.power_state)
+        self.assertEqual(sushy.PowerState.ON, self.chassis.power_state)
         self.assertEqual(sushy.State.ENABLED, self.chassis.status.state)
         self.assertEqual(44.45, self.chassis.height_mm)
         self.assertEqual(431.8, self.chassis.width_mm)
@@ -81,7 +80,7 @@ class ChassisTestCase(base.TestCase):
         self.assertEqual('Blade', attributes.get('name'))
         self.assertEqual(sushy.IndicatorLED.OFF,
                          attributes.get('indicator_led'))
-        self.assertEqual(sushy.POWER_STATE_ON, attributes.get('power_state'))
+        self.assertEqual(sushy.PowerState.ON, attributes.get('power_state'))
         self.assertEqual({'intrusion_sensor': sushy.IntrusionSensor.NORMAL,
                           'intrusion_sensor_number': 123,
                           'intrusion_sensor_re_arm':
