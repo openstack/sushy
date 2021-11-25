@@ -16,7 +16,7 @@
 
 from sushy.resources import base
 from sushy.resources import common
-from sushy.resources.system.network import mappings as net_maps
+from sushy.resources.system.network import constants
 
 
 class NetworkPortCollection(base.ResourceCollectionBase):
@@ -40,23 +40,18 @@ class NetworkPort(base.ResourceBase):
     description = base.Field('Description')
     """The network port description"""
 
-    flow_control_configuration = base.MappedField(
-        'FlowControlConfiguration',
-        net_maps.FLOW_CONTROL_TYPE_MAP
-    )
+    flow_control_configuration = base.MappedField('FlowControlConfiguration',
+                                                  constants.FlowControl)
     """The locally configured 802.3x flow control setting."""
 
     flow_control_status = base.MappedField('FlowControlStatus',
-                                           net_maps.FLOW_CONTROL_TYPE_MAP)
+                                           constants.FlowControl)
     """The 802.3x flow control behavior negotiated with the link partner"""
 
     identity = base.Field('Id', required=True)
     """The network port identity"""
 
-    link_status = base.MappedField(
-        'LinkStatus',
-        net_maps.LINK_STATUS_TYPE_MAP
-    )
+    link_status = base.MappedField('LinkStatus', constants.LinkStatus)
     """The link status of the network port."""
 
     name = base.Field(
