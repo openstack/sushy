@@ -10,52 +10,98 @@
 # License for the specific language governing permissions and limitations
 # under the License.
 
-# Values come from the Redfish Fabric json-schema 1.0.4:
-# http://redfish.dmtf.org/schemas/v1/Fabric.v1_0_4.json#/definitions/Fabric
+# Values come from the Redfish Fabric json-schema:
+# https://redfish.dmtf.org/schemas/v1/Fabric.v1_2_2.json
+# https://redfish.dmtf.org/schemas/v1/Endpoint.v1_6_1.json
 
-# Address origin IPv4 constants
+import enum
 
-ADDRESS_ORIGIN_IPv4_BOOTP = 'Address is provided by a BOOTP service'
-ADDRESS_ORIGIN_IPv4_DHCP = 'Address is provided by a DHCPv4 service'
-ADDRESS_ORIGIN_IPv4_IPv4LINKLOCAL = 'Address valid only for this segment'
-ADDRESS_ORIGIN_IPv4_STATIC = 'A static address as configured by the user'
 
-# Address origin IPv6 constants
+class EntityRole(enum.Enum):
+    """Entity role constants"""
 
-ADDRESS_ORIGIN_IPv6_DHCPv6 = 'Address is provided by a DHCPv6 service'
-ADDRESS_ORIGIN_IPv6_LINKLOCAL = 'Address valid only for this network segment'
-ADDRESS_ORIGIN_IPv6_SLAAC = 'Stateless Address Auto Configuration service'
-ADDRESS_ORIGIN_IPv6_STATIC = 'A static address as configured by the user'
+    INITIATOR = 'Initiator'
+    """The entity sends commands, messages, or other types of requests to
+    other entities on the fabric, but cannot receive commands from other
+    entities."""
 
-# Address state constants
+    TARGET = 'Target'
+    """The entity receives commands, messages, or other types of requests
+    from other entities on the fabric, but cannot send commands to other
+    entities."""
 
-ADDRESS_STATE_DEPRECATED = 'Deprecated'
-"""This address is currently within it's valid lifetime, but is now outside of
-it's preferred lifetime as defined in RFC 4862."""
-ADDRESS_STATE_FAILED = 'Failed'
-"""This address has failed Duplicate Address Detection testing as defined in
-RFC 4862 section 5.4 and is not currently in use."""
-ADDRESS_STATE_PREFERRED = 'Preferred'
-"""This address is currently within both it's valid and preferred lifetimes as
-defined in RFC 4862."""
-ADDRESS_STATE_TENTATIVE = 'Tentative'
-"""This address is currently undergoing Duplicate Address Detection testing as
-defined in RFC 4862 section 5.4."""
+    BOTH = 'Both'
+    """The entity can both send and receive commands, messages, and other
+    requests to or from other entities on the fabric."""
 
-# Entity role constants
 
-ENTITY_ROLE_BOTH = 'The entity is acting as both an initiator and a target'
-ENTITY_ROLE_INITIATOR = 'The entity is acting as an initiator'
-ENTITY_ROLE_TARGET = 'The entity is acting as a target'
+# Backward compatibility
+ENTITY_ROLE_INITIATOR = EntityRole.INITIATOR
+ENTITY_ROLE_TARGET = EntityRole.TARGET
+ENTITY_ROLE_BOTH = EntityRole.BOTH
 
-# Entity type constants
 
-ENTITY_TYPE_PCI_BRIDGE = 'PCI(e) Bridge'
-ENTITY_TYPE_DISPLAY_CONTROLLER = 'Display Controller'
-ENTITY_TYPE_DRIVE = 'Disk Drive'
-ENTITY_TYPE_NETWORK_CONTROLLER = 'Network Controller'
-ENTITY_TYPE_PROCESSOR = 'Processor Device'
-ENTITY_TYPE_ROOT_COMPLEX = 'Root Complex'
-ENTITY_TYPE_STORAGE_EXPANDER = 'Storage Expander'
-ENTITY_TYPE_STORAGE_INITIATOR = 'Storage Initiator'
-ENTITY_TYPE_VOLUME = 'Volume'
+class EntityType(enum.Enum):
+    """Entity type constants"""
+
+    STORAGE_INITIATOR = 'StorageInitiator'
+    """The entity is a storage initiator."""
+
+    ROOT_COMPLEX = 'RootComplex'
+    """The entity is a PCI(e) root complex."""
+
+    NETWORK_CONTROLLER = 'NetworkController'
+    """The entity is a network controller."""
+
+    DRIVE = 'Drive'
+    """The entity is a drive."""
+
+    STORAGE_EXPANDER = 'StorageExpander'
+    """The entity is a storage expander."""
+
+    DISPLAY_CONTROLLER = 'DisplayController'
+    """The entity is a display controller."""
+
+    BRIDGE = 'Bridge'
+    """The entity is a PCI(e) bridge."""
+
+    PROCESSOR = 'Processor'
+    """The entity is a processor."""
+
+    VOLUME = 'Volume'
+    """The entity is a volume."""
+
+    ACCELERATION_FUNCTION = 'AccelerationFunction'
+    """The entity is an acceleration function realized through a device,
+    such as an FPGA."""
+
+    MEDIA_CONTROLLER = 'MediaController'
+    """The entity is a media controller."""
+
+    MEMORY_CHUNK = 'MemoryChunk'
+    """The entity is a memory chunk."""
+
+    SWITCH = 'Switch'
+    """The entity is a switch, not an expander.  Use `Expander` for
+    expanders."""
+
+    FABRIC_BRIDGE = 'FabricBridge'
+    """The entity is a fabric bridge."""
+
+    MANAGER = 'Manager'
+    """The entity is a manager."""
+
+    STORAGE_SUBSYSTEM = 'StorageSubsystem'
+    """The entity is a storage subsystem."""
+
+
+# Backward compatibility
+ENTITY_TYPE_STORAGE_INITIATOR = EntityType.STORAGE_INITIATOR
+ENTITY_TYPE_ROOT_COMPLEX = EntityType.ROOT_COMPLEX
+ENTITY_TYPE_NETWORK_CONTROLLER = EntityType.NETWORK_CONTROLLER
+ENTITY_TYPE_DRIVE = EntityType.DRIVE
+ENTITY_TYPE_STORAGE_EXPANDER = EntityType.STORAGE_EXPANDER
+ENTITY_TYPE_DISPLAY_CONTROLLER = EntityType.DISPLAY_CONTROLLER
+ENTITY_TYPE_PCI_BRIDGE = EntityType.BRIDGE
+ENTITY_TYPE_PROCESSOR = EntityType.PROCESSOR
+ENTITY_TYPE_VOLUME = EntityType.VOLUME

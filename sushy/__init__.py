@@ -22,6 +22,7 @@ from sushy.resources.chassis.constants import *  # noqa
 from sushy.resources.constants import *  # noqa
 from sushy.resources.eventservice.constants import * # noqa
 from sushy.resources.fabric.constants import *  # noqa
+from sushy.resources.ipaddresses import *  # noqa
 from sushy.resources.manager.constants import *  # noqa
 from sushy.resources.registry.constants import *  # noqa
 from sushy.resources.system.constants import *  # noqa

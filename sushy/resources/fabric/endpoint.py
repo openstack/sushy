@@ -18,7 +18,8 @@ import logging
 from sushy.resources import base
 from sushy.resources import common
 from sushy.resources import constants as res_cons
-from sushy.resources.fabric import mappings as fab_maps
+from sushy.resources.fabric import constants as fab_cons
+from sushy.resources import ipaddresses
 from sushy import utils
 
 LOG = logging.getLogger(__name__)
@@ -36,7 +37,7 @@ class IPv4AddressField(base.CompositeField):
     """This is the IPv4 Subnet mask."""
 
     address_origin = base.MappedField('AddressOrigin',
-                                      fab_maps.ADDRESS_ORIGIN_IPv4_VALUE_MAP)
+                                      ipaddresses.IPv4AddressOrigin)
     """This indicates how the address was determined."""
 
 
@@ -49,11 +50,10 @@ class IPv6AddressField(base.CompositeField):
     """This is the IPv6 Address Prefix Length."""
 
     address_origin = base.MappedField('AddressOrigin',
-                                      fab_maps.ADDRESS_ORIGIN_IPv6_VALUE_MAP)
+                                      ipaddresses.IPv6AddressOrigin)
     """This indicates how the address was determined."""
 
-    address_state = base.MappedField('AddressState',
-                                     fab_maps.ADDRESS_STATE_VALUE_MAP)
+    address_state = base.MappedField('AddressState', ipaddresses.AddressState)
     """The current state of this address as defined in RFC 4862."""
 
 
@@ -111,12 +111,10 @@ class ConnectedEntitiesListField(base.ListField):
     identifiers = common.IdentifiersListField('Identifiers', default=[])
     """Identifiers for the remote entity."""
 
-    entity_role = base.MappedField('EntityRole',
-                                   fab_maps.ENTITY_ROLE_VALUE_MAP)
+    entity_role = base.MappedField('EntityRole', fab_cons.EntityRole)
     """The role of the connected entity."""
 
-    entity_type = base.MappedField('EntityType',
-                                   fab_maps.ENTITY_TYPE_VALUE_MAP)
+    entity_type = base.MappedField('EntityType', fab_cons.EntityType)
     """The type of the connected entity."""
 
 

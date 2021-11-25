@@ -40,12 +40,12 @@ class EndpointTestCase(base.TestCase):
         self.assertEqual('SAS Drive', self.fab_endpoint.name)
         self.assertEqual(sushy.Protocol.SAS,
                          self.fab_endpoint.endpoint_protocol)
-        self.assertEqual(sushy.ENTITY_TYPE_DRIVE,
+        self.assertEqual(sushy.EntityType.DRIVE,
                          self.fab_endpoint.connected_entities[0].entity_type)
-        self.assertEqual(sushy.ENTITY_ROLE_TARGET,
+        self.assertEqual(sushy.EntityRole.TARGET,
                          self.fab_endpoint.connected_entities[0].entity_role)
         con_entity = self.fab_endpoint.connected_entities[0]
-        self.assertEqual(sushy.DURABLE_NAME_FORMAT_NAA,
+        self.assertEqual(sushy.DurableNameFormat.NAA,
                          con_entity.identifiers[0].durable_name_format)
         self.assertEqual('32ADF365C6C1B7C3',
                          con_entity.identifiers[0].durable_name)
