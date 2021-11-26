@@ -8,9 +8,11 @@
       - release-notes-jobs-python3
     check:
       jobs:
+        - ironic-cross-sushy
         - sushy-tempest-partition-bios-redfish-pxe
         - sushy-tempest-partition-uefi-redfish-vmedia
     gate:
       jobs:
+        - ironic-cross-sushy
         - sushy-tempest-partition-bios-redfish-pxe
         - sushy-tempest-partition-uefi-redfish-vmedia
