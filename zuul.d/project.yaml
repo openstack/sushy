@@ -8,11 +8,21 @@
       - release-notes-jobs-python3
     check:
       jobs:
+        # NOTE(rpittau): yoga jobs support py38 and py39 but we want to keep
+        # testing py36 to maintain compatibility with older distributions like
+        # CentOS Stream 8, Ubuntu Bionic, Debian 10, and openSuse Leap
+        # Remove after Yoga
+        - openstack-tox-py36
         - ironic-cross-sushy
         - sushy-tempest-partition-bios-redfish-pxe
         - sushy-tempest-partition-uefi-redfish-vmedia
     gate:
       jobs:
+        # NOTE(rpittau): yoga jobs support py38 and py39 but we want to keep
+        # testing py36 to maintain compatibility with older distributions like
+        # CentOS Stream 8, Ubuntu Bionic, Debian 10, and openSuse Leap
+        # Remove after Yoga
+        - openstack-tox-py36
         - ironic-cross-sushy
         - sushy-tempest-partition-bios-redfish-pxe
         - sushy-tempest-partition-uefi-redfish-vmedia
