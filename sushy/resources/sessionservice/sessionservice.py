@@ -53,6 +53,7 @@ class SessionService(base.ResourceBase):
             the object according to schema of given version.
         :param registries: Dict of Redfish Message Registry objects to be
             used in any resource that needs registries to parse messages
+        :raises: AccessError if resource authentication fails.
         """
         try:
             super(SessionService, self).__init__(
@@ -63,6 +64,7 @@ class SessionService(base.ResourceBase):
                       'SessionService. If this happens before '
                       'authentication, we\'ll have to guess the Sessions URL.',
                       ae)
+            raise
 
     def _get_sessions_collection_path(self):
         """Helper function to find the SessionCollections path"""
