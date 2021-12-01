@@ -43,7 +43,11 @@ class SessionServiceTestCase(base.TestCase):
         self.conn.get.return_value.json.side_effect = (
             exceptions.AccessError(
                 'GET', 'any_url', mock.MagicMock()))
-        sessionservice.SessionService(
+        # Actually, it is a good thing to raise access error exceptions,
+        # so we know when we need to handle failures.
+        self.assertRaises(
+            exceptions.AccessError,
+            sessionservice.SessionService,
             self.conn, '/redfish/v1/SessionService', redfish_version='1.0.2')
         self.assertTrue(mock_LOG.debug.called)
 
