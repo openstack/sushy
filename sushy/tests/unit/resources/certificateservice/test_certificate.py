@@ -22,7 +22,7 @@ from sushy.tests.unit import base
 class CertificateTestCase(base.TestCase):
 
     def setUp(self):
-        super(CertificateTestCase, self).setUp()
+        super().setUp()
         self.conn = mock.Mock()
         with open('sushy/tests/unit/json_samples/certificate.json') as f:
             self.json_doc = json.load(f)
@@ -60,3 +60,85 @@ class CertificateTestCase(base.TestCase):
         self.assertEqual("TPM_ALG_SHA1", self.cert.fingerprint_hash_algorithm)
         self.assertEqual("sha256WithRSAEncryption",
                          self.cert.signature_algorithm)
+
+
+class CertificateCollectionTestCase(base.TestCase):
+
+    def setUp(self):
+        super().setUp()
+        self.conn = mock.Mock()
+        with open('sushy/tests/unit/json_samples'
+                  '/certificate_collection.json') as f:
+            self.json_coll = json.load(f)
+
+        with open('sushy/tests/unit/json_samples/certificate.json') as f:
+            self.json_cert = json.load(f)
+
+        self.conn.get.return_value.json.side_effect = [self.json_coll,
+                                                       self.json_cert]
+
+        self.ident = \
+            "/redfish/v1/Managers/BMC/NetworkProtocol/HTTPS/Certificates"
+        self.cert_coll = certificate.CertificateCollection(
+            self.conn, self.ident,
+            redfish_version='1.0.2')
+
+    def test_get_member(self):
+        member = f"{self.ident}/1"
+        cert = self.cert_coll.get_member(member)
+        self.assertEqual("1", cert.identity)
+        self.conn.get.assert_has_calls([
+            mock.call(path=self.ident),
+            mock.call().json(),
+            mock.call(path=member),
+            mock.call().json(),
+        ])
+
+    def test_delete_member(self):
+        member = f"{self.ident}/1"
+        self.cert_coll.delete_member(member)
+        self.conn.delete.assert_called_once_with(member)
+
+    def test_create_member(self):
+        # Another loading of collection is because of a refresh
+        self.conn.get.return_value.json.side_effect = [self.json_coll,
+                                                       self.json_cert]
+
+        member = f"{self.ident}/1"
+        self.conn.post.return_value.headers = {'Location': member}
+
+        result = self.cert_coll.create_member(
+            certificate_string='abcd',
+            certificate_type=sushy.CertificateType.PEM)
+        self.assertEqual("1", result.identity)
+
+        self.conn.get.assert_has_calls([
+            mock.call(path=self.ident),
+            mock.call().json(),
+            mock.call(path=self.ident),
+            mock.call().json(),
+            mock.call(path=member),
+            mock.call().json(),
+        ])
+        self.conn.post.assert_called_once_with(
+            self.ident, data={'CertificateString': 'abcd',
+                              'CertificateType': 'PEM'})
+
+    def test_create_member_no_location(self):
+        self.conn.get.return_value.json.side_effect = [self.json_coll]
+        self.conn.post.return_value.headers = {}
+
+        result = self.cert_coll.create_member(
+            certificate_string='abcd',
+            certificate_type=sushy.CertificateType.PEM)
+        self.assertIsNone(result)
+
+        self.conn.get.assert_has_calls([
+            mock.call(path=self.ident),
+            mock.call().json(),
+            mock.call(path=self.ident),
+            mock.call().json(),
+        ])
+        self.conn.post.assert_called_once_with(
+            self.ident, data={'CertificateString': 'abcd',
+                              'CertificateType': 'PEM'})

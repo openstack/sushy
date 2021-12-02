@@ -87,7 +87,27 @@ class Certificate(base.ResourceBase):
 
     # TODO(dtantsur): actions
 
+    def delete(self):
+        """Delete this certificate."""
+        self._conn.delete(self._path)
 
-class CertificateCollection(base.ResourceCollectionBase):
+
+# Yes, certificate collection is not the same thing as certificate locations.
+# The latter is only used in CertificateService, while the former - in every
+# place where certificates are supported, e.g. virtual media. For this reason
+# there is no link from CertificateService to CertificateCollection.
+class CertificateCollection(base.MutableResourceCollectionBase):
 
     _resource_type = Certificate
+
+    def create_member(self, certificate_string, certificate_type):
+        """Create a new member of this collection.
+
+        :param certificate_string: the contents of the new certificate.
+        :param certificate_type: the type of the new certificate, one of
+            :py:class:`sushy.CertificateType`.
+        """
+        return self._create_member(dict(
+            CertificateString=certificate_string,
+            CertificateType=cert_cons.CertificateType(certificate_type).value,
+        ))

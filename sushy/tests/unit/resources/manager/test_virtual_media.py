@@ -18,6 +18,7 @@ from unittest import mock
 
 import sushy
 from sushy import exceptions
+from sushy.resources.certificateservice import certificate
 from sushy.resources.manager import constants as mgr_cons
 from sushy.resources.manager import virtual_media
 from sushy.tests.unit import base
@@ -265,3 +266,14 @@ class VirtualMediaTestCase(base.TestCase):
     def test_set_verify_certificate_wrong_input(self):
         self.assertRaises(exceptions.InvalidParameterValueError,
                           self.sys_virtual_media.set_verify_certificate, 'yes')
+
+    @mock.patch.object(certificate, 'CertificateCollection', autospec=True)
+    def test_certificate_collection(self, mock_cert_coll):
+        result = self.sys_virtual_media.certificates
+        self.assertEqual(mock_cert_coll.return_value, result)
+        mock_cert_coll.assert_called_once_with(
+            self.conn,
+            "/redfish/v1/Managers/BMC/VirtualMedia/Floppy1/Certificates/",
+            redfish_version='1.0.2',
+            registries=self.sys_virtual_media.registries,
+            root=self.sys_virtual_media.root)

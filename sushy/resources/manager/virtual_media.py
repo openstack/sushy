@@ -17,8 +17,10 @@ from http import client as http_client
 
 from sushy import exceptions
 from sushy.resources import base
+from sushy.resources.certificateservice import certificate
 from sushy.resources import common
 from sushy.resources.manager import constants as mgr_cons
+from sushy import utils
 
 
 class ActionsField(base.CompositeField):
@@ -75,6 +77,8 @@ class VirtualMedia(base.ResourceBase):
 
     _actions = ActionsField('Actions')
     """Insert/eject action for virtual media"""
+
+    _certificates_path = base.Field(['Certificates', '@odata.id'])
 
     def _get_insert_media_uri(self):
         insert_media = self._actions.insert_media if self._actions else None
@@ -199,6 +203,20 @@ class VirtualMedia(base.ResourceBase):
         self._conn.patch(self.path,
                          data={'VerifyCertificate': verify_certificate})
         self.invalidate()
+
+    @property
+    @utils.cache_it
+    def certificates(self):
+        """Get the collection of certificates for this device."""
+        if not self._certificates_path:
+            raise exceptions.MissingAttributeError(
+                attribute='Certificates/@odata.id',
+                resource=self._path)
+
+        return certificate.CertificateCollection(
+            self._conn, self._certificates_path,
+            redfish_version=self.redfish_version,
+            registries=self.registries, root=self.root)
 
 
 class VirtualMediaCollection(base.ResourceCollectionBase):
