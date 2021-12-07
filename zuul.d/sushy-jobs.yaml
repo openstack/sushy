@@ -6,6 +6,8 @@
       - ^sushy/tests/.*$
     timeout: 5400
     required-projects:
+      - name: openstack/sushy-tools
+        override-checkout: 0.17.0
       - openstack/sushy
     vars:
       devstack_localrc:
