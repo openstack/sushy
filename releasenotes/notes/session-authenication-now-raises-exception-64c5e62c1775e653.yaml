@@ -1,0 +1,7 @@
+---
+fixes:
+  - |
+    Fixes an issue where stale or invalid authentication data may
+    result in an attempt to lookup the ``SessionService`` failing
+    without any exception. The failure will now raise an
+    ``AccessError`` exception.
