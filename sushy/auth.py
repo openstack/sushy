@@ -40,6 +40,8 @@ class AuthBase(object, metaclass=abc.ABCMeta):
         :param root_resource: Root sushy object
         :param connector: Connector for http connections
         """
+        # Set the root resource, and connector to use
+        # for normal opreations.
         self._root_resource = root_resource
         self._connector = connector
         self._connector.set_auth(self)
@@ -123,6 +125,8 @@ class SessionAuth(AuthBase):
         """Our Sessions Key"""
         self._session_resource_id = None
         """Our Sessions Unique Resource ID or URL"""
+        self._session_auth_previously_successful = False
+        """Our reminder for tracking if session auth has previously worked."""
 
         super(SessionAuth, self).__init__(username,
                                           password)
@@ -149,21 +153,18 @@ class SessionAuth(AuthBase):
         :raises: AccessError
         :raises: HTTPError
         """
-        target_uri = None
-        try:
-            target_uri = self._root_resource.get_sessions_path()
-        except exceptions.MissingAttributeError:
-            LOG.debug('Missing Sessions attribute under Links in Root '
-                      'Service, we\'ll try to determine it from Session '
-                      'Service')
-        session_service = self._root_resource.get_session_service()
-        session_auth_token, session_uri = (
-            session_service.create_session(self._username,
-                                           self._password,
-                                           target_uri=target_uri))
-        self._session_key = session_auth_token
+        auth_token = None
+
+        auth_token, session_uri = self._root_resource.create_session(
+            self._username, self._password)
+        # Record the session authentication data.
+        self._session_key = auth_token
         self._session_resource_id = session_uri
-        self._connector.set_http_session_auth(session_auth_token)
+        # Set flag so we know we've previously successfully achieved
+        # session authentication in order to lockout possible fallback during
+        # session refresh/renegotiation.
+        self._session_auth_previously_successful = True
+        self._connector.set_http_session_auth(auth_token)
 
     def can_refresh_session(self):
         """Method to assert if session based refresh can be done."""
@@ -225,6 +226,12 @@ class SessionOrBasicAuth(SessionAuth):
         super(SessionOrBasicAuth, self).__init__(username, password)
         self.basic_auth = BasicAuth(username=username, password=password)
 
+    def _fallback_to_basic_authentication(self):
+        """Fallback to basic authentication."""
+        self.reset_session_attrs()
+        self.basic_auth.set_context(self._root_resource, self._connector)
+        self.basic_auth.authenticate()
+
     def _do_authenticate(self):
         """Establish a RedfishSession.
 
@@ -234,16 +241,50 @@ class SessionOrBasicAuth(SessionAuth):
         try:
             # Attempt session based authentication
             super(SessionOrBasicAuth, self)._do_authenticate()
+        except exceptions.AccessError as e:
+            if (not self.can_refresh_session()
+                    and not self._session_auth_previously_successful):
+                # We should only try and fallback if we've not been able
+                # to establish a session. If we had a session previously
+                # and we're trying to fallback, something fishy is afoot.
+                LOG.warning('Falling back to "Basic" authentication as '
+                            'we have been unable to authenticate to the '
+                            'BMC. Exception: %(exception)s.',
+                            {'exception': e})
+                self._fallback_to_basic_authentication()
+            else:
+                # We previously had session authentication, something
+                # has changed which is far out of the ordinary.
+                LOG.debug('Received exception "%(exception)s" while '
+                          'attempting to re-establish a session. '
+                          'Raising AccessError, as something fishy '
+                          'has occurred and the BMC has suddenly '
+                          'ceased to support Session based '
+                          'authentication.',
+                          {'exception': e})
+                raise
+        except exceptions.ConnectionError as e:
+            # The reason to explicitly catch a connectivity failure is the
+            # case where transitory connectivity failures can occur while
+            # working to authenticate.
+            LOG.debug('Encountered a connectivity failure while attempting '
+                      'to authenticate. We will not explicitly fallback. '
+                      'Error: %(exception)s',
+                      {'exception': e})
+            # Previously we would silently eat the failure as SushyError
+            # and fallback as it is a general fault. Callers on direct
+            # invocations through a connector _op method call can still
+            # receieve these exceptions, and applicaitons like Ironic do
+            # consider a client re-use disqualifier if there has been
+            # a connection failure, so it is okay for us to fix the behavior
+            # here.
+            raise
         except exceptions.SushyError as e:
             LOG.debug('Received exception "%(exception)s" while '
                       'attempting to establish a session. '
                       'Falling back to basic authentication.',
                       {'exception': e})
-
-            # Fall back to basic authentication
-            self.reset_session_attrs()
-            self.basic_auth.set_context(self._root_resource, self._connector)
-            self.basic_auth.authenticate()
+            self._fallback_to_basic_authentication()
 
     def refresh_session(self):
         """Method to refresh a session to a Redfish controller.
