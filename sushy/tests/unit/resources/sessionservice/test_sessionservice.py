@@ -37,15 +37,17 @@ class SessionServiceTestCase(base.TestCase):
             self.conn, '/redfish/v1/SessionService',
             redfish_version='1.0.2')
 
-    @mock.patch.object(sessionservice, 'LOG', autospec=True)
-    def test__init_throws_exception(self, mock_LOG):
+    def test__init_throws_exception(self):
         self.conn.get.return_value.json.reset_mock()
         self.conn.get.return_value.json.side_effect = (
             exceptions.AccessError(
                 'GET', 'any_url', mock.MagicMock()))
-        sessionservice.SessionService(
-            self.conn, '/redfish/v1/SessionService', redfish_version='1.0.2')
-        self.assertTrue(mock_LOG.debug.called)
+        # Previously sushy would just mask these, but now we raise
+        # the access error to the user.
+        self.assertRaises(exceptions.AccessError,
+                          sessionservice.SessionService,
+                          self.conn, '/redfish/v1/SessionService',
+                          redfish_version='1.0.2')
 
     def test__parse_attributes(self):
         self.sess_serv_inst._parse_attributes(self.json_doc)

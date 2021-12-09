@@ -140,24 +140,21 @@ class SessionAuthTestCase(base.TestCase):
     def test__do_authenticate(self):
         self.assertIsNone(self.sess_auth.get_session_resource_id())
         self.assertIsNone(self.sess_auth.get_session_key())
-        mock_sess_serv = mock.Mock()
-        mock_sess_serv.create_session.return_value = (self.sess_key,
-                                                      self.sess_uri)
-        self.root.get_session_service.return_value = mock_sess_serv
+        self.assertFalse(self.sess_auth._session_auth_previously_successful)
+        self.root.create_session.return_value = (self.sess_key,
+                                                 self.sess_uri)
         self.sess_auth.set_context(self.root, self.conn)
         self.sess_auth.authenticate()
         self.assertEqual(self.sess_uri,
                          self.sess_auth.get_session_resource_id())
         self.assertEqual(self.sess_key,
                          self.sess_auth.get_session_key())
+        self.assertTrue(self.sess_auth._session_auth_previously_successful)
         self.conn.set_http_session_auth.assert_called_once_with(self.sess_key)
 
     def test_can_refresh_session(self):
-        mock_sess_serv = mock.Mock()
-        mock_sess_serv.create_session.return_value = (self.sess_key,
-                                                      self.sess_uri)
-        self.root.get_session_service.return_value = mock_sess_serv
-
+        self.root.create_session.return_value = (self.sess_key,
+                                                 self.sess_uri)
         self.sess_auth.set_context(self.root, self.conn)
         self.sess_auth.authenticate()
 
@@ -166,10 +163,8 @@ class SessionAuthTestCase(base.TestCase):
     def test_refresh(self):
         self.assertIsNone(self.sess_auth.get_session_resource_id())
         self.assertIsNone(self.sess_auth.get_session_key())
-        mock_sess_serv = mock.Mock()
-        mock_sess_serv.create_session.return_value = (self.sess_key,
-                                                      self.sess_uri)
-        self.root.get_session_service.return_value = mock_sess_serv
+        self.root.create_session.return_value = (self.sess_key,
+                                                 self.sess_uri)
         self._session = mock.Mock(spec=requests.Session)
         self.sess_auth.set_context(self.root, self.conn)
         self.sess_auth.refresh_session()
@@ -287,10 +282,8 @@ class SessionOrBasicAuthTestCase(base.TestCase):
     def test__do_authenticate(self):
         self.assertIsNone(self.sess_basic_auth.get_session_resource_id())
         self.assertIsNone(self.sess_basic_auth.get_session_key())
-        mock_sess_serv = mock.Mock()
-        mock_sess_serv.create_session.return_value = (self.sess_key,
-                                                      self.sess_uri)
-        self.root.get_session_service.return_value = mock_sess_serv
+        self.root.create_session.return_value = (self.sess_key,
+                                                 self.sess_uri)
         self.sess_basic_auth.set_context(self.root, self.conn)
         self.sess_basic_auth.authenticate()
         self.assertEqual(self.sess_uri,
@@ -302,10 +295,7 @@ class SessionOrBasicAuthTestCase(base.TestCase):
     def test__do_authenticate_for_basic_auth(self):
         self.assertIsNone(self.sess_basic_auth.get_session_resource_id())
         self.assertIsNone(self.sess_basic_auth.get_session_key())
-        mock_sess_serv = mock.Mock()
-        mock_sess_serv.create_session.side_effect = exceptions.SushyError
-        self.root.get_session_service.return_value = mock_sess_serv
-
+        self.root.create_session.side_effect = exceptions.SushyError
         self.sess_basic_auth.set_context(self.root, self.conn)
         self.sess_basic_auth.authenticate()
 
@@ -315,11 +305,8 @@ class SessionOrBasicAuthTestCase(base.TestCase):
             self.username, self.password)
 
     def test_can_refresh_session(self):
-        mock_sess_serv = mock.Mock()
-        mock_sess_serv.create_session.return_value = (self.sess_key,
-                                                      self.sess_uri)
-        self.root.get_session_service.return_value = mock_sess_serv
-
+        self.root.create_session.return_value = (self.sess_key,
+                                                 self.sess_uri)
         self.sess_basic_auth.set_context(self.root, self.conn)
         self.sess_basic_auth.authenticate()
 
@@ -340,10 +327,8 @@ class SessionOrBasicAuthTestCase(base.TestCase):
         test_url = ('https://testing:8000/redfish/v1/SessionService'
                     '/Sessions/testingfirst')
         self.sess_basic_auth._session_resource_id = test_url
-        mock_sess_serv = mock.Mock()
-        mock_sess_serv.create_session.return_value = (self.sess_key,
-                                                      self.sess_uri)
-        self.root.get_session_service.return_value = mock_sess_serv
+        self.root.create_session.return_value = (self.sess_key,
+                                                 self.sess_uri)
         self.sess_basic_auth.set_context(self.root, self.conn)
         self.sess_basic_auth.refresh_session()
         self.assertEqual(self.sess_uri,
@@ -351,6 +336,121 @@ class SessionOrBasicAuthTestCase(base.TestCase):
         self.assertEqual(self.sess_key,
                          self.sess_basic_auth.get_session_key())
         self.conn.set_http_session_auth.assert_called_once_with(self.sess_key)
+
+    @mock.patch.object(auth.SessionOrBasicAuth,
+                       '_fallback_to_basic_authentication',
+                       autospec=True)
+    def test_refresh_refresh_connection_error(self, mock_activate_basic_auth):
+        self.sess_basic_auth._session_key = 'ThisisFirstKey'
+        test_url = ('https://testing:8000/redfish/v1/SessionService'
+                    '/Sessions/testingfirst')
+        self.sess_basic_auth._session_auth_previously_successful = True
+        self.sess_basic_auth._session_resource_id = test_url
+        self.root.create_session.side_effect = \
+            exceptions.ConnectionError()
+        self.sess_basic_auth.set_context(self.root, self.conn)
+        self.assertRaises(exceptions.ConnectionError,
+                          self.sess_basic_auth.refresh_session)
+        self.assertIsNone(self.sess_basic_auth.get_session_resource_id())
+        self.assertIsNone(self.sess_basic_auth.get_session_key())
+        self.conn.set_http_session_auth.assert_not_called()
+        self.assertIsNone(self.sess_basic_auth.basic_auth._root_resource)
+        self.assertIsNone(self.sess_basic_auth.basic_auth._connector)
+        self.assertFalse(mock_activate_basic_auth.called)
+
+    @mock.patch.object(auth.SessionOrBasicAuth,
+                       '_fallback_to_basic_authentication',
+                       autospec=True)
+    def test_refresh_refresh_connection_error_clears(
+            self, mock_activate_basic_auth):
+        self.sess_basic_auth._session_key = 'ThisisFirstKey'
+        test_url = ('https://testing:8000/redfish/v1/SessionService'
+                    '/Sessions/testingfirst')
+        self.sess_basic_auth._session_auth_previously_successful = True
+        self.sess_basic_auth._session_resource_id = test_url
+        self.root.create_session.side_effect = [
+            exceptions.ConnectionError(),
+            (self.sess_key, self.sess_uri)
+        ]
+        self.sess_basic_auth.set_context(self.root, self.conn)
+        self.assertRaises(exceptions.ConnectionError,
+                          self.sess_basic_auth.refresh_session)
+        self.assertIsNone(self.sess_basic_auth.get_session_resource_id())
+        self.assertIsNone(self.sess_basic_auth.get_session_key())
+        self.conn.set_http_session_auth.assert_not_called()
+        self.assertIsNone(self.sess_basic_auth.basic_auth._root_resource)
+        self.assertIsNone(self.sess_basic_auth.basic_auth._connector)
+        self.assertFalse(mock_activate_basic_auth.called)
+        # Refresh no longer works, explicit authentication is now required.
+        self.sess_basic_auth.refresh_session()
+        self.conn.set_http_session_auth.assert_not_called()
+
+        self.sess_basic_auth.authenticate()
+        self.conn.set_http_session_auth.assert_called_once_with(self.sess_key)
+
+    @mock.patch.object(auth.SessionOrBasicAuth,
+                       '_fallback_to_basic_authentication',
+                       autospec=True)
+    def test_authenticate_session_fails(self, mock_activate_basic_auth):
+        self.sess_basic_auth._session_key = None
+        self.sess_basic_auth._session_auth_previously_successful = False
+        test_url = ('https://testing:8000/redfish/v1/SessionService'
+                    '/Sessions/testingfirst')
+        self.sess_basic_auth._session_resource_id = test_url
+        ae_exc = exceptions.AccessError(
+            'GET', 'any_url', mock.MagicMock())
+
+        self.root.create_session.side_effect = ae_exc
+        self.sess_basic_auth.set_context(self.root, self.conn)
+        self.sess_basic_auth.authenticate()
+        # We fall back to basic auth as we failed to authenticate.
+        self.assertTrue(mock_activate_basic_auth.called)
+
+    @mock.patch.object(auth, 'LOG', autospec=True)
+    @mock.patch.object(auth.SessionOrBasicAuth,
+                       '_fallback_to_basic_authentication',
+                       autospec=True)
+    def test_authenticate_session_fails_reauth_raises_exception(
+            self, mock_activate_basic_auth, mock_log):
+        self.sess_basic_auth._session_key = None
+        self.sess_basic_auth._session_auth_previously_successful = True
+        test_url = ('https://testing:8000/redfish/v1/SessionService'
+                    '/Sessions/testingfirst')
+        self.sess_basic_auth._session_resource_id = test_url
+        ae_exc = exceptions.AccessError(
+            'GET', 'any_url', mock.MagicMock())
+
+        self.root.create_session.side_effect = ae_exc
+        self.sess_basic_auth.set_context(self.root, self.conn)
+        self.assertRaises(exceptions.AccessError,
+                          self.sess_basic_auth.authenticate)
+        self.assertTrue(mock_log.debug.called)
+        # We do not fallback to basic auth if we have already been
+        # authenticated.
+        self.assertFalse(mock_activate_basic_auth.called)
+
+    @mock.patch.object(auth.SessionOrBasicAuth,
+                       '_fallback_to_basic_authentication',
+                       autospec=True)
+    def test_authenticate_session_fails_connection_error(
+            self, mock_activate_basic_auth):
+        self.sess_basic_auth._session_key = None
+        self.sess_basic_auth._session_auth_previously_successful = False
+        test_url = ('https://testing:8000/redfish/v1/SessionService'
+                    '/Sessions/testingfirst')
+        self.sess_basic_auth._session_resource_id = test_url
+        mock_sess_serv = mock.Mock()
+
+        ae_exc = exceptions.ConnectionError()
+
+        self.root.create_session.side_effect = ae_exc
+        self.root.get_session_service.return_value = mock_sess_serv
+        self.sess_basic_auth.set_context(self.root, self.conn)
+        self.assertRaises(exceptions.ConnectionError,
+                          self.sess_basic_auth.authenticate)
+        # We don't fall back to basic auth if we've never connected
+        # before
+        self.assertFalse(mock_activate_basic_auth.called)
 
     def test_close_do_nothing(self):
         self.conn.delete.assert_not_called()

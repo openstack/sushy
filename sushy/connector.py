@@ -33,6 +33,9 @@ class Connector(object):
         self._session.verify = self._verify
         self._auth = None
 
+        # NOTE(TheJulia): In order to help prevent recursive post operations
+        # by allowing us to understand that we should stop authentication.
+        self._sessions_uri = None
         # NOTE(etingof): field studies reveal that some BMCs choke at
         # long-running persistent HTTP connections (or TCP connections).
         # By default, we ask HTTP server to shut down HTTP connection we've
@@ -107,9 +110,23 @@ class Connector(object):
         try:
             exceptions.raise_for_response(method, url, response)
         except exceptions.AccessError as e:
-            if self._auth is not None and self._auth.can_refresh_session():
+            if (method == 'POST'
+                    and self._sessions_uri is not None
+                    and self._sessions_uri in url):
+                LOG.error('Authentication to the session service failed. '
+                          'Please check credentials and try again.')
+                raise
+            if self._auth is not None:
                 try:
-                    self._auth.refresh_session()
+                    if self._auth.can_refresh_session():
+                        self._auth.refresh_session()
+                    else:
+                        LOG.warning('Session authentication appears to have '
+                                    'been lost at some point in time. '
+                                    'Connectivity may have been lost during '
+                                    'a prior session refresh. Attempting to '
+                                    're-authenticate.')
+                        self._auth.authenticate()
                 except exceptions.AccessError as refresh_exc:
                     LOG.error("A failure occured while attempting to refresh "
                               "the session. Error: %s", refresh_exc.message)

@@ -1,0 +1,26 @@
+---
+fixes:
+  - |
+    Fixes issues with the refresh of ``Session`` based authentication where
+    a previous refresh attempt failing could result in a fallback
+    to ``Basic`` authentication and would silently fail. The client library
+    now attempts to re-authenticate.
+  - |
+    Fixes silent failures when a refresh of an authentication ``Session``
+    fails and was unable to be re-established due to an ``AccessError``.
+    Should this occur, now the ``AccessError`` exception is explicitly raised
+    as opposed to attempting to fall back to ``Basic`` authentication.
+  - |
+    Fixes issues where the ``Session`` and ``Basic`` auth interface would
+    fallback to ``Basic`` authentication should a ``ConnectionError``
+    exception occur while attempting to perform an authentication action.
+    ``ConnectionError`` exceptions are signs of networking transport issues,
+    and should be investigated. A ``ConnectionError`` exception is now raised.
+  - |
+    Prevents the combined ``Session`` and ``Basic`` authentication support
+    from falling back to ``Basic`` authentication once ``Session`` based
+    authentication has been established. This should be considered a potential
+    security issue or an environmental change requiring potential client
+    re-initialization. This is exposed as an ``AccessError`` exception.
+    Continued operations against the Sushy library will attempt to
+    reauthenticate, if possible.
