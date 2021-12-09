@@ -248,9 +248,9 @@ Creating and using a sushy manager object
   virtmedia_inst.eject_media()
 
 
--------------------------------------------------
-Creating and using a sushy session service object
--------------------------------------------------
+-----------------------------------------------
+Creating and using a sushy client with Sessions
+-----------------------------------------------
 
 .. code-block:: python
 
@@ -266,33 +266,27 @@ Creating and using a sushy session service object
   s = sushy.Sushy('http://localhost:8000/redfish/v1',
                   username='foo', password='bar')
 
-  # Instantiate a SessionService object
-  sess_serv = s.get_session_service()
+  # Get the ComputerSystem object (if there is only one), otherwise
+  # the identity must be provided as a path to the system.
+  system = s.get_system()
 
-  # Get SessionCollection
-  sess_col = sess_serv.sessions
+  # A session is created automatically for you.
+  # Print the boot field in the ComputerSystem.
+  print(system.boot)
 
-  # Print the ID of the sessions available in the collection
-  print(sess_col.members_identities)
+  # Upon session timeout, Sushy recreates the session based upon
+  # provided credentials. If this fails, an exception is raised.
 
-  # Get a list of systems objects available in the collection
-  sess_col_insts = sess_col.get_members()
+  # Explicitly request a session_key and session_uri.
+  # This is not stored, but may be useful.
+  session_key, session_uri = s.create_session(username='foo',
+                                              password='bar')
 
-  # Instantiate a session object, same as getting it directly
-  sess_inst = sess_col.get_member(sess_col.members_identities[0])
-  # Getting it directly
-  sess_inst = s.get_session(sess_col.members_identities[0])
+  # Retrieve the session
+  session = s.get_session(session_uri)
 
   # Delete the session
-  sess_inst.delete()
-
-  # Create a new session
-  session_key, session_id = sess_serv.create_session(
-    username='foo', password='bar')
-
-  # Delete a session
-  sess_serv.close_session(sess_col.members_identities[0])
-
+  session.delete()
 
 --------------------
 Using OEM extensions
