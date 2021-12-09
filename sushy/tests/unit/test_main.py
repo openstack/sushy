@@ -281,6 +281,110 @@ class MainTestCase(base.TestCase):
             self.root._conn, 'asdf',
             self.root.redfish_version, self.root.lazy_registries)
 
+    def test_create_session(self):
+        self.root._conn._session.headers = []
+        self.root._conn._sessions_uri = None
+        with open('sushy/tests/unit/json_samples/'
+                  'session_creation_headers.json') as f:
+            self.conn.post.return_value.headers = json.load(f)
+
+        session_key, session_uri = (
+            self.root.create_session('foo', 'secret'))
+        self.assertEqual('adc530e2016a0ea98c76c087f0e4b76f', session_key)
+        self.assertEqual(
+            '/redfish/v1/SessionService/Sessions/151edd65d41c0b89',
+            session_uri)
+        self.assertEqual('/redfish/v1/SessionService/Sessions',
+                         self.root._conn._sessions_uri)
+
+    def test_create_session_removes_auth_data(self):
+        self.root._conn._session.headers = {'X-Auth-Token': 'meow'}
+        self.root._conn._session.auth = 'meow'
+        with open('sushy/tests/unit/json_samples/'
+                  'session_creation_headers.json') as f:
+            self.conn.post.return_value.headers = json.load(f)
+
+        session_key, session_uri = (
+            self.root.create_session('foo', 'secret'))
+        self.assertEqual('adc530e2016a0ea98c76c087f0e4b76f', session_key)
+        self.assertEqual(
+            '/redfish/v1/SessionService/Sessions/151edd65d41c0b89',
+            session_uri)
+        self.assertIsNone(self.root._conn._session.auth)
+        self.assertNotIn('X-Auth-Token', self.root._conn._session.headers)
+
+    def test_create_session_no_session_path(self):
+        self.root._conn._session.headers = []
+        mock_get_session_path = mock.Mock()
+        mock_get_session_path.side_effect = exceptions.MissingAttributeError()
+        self.root.get_sessions_path = mock_get_session_path
+        with open('sushy/tests/unit/json_samples/'
+                  'session_creation_headers.json') as f:
+            self.conn.post.return_value.headers = json.load(f)
+
+        session_key, session_uri = (
+            self.root.create_session('foo', 'secret'))
+        self.assertEqual('adc530e2016a0ea98c76c087f0e4b76f', session_key)
+        self.assertEqual(
+            '/redfish/v1/SessionService/Sessions/151edd65d41c0b89',
+            session_uri)
+        self.conn.post.assert_called_once_with(
+            '/redfish/v1/SessionService/Sessions',
+            data={'UserName': 'foo', 'Password': 'secret'})
+
+    @mock.patch.object(main, 'LOG', autospec=True)
+    def test_create_session_no_session_path_access_error(self, mock_log):
+        self.root._conn._session.headers = []
+        mock_res = mock.Mock()
+        mock_res.status_code = 403
+        mock_res.json.side_effect = ValueError('no json')
+        mock_get_session_path = mock.Mock()
+        mock_get_session_path.side_effect = exceptions.AccessError(
+            'GET', 'redfish/v1', mock_res)
+        self.root.get_sessions_path = mock_get_session_path
+        with open('sushy/tests/unit/json_samples/'
+                  'session_creation_headers_no_location.json') as f:
+            self.conn.post.return_value.headers = json.load(f)
+
+        session_key, session_uri = (
+            self.root.create_session('foo', 'secret'))
+        self.assertEqual('adc530e2016a0ea98c76c087f0e4b76f', session_key)
+        self.assertIsNone(session_uri)
+        self.conn.post.assert_called_once_with(
+            '/redfish/v1/SessionService/Sessions',
+            data={'UserName': 'foo', 'Password': 'secret'})
+        self.assertTrue(mock_log.warning.called)
+
+    def test_create_session_path_discovery(self):
+        self.root._conn._session.headers = []
+        with open('sushy/tests/unit/json_samples/root.json') as f:
+            self.conn.get.json.return_value = json.load(f)
+        with open('sushy/tests/unit/json_samples/'
+                  'session_creation_headers.json') as f:
+            self.conn.post.return_value.headers = json.load(f)
+
+        session_key, session_uri = (
+            self.root.create_session('foo', 'secret'))
+        self.assertEqual('adc530e2016a0ea98c76c087f0e4b76f', session_key)
+        self.assertEqual(
+            '/redfish/v1/SessionService/Sessions/151edd65d41c0b89',
+            session_uri)
+        self.conn.get.assert_called_once_with(path='/redfish/v1/')
+        self.conn.post.assert_called_once_with(
+            '/redfish/v1/SessionService/Sessions',
+            data={'UserName': 'foo', 'Password': 'secret'})
+
+    def test_create_session_missing_x_auth_token(self):
+        self.root._conn._session.headers = []
+        with open('sushy/tests/unit/json_samples/'
+                  'session_creation_headers.json') as f:
+            self.conn.post.return_value.headers = json.load(f)
+
+        self.conn.post.return_value.headers.pop('X-Auth-Token')
+        self.assertRaisesRegex(
+            exceptions.MissingXAuthToken, 'No X-Auth-Token returned',
+            self.root.create_session, 'foo', 'bar')
+
     @mock.patch.object(updateservice, 'UpdateService', autospec=True)
     def test_get_update_service(self, mock_upd_serv):
         self.root.get_update_service()
@@ -396,8 +500,10 @@ class MainTestCase(base.TestCase):
         self.assertEqual(1, mock_registries.__getitem__.call_count)
 
     def test_get_sessions_path(self):
+        self.root._conn._sessions_uri = None
         expected = '/redfish/v1/SessionService/Sessions'
         self.assertEqual(expected, self.root.get_sessions_path())
+        self.assertEqual(expected, self.root._conn._sessions_uri)
 
     @mock.patch.object(taskmonitor, 'TaskMonitor', autospec=True)
     def test_get_task_monitor(self, mock_task_mon):
