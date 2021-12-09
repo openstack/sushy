@@ -47,6 +47,9 @@ class SessionService(base.ResourceBase):
                  registries=None):
         """A class representing a SessionService
 
+        Warning: This class should only be invoked with a connector which
+        has already established authentication.
+
         :param connector: A Connector instance
         :param identity: The identity of the SessionService resource
         :param redfish_version: The version of RedFish. Used to construct
@@ -54,15 +57,11 @@ class SessionService(base.ResourceBase):
         :param registries: Dict of Redfish Message Registry objects to be
             used in any resource that needs registries to parse messages
         """
-        try:
-            super(SessionService, self).__init__(
-                connector, identity, redfish_version, registries)
-
-        except exceptions.AccessError as ae:
-            LOG.debug('Received access error "%s" when trying to refresh the '
-                      'SessionService. If this happens before '
-                      'authentication, we\'ll have to guess the Sessions URL.',
-                      ae)
+        # Populating the base resource so session interactions can
+        # occur based on the contents of it.
+        super(SessionService, self).__init__(
+            connector, identity, redfish_version=redfish_version,
+            registries=registries)
 
     def _get_sessions_collection_path(self):
         """Helper function to find the SessionCollections path"""
@@ -93,6 +92,8 @@ class SessionService(base.ResourceBase):
 
     def create_session(self, username, password, target_uri=None):
         """This function will try to create a session.
+
+        Create a session and return the associated key and URI.
 
         :param username: the username of the user requesting a new session
         :param password: the password associated to the user requesting

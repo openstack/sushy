@@ -14,6 +14,8 @@
 #    under the License.
 import collections
 import logging
+import os
+
 import pkg_resources
 import requests
 
@@ -366,10 +368,15 @@ class Sushy(base.ResourceBase):
 
     def get_sessions_path(self):
         """Returns the Sessions url"""
-
+        # NOTE(TheJulia): This method is the standard discovery method
+        # advised by the DMTF DSP0266 standard to find the session service.
         try:
             links_url = self.json.get('Links')
-            return links_url['Sessions']['@odata.id']
+            sessions_uri = links_url['Sessions']['@odata.id']
+            # Save the session URL for post detection and prevention
+            # of recursive autentication attempts.
+            self._conn._sessions_uri = sessions_uri
+            return sessions_uri
         except (TypeError, KeyError):
             raise exceptions.MissingAttributeError(
                 attribute='Links/Sessions/@data.id', resource=self.path)
@@ -384,6 +391,63 @@ class Sushy(base.ResourceBase):
             self._conn, identity,
             redfish_version=self.redfish_version,
             registries=self.lazy_registries)
+
+    def create_session(self, username=None, password=None):
+        """Creates a session without invoking SessionService.
+
+        For use when a new connection is to be established. Removes prior
+        Session and authentication data before making the request.
+
+        :param username: The username to utilize to create a session with the
+                         remote endpoint.
+        :param password: The password to utilize to create a session with the
+                         remote endpoint.
+        :returns: A session key and uri in the form of a tuple
+        :raises: MissingXAuthToken
+        :raises: ConnectionError
+        :raises: AccessError
+        :raises: HTTPError
+        :raises: MissingAttributeError
+        """
+
+        # Explicitly removes in-client session data to proceed. This prevents
+        # AccessErrors as prior authentication shouldn't be submitted with a
+        # new authentication attempt, and doing so with old/invalid session
+        # data can result in an AccessError being raised.
+        self._conn._session.auth = None
+        if 'X-Auth-Token' in self._conn._session.headers:
+            # Delete the token value that was saved to the session
+            # as otherwise we would end up with a dictionary containing
+            # a {'X-Auth-Token': null} being sent across to the remote
+            # bmc.
+            del self._conn._session.headers['X-Auth-Token']
+        try:
+            session_service_path = self.get_sessions_path()
+        except (exceptions.MissingAttributeError, exceptions.AccessError):
+            # Guesses path based upon DMTF standard, in the event
+            # the links resource on the service root is incorrect.
+            session_service_path = os.path.join(self._path,
+                                                'SessionService/Sessions')
+            LOG.warning('Could not discover the Session service path, '
+                        'falling back to %s.',
+                        session_service_path)
+            session_url = self._root_prefix + 'SessionService/Sessions'
+            self._conn._sessions_uri = session_url
+
+        data = {'UserName': username, 'Password': password}
+        LOG.debug("Requesting new session from %s.",
+                  session_service_path)
+        rsp = self._conn.post(session_service_path, data=data)
+        session_key = rsp.headers.get('X-Auth-Token')
+        if session_key is None:
+            raise exceptions.MissingXAuthToken(
+                method='POST', url=session_service_path, response=rsp)
+
+        session_uri = rsp.headers.get('Location')
+        if session_uri is None:
+            LOG.warning("Received X-Auth-Token but NO session uri.")
+
+        return session_key, session_uri
 
     def get_update_service(self):
         """Get the UpdateService object
