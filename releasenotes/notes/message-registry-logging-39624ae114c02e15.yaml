@@ -1,0 +1,4 @@
+---
+fixes:
+  - |
+    The large ``MessageRegistry`` objects are no longer logged.

@@ -57,6 +57,8 @@ class MessageDictionaryField(base.DictionaryField):
 
 class MessageRegistry(base.ResourceBase):
 
+    _log_resource_body = False
+
     identity = base.Field('Id', required=True)
     """The Message registry identity string"""
 

@@ -514,6 +514,9 @@ class ResourceBase(object, metaclass=abc.ABCMeta):
 
     links = LinksField('Links')
 
+    _log_resource_body = True
+    """Whether to log the whole resource body in debug mode."""
+
     def __init__(self,
                  connector,
                  path='',
@@ -663,7 +666,9 @@ class ResourceBase(object, metaclass=abc.ABCMeta):
         attributes = self._parse_attributes(self._json)
         LOG.debug('Received representation of %(type)s %(path)s: %(json)s',
                   {'type': self.__class__.__name__,
-                   'path': self._path, 'json': attributes})
+                   'path': self._path,
+                   'json': (attributes if self._log_resource_body
+                            else '<stripped>')})
         self._do_refresh(force)
 
         # Mark it fresh
