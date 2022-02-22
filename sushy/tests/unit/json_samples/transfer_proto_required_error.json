@@ -1,0 +1,22 @@
+{
+  "error": {
+    "@Message.ExtendedInfo": [
+      {
+        "@odata.type": "#Message.v1_0_8.Message",
+        "Message": "The action /redfish/v1/Managers/Self/VirtualMedia/CD1/Actions/VirtualMedia.InsertMedia requires the parameter TransferProtocolType to be present in the request body.",
+        "MessageArgs": [
+          "/redfish/v1/Managers/Self/VirtualMedia/CD1/Actions/VirtualMedia.InsertMedia",
+          "TransferProtocolType"
+        ],
+        "MessageId": "Base.1.5.ActionParameterMissing",
+        "RelatedProperties": [
+          "#/TransferProtocolType"
+        ],
+        "Resolution": "Supply the action with the required parameter in the request body when the request is resubmitted.",
+        "Severity": "Critical"
+      }
+    ],
+    "code": "Base.1.5.ActionParameterMissing",
+    "message": "The action /redfish/v1/Managers/Self/VirtualMedia/CD1/Actions/VirtualMedia.InsertMedia requires the parameter TransferProtocolType to be present in the request body."
+  }
+}
