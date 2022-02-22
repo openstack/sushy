@@ -16,6 +16,8 @@ from http import client as http_client
 import json
 from unittest import mock
 
+import requests
+
 import sushy
 from sushy import exceptions
 from sushy.resources.certificateservice import certificate
@@ -175,6 +177,20 @@ class VirtualMediaTestCase(base.TestCase):
                   "Inserted": True, "WriteProtected": False},
             headers={"If-Match": 'W/"3d7b8a7360bf2941d","3d7b8a7360bf2941d"'})
         self.assertTrue(self.sys_virtual_media._is_stale)
+
+    @mock.patch.object(requests, 'post', autospec=True)
+    def test_is_transfer_protocol_required(self, mock_post):
+        with open('sushy/tests/unit/json_samples/'
+                  'transfer_proto_required_error.json') as f:
+            response_obj = json.load(f)
+        response = mock.MagicMock()
+        response.status_code = 400
+        response.code = "Base.1.5.ActionParameterMissing"
+        response.body = response_obj['error']
+        response.raise_for_status.side_effect = requests.exceptions.HTTPError
+        mock_post.return_value = response
+        retval = self.sys_virtual_media.is_transfer_protocol_required(response)
+        self.assertTrue(retval)
 
     def test_eject_media_none(self):
         self.sys_virtual_media._actions.eject_media = None

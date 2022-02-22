@@ -1,0 +1,7 @@
+---
+fixes:
+  - |
+    Resolved virtualmedia attach failures caused by the lack of
+    TransferProtocolType parameter in the request payload which is required
+    by certain BMCs (e.g. on Nokia servers). This is done by adding capability
+    to retry virtualmedia InsertMedia with the updated payload in such cases.

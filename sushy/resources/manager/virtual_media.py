@@ -106,6 +106,18 @@ class VirtualMedia(base.ResourceBase):
             eject_uri = eject_media.target_uri
         return eject_uri, use_patch
 
+    def is_transfer_protocol_required(self, response=None):
+        """Check the response code and body and in case of failure
+
+        Try to determine if it happened due to missing TransferProtocolType.
+        """
+        if (response.code == "Base.1.5.ActionParameterMissing"
+           and response.body is not None):
+            if ("#/TransferProtocolType" in response.body
+               ["@Message.ExtendedInfo"][0]['RelatedProperties']):
+                return True
+        return False
+
     def insert_media(self, image, inserted=True, write_protected=True,
                      username=None, password=None, transfer_method=None):
         """Attach remote media to virtual media
@@ -161,7 +173,19 @@ class VirtualMedia(base.ResourceBase):
                 payload['Inserted'] = False
             if not write_protected:
                 payload['WriteProtected'] = False
-            self._conn.post(target_uri, data=payload)
+            # NOTE(janders) attempting to detect whether attachment failure is
+            # due to absence of TransferProtocolType param and if so adding it
+            try:
+                self._conn.post(target_uri, data=payload)
+            except exceptions.HTTPError as response:
+                if self.is_transfer_protocol_required(response):
+                    if payload['Image'].startswith('https://'):
+                        payload['TransferProtocolType'] = "HTTPS"
+                    elif payload['Image'].startswith('http://'):
+                        payload['TransferProtocolType'] = "HTTP"
+                    self._conn.post(target_uri, data=payload)
+                else:
+                    raise
         self.invalidate()
 
     def eject_media(self):
