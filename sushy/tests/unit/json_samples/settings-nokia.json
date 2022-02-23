@@ -1,0 +1,8 @@
+{
+  "@Redfish.Settings": {
+    "@odata.type": "#Settings.v1_2_2.Settings",
+    "SettingsObject": {
+      "@odata.id": "/redfish/v1/Systems/Self/SD"
+    }
+  }
+}
