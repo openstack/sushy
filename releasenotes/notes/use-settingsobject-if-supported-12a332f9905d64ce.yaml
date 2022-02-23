@@ -1,0 +1,7 @@
+---
+fixes:
+  - |
+    Fixes incompatibility with BMCs that require use of a specific
+    SettingsObject URI specified in @Redfish.Settings resource in order to
+    set BootSourceOverride or similar attributes. For example, this is
+    required on Nokia servers.

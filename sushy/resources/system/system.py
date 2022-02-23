@@ -135,6 +135,12 @@ class System(base.ResourceBase):
     """Indicates if a given resource has a maintenance window assignment
     for applying settings or operations"""
 
+    _settings = settings.SettingsField()
+    """Settings Resource is used to represent the future intended state
+    of a Resource
+    Ref: http://redfish.dmtf.org/schemas/DSP0266_1.7.0.html#settings-resource
+    """
+
     _actions = ActionsField('Actions', required=True)
 
     def __init__(self, connector, identity, redfish_version=None,
@@ -282,14 +288,24 @@ class System(base.ResourceBase):
 
             data['Boot']['BootSourceOverrideMode'] = fishy_mode
 
-        # TODO(lucasagomes): Check the return code and response body ?
-        #                    Probably we should call refresh() as well.
-
         headers = None
         etag = self._get_etag()
+        path = self.path
+
+        # NOTE(janders): checking if @RedFish.Settings are available; if so
+        # using the URI from the SettingsObject. Also ensuring the ETag URI
+        # matches in this case (the one above would not be valid for new URI).
+        if self._settings and self._settings.resource_uri:
+            path = self._settings.resource_uri
+            resp = self._conn.get(path)
+            if resp:
+                etag = resp.headers['ETag']
+
+        # TODO(lucasagomes): Check the return code and response body ?
+        #                    Probably we should call refresh() as well.
         if etag is not None:
-            headers = {"If-Match": etag}
-        self._conn.patch(self.path, data=data, headers=headers)
+            headers = {'If-Match': etag}
+        self._conn.patch(path, data=data, headers=headers)
 
     # TODO(etingof): we should remove this method, eventually
     def set_system_boot_source(
