@@ -292,14 +292,13 @@ class System(base.ResourceBase):
         etag = self._get_etag()
         path = self.path
 
-        # NOTE(janders): checking if @RedFish.Settings are available; if so
+        # NOTE(janders): checking if @Redfish.Settings are available; if so
         # using the URI from the SettingsObject. Also ensuring the ETag URI
         # matches in this case (the one above would not be valid for new URI).
         if self._settings and self._settings.resource_uri:
             path = self._settings.resource_uri
             resp = self._conn.get(path)
-            if resp:
-                etag = resp.headers['ETag']
+            etag = resp.headers.get('ETag')
 
         # TODO(lucasagomes): Check the return code and response body ?
         #                    Probably we should call refresh() as well.
