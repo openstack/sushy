@@ -1,6 +1,6 @@
 - job:
-    name: sushy-tempest-partition-bios-redfish-pxe
-    parent: ironic-tempest-partition-bios-redfish-pxe
+    name: sushy-tempest-bios-redfish-netboot
+    parent: ironic-tempest-bios-redfish-netboot
     irrelevant-files:
       - ^.*\.rst$
       - ^doc/.*$
@@ -10,8 +10,8 @@
       - openstack/sushy
 
 - job:
-    name: sushy-tempest-partition-uefi-redfish-vmedia
-    parent: ironic-tempest-partition-uefi-redfish-vmedia
+    name: sushy-tempest-uefi-redfish-vmedia
+    parent: ironic-tempest-uefi-redfish-vmedia
     irrelevant-files:
       - ^.*\.rst$
       - ^doc/.*$
