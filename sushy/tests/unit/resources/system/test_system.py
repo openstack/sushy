@@ -361,6 +361,42 @@ class SystemTestCase(base.TestCase):
                            'BootSourceOverrideTarget': 'Cd'}},
             headers=None)
 
+    def test_set_system_boot_options_settings_resource_nokia(self):
+        self.conn.get.return_value.headers = {'ETag': '"3d7b838291941d"'}
+        with open('sushy/tests/unit/json_samples/settings-nokia.json') as f:
+            settings_obj = json.load(f)
+
+        self.json_doc.update(settings_obj)
+        self.sys_inst._parse_attributes(self.json_doc)
+
+        self.sys_inst.set_system_boot_options(
+            target=sushy.BOOT_SOURCE_TARGET_CD,
+            enabled=sushy.BOOT_SOURCE_ENABLED_ONCE)
+
+        self.sys_inst._conn.patch.assert_called_once_with(
+            '/redfish/v1/Systems/Self/SD',
+            data={'Boot': {'BootSourceOverrideEnabled': 'Once',
+                           'BootSourceOverrideTarget': 'Cd'}},
+            headers={'If-Match': '"3d7b838291941d"'})
+
+    def test_set_system_boot_options_settings_resource(self):
+        self.conn.get.return_value.headers = {'ETag': '"3d7b838291941d"'}
+        with open('sushy/tests/unit/json_samples/settings.json') as f:
+            settings_obj = json.load(f)
+
+        self.json_doc.update(settings_obj)
+        self.sys_inst._parse_attributes(self.json_doc)
+
+        self.sys_inst.set_system_boot_options(
+            target=sushy.BOOT_SOURCE_TARGET_CD,
+            enabled=sushy.BOOT_SOURCE_ENABLED_ONCE)
+
+        self.sys_inst._conn.patch.assert_called_once_with(
+            '/redfish/v1/Systems/437XR1138R2/BIOS/Settings',
+            data={'Boot': {'BootSourceOverrideEnabled': 'Once',
+                           'BootSourceOverrideTarget': 'Cd'}},
+            headers={'If-Match': '"3d7b838291941d"'})
+
     def test_set_system_boot_source(self):
         self.sys_inst.set_system_boot_source(
             sushy.BOOT_SOURCE_TARGET_PXE,
