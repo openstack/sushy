@@ -52,8 +52,8 @@ source_suffix = '.rst'
 master_doc = 'index'
 
 # General information about the project.
-project = u'sushy Release Notes'
-copyright = u'2016, OpenStack Foundation'
+project = 'sushy Release Notes'
+copyright = '2016, OpenStack Foundation'
 
 # The version info for the project you're documenting, acts as replacement for
 # |version| and |release|, also used in various other places throughout the
@@ -210,8 +210,8 @@ latex_elements = {
 # (source start file, target name, title,
 #  author, documentclass [howto, manual, or own class]).
 latex_documents = [
-    ('index', 'SushyReleaseNotes.tex', u'Sushy Release Notes Documentation',
-     u'Ironic Developers', 'manual'),
+    ('index', 'SushyReleaseNotes.tex', 'Sushy Release Notes Documentation',
+     'Ironic Developers', 'manual'),
 ]
 
 # The name of an image file (relative to this directory) to place at the top of
@@ -240,8 +240,8 @@ latex_documents = [
 # One entry per manual page. List of tuples
 # (source start file, name, description, authors, manual section).
 man_pages = [
-    ('index', 'sushyreleasenotes', u'Sushy Release Notes Documentation',
-     [u'Ironic Developers'], 1)
+    ('index', 'sushyreleasenotes', 'Sushy Release Notes Documentation',
+     ['Ironic Developers'], 1)
 ]
 
 # If true, show URL addresses after external links.
@@ -254,8 +254,8 @@ man_pages = [
 # (source start file, target name, title, author,
 #  dir menu entry, description, category)
 texinfo_documents = [
-    ('index', 'SushyReleaseNotes', u'Sushy Release Notes Documentation',
-     u'Ironic Developers', 'SushyReleaseNotes',
+    ('index', 'SushyReleaseNotes', 'Sushy Release Notes Documentation',
+     'Ironic Developers', 'SushyReleaseNotes',
      'One line description of project.',
      'Miscellaneous'),
 ]
