@@ -1,6 +1,6 @@
 - job:
-    name: sushy-tempest-bios-redfish-netboot
-    parent: ironic-tempest-bios-redfish-netboot
+    name: sushy-tempest-bios-redfish-pxe
+    parent: ironic-tempest-bios-redfish-pxe
     irrelevant-files:
       - ^.*\.rst$
       - ^doc/.*$

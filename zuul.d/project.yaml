@@ -8,10 +8,10 @@
     check:
       jobs:
         - ironic-cross-sushy
-        - sushy-tempest-bios-redfish-netboot
+        - sushy-tempest-bios-redfish-pxe
         - sushy-tempest-uefi-redfish-vmedia
     gate:
       jobs:
         - ironic-cross-sushy
-        - sushy-tempest-bios-redfish-netboot
+        - sushy-tempest-bios-redfish-pxe
         - sushy-tempest-uefi-redfish-vmedia
