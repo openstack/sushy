@@ -418,7 +418,6 @@ class Sushy(base.ResourceBase):
         :raises: HTTPError
         :raises: MissingAttributeError
         """
-
         # Explicitly removes in-client session data to proceed. This prevents
         # AccessErrors as prior authentication shouldn't be submitted with a
         # new authentication attempt, and doing so with old/invalid session
