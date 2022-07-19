@@ -101,6 +101,7 @@ class BasicAuth(AuthBase):
         """Attempts to establish a Basic Authentication Session.
 
         """
+        LOG.debug('Setting basic authentication connector information.')
         self._connector.set_http_basic_auth(self._username, self._password)
 
     def can_refresh_session(self):

@@ -1,0 +1,9 @@
+---
+fixes:
+  - |
+    Fixes an issue in the sushy connector object handling where a
+    Sushy client utilizing ``basic`` authentication would not raise
+    an AccessError exception once the credentials stopped working.
+    We now explicitly check to see if ``basic`` authentication
+    is in use, and raise the exception if an AccessError is
+    encountered.
