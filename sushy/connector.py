@@ -136,6 +136,15 @@ class Connector(object):
                           'Please check credentials and try again.')
                 raise
             if self._auth is not None:
+                # self._session.auth value is only set when basic auth is used
+                if self._session.auth is not None:
+                    LOG.warning('We have encountered an AccessError when '
+                                'using \'basic\' authentication. %(err)s',
+                                {'err': str(e)})
+                    # NOTE(TheJulia): There is no way to recover Basic auth,
+                    # as we need the client to be re-launched with new
+                    # credentials.
+                    raise
                 try:
                     if self._auth.can_refresh_session():
                         self._auth.refresh_session()
