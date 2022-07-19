@@ -259,6 +259,7 @@ class ConnectorOpTestCase(base.TestCase):
 
     def test_timed_out_session_unable_to_create_session(self):
         self.conn._auth.can_refresh_session.return_value = False
+        self.session.auth = None
         self.conn._session = self.session
         self.request = self.session.request
         self.request.return_value.status_code = http_client.FORBIDDEN
@@ -280,6 +281,7 @@ class ConnectorOpTestCase(base.TestCase):
         self.auth.get_session_key.return_value = 'asdf1234'
         self.conn._auth = self.auth
         self.session = mock.Mock(spec=requests.Session)
+        self.session.auth = None
         self.conn._session = self.session
         self.request = self.session.request
         first_response = mock.MagicMock()
@@ -299,6 +301,7 @@ class ConnectorOpTestCase(base.TestCase):
         self.auth.get_session_key.return_value = 'asdf1234'
         self.conn._auth = self.auth
         self.session = mock.Mock(spec=requests.Session)
+        self.session.auth = None
         self.conn._session = self.session
         self.request = self.session.request
         first_response = mock.MagicMock()
@@ -434,6 +437,8 @@ class ConnectorOpTestCase(base.TestCase):
         mock_response = mock.Mock()
         mock_response.json.side_effect = value_error
         mock_response.status_code = http_client.FORBIDDEN
+        self.session.auth = None
+        self.conn._session = self.session
         # This doesn't test/wire all way back through auth -> main
         # and ultimately we want to make sure we get an error all
         # the way back.
@@ -469,6 +474,8 @@ class ConnectorOpTestCase(base.TestCase):
         mock_response = mock.Mock()
         mock_response.json.side_effect = ValueError('no json')
         mock_response.status_code = http_client.FORBIDDEN
+        self.session.auth = None
+        self.conn._session = self.session
         self.conn._auth.authenticate.side_effect = \
             exceptions.AccessError('POST', 'fake/path', mock_response)
         self.request.return_value.json.side_effect = ValueError('no json')
@@ -527,3 +534,27 @@ class ConnectorOpTestCase(base.TestCase):
         self.request.side_effect = [response1, response1, response2]
         with self.assertRaisesRegex(exceptions.BadRequestError, message):
             self.conn._op('POST', 'http://foo.bar', blocking=True)
+
+    @mock.patch.object(connector.LOG, 'warning', autospec=True)
+    def test_access_error_basic_auth(self, mock_log):
+        self.conn._auth.can_refresh_session.return_value = False
+        self.conn._session.auth = ('foo', 'bar')
+        self.request.return_value.status_code = http_client.FORBIDDEN
+        mock_response = mock.Mock()
+        mock_response.json.side_effect = ValueError('no json')
+        mock_response.status_code = http_client.FORBIDDEN
+        self.request.return_value.json.side_effect = ValueError('no json')
+
+        with self.assertRaisesRegex(exceptions.AccessError,
+                                    'unknown error') as cm:
+            self.conn._op('GET', 'http://redfish/v1/SessionService')
+        exc = cm.exception
+        self.assertEqual(http_client.FORBIDDEN, exc.status_code)
+        self.conn._auth.authenticate.assert_not_called()
+        mock_log.assert_called_once_with(
+            "We have encountered an AccessError when using 'basic' "
+            "authentication. %(err)s",
+            {'err': 'HTTP GET http://redfish/v1/SessionService '
+                    'returned code HTTPStatus.FORBIDDEN. unknown error '
+                    'Extended information: none'}
+        )
