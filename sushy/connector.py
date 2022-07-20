@@ -41,6 +41,15 @@ class Connector(object):
         # By default, we ask HTTP server to shut down HTTP connection we've
         # just used.
         self._session.headers['Connection'] = 'close'
+        # NOTE(TheJulia): Depending on the BMC, offering compression as an
+        # acceptable response changes the ETag behavior to offering an
+        # automatic "weak" ETag response, which is appropriate because the
+        # body content *may* not be a byte for byte match given compression.
+        # Overall, the value of compression is less than the value of concise
+        # interaction with the BMC. Setting to identity basically means
+        # "without modification or compression". By default, python-requests
+        # indicates responses can be compressed.
+        self._session.headers['Accept-Encoding'] = 'identity'
 
         if username or password:
             LOG.warning('Passing username and password to Connector is '
