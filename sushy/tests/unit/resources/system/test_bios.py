@@ -118,23 +118,7 @@ class BiosTestCase(base.TestCase):
                           parser.parse('2020-09-01T04:30:00-06:00')},
                          attributes.get('maintenance_window'))
 
-    def test_set_attribute(self):
-        self.sys_bios.set_attribute('ProcTurboMode', 'Disabled')
-        self.sys_bios._conn.patch.assert_called_once_with(
-            '/redfish/v1/Systems/437XR1138R2/BIOS/Settings',
-            data={'Attributes': {'ProcTurboMode': 'Disabled'}})
-
     def test_set_attribute_apply_time(self):
-        self.sys_bios.set_attribute('ProcTurboMode', 'Disabled',
-                                    res_cons.ApplyTime.ON_RESET)
-        self.sys_bios._conn.patch.assert_called_once_with(
-            '/redfish/v1/Systems/437XR1138R2/BIOS/Settings',
-            data={'Attributes': {'ProcTurboMode': 'Disabled'},
-                  '@Redfish.SettingsApplyTime': {
-                      '@odata.type': '#Settings.v1_0_0.PreferredApplyTime',
-                      'ApplyTime': 'OnReset'}})
-
-    def test_set_attribute_apply_time_with_maintenance_window(self):
         self.sys_bios.set_attribute(
             'ProcTurboMode', 'Disabled',
             res_cons.ApplyTime.IN_MAINTENANCE_WINDOW_ON_RESET,
@@ -166,26 +150,6 @@ class BiosTestCase(base.TestCase):
         self.assertTrue(self.conn.get.called)
 
     def test_set_attributes(self):
-        self.sys_bios.set_attributes({'ProcTurboMode': 'Disabled',
-                                      'UsbControl': 'UsbDisabled'})
-        self.sys_bios._conn.patch.assert_called_once_with(
-            '/redfish/v1/Systems/437XR1138R2/BIOS/Settings',
-            data={'Attributes': {'ProcTurboMode': 'Disabled',
-                                 'UsbControl': 'UsbDisabled'}})
-
-    def test_set_attributes_apply_time(self):
-        self.sys_bios.set_attributes({'ProcTurboMode': 'Disabled',
-                                      'UsbControl': 'UsbDisabled'},
-                                     res_cons.ApplyTime.IMMEDIATE)
-        self.sys_bios._conn.patch.assert_called_once_with(
-            '/redfish/v1/Systems/437XR1138R2/BIOS/Settings',
-            data={'Attributes': {'ProcTurboMode': 'Disabled',
-                                 'UsbControl': 'UsbDisabled'},
-                  '@Redfish.SettingsApplyTime': {
-                      '@odata.type': '#Settings.v1_0_0.PreferredApplyTime',
-                      'ApplyTime': 'Immediate'}})
-
-    def test_set_attributes_apply_time_with_maintenance_window(self):
         self.sys_bios.set_attributes(
             {'ProcTurboMode': 'Disabled', 'UsbControl': 'UsbDisabled'},
             res_cons.ApplyTime.AT_MAINTENANCE_WINDOW_START,
@@ -200,30 +164,6 @@ class BiosTestCase(base.TestCase):
                       'ApplyTime': 'AtMaintenanceWindowStart',
                       'MaintenanceWindowStartTime': '2020-09-01T04:30:00',
                       'MaintenanceWindowDurationInSeconds': 600}})
-
-    def test_set_attributes_apply_time_missing(self):
-        self.assertRaises(ValueError,
-                          self.sys_bios.set_attributes,
-                          {'ProcTurboMode': 'Disabled',
-                           'UsbControl': 'UsbDisabled'},
-                          maint_window_start_time=datetime.datetime.now(),
-                          maint_window_duration=600)
-
-    def test_set_attributes_maint_window_start_time_missing(self):
-        self.assertRaises(ValueError,
-                          self.sys_bios.set_attributes,
-                          {'ProcTurboMode': 'Disabled',
-                           'UsbControl': 'UsbDisabled'},
-                          res_cons.ApplyTime.AT_MAINTENANCE_WINDOW_START,
-                          maint_window_duration=600)
-
-    def test_set_attributes_maint_window_duration_missing(self):
-        self.assertRaises(ValueError,
-                          self.sys_bios.set_attributes,
-                          {'ProcTurboMode': 'Disabled',
-                           'UsbControl': 'UsbDisabled'},
-                          res_cons.ApplyTime.AT_MAINTENANCE_WINDOW_START,
-                          datetime.datetime.now())
 
     def test_set_attributes_on_refresh(self):
         self.conn.get.reset_mock()

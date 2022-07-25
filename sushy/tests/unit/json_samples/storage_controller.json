@@ -1,0 +1,50 @@
+{
+    "@Redfish.Settings": {
+        "@odata.context": "/redfish/v1/$metadata#Settings.Settings",
+        "@odata.type": "#Settings.v1_3_3.Settings",
+        "SettingsObject": {
+            "@odata.id": "/redfish/v1/Systems/437XR1138R2/Storage/1/Controllers/1/Settings"
+        },
+        "SupportedApplyTimes": [
+            "Immediate",
+            "OnReset"
+        ]
+    },
+    "@odata.context": "/redfish/v1/$metadata#StorageController.StorageController",
+    "@odata.id": "/redfish/v1/Systems/437XR1138R2/Storage/1/Controllers/1",
+    "@odata.type": "#StorageController.v1_2_0.StorageController",
+    "Description": "Integrated RAID Controller",
+    "FirmwareVersion": "1.0.0.7",
+    "Id": "1",
+    "Identifiers": [
+        {
+            "@odata.type": "#Resource.v1_1_0.Identifier",
+            "DurableNameFormat": "NAA",
+            "DurableName": "345C59DBD970859C"
+        }
+    ],
+    "Identifiers@odata.count": 1,
+    "Manufacturer": "Contoso",
+    "Model": "12Gbs Integrated RAID",
+    "Name": "Contoso Integrated RAID",
+    "SpeedGbps": 12,
+    "Status": {
+        "Health": "OK",
+        "HealthRollup": "OK",
+        "State": "Enabled"
+    },
+    "SupportedControllerProtocols": [
+        "PCIe"
+    ],
+    "SupportedControllerProtocols@odata.count": 1,
+    "SupportedDeviceProtocols": [
+        "SAS",
+        "SATA"
+    ],
+    "SupportedDeviceProtocols@odata.count": 2,
+    "SupportedRAIDTypes": [
+        "RAID0",
+        "RAID1"
+    ],
+    "SupportedRAIDTypes@odata.count": 2
+}

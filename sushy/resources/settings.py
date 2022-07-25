@@ -167,9 +167,10 @@ class SettingsField(base.CompositeField):
         :param connector: A Connector instance
         :param value: Value representing JSON whose structure is specific
             to each resource and the caller must format it correctly
+        :returns: Response object
         """
 
-        connector.patch(self.resource_uri, data=value)
+        return connector.patch(self.resource_uri, data=value)
 
     @property
     def resource_uri(self):

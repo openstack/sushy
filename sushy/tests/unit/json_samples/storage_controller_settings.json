@@ -1,0 +1,8 @@
+{
+    "@odata.context": "/redfish/v1/$metadata#StorageController.StorageController",
+    "@odata.id": "/redfish/v1/Systems/437XR1138R2/Storage/1/Controllers/1",
+    "@odata.type": "#StorageController.v1_2_0.StorageController",
+    "Id": "1",
+    "Name": "Local Storage Controller",
+    "Description": "Integrated RAID Controller"
+}

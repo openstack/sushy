@@ -16,6 +16,7 @@ from unittest import mock
 
 import sushy
 from sushy.resources import constants as res_cons
+from sushy.resources.system.storage import controller
 from sushy.resources.system.storage import drive
 from sushy.resources.system.storage import storage
 from sushy.resources.system.storage import volume
@@ -43,6 +44,12 @@ class StorageTestCase(base.TestCase):
         self.conn = mock.Mock()
         with open('sushy/tests/unit/json_samples/storage.json') as f:
             self.json_doc = json.load(f)
+        with open('sushy/tests/unit/json_samples/'
+                  'storage_controller_collection.json') as f:
+            self.json_doc_ctrl_col = json.load(f)
+        with open('sushy/tests/unit/json_samples/'
+                  'storage_controller.json') as f:
+            self.json_doc_ctrl = json.load(f)
 
         self.conn.get.return_value.json.return_value = self.json_doc
 
@@ -135,6 +142,16 @@ class StorageTestCase(base.TestCase):
                          controller.device_protocols)
         self.assertEqual([sushy.RAIDType.RAID0, sushy.RAIDType.RAID1],
                          controller.raid_types)
+
+    def test_controllers(self):
+        self.conn.get.return_value.json.side_effect = [
+            self.json_doc_ctrl_col,
+            self.json_doc_ctrl]
+        controllers = self.storage.controllers
+        self.assertIsInstance(controllers, controller.ControllerCollection)
+        self.assertEqual(1, len(controllers.get_members()))
+        controller1 = controllers.get_members()[0]
+        self.assertEqual('1', controller1.identity)
 
     def test_drives_after_refresh(self):
         self.storage.refresh()
