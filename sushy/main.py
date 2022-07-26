@@ -589,6 +589,7 @@ class Sushy(base.ResourceBase):
 
         registry_col = self._get_registry_collection()
 
+        endpoint_registries = {}
         if registry_col:
             provided = registry_col.get_members()
             for r in provided:
@@ -602,9 +603,16 @@ class Sushy(base.ResourceBase):
                         self._language,
                         self._public_connector)
                 if registry:
-                    registries[r.registry] = registry
-                    if r.identity not in registries:
-                        registries[r.identity] = registry
+                    endpoint_registries[r.registry] = registry
+                    endpoint_registries.setdefault(r.identity, registry)
+
+        if endpoint_registries:
+            LOG.debug('Found registries for %(id)s: %(reg)s',
+                      {'id': self.identity,
+                       'reg': ', '.join(endpoint_registries)})
+            registries.update(endpoint_registries)
+        else:
+            LOG.debug('No registries are available for %s', self.identity)
 
         return registries
 

@@ -578,6 +578,43 @@ class ResourceBase(object, metaclass=abc.ABCMeta):
 
         return val
 
+    def _get_registry(self, identity, language='en', description='registry'):
+        """Get a registry with the given identity.
+
+        :param identity: The registry identity.
+        :param language: RFC 5646 language code for Message Registries.
+            Indicates language of registry to be used. Defaults to 'en'.
+        :param description: Human-readable description to use in logging.
+        :returns: the corresponding registry object or None.
+        """
+        registries = self._registries
+        if not registries:
+            LOG.info('No %s is available', description)
+            return None
+
+        for key, registry in registries.items():
+            if (registry
+                    and self._attribute_registry in (key, registry.identity)):
+                if language != registry.language:
+                    LOG.debug('Found %(descr)s but its language %(reg_lang)s '
+                              'does not match the requested %(lang)s',
+                              {'descr': description,
+                               'lang': language,
+                               'reg_lang': registry.language})
+                    continue
+
+                return registry
+
+        avail = ', '.join(f'{reg.identity} ({reg.language})'
+                          for reg in registries.values())
+        LOG.info('%(descr)s %(registry)s not available for language %(lang)s; '
+                 'available are: %(avail)s',
+                 {'descr': description,
+                  'registry': self._attribute_registry,
+                  'lang': language,
+                  'avail': avail})
+        return None
+
     def _parse_attributes(self, json_doc):
         """Parse the attributes of a resource.
 
