@@ -56,11 +56,11 @@ class BiosTestCase(base.TestCase):
         with open('sushy/tests/unit/json_samples/'
                   'bios_attribute_registry.json') as f:
             conn.get.return_value.json.return_value = json.load(f)
-            bios_reg = attribute_registry.AttributeRegistry(
+            self.bios_reg = attribute_registry.AttributeRegistry(
                 conn, '/redfish/v1/Registries/BiosRegistryTest',
                 redfish_version='1.0.2')
 
-            registries['BiosRegistry.1.0'] = bios_reg
+            registries['BiosRegistry.1.0'] = self.bios_reg
 
         self.sys_bios = bios.Bios(
             self.conn, '/redfish/v1/Systems/437XR1138R2/BIOS',
@@ -382,6 +382,14 @@ class BiosTestCase(base.TestCase):
                            'ValueName': 'Enabled'},
                           {'ValueDisplayName': 'Disabled',
                            'ValueName': 'Disabled'}])
+
+    def test_get_attribute_registry_by_key(self):
+        # This is seen on some SuperMicro hardware
+        self.sys_bios._registries[self.bios_reg.identity] = self.bios_reg
+        self.bios_reg.identity = 'I.dont.match'
+        registry = self.sys_bios.get_attribute_registry()
+        self.assertIsNotNone(registry)
+        self.assertEqual(registry.name, 'BIOS Attribute Registry')
 
     def test_get_attribute_registry_no_lang(self):
 
