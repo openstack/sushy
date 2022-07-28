@@ -262,7 +262,8 @@ class Bios(base.ResourceBase):
         for key, registry in registries.items():
             # Check that BIOS attribute_registry matches the identity
             # of a registry, and this is the requested language
-            if registry and self._attribute_registry == registry.identity:
+            if (registry
+                    and self._attribute_registry in (key, registry.identity)):
                 if language != registry.language:
                     LOG.debug('Found BIOS attribute registry but '
                               'language %(lang)s does not match '
