@@ -1,0 +1,16 @@
+---
+fixes:
+  - |
+    Fixes unreliable behavior with ETag interactions with some BMCs as
+    opportunistic use of compressed responses may cause the BMC to change
+    an ETag response to "Weak", which is to be expected as an ETag represents
+    an absolute byte-by-byte response consistency, and compression cannot
+    reliably honor that contract. Introduction of a client perceiving a
+    "Weak" ETag may not be expected by the server, and the server may reject
+    responses because the ETag is not a "Strong" ETag when we respond or
+    interact with a resource.
+
+    As a result, requests no longer offer oppurtunistic compression
+    of responses as an acceptable possibility, which overall has minimal
+    impact, espescially when compared to the value of consistent BMC
+    behavior and interaction.
