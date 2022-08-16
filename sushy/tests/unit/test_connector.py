@@ -558,3 +558,22 @@ class ConnectorOpTestCase(base.TestCase):
                     'returned code HTTPStatus.FORBIDDEN. unknown error '
                     'Extended information: none'}
         )
+
+    def test__op_raises_connection_error(self):
+
+        exception_list = [
+            requests.exceptions.ChunkedEncodingError,
+            requests.exceptions.ContentDecodingError,
+            requests.exceptions.ReadTimeout,
+            requests.exceptions.ConnectTimeout,
+            requests.exceptions.SSLError,
+            requests.exceptions.ConnectionError,
+            requests.exceptions.RequestException,
+        ]
+        for exc in exception_list:
+            self.request.side_effect = exc
+            self.assertRaises(exceptions.ConnectionError,
+                              self.conn._op,
+                              'POST',
+                              'http://foo.bar',
+                              blocking=True)
