@@ -125,7 +125,14 @@ class Connector(object):
             response = self._session.request(method, url, json=data,
                                              headers=headers,
                                              **extra_session_req_kwargs)
-        except requests.ConnectionError as e:
+        except requests.exceptions.RequestException as e:
+            # Capture any general exception by looking for the parent
+            # class of exceptions in the requests library.
+            # Specifically this will cover cases such as transport
+            # failures, connection timeouts, and encoding errors.
+            # Raising this as sushy ConnectionError allows users to
+            # understand something bad has happened, and to
+            # allow them to respond accordingly.
             raise exceptions.ConnectionError(url=url, error=e)
 
         if self._response_callback:
