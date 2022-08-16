@@ -1,0 +1,8 @@
+---
+fixes:
+  - |
+    Fixes potential cases where exceptions from the underlying ``requests``
+    library may be raised up through ``sushy``, resulting in client
+    applications possibly not understanding that an error has occurred.
+    The sushy ``ConnectionError`` exception is now returned upon any exception
+    falling under ``RequestException`` from the ``requests`` library.
