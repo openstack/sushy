@@ -19,6 +19,7 @@ import logging
 import threading
 
 from sushy import exceptions
+from sushy.resources import constants as res_cons
 
 LOG = logging.getLogger(__name__)
 
@@ -352,3 +353,45 @@ def sanitize(item):
                 for key, value in item.items()}
     else:
         return item
+
+
+def process_apply_time_input(
+        payload, apply_time, maint_window_start_time, maint_window_duration):
+    """Validates apply time input for asynchronous operations
+
+    :param payload: Payload for which to process apply time settings
+    :param apply_time: When to update the attribute. Optional.
+            An :py:class:`sushy.ApplyTime` value.
+    :param maint_window_start_time: The start time of a maintenance window,
+        datetime. Required when updating during maintenance window and
+        default maintenance window not set by the system.
+    :param maint_window_duration: Duration of maintenance time since
+        maintenance window start time in seconds. Required when updating
+        during maintenance window and default maintenance window not
+        set by the system.
+
+    :raises ValueError: When input apply time settings incorrect
+    :returns: Payload with adjusted apply time settings if valid
+    """
+
+    if (not apply_time
+            and (maint_window_start_time or maint_window_duration)):
+        raise ValueError('"apply_time" missing when passing maintenance '
+                         'window settings')
+    if apply_time:
+        prop = '@Redfish.SettingsApplyTime'
+        payload[prop] = {
+            '@odata.type': '#Settings.v1_0_0.PreferredApplyTime',
+            'ApplyTime': res_cons.ApplyTime(apply_time).value,
+        }
+        if maint_window_start_time and not maint_window_duration:
+            raise ValueError('"maint_window_duration" missing')
+        if not maint_window_start_time and maint_window_duration:
+            raise ValueError('"maint_window_start_time" missing')
+        if maint_window_start_time and maint_window_duration:
+            payload[prop]['MaintenanceWindowStartTime'] =\
+                maint_window_start_time.isoformat()
+            payload[prop]['MaintenanceWindowDurationInSeconds'] =\
+                maint_window_duration
+
+    return payload

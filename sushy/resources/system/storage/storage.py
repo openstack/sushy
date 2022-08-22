@@ -19,6 +19,7 @@ from sushy.resources import base
 from sushy.resources import common
 from sushy.resources import constants as res_cons
 from sushy.resources.system.storage import constants
+from sushy.resources.system.storage import controller
 from sushy.resources.system.storage import drive
 from sushy.resources.system.storage import volume
 from sushy import utils
@@ -134,7 +135,25 @@ class Storage(base.ResourceBase):
 
     storage_controllers = StorageControllersListField('StorageControllers',
                                                       default=[])
-    """The storage devices associated with this resource."""
+    """The storage devices associated with this resource.
+
+    Deprecated since Redfish v1.13 to allow storage controllers be their own
+    resource. Use `controllers` where available.
+    """
+
+    @property
+    @utils.cache_it
+    def controllers(self):
+        """The storage controllers allocated to this storage subsystem.
+
+        Replaces `storage_controllers` since Redfish v1.9 to allow storage
+        controllers be their own resource.
+        """
+        return controller.ControllerCollection(
+            self._conn,
+            utils.get_sub_resource_path_by(self, "Controllers"),
+            redfish_version=self.redfish_version,
+            registries=self.registries, root=self.root)
 
 
 class StorageCollection(base.ResourceCollectionBase):

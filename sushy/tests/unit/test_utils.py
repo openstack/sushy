@@ -13,10 +13,11 @@
 #    License for the specific language governing permissions and limitations
 #    under the License.
 
+import datetime
 import json
 from unittest import mock
 
-
+import sushy
 from sushy import exceptions
 from sushy.resources import base as resource_base
 from sushy.resources.system import system
@@ -244,3 +245,47 @@ class CacheTestCase(base.TestCase):
         expected = {'UserName': 'admin', 'Password': '***',
                     'nested': {'answer': 42, 'password': '***'}}
         self.assertEqual(expected, utils.sanitize(orig))
+
+
+class ProcessApplyTimeTestCase(base.TestCase):
+
+    def test_process_apply_time_input(self):
+        payload = utils.process_apply_time_input(
+            {'test': 'value'},
+            sushy.ApplyTime.ON_RESET, None, None)
+        self.assertEqual(
+            {'@Redfish.SettingsApplyTime': {
+                '@odata.type': '#Settings.v1_0_0.PreferredApplyTime',
+                'ApplyTime': 'OnReset'},
+                'test': 'value'}, payload)
+
+    def test_process_apply_time_input_maintenance_window(self):
+        payload = utils.process_apply_time_input(
+            {'test': 'value'},
+            sushy.ApplyTime.AT_MAINTENANCE_WINDOW_START,
+            datetime.datetime(2020, 9, 1, 4, 30, 0),
+            600)
+        self.assertEqual(
+            {'@Redfish.SettingsApplyTime': {
+                '@odata.type': '#Settings.v1_0_0.PreferredApplyTime',
+                'ApplyTime': 'AtMaintenanceWindowStart',
+                'MaintenanceWindowDurationInSeconds': 600,
+                'MaintenanceWindowStartTime': '2020-09-01T04:30:00'},
+             'test': 'value'}, payload)
+
+    def test_process_apply_time_missing(self):
+        self.assertRaises(
+            ValueError, utils.process_apply_time_input,
+            {'test': 'value'}, None, datetime.datetime(2020, 9, 1, 4, 30, 0),
+            600)
+
+    def test_process_apply_time_maint_window_start_time_missing(self):
+        self.assertRaises(
+            ValueError, utils.process_apply_time_input, {'test': 'value'},
+            sushy.ApplyTime.AT_MAINTENANCE_WINDOW_START, None, 600)
+
+    def test_process_apply_time_maint_window_duration_missing(self):
+        self.assertRaises(
+            ValueError, utils.process_apply_time_input, {'test': 'value'},
+            sushy.ApplyTime.AT_MAINTENANCE_WINDOW_START,
+            datetime.datetime.now(), None)

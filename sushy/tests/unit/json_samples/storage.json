@@ -1,5 +1,5 @@
 {
-    "@odata.type": "#Storage.v1_4_0.Storage",
+    "@odata.type": "#Storage.v1_10_1.Storage",
     "Id": "1",
     "Name": "Local Storage Controller",
     "Description": "Integrated RAID Controller",
@@ -8,6 +8,9 @@
         "State": "Enabled",
         "Health": "OK",
         "HealthRollup": "OK"
+    },
+    "Controllers": {
+        "@odata.id": "/redfish/v1/Systems/437XR1138R2/Storage/1/Controllers"
     },
     "StorageControllers": [
         {
