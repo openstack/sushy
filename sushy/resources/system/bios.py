@@ -235,24 +235,6 @@ class Bios(base.ResourceBase):
             Indicates language of registry to be used. Defaults to 'en'.
         :returns: the BIOS Attribute Registry
         """
-        registries = self._registries
-        for key, registry in registries.items():
-            # Check that BIOS attribute_registry matches the identity
-            # of a registry, and this is the requested language
-            if (registry
-                    and self._attribute_registry in (key, registry.identity)):
-                if language != registry.language:
-                    LOG.debug('Found BIOS attribute registry but '
-                              'language %(lang)s does not match '
-                              '%(reg_lang)s',
-                              {'lang': language,
-                               'reg_lang': registry.language})
-                    continue
-
-                return registry
-
-        LOG.info('BIOS attribute registry %(registry)s '
-                 'not available for language %(lang)s',
-                 {'registry': self._attribute_registry,
-                  'lang': language})
-        return None
+        return self._get_registry(self._attribute_registry,
+                                  language=language,
+                                  description='BIOS attribute registry')
