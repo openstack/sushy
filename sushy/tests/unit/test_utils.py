@@ -43,7 +43,7 @@ class UtilsTestCase(base.TestCase):
 
     def test_int_or_none(self):
         self.assertEqual(1, utils.int_or_none('1'))
-        self.assertIsNone(None, utils.int_or_none(None))
+        self.assertIsNone(utils.int_or_none(None))
 
     def test_bool_or_none_none(self):
         self.assertIsNone(utils.bool_or_none(None))
