@@ -1,0 +1,10 @@
+---
+fixes:
+  - |
+    Alters eTag handling in PATCH requests: First, the original eTag is used.
+    In case of a failure, if the eTag provided was weak, it is converted to
+    a strong format by removing the weak prefix. If this approach is not
+    applicable or fails, the final attempt is made omitting the eTag entirely.
+    By taking this approach, no workarounds are applied if BMC is handling
+    eTags as expected and in case of failures, known workarounds are
+    attempted, improving overall resiliency.
