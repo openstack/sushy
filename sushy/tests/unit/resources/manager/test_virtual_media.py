@@ -154,7 +154,7 @@ class VirtualMediaTestCase(base.TestCase):
             ("/redfish/v1/Managers/BMC/VirtualMedia/Floppy1"),
             data={"Image": "https://www.dmtf.org/freeImages/Sardine.img",
                   "Inserted": True, "WriteProtected": False},
-            headers={"If-Match": 'W/"3d7b8a7360bf2941d","3d7b8a7360bf2941d"'})
+            headers={"If-Match": 'W/"3d7b8a7360bf2941d"'})
         self.assertTrue(self.sys_virtual_media._is_stale)
 
     @mock.patch.object(requests, 'post', autospec=True)
@@ -218,7 +218,7 @@ class VirtualMediaTestCase(base.TestCase):
         self.sys_virtual_media._conn.patch.assert_called_once_with(
             ("/redfish/v1/Managers/BMC/VirtualMedia/Floppy1"),
             data={"Image": None, "Inserted": False},
-            headers={"If-Match": 'W/"3d7b8a7360bf2941d","3d7b8a7360bf2941d"'})
+            headers={"If-Match": 'W/"3d7b8a7360bf2941d"'})
         self.assertTrue(self.sys_virtual_media._is_stale)
 
     def test_eject_media_pass_empty_dict_415(self):
