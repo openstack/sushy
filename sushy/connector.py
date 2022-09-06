@@ -13,7 +13,9 @@
 #    License for the specific language governing permissions and limitations
 #    under the License.
 
+from http import client as http_client
 import logging
+import re
 import time
 from urllib import parse as urlparse
 
@@ -268,13 +270,14 @@ class Connector(object):
                         blocking=blocking, timeout=timeout,
                         **extra_session_req_kwargs)
 
-    def patch(self, path='', data=None, headers=None, blocking=False,
-              timeout=60, **extra_session_req_kwargs):
-        """HTTP PATCH method.
+    def _etag_handler(self, path='', data=None, headers=None, etag=None,
+                      blocking=False, timeout=60, **extra_session_req_kwargs):
+        """eTag handler containing workarounds for PATCH requests with eTags.
 
         :param path: Optional sub-URI path to the resource.
         :param data: Optional JSON data.
         :param headers: Optional dictionary of headers.
+        :param etag: eTag string.
         :param blocking: Whether to block for asynchronous operations.
         :param timeout: Max time in seconds to wait for blocking async call.
         :param extra_session_req_kwargs: Optional keyword argument to pass
@@ -284,9 +287,89 @@ class Connector(object):
         :raises: ConnectionError
         :raises: HTTPError
         """
-        return self._op('PATCH', path, data=data, headers=headers,
-                        blocking=blocking, timeout=timeout,
-                        **extra_session_req_kwargs)
+        if etag is not None:
+            if not headers:
+                headers = {}
+            headers['If-Match'] = etag
+        try:
+            response = self._op('PATCH', path, data=data,
+                                headers=headers,
+                                blocking=blocking, timeout=timeout,
+                                **extra_session_req_kwargs)
+        except exceptions.HTTPError as resp:
+            LOG.warning("Initial request with eTag failed: %s",
+                        resp)
+            if resp.status_code == http_client.PRECONDITION_FAILED:
+                # NOTE(janders) if there was no eTag provided AND the response
+                # is HTTP 412 Precondition Failed, raise the exception
+                if not etag:
+                    raise
+                # checking for weak eTag
+                pattern = re.compile(r'^(W\/)("\w*")$')
+                match = pattern.match(etag)
+                if match:
+                    LOG.info("Weak eTag provided with original request to "
+                             "%s. Attempting to conversion to strong eTag "
+                             "and re-trying.", path)
+                    # trying weak eTag converted to strong
+                    headers['If-Match'] = match.group(2)
+                    try:
+                        response = self._op('PATCH', path, data=data,
+                                            headers=headers,
+                                            blocking=blocking,
+                                            timeout=timeout,
+                                            **extra_session_req_kwargs)
+                    except exceptions.HTTPError as resp:
+                        if (resp.status_code == http_client.
+                           PRECONDITION_FAILED):
+                            LOG.warning("Request to %s with weak eTag "
+                                        "converted to strong eTag also "
+                                        "failed. Making the final attempt "
+                                        "with no eTag specified.", path)
+                        response = None
+                    if response:
+                        return response
+                else:
+                    # eTag is strong, if it failed the only other thing
+                    # to try is removing it entirely
+                    # info
+                    LOG.warning("Strong eTag provided - retrying request to "
+                                "%s with eTag removed.", path)
+                del headers['If-Match']
+                try:
+                    response = self._op('PATCH', path, data=data,
+                                        headers=headers,
+                                        blocking=blocking, timeout=timeout,
+                                        **extra_session_req_kwargs)
+                except exceptions.HTTPError as resp:
+                    LOG.error("Final re-try with eTag removed has failed, "
+                              "raising exception %s", resp)
+                    raise
+            else:
+                raise
+        return response
+
+    def patch(self, path='', data=None, headers=None, etag=None,
+              blocking=False, timeout=60, **extra_session_req_kwargs):
+        """HTTP PATCH method.
+
+        :param path: Optional sub-URI path to the resource.
+        :param data: Optional JSON data.
+        :param headers: Optional dictionary of headers.
+        :param etag: Optional eTag string.
+        :param blocking: Whether to block for asynchronous operations.
+        :param timeout: Max time in seconds to wait for blocking async call.
+        :param extra_session_req_kwargs: Optional keyword argument to pass
+         requests library arguments which would pass on to requests session
+         object.
+        :returns: The response object from the requests library.
+        :raises: ConnectionError
+        :raises: HTTPError
+        """
+        return self._etag_handler(path, data,
+                                  headers, etag,
+                                  blocking, timeout,
+                                  **extra_session_req_kwargs)
 
     def put(self, path='', data=None, headers=None, blocking=False,
             timeout=60, **extra_session_req_kwargs):

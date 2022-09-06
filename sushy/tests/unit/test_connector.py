@@ -577,3 +577,175 @@ class ConnectorOpTestCase(base.TestCase):
                               'POST',
                               'http://foo.bar',
                               blocking=True)
+
+    @mock.patch.object(connector.Connector, '_op', autospec=True)
+    def test_etag_handler_strong_etag_ok(self, mock__op):
+        self.headers['If-Match'] = '"3d7b8a7360bf2941d"'
+        response = mock.MagicMock(spec=requests.Response)
+        response.status_code = http_client.OK
+        data = {'Boot': {'BootSourceOverrideTarget': 'Cd',
+                         'BootSourceOverrideEnabled': 'Once'}}
+        mock__op.return_value = response
+        self.conn._etag_handler(path='/redfish/v1/Systems/1',
+                                headers=self.headers, data=data,
+                                etag=self.headers['If-Match'],
+                                blocking=False, timeout=60)
+        mock__op.assert_called_once_with(
+            self.conn,
+            "PATCH",
+            '/redfish/v1/Systems/1',
+            data={'Boot': {'BootSourceOverrideTarget': 'Cd',
+                           'BootSourceOverrideEnabled': 'Once'}},
+            headers={'X-Fake': 'header',
+                     'If-Match': '"3d7b8a7360bf2941d"'},
+            blocking=False,
+            timeout=60)
+
+    @mock.patch.object(connector.Connector, '_op', autospec=True)
+    def test_etag_handler_weak_etag_ok(self, mock__op):
+        self.headers['If-Match'] = 'W/"3d7b8a7360bf2941d"'
+        response = mock.MagicMock(spec=requests.Response)
+        response.status_code = http_client.OK
+        data = {'Boot': {'BootSourceOverrideTarget': 'Cd',
+                         'BootSourceOverrideEnabled': 'Once'}}
+        mock__op.return_value = response
+        self.conn._etag_handler(path='/redfish/v1/Systems/1',
+                                headers=self.headers, data=data,
+                                etag=self.headers['If-Match'],
+                                blocking=False, timeout=60)
+        mock__op.assert_called_once_with(
+            self.conn,
+            "PATCH",
+            '/redfish/v1/Systems/1',
+            data={'Boot': {'BootSourceOverrideTarget': 'Cd',
+                           'BootSourceOverrideEnabled': 'Once'}},
+            headers={'X-Fake': 'header',
+                     'If-Match': 'W/"3d7b8a7360bf2941d"'},
+            blocking=False,
+            timeout=60)
+
+    @mock.patch.object(connector.Connector, '_op', autospec=True)
+    def test_etag_handler_no_etag_ok(self, mock__op):
+        response = mock.MagicMock(spec=requests.Response)
+        response.status_code = http_client.OK
+        data = {'Boot': {'BootSourceOverrideTarget': 'Cd',
+                         'BootSourceOverrideEnabled': 'Once'}}
+        mock__op.return_value = response
+        self.conn._etag_handler(path='/redfish/v1/Systems/1',
+                                headers=self.headers, data=data,
+                                blocking=False, timeout=60)
+        mock__op.assert_called_once_with(
+            self.conn,
+            "PATCH",
+            '/redfish/v1/Systems/1',
+            data={'Boot': {'BootSourceOverrideTarget': 'Cd',
+                           'BootSourceOverrideEnabled': 'Once'}},
+            headers={'X-Fake': 'header'},
+            blocking=False,
+            timeout=60)
+
+    @mock.patch.object(connector.Connector, '_op', autospec=True)
+    def test_etag_handler_weak_etag_fallback_to_strong(self, mock__op):
+        self.headers['If-Match'] = 'W/"3d7b8a7360bf2941d"'
+        target_uri = '/redfish/v1/Systems/1'
+        response_412 = mock.MagicMock(spec=requests.Response)
+        response_412.status_code = http_client.PRECONDITION_FAILED
+        response_200 = mock.MagicMock(spec=requests.Response)
+        response_200.status_code = http_client.OK
+        mock__op.side_effect = [
+            exceptions.HTTPError(method='PATCH', url=target_uri,
+                                 response=response_412),
+            response_200]
+
+        data = {'Boot': {'BootSourceOverrideTarget': 'Cd',
+                         'BootSourceOverrideEnabled': 'Once'}}
+        self.conn._etag_handler(path=target_uri, headers=self.headers,
+                                data=data, etag=self.headers['If-Match'],
+                                blocking=False, timeout=60)
+        mock__op.assert_called_with(
+            self.conn,
+            "PATCH",
+            '/redfish/v1/Systems/1',
+            data={'Boot': {'BootSourceOverrideTarget': 'Cd',
+                           'BootSourceOverrideEnabled': 'Once'}},
+            headers={'X-Fake': 'header',
+                     'If-Match': '"3d7b8a7360bf2941d"'},
+            blocking=False,
+            timeout=60)
+
+    @mock.patch.object(connector.Connector, '_op', autospec=True)
+    def test_etag_handler_weak_etag_fallback_to_no_etag(self, mock__op):
+        self.headers['If-Match'] = 'W/"3d7b8a7360bf2941d"'
+        target_uri = '/redfish/v1/Systems/1'
+        response_412 = mock.MagicMock(spec=requests.Response)
+        response_412.status_code = http_client.PRECONDITION_FAILED
+        response_200 = mock.MagicMock(spec=requests.Response)
+        response_200.status_code = http_client.OK
+        mock__op.side_effect = [
+            exceptions.HTTPError(method='PATCH', url=target_uri,
+                                 response=response_412),
+            exceptions.HTTPError(method='PATCH', url=target_uri,
+                                 response=response_412),
+            response_200]
+
+        data = {'Boot': {'BootSourceOverrideTarget': 'Cd',
+                         'BootSourceOverrideEnabled': 'Once'}}
+        self.conn._etag_handler(path=target_uri, headers=self.headers,
+                                data=data, etag=self.headers['If-Match'],
+                                blocking=False, timeout=60)
+        mock__op.assert_called_with(
+            self.conn,
+            "PATCH",
+            '/redfish/v1/Systems/1',
+            data={'Boot': {'BootSourceOverrideTarget': 'Cd',
+                           'BootSourceOverrideEnabled': 'Once'}},
+            headers={'X-Fake': 'header'},
+            blocking=False,
+            timeout=60)
+
+    @mock.patch.object(connector.Connector, '_op', autospec=True)
+    def test_etag_handler_strong_etag_fallback_to_no_etag(self, mock__op):
+        self.headers['If-Match'] = '"3d7b8a7360bf2941d"'
+        target_uri = '/redfish/v1/Systems/1'
+        response_412 = mock.MagicMock(spec=requests.Response)
+        response_412.status_code = http_client.PRECONDITION_FAILED
+        response_200 = mock.MagicMock(spec=requests.Response)
+        response_200.status_code = http_client.OK
+        mock__op.side_effect = [
+            exceptions.HTTPError(method='PATCH', url=target_uri,
+                                 response=response_412),
+            response_200]
+
+        data = {'Boot': {'BootSourceOverrideTarget': 'Cd',
+                         'BootSourceOverrideEnabled': 'Once'}}
+        self.conn._etag_handler(path=target_uri, headers=self.headers,
+                                data=data, etag=self.headers['If-Match'],
+                                blocking=False, timeout=60)
+        mock__op.assert_called_with(
+            self.conn,
+            "PATCH",
+            '/redfish/v1/Systems/1',
+            data={'Boot': {'BootSourceOverrideTarget': 'Cd',
+                           'BootSourceOverrideEnabled': 'Once'}},
+            headers={'X-Fake': 'header'},
+            blocking=False,
+            timeout=60)
+
+    @mock.patch.object(connector.Connector, '_op', autospec=True)
+    def test_etag_handler_fail_other_exception(self, mock__op):
+        self.headers['If-Match'] = 'W/"3d7b8a7360bf2941d"'
+        target_uri = '/redfish/v1/Systems/1'
+        data = {'Boot': {'BootSourceOverrideTarget': 'Cd',
+                         'BootSourceOverrideEnabled': 'Once'}}
+        response = mock.MagicMock(spec=requests.Response)
+        response.status_code = http_client.FORBIDDEN
+        response.message = "boom"
+        mock__op.return_value = response
+        mock__op.side_effect = \
+            exceptions.HTTPError(method='PATCH',
+                                 url=target_uri,
+                                 response=response)
+        self.assertRaises(exceptions.HTTPError, self.conn._etag_handler,
+                          'PATCH', target_uri, data,
+                          self.headers,
+                          blocking=False, timeout=60)

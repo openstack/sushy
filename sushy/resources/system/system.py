@@ -284,7 +284,6 @@ class System(base.ResourceBase):
 
             data['Boot']['BootSourceOverrideMode'] = fishy_mode
 
-        headers = None
         etag = self._get_etag()
         path = self.path
 
@@ -298,9 +297,7 @@ class System(base.ResourceBase):
 
         # TODO(lucasagomes): Check the return code and response body ?
         #                    Probably we should call refresh() as well.
-        if etag is not None:
-            headers = {'If-Match': etag}
-        self._conn.patch(path, data=data, headers=headers)
+        self._conn.patch(path, data=data, etag=etag)
 
     # TODO(etingof): we should remove this method, eventually
     def set_system_boot_source(

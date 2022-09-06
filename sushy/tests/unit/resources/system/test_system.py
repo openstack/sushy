@@ -279,7 +279,7 @@ class SystemTestCase(base.TestCase):
             data={'Boot': {'BootSourceOverrideEnabled': 'Continuous',
                            'BootSourceOverrideTarget': 'Pxe',
                            'BootSourceOverrideMode': 'UEFI'}},
-            headers=None)
+            etag=None)
 
     def test_set_system_boot_options_no_mode_specified(self):
         self.sys_inst.set_system_boot_options(
@@ -289,7 +289,7 @@ class SystemTestCase(base.TestCase):
             '/redfish/v1/Systems/437XR1138R2',
             data={'Boot': {'BootSourceOverrideEnabled': 'Once',
                            'BootSourceOverrideTarget': 'Hdd'}},
-            headers=None)
+            etag=None)
 
     def test_set_system_boot_options_no_target_specified(self):
         self.sys_inst.set_system_boot_options(
@@ -299,7 +299,7 @@ class SystemTestCase(base.TestCase):
             '/redfish/v1/Systems/437XR1138R2',
             data={'Boot': {'BootSourceOverrideEnabled': 'Continuous',
                            'BootSourceOverrideMode': 'UEFI'}},
-            headers=None)
+            etag=None)
 
     def test_set_system_boot_options_no_freq_specified(self):
         self.sys_inst.set_system_boot_options(
@@ -309,13 +309,13 @@ class SystemTestCase(base.TestCase):
             '/redfish/v1/Systems/437XR1138R2',
             data={'Boot': {'BootSourceOverrideTarget': 'Pxe',
                            'BootSourceOverrideMode': 'UEFI'}},
-            headers=None)
+            etag=None)
 
     def test_set_system_boot_options_nothing_specified(self):
         self.sys_inst.set_system_boot_options()
         self.sys_inst._conn.patch.assert_called_once_with(
             '/redfish/v1/Systems/437XR1138R2', data={},
-            headers=None)
+            etag=None)
 
     def test_set_system_boot_options_invalid_target(self):
         self.assertRaises(exceptions.InvalidParameterValueError,
@@ -346,7 +346,7 @@ class SystemTestCase(base.TestCase):
             '/redfish/v1/Systems/437XR1138R2',
             data={'Boot': {'BootSourceOverrideEnabled': 'Once',
                            'BootSourceOverrideTarget': 'UsbCd'}},
-            headers=None)
+            etag=None)
 
     def test_set_system_boot_options_supermicro_no_usb_cd_boot(self):
 
@@ -359,7 +359,7 @@ class SystemTestCase(base.TestCase):
             '/redfish/v1/Systems/437XR1138R2',
             data={'Boot': {'BootSourceOverrideEnabled': 'Once',
                            'BootSourceOverrideTarget': 'Cd'}},
-            headers=None)
+            etag=None)
 
     def test_set_system_boot_options_settings_resource_nokia(self):
         self.conn.get.return_value.headers = {'ETag': '"3d7b838291941d"'}
@@ -377,7 +377,7 @@ class SystemTestCase(base.TestCase):
             '/redfish/v1/Systems/Self/SD',
             data={'Boot': {'BootSourceOverrideEnabled': 'Once',
                            'BootSourceOverrideTarget': 'Cd'}},
-            headers={'If-Match': '"3d7b838291941d"'})
+            etag='"3d7b838291941d"')
 
     def test_set_system_boot_options_settings_resource(self):
         self.conn.get.return_value.headers = {'ETag': '"3d7b838291941d"'}
@@ -395,7 +395,7 @@ class SystemTestCase(base.TestCase):
             '/redfish/v1/Systems/437XR1138R2/BIOS/Settings',
             data={'Boot': {'BootSourceOverrideEnabled': 'Once',
                            'BootSourceOverrideTarget': 'Cd'}},
-            headers={'If-Match': '"3d7b838291941d"'})
+            etag='"3d7b838291941d"')
 
     def test_set_system_boot_source(self):
         self.sys_inst.set_system_boot_source(
@@ -407,7 +407,7 @@ class SystemTestCase(base.TestCase):
             data={'Boot': {'BootSourceOverrideEnabled': 'Continuous',
                            'BootSourceOverrideTarget': 'Pxe',
                            'BootSourceOverrideMode': 'UEFI'}},
-            headers=None)
+            etag=None)
 
     def test_set_system_boot_source_with_etag(self):
         self.conn.get.return_value.headers = {'ETag': '"3d7b838291941d"'}
@@ -420,7 +420,7 @@ class SystemTestCase(base.TestCase):
             data={'Boot': {'BootSourceOverrideEnabled': 'Continuous',
                            'BootSourceOverrideTarget': 'Pxe',
                            'BootSourceOverrideMode': 'UEFI'}},
-            headers={'If-Match': '"3d7b838291941d"'})
+            etag='"3d7b838291941d"')
 
     def test_set_system_boot_source_no_mode_specified(self):
         self.sys_inst.set_system_boot_source(
@@ -430,7 +430,7 @@ class SystemTestCase(base.TestCase):
             '/redfish/v1/Systems/437XR1138R2',
             data={'Boot': {'BootSourceOverrideEnabled': 'Once',
                            'BootSourceOverrideTarget': 'Hdd'}},
-            headers=None)
+            etag=None)
 
     def test_set_system_boot_source_invalid_target(self):
         self.assertRaises(exceptions.InvalidParameterValueError,
