@@ -1,0 +1,17 @@
+{
+  "Description": "ComputerSystem 1 Pending Setting",
+  "Id": "Pending",
+  "@odata.type": "#ComputerSystem.v1_11_0.ComputerSystem",
+  "Boot": {
+    "BootOrder": [
+      "Boot0000",
+      "Boot0001",
+      "Boot0002",
+      "Boot0003",
+      "Boot0004"
+    ]
+  },
+  "Name": "Pending",
+  "@odata.etag": "\"21a8f5383ebb2a1fb41\"",
+  "@odata.id": "/redfish/v1/Systems/1/Pending"
+}
