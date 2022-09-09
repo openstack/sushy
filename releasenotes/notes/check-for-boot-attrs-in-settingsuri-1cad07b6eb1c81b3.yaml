@@ -1,0 +1,14 @@
+---
+fixes:
+  - |
+    Adds an extra check for cases where the BMC provides a SettingsObject
+    URI through @Redfish.Settings but this URI does not allow setting boot
+    related attributes. Prior to sending a PATCH request to SettingsURI, a
+    GET request is issued to verify if it contains the attributes to be
+    updated. In case these attributes are missing, the request is made against
+    System URI instead.
+    Issues such as the one addressed with this change usually manifest
+    themselves with a Redfish response containing an error message similar to
+    the following: ``MessageId: Base.1.8.PropertyNotWritable, Message: The
+    property BootSourceOverrideEnabled is a read only property and cannot be
+    assigned a value.``
