@@ -1,0 +1,13 @@
+{
+  "@Redfish.Settings": {
+    "Time": null,
+    "SupportedApplyTimes": [
+      "OnReset"
+    ],
+    "Messages": [],
+    "@odata.type": "#Settings.v1_3_0.Settings",
+    "SettingsObject": {
+      "@odata.id": "/redfish/v1/Systems/1/Pending"
+    }
+  }
+}
