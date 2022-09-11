@@ -41,7 +41,7 @@ class CompositionServiceTestCase(base.TestCase):
         self.comp_ser._parse_attributes(self.json_doc)
         self.assertFalse(self.comp_ser.allow_overprovisioning)
         self.assertTrue(self.comp_ser.allow_zone_affinity)
-        self.assertTrue(self.comp_ser.description, 'CompositionService1')
+        self.assertEqual('CompositionService1', self.comp_ser.description)
         self.assertEqual(
             'CompositionService',
             self.comp_ser.identity)
