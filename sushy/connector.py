@@ -28,7 +28,7 @@ from sushy import utils
 LOG = logging.getLogger(__name__)
 
 
-_SERVER_SIDE_RETRIES = 5
+_SERVER_SIDE_RETRIES = 10
 _SERVER_SIDE_RETRY_DELAY = 3
 
 

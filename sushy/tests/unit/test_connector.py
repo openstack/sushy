@@ -401,8 +401,8 @@ class ConnectorOpTestCase(base.TestCase):
             self.conn._op('GET', 'http://foo.bar')
         exc = cm.exception
         self.assertEqual(http_client.INTERNAL_SERVER_ERROR, exc.status_code)
-        self.assertEqual(5, mock_sleep.call_count)
-        self.assertEqual(6, self.request.call_count)
+        self.assertEqual(10, mock_sleep.call_count)
+        self.assertEqual(11, self.request.call_count)
 
     def test_access_error(self):
         self.conn._auth = None

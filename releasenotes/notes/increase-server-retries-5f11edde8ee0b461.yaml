@@ -1,0 +1,6 @@
+fixes:
+  - |
+    To avoid timeouts with recent versions of firmwares we need to increase
+    the number of server side retries.
+    For example, in idrac firmware series 5.x the time gap between operations
+    is almost 20 seconds instead of the 10 seconds in the 4.x series.
