@@ -28,21 +28,20 @@ from sushy import utils
 LOG = logging.getLogger(__name__)
 
 
-_SERVER_SIDE_RETRIES = 10
-_SERVER_SIDE_RETRY_DELAY = 3
-
-
 class Connector(object):
 
     def __init__(
             self, url, username=None, password=None, verify=True,
-            response_callback=None):
+            response_callback=None, server_side_retries=0,
+            server_side_retries_delay=0):
         self._url = url
         self._verify = verify
         self._session = requests.Session()
         self._session.verify = self._verify
         self._response_callback = response_callback
         self._auth = None
+        self._server_side_retries = server_side_retries
+        self._server_side_retries_delay = server_side_retries_delay
 
         # NOTE(TheJulia): In order to help prevent recursive post operations
         # by allowing us to understand that we should stop authentication.
@@ -87,8 +86,7 @@ class Connector(object):
         self._session.close()
 
     def _op(self, method, path='', data=None, headers=None, blocking=False,
-            timeout=60, server_side_retries=_SERVER_SIDE_RETRIES,
-            **extra_session_req_kwargs):
+            timeout=60, **extra_session_req_kwargs):
         """Generic RESTful request handler.
 
         :param method: The HTTP method to be used, e.g: GET, POST,
@@ -199,16 +197,16 @@ class Connector(object):
                               "%s", e.message)
                 raise
         except exceptions.ServerSideError as e:
-            if method.lower() != 'get' or server_side_retries <= 0:
+            if method.lower() != 'get' or self._server_side_retries <= 0:
                 raise
             else:
                 LOG.warning('Got server side error %s in response to a '
                             'GET request, retrying after %d seconds',
-                            e, _SERVER_SIDE_RETRY_DELAY)
-                time.sleep(_SERVER_SIDE_RETRY_DELAY)
+                            e, self._server_side_retries)
+                time.sleep(self._server_side_retries_delay)
+                self._server_side_retries -= 1
                 return self._op(method, path, data=data, headers=headers,
                                 blocking=blocking, timeout=timeout,
-                                server_side_retries=server_side_retries - 1,
                                 **extra_session_req_kwargs)
 
         if blocking and response.status_code == 202:

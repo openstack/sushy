@@ -158,7 +158,8 @@ class Sushy(base.ResourceBase):
                  root_prefix='/redfish/v1/', verify=True,
                  auth=None, connector=None,
                  public_connector=None,
-                 language='en'):
+                 language='en', server_side_retries=10,
+                 server_side_retries_delay=3):
         """A class representing a RootService
 
         :param base_url: The base URL to the Redfish controller. It
@@ -181,6 +182,10 @@ class Sushy(base.ResourceBase):
             on the Internet, e.g., for Message Registries. Defaults to None.
         :param language: RFC 5646 language code for Message Registries.
             Defaults to 'en'.
+        :param server_side_retries: Number of times to retry GET requests in
+            case of server side errors. Defaults to 10.
+        :param server_side_retries_delay: Time in seconds between retries of
+            GET requests in case of server side errors. Defaults to 3.
         """
         self._root_prefix = root_prefix
         if (auth is not None and (password is not None
@@ -194,7 +199,10 @@ class Sushy(base.ResourceBase):
         self._auth = auth
 
         super(Sushy, self).__init__(
-            connector or sushy_connector.Connector(base_url, verify=verify),
+            connector or sushy_connector.Connector(
+                base_url, verify=verify,
+                server_side_retries=server_side_retries,
+                server_side_retries_delay=server_side_retries_delay),
             path=self._root_prefix)
         self._public_connector = public_connector or requests
         self._language = language

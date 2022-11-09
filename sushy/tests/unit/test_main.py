@@ -53,7 +53,8 @@ class MainTestCase(base.TestCase):
         self.root = main.Sushy('http://foo.bar:1234',
                                verify=True, auth=mock_auth)
         mock_connector.assert_called_once_with(
-            'http://foo.bar:1234', verify=True)
+            'http://foo.bar:1234', verify=True, server_side_retries=10,
+            server_side_retries_delay=3)
 
     def test__parse_attributes(self):
         self.root._parse_attributes(self.json_doc)

@@ -1,0 +1,9 @@
+---
+features:
+  - |
+    Adds two new configuration options:
+    ``server_side_retries`` allows to set a custom value for the number of
+    times we should retry a GET request in case of a server error,
+    defaults to 10;
+    ``server_side_retries_delay`` allows to customize the time in seconds
+    between the request retries, defaults to 3.

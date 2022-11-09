@@ -164,7 +164,8 @@ class ConnectorOpTestCase(base.TestCase):
         self.auth = mock_auth
         super(ConnectorOpTestCase, self).setUp()
         self.conn = connector.Connector(
-            'http://foo.bar:1234', verify=True)
+            'http://foo.bar:1234', verify=True,
+            server_side_retries=10, server_side_retries_delay=3)
         self.conn._auth = mock_auth
         self.data = {'fake': 'data'}
         self.headers = {'X-Fake': 'header'}
