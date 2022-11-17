@@ -1,0 +1,8 @@
+---
+fixes:
+  - |
+    Add retries on iDRAC error with code SYS518 and message "iDRAC is
+    currently unable to display any information because data sources are
+    unavailable." for all request types in addition to existing GET methods.
+    This helps to fix a known intermittent issue when deleting set of volumes
+    one after another and iDRAC is reloading after deleting each volume.
