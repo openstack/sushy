@@ -1,0 +1,4 @@
+fixes:
+  - |
+    Fixes 'Unsupported parameter name @Redfish.OperationApplyTime' error
+    on iDRAC firmware version 6.00.02.00 or newer when deleting volumes.
