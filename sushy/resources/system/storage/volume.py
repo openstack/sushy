@@ -168,8 +168,22 @@ class Volume(base.ResourceBase):
         if (payload and payload.get(oat_prop) == res_maps.
                 APPLY_TIME_VALUE_MAP_REV[res_cons.APPLY_TIME_IMMEDIATE]):
             blocking = True
-        r = self._conn.delete(self._path, data=payload, blocking=blocking,
-                              timeout=timeout)
+        try:
+            r = self._conn.delete(self._path, data=payload,
+                                  blocking=blocking, timeout=timeout)
+        except exceptions.ServerSideError as exc:
+            if (oat_prop in str(exc.message)
+                    and 'SYS029' in str(exc.message)):
+                LOG.debug('Retry volume delete without %(prop)s for %(path)s '
+                          'because got error: %(err)s',
+                          {'prop': oat_prop,
+                           'path': self._path,
+                           'err': exc})
+                payload.pop(oat_prop)
+                r = self._conn.delete(self._path, data=payload,
+                                      blocking=blocking, timeout=timeout)
+            else:
+                raise exc
         return r
 
     def delete(self, payload=None, apply_time=None, timeout=500):
