@@ -317,9 +317,7 @@ class SystemTestCase(base.TestCase):
 
     def test_set_system_boot_options_nothing_specified(self):
         self.sys_inst.set_system_boot_options()
-        self.sys_inst._conn.patch.assert_called_once_with(
-            '/redfish/v1/Systems/437XR1138R2', data={},
-            etag=None)
+        self.sys_inst._conn.patch.assert_not_called()
 
     def test_set_system_boot_options_invalid_target(self):
         self.assertRaises(exceptions.InvalidParameterValueError,
@@ -366,12 +364,20 @@ class SystemTestCase(base.TestCase):
             etag=None)
 
     def test_set_system_boot_options_settings_resource_nokia(self):
-        self.conn.get.return_value.headers = {'ETag': '"3d7b838291941d"'}
         with open('sushy/tests/unit/json_samples/settings-nokia.json') as f:
             settings_obj = json.load(f)
 
         self.json_doc.update(settings_obj)
         self.sys_inst._parse_attributes(self.json_doc)
+
+        with open('sushy/tests/unit/json_samples/'
+                  'settings-body-nokia.json') as f:
+            settings_body = json.load(f)
+
+        get_settings = mock.MagicMock(headers={'ETag': '"3d7b838291941d"'})
+        get_settings.json.return_value = settings_body
+        get_system = mock.MagicMock(headers={'ETag': '"222"'})
+        self.conn.get.side_effect = [get_settings, get_system]
 
         self.sys_inst.set_system_boot_options(
             target=sushy.BootSource.CD,
@@ -384,12 +390,22 @@ class SystemTestCase(base.TestCase):
             etag='"3d7b838291941d"')
 
     def test_set_system_boot_options_settings_resource(self):
-        self.conn.get.return_value.headers = {'ETag': '"3d7b838291941d"'}
         with open('sushy/tests/unit/json_samples/settings.json') as f:
             settings_obj = json.load(f)
 
         self.json_doc.update(settings_obj)
         self.sys_inst._parse_attributes(self.json_doc)
+
+        with open('sushy/tests/unit/json_samples/'
+                  'settings-body-nokia.json') as f:
+            settings_body = json.load(f)
+
+        get_settings = mock.MagicMock(headers={'ETag': '"3d7b838291941d"'})
+        get_settings.json.return_value = settings_body
+        get_system = mock.MagicMock(headers={'ETag': '"222"'})
+        self.conn.get.side_effect = [get_settings, get_system]
+
+        self.conn.get.return_value.json.return_value = settings_body
 
         self.sys_inst.set_system_boot_options(
             target=sushy.BootSource.CD,
@@ -399,6 +415,66 @@ class SystemTestCase(base.TestCase):
             '/redfish/v1/Systems/437XR1138R2/BIOS/Settings',
             data={'Boot': {'BootSourceOverrideEnabled': 'Once',
                            'BootSourceOverrideTarget': 'Cd'}},
+            etag='"3d7b838291941d"')
+
+    def test_set_system_boot_options_settings_resource_lenovo(self):
+        self.sys_inst = system.System(
+            self.conn, '/redfish/v1/Systems/1',
+            redfish_version='1.0.2')
+
+        with open('sushy/tests/unit/json_samples/'
+                  'settings-lenovo-se450.json') as f:
+            settings_obj = json.load(f)
+
+        self.json_doc.update(settings_obj)
+        self.sys_inst._parse_attributes(self.json_doc)
+
+        with open('sushy/tests/unit/json_samples/'
+                  'settings-body-lenovo-se450.json') as f:
+            settings_body = json.load(f)
+
+        get_settings = mock.MagicMock(headers={'ETag': '"3d7b838291941d"'})
+        get_settings.json.return_value = settings_body
+        get_system = mock.MagicMock(headers={'ETag': '"222"'})
+        self.conn.get.side_effect = [get_settings, get_system]
+
+        self.sys_inst.set_system_boot_options(
+            target=sushy.BootSource.CD,
+            enabled=sushy.BootSourceOverrideEnabled.ONCE)
+
+        self.sys_inst._conn.patch.assert_called_once_with(
+            '/redfish/v1/Systems/1',
+            data={'Boot': {'BootSourceOverrideEnabled': 'Once',
+                           'BootSourceOverrideTarget': 'Cd'}},
+            etag='"222"')
+
+    def test_set_system_boot_options_settings_resource_bootmode_only(self):
+        self.sys_inst = system.System(
+            self.conn, '/redfish/v1/Systems/1',
+            redfish_version='1.0.2')
+
+        with open('sushy/tests/unit/json_samples/'
+                  'settings-nokia.json') as f:
+            settings_obj = json.load(f)
+
+        self.json_doc.update(settings_obj)
+        self.sys_inst._parse_attributes(self.json_doc)
+
+        with open('sushy/tests/unit/json_samples/'
+                  'settings-body-bootsourceoverridemode-only.json') as f:
+            settings_body = json.load(f)
+
+        get_settings = mock.MagicMock(headers={'ETag': '"3d7b838291941d"'})
+        get_settings.json.return_value = settings_body
+        get_system = mock.MagicMock(headers={'ETag': '"222"'})
+        self.conn.get.side_effect = [get_settings, get_system]
+
+        self.sys_inst.set_system_boot_options(
+            mode=sushy.BootSourceOverrideMode.UEFI)
+
+        self.sys_inst._conn.patch.assert_called_with(
+            '/redfish/v1/Systems/Self/SD',
+            data={'Boot': {'BootSourceOverrideMode': 'UEFI'}},
             etag='"3d7b838291941d"')
 
     def test_set_system_boot_source(self):

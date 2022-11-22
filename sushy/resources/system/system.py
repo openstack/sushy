@@ -228,6 +228,13 @@ class System(base.ResourceBase):
             invalid.
         """
         data = collections.defaultdict(dict)
+        settings_data = collections.defaultdict(dict)
+
+        if self._settings and self._settings.resource_uri:
+            settings_resp = self._conn.get(self._settings.resource_uri)
+            settings_boot_section = settings_resp.json().get('Boot', {})
+        else:
+            settings_resp = None
 
         if target is not None:
             valid_targets = self.get_allowed_system_boot_source_values()
@@ -253,8 +260,12 @@ class System(base.ResourceBase):
                           'machine. Overriding boot device from %s to %s.',
                           target, sys_cons.BootSource.USB_CD)
                 target = sys_cons.BootSource.USB_CD
-
-            data['Boot']['BootSourceOverrideTarget'] = target.value
+            if (settings_resp and "BootSourceOverrideTarget" in
+                    settings_boot_section):
+                settings_data['Boot']['BootSourceOverrideTarget'] = \
+                    target.value
+            else:
+                data['Boot']['BootSourceOverrideTarget'] = target.value
 
         if enabled is not None:
             try:
@@ -263,8 +274,11 @@ class System(base.ResourceBase):
                 raise exceptions.InvalidParameterValueError(
                     parameter='enabled', value=enabled,
                     valid_values=list(sys_cons.BootSourceOverrideEnabled))
-
-            data['Boot']['BootSourceOverrideEnabled'] = fishy_freq
+            if (settings_resp and "BootSourceOverrideEnabled" in
+                    settings_boot_section):
+                settings_data['Boot']['BootSourceOverrideEnabled'] = fishy_freq
+            else:
+                data['Boot']['BootSourceOverrideEnabled'] = fishy_freq
 
         if mode is not None:
             try:
@@ -273,23 +287,23 @@ class System(base.ResourceBase):
                 raise exceptions.InvalidParameterValueError(
                     parameter='mode', value=mode,
                     valid_values=list(sys_cons.BootSourceOverrideMode))
-
-            data['Boot']['BootSourceOverrideMode'] = fishy_mode
-
-        etag = self._get_etag()
-        path = self.path
-
-        # NOTE(janders): checking if @Redfish.Settings are available; if so
-        # using the URI from the SettingsObject. Also ensuring the ETag URI
-        # matches in this case (the one above would not be valid for new URI).
-        if self._settings and self._settings.resource_uri:
-            path = self._settings.resource_uri
-            resp = self._conn.get(path)
-            etag = resp.headers.get('ETag')
+            if (settings_resp and "BootSourceOverrideMode" in
+                    settings_boot_section):
+                settings_data['Boot']['BootSourceOverrideMode'] = fishy_mode
+            else:
+                data['Boot']['BootSourceOverrideMode'] = fishy_mode
 
         # TODO(lucasagomes): Check the return code and response body ?
         #                    Probably we should call refresh() as well.
-        self._conn.patch(path, data=data, etag=etag)
+        if settings_data.get('Boot'):
+            etag = settings_resp.headers.get('ETag')
+            path = self._settings.resource_uri
+            self._conn.patch(path, data=settings_data,
+                             etag=etag)
+        if data.get('Boot'):
+            etag = self._get_etag()
+            path = self.path
+            self._conn.patch(path, data=data, etag=etag)
 
     # TODO(etingof): we should remove this method, eventually
     def set_system_boot_source(
