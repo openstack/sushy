@@ -96,6 +96,9 @@ class HTTPError(SushyError):
     message = ('HTTP %(method)s %(url)s returned code %(code)s. %(error)s '
                'Extended information: %(ext_info)s')
 
+    extended_info = None
+    """Extended information provided in the response."""
+
     def __init__(self, method, url, response):
         self.status_code = response.status_code
         try:
@@ -106,17 +109,16 @@ class HTTPError(SushyError):
                         {'method': method, 'url': url, 'code':
                          self.status_code})
             error = 'unknown error'
-            ext_info = 'none'
         else:
             self.body = body.get('error', {})
             self.code = self.body.get('code', 'Base.1.0.GeneralError')
             self.detail = self.body.get('message')
-            ext_info = self.body.get('@Message.ExtendedInfo', [{}])
-            message = self._get_most_severe_msg(ext_info)
+            self.extended_info = self.body.get('@Message.ExtendedInfo')
+            message = self._get_most_severe_msg(self.extended_info or [{}])
             self.detail = message or self.detail
             error = '%s: %s' % (self.code, self.detail or 'unknown error.')
         kwargs = {'method': method, 'url': url, 'code': self.status_code,
-                  'error': error, 'ext_info': ext_info}
+                  'error': error, 'ext_info': self.extended_info}
         LOG.debug('HTTP response for %(method)s %(url)s: '
                   'status code: %(code)s, error: %(error)s, '
                   'extended: %(ext_info)s', kwargs)
@@ -131,6 +133,14 @@ class HTTPError(SushyError):
                 for i, m in enumerate(extended_info):
                     if m.get('Severity') == sev:
                         return m.get('Message')
+
+    @property
+    def related_properties(self):
+        """List of properties related to the error."""
+        try:
+            return self.extended_info[0]['RelatedProperties']
+        except (IndexError, KeyError, TypeError):
+            return []
 
 
 class BadRequestError(HTTPError):
