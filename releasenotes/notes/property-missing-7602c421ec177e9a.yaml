@@ -1,0 +1,6 @@
+---
+fixes:
+  - |
+    Correctly handles error code ``Base.1.5.PropertyMissing`` when dealing with
+    hardware that requires ``TransferProtocolType`` for virtual media
+    operations.
