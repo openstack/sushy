@@ -106,17 +106,16 @@ class VirtualMedia(base.ResourceBase):
             eject_uri = eject_media.target_uri
         return eject_uri, use_patch
 
-    def is_transfer_protocol_required(self, response=None):
+    def is_transfer_protocol_required(self, error=None):
         """Check the response code and body and in case of failure
 
         Try to determine if it happened due to missing TransferProtocolType.
         """
-        if (response.code == "Base.1.5.ActionParameterMissing"
-           and response.body is not None):
-            if ("#/TransferProtocolType" in response.body
-               ["@Message.ExtendedInfo"][0]['RelatedProperties']):
-                return True
-        return False
+        return (
+            (error.code.endswith(".ActionParameterMissing")
+             or error.code.endswith(".PropertyMissing"))
+            and "#/TransferProtocolType" in error.related_properties
+        )
 
     def insert_media(self, image, inserted=True, write_protected=True,
                      username=None, password=None, transfer_method=None):
@@ -177,8 +176,8 @@ class VirtualMedia(base.ResourceBase):
             # due to absence of TransferProtocolType param and if so adding it
             try:
                 self._conn.post(target_uri, data=payload)
-            except exceptions.HTTPError as response:
-                if self.is_transfer_protocol_required(response):
+            except exceptions.HTTPError as error:
+                if self.is_transfer_protocol_required(error):
                     if payload['Image'].startswith('https://'):
                         payload['TransferProtocolType'] = "HTTPS"
                     elif payload['Image'].startswith('http://'):
