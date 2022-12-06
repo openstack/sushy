@@ -408,6 +408,42 @@ class ConnectorOpTestCase(base.TestCase):
         self.assertEqual(10, mock_sleep.call_count)
         self.assertEqual(11, self.request.call_count)
 
+    @mock.patch('time.sleep', autospec=True)
+    def test_op_retry_on_server_500_sys518(self, mock_sleep):
+        response_info = {"error": {"@Message.ExtendedInfo": [
+            {'MessageId': 'IDRAC.2.7.SYS518'}]}}
+        mock_error = mock.Mock()
+        mock_error.status_code = 500
+        mock_error.json.return_value = response_info
+        self.request.return_value.status_code = (
+            http_client.INTERNAL_SERVER_ERROR)
+        self.request.return_value.json.side_effect =\
+            exceptions.ServerSideError(
+                method='DELETE', url='http://foo.bar', response=mock_error)
+
+        self.assertRaises(exceptions.ServerSideError, self.conn._op, 'DELETE',
+                          'http://foo.bar')
+        self.assertEqual(10, mock_sleep.call_count)
+        self.assertEqual(11, self.request.call_count)
+
+    @mock.patch('time.sleep', autospec=True)
+    def test_op_retry_on_server_500_other_than_sys518(self, mock_sleep):
+        response_info = {"error": {"@Message.ExtendedInfo": [
+            {'MessageId': 'IDRAC.2.7.SYS999'}]}}
+        mock_error = mock.Mock()
+        mock_error.status_code = 500
+        mock_error.json.return_value = response_info
+        self.request.return_value.status_code = (
+            http_client.INTERNAL_SERVER_ERROR)
+        self.request.return_value.json.side_effect =\
+            exceptions.ServerSideError(
+                method='DELETE', url='http://foo.bar', response=mock_error)
+
+        self.assertRaises(exceptions.ServerSideError, self.conn._op, 'DELETE',
+                          'http://foo.bar')
+        self.assertEqual(0, mock_sleep.call_count)
+        self.assertEqual(1, self.request.call_count)
+
     def test_access_error(self):
         self.conn._auth = None
 

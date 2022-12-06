@@ -85,6 +85,15 @@ class Connector(object):
         """Close this connector and the associated HTTP session."""
         self._session.close()
 
+    def check_retry_on_exception(self, exception_msg):
+        """Checks whether retry on exception is required."""
+        if ('SYS518' in str(exception_msg)):
+            LOG.debug('iDRAC is not yet ready after previous operation. '
+                      'Error: %(err)s', {'err': str(exception_msg)})
+            return True
+        else:
+            return False
+
     def _op(self, method, path='', data=None, headers=None, blocking=False,
             timeout=60, **extra_session_req_kwargs):
         """Generic RESTful request handler.
@@ -197,9 +206,9 @@ class Connector(object):
                               "%s", e.message)
                 raise
         except exceptions.ServerSideError as e:
-            if method.lower() != 'get' or self._server_side_retries <= 0:
-                raise
-            else:
+            if ((method.lower() == 'get'
+                or self.check_retry_on_exception(e.message))
+                    and self._server_side_retries > 0):
                 LOG.warning('Got server side error %s in response to a '
                             'GET request, retrying after %d seconds',
                             e, self._server_side_retries)
@@ -208,6 +217,8 @@ class Connector(object):
                 return self._op(method, path, data=data, headers=headers,
                                 blocking=blocking, timeout=timeout,
                                 **extra_session_req_kwargs)
+            else:
+                raise
 
         if blocking and response.status_code == 202:
             if not response.headers.get('Location'):
