@@ -362,6 +362,7 @@ class ConnectorOpTestCase(base.TestCase):
         self.assertEqual(http_client.BAD_REQUEST, exc.status_code)
         self.assertIsNotNone(exc.body)
         self.assertIn('body submitted was malformed JSON', exc.detail)
+        self.assertEqual(len(exc.extended_info), 3, exc.extended_info)
 
     def test_known_http_error_nonlist_ext_info(self):
         self.request.return_value.status_code =\
@@ -377,6 +378,8 @@ class ConnectorOpTestCase(base.TestCase):
         self.assertEqual(http_client.UNSUPPORTED_MEDIA_TYPE, exc.status_code)
         self.assertIsNotNone(exc.body)
         self.assertIn('See Resolution for information', exc.detail)
+        self.assertIn('unsupported media type',
+                      exc.extended_info['Resolution'])
 
     @mock.patch('time.sleep', autospec=True)
     def test_not_found_error(self, mock_sleep):
@@ -504,7 +507,7 @@ class ConnectorOpTestCase(base.TestCase):
             'this is expected prior to authentication', 'HTTP GET '
             'http://redfish/v1/SessionService returned code '
             '%s. unknown error Extended information: '
-            'none' % http_client.FORBIDDEN)
+            'None' % http_client.FORBIDDEN)
         self.assertEqual(http_client.FORBIDDEN, exc.status_code)
 
     def test_blocking_no_location_header(self):
@@ -557,7 +560,7 @@ class ConnectorOpTestCase(base.TestCase):
             "authentication. %(err)s",
             {'err': 'HTTP GET http://redfish/v1/SessionService '
                     'returned code HTTPStatus.FORBIDDEN. unknown error '
-                    'Extended information: none'}
+                    'Extended information: None'}
         )
 
     def test__op_raises_connection_error(self):
