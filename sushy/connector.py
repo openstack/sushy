@@ -95,7 +95,8 @@ class Connector(object):
             return False
 
     def _op(self, method, path='', data=None, headers=None, blocking=False,
-            timeout=60, **extra_session_req_kwargs):
+            timeout=60, server_side_retries_left=None,
+            **extra_session_req_kwargs):
         """Generic RESTful request handler.
 
         :param method: The HTTP method to be used, e.g: GET, POST,
@@ -105,6 +106,8 @@ class Connector(object):
         :param headers: Optional dictionary of headers.
         :param blocking: Whether to block for asynchronous operations.
         :param timeout: Max time in seconds to wait for blocking async call.
+        :param server_side_retries_left: Remaining retries. If not provided
+            will use limit provided by instance's server_side_retries
         :param extra_session_req_kwargs: Optional keyword argument to pass
          requests library arguments which would pass on to requests session
          object.
@@ -112,6 +115,10 @@ class Connector(object):
         :raises: ConnectionError
         :raises: HTTPError
         """
+
+        if server_side_retries_left is None:
+            server_side_retries_left = self._server_side_retries
+
         url = path if urlparse.urlparse(path).netloc else urlparse.urljoin(
             self._url, path)
         headers = headers or {}
@@ -208,15 +215,19 @@ class Connector(object):
         except exceptions.ServerSideError as e:
             if ((method.lower() == 'get'
                 or self.check_retry_on_exception(e.message))
-                    and self._server_side_retries > 0):
+                    and server_side_retries_left > 0):
                 LOG.warning('Got server side error %s in response to a '
-                            'GET request, retrying after %d seconds',
-                            e, self._server_side_retries)
+                            'GET request, retrying after %d seconds. Retries '
+                            'left %d.',
+                            e, self._server_side_retries_delay,
+                            server_side_retries_left)
                 time.sleep(self._server_side_retries_delay)
-                self._server_side_retries -= 1
-                return self._op(method, path, data=data, headers=headers,
-                                blocking=blocking, timeout=timeout,
-                                **extra_session_req_kwargs)
+                server_side_retries_left -= 1
+                return self._op(
+                    method, path, data=data, headers=headers,
+                    blocking=blocking, timeout=timeout,
+                    server_side_retries_left=server_side_retries_left,
+                    **extra_session_req_kwargs)
             else:
                 raise
 
