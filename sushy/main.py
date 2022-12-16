@@ -465,6 +465,13 @@ class Sushy(base.ResourceBase):
 
         session_uri = rsp.headers.get('Location')
         if session_uri is None:
+            try:
+                body = rsp.json()
+                session_uri = body.get("@odata.id")
+            except ValueError:  # JSON decoding failed
+                pass
+
+        if session_uri is None:
             LOG.warning("Received X-Auth-Token but NO session uri.")
 
         return session_key, session_uri

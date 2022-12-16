@@ -350,13 +350,14 @@ class MainTestCase(base.TestCase):
         mock_res = mock.Mock()
         mock_res.status_code = 403
         mock_res.json.side_effect = ValueError('no json')
+        self.conn.post.return_value = mock_res
         mock_get_session_path = mock.Mock()
         mock_get_session_path.side_effect = exceptions.AccessError(
             'GET', 'redfish/v1', mock_res)
         self.root.get_sessions_path = mock_get_session_path
         with open('sushy/tests/unit/json_samples/'
                   'session_creation_headers_no_location.json') as f:
-            self.conn.post.return_value.headers = json.load(f)
+            mock_res.headers = json.load(f)
 
         session_key, session_uri = (
             self.root.create_session('foo', 'secret'))
@@ -366,6 +367,31 @@ class MainTestCase(base.TestCase):
             '/redfish/v1/SessionService/Sessions',
             data={'UserName': 'foo', 'Password': 'secret'})
         self.assertTrue(mock_log.warning.called)
+
+    def test_create_session_recover_session_uri_from_body(self):
+        self.root._conn._session.headers = []
+        mock_res = mock.Mock()
+        mock_res.status_code = 200
+        mock_json = mock_res.json.return_value
+        mock_session_uri = mock_json.get.return_value
+
+        self.conn.post.return_value = mock_res
+        mock_get_session_path = mock.Mock()
+        mock_get_session_path.side_effect = exceptions.AccessError(
+            'GET', 'redfish/v1', mock_res)
+        self.root.get_sessions_path = mock_get_session_path
+        with open('sushy/tests/unit/json_samples/'
+                  'session_creation_headers_no_location.json') as f:
+            mock_res.headers = json.load(f)
+
+        session_key, session_uri = (
+            self.root.create_session('foo', 'secret'))
+        self.assertEqual('adc530e2016a0ea98c76c087f0e4b76f', session_key)
+        self.assertEqual(session_uri, mock_session_uri)
+        self.conn.post.assert_called_once_with(
+            '/redfish/v1/SessionService/Sessions',
+            data={'UserName': 'foo', 'Password': 'secret'})
+        mock_json.get.assert_called_with('@odata.id')
 
     def test_create_session_path_discovery(self):
         self.root._conn._session.headers = []
