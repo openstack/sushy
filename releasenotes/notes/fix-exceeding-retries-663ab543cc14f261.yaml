@@ -1,0 +1,5 @@
+---
+fixes:
+  - |
+    Fixes exceeding retries. Before this fix running sushy for longer it no
+    longer retried for temporary failures when it should.
