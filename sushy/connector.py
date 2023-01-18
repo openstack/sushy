@@ -20,6 +20,7 @@ import time
 from urllib import parse as urlparse
 
 import requests
+from urllib3.exceptions import InsecureRequestWarning
 
 from sushy import exceptions
 from sushy.taskmonitor import TaskMonitor
@@ -37,7 +38,6 @@ class Connector(object):
         self._url = url
         self._verify = verify
         self._session = requests.Session()
-        self._session.verify = self._verify
         self._response_callback = response_callback
         self._auth = None
         self._server_side_retries = server_side_retries
@@ -67,6 +67,13 @@ class Connector(object):
                         'set_auth now, support for these arguments will '
                         'be removed in the future')
             self.set_http_basic_auth(username, password)
+
+        if not self._verify:
+            # As the user specifically needs to opt out of certificate
+            # validation the user is aware of the security implications
+            # and does not need to be overwhelmed by the urllib3 warnings
+            requests.packages.urllib3.disable_warnings(
+                category=InsecureRequestWarning)
 
     def set_auth(self, auth):
         """Sets the authentication mechanism for our connector."""
@@ -140,6 +147,7 @@ class Connector(object):
         try:
             response = self._session.request(method, url, json=data,
                                              headers=headers,
+                                             verify=self._verify,
                                              **extra_session_req_kwargs)
         except requests.exceptions.RequestException as e:
             # Capture any general exception by looking for the parent
@@ -197,6 +205,7 @@ class Connector(object):
                     response = self._session.request(
                         method, url, json=data,
                         headers=headers,
+                        verify=self._verify,
                         **extra_session_req_kwargs)
                 except exceptions.HTTPError as retry_exc:
                     LOG.error("Failure occured while attempting to retry "
