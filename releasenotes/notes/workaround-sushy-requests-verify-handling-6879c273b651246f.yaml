@@ -1,0 +1,9 @@
+---
+fixes:
+  - |
+    Workaround for https://github.com/psf/requests/issues/3829
+    If the env ``REQUESTS_CA_BUNDLE`` is set the ``requests.Session()``
+    ignores the verify parameter. Therefore the verify parameter
+    is moved directly into the function call of requests.
+
+
