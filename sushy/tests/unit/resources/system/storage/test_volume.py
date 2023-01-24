@@ -171,6 +171,84 @@ class VolumeTestCase(base.TestCase):
         self.assertEqual(task_mon.task_monitor_uri,
                          '/redfish/v1/taskmon/4608f7e6')
 
+    @mock.patch.object(volume.LOG, 'debug', autospec=True)
+    def test_delete_retry_on_501_sys029_apply_time(self, mock_debug):
+        payload = {}
+        oat_prop = '@Redfish.OperationApplyTime'
+        payload[oat_prop] = 'Immediate'
+        target_uri = '/redfish/v1/Systems/437XR1138R2/Storage/1/Volumes/1'
+        response_info = {"error": {"@Message.ExtendedInfo": [
+            {'Message': '@Redfish.OperationApplyTime.',
+             'MessageId': 'IDRAC.2.7.SYS029'}]}}
+        mock_error = mock.Mock()
+        mock_error.status_code = 501
+        mock_error.json.return_value = response_info
+        mock_success = mock.Mock()
+        mock_success.status_code = 201
+        self.conn.delete.side_effect = [exceptions.ServerSideError(
+            method='DELETE', url=target_uri, response=mock_error),
+            mock_success]
+
+        resource = self.stor_volume.delete(
+            payload=payload, apply_time=res_cons.APPLY_TIME_IMMEDIATE)
+
+        self.assertIsNone(resource)
+        self.assertEqual(2, self.stor_volume._conn.delete.call_count)
+        expected_calls = [
+            mock.call(self.stor_volume._path, data=payload, blocking=True,
+                      timeout=500),
+            mock.call(self.stor_volume._path, data={}, blocking=True,
+                      timeout=500)
+        ]
+        self.stor_volume._conn.delete.assert_has_calls(expected_calls)
+        mock_debug.assert_called_once()
+
+    @mock.patch.object(volume.LOG, 'debug', autospec=True)
+    def test_delete_retry_on_501_sys029_other(self, mock_debug):
+        payload = {}
+        oat_prop = '@Redfish.OperationApplyTime'
+        payload[oat_prop] = 'Immediate'
+        target_uri = '/redfish/v1/Systems/437XR1138R2/Storage/1/Volumes/1'
+        response_info = {"error": {"@Message.ExtendedInfo": [
+            {'Message': '@Redfish.SomethingElse.',
+             'MessageId': 'IDRAC.2.7.SYS029'}]}}
+        mock_error = mock.Mock()
+        mock_error.status_code = 501
+        mock_error.json.return_value = response_info
+        mock_success = mock.Mock()
+        mock_success.status_code = 201
+        self.conn.delete.side_effect = [exceptions.ServerSideError(
+            method='DELETE', url=target_uri, response=mock_error),
+            mock_success]
+
+        self.assertRaises(exceptions.ServerSideError, self.stor_volume.delete,
+                          payload=payload,
+                          apply_time=res_cons.APPLY_TIME_IMMEDIATE)
+        self.stor_volume._conn.delete.assert_called_once_with(
+            self.stor_volume._path, data=payload, blocking=True, timeout=500)
+        mock_debug.assert_not_called()
+
+    @mock.patch.object(volume.LOG, 'debug', autospec=True)
+    def test_delete_raise_on_501_other(self, mock_debug):
+        payload = {}
+        _OAT_PROP = '@Redfish.OperationApplyTime'
+        payload[_OAT_PROP] = 'Immediate'
+        target_uri = '/redfish/v1/Systems/437XR1138R2/Storage/1/Volumes/1'
+        response_info = {"error": {"@Message.ExtendedInfo": [
+            {'Message': 'Other message.'}]}}
+        mock_error = mock.Mock()
+        mock_error.status_code = 501
+        mock_error.json.return_value = response_info
+        self.conn.delete.side_effect = [exceptions.ServerSideError(
+            method='DELETE', url=target_uri, response=mock_error)]
+
+        self.assertRaises(exceptions.ServerSideError, self.stor_volume.delete,
+                          payload=payload,
+                          apply_time=res_cons.APPLY_TIME_IMMEDIATE)
+        self.stor_volume._conn.delete.assert_called_once_with(
+            self.stor_volume._path, data=payload, blocking=True, timeout=500)
+        mock_debug.assert_not_called()
+
 
 class VolumeCollectionTestCase(base.TestCase):
 
