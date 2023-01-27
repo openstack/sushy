@@ -1,0 +1,75 @@
+{
+  "RegistryVersion": "208.208.0",
+  "OwningEntity": "AMI",
+  "Name": "Prot0 BIOS Attribute Registry",
+  "@odata.context": "/redfish/v1/$metadata#AttributeRegistry.AttributeRegistry",
+  "RegistryEntries": {
+    "Dependencies": [
+      {
+        "Type": "Map",
+        "DependencyFor": "ACPI004",
+        "Dependency": {
+          "MapToValue": "true",
+          "MapToProperty": "Hidden",
+          "MapFrom": [
+            {
+              "MapFromValue": true,
+              "MapFromProperty": "CurrentValue",
+              "MapFromAttribute": "ACPI004",
+              "MapFromCondition": "EQU"
+            }
+          ],
+          "MapToAttribute": "ACPI002"
+        }
+      }
+    ],
+    "Attributes": [
+      {
+        "DefaultValue": "Enable",
+        "UefiNamespaceId": "x-UEFI-AMI",
+        "DisplayName": "TPM SUPPORT",
+        "HelpText": "Enables or Disables BIOS support for security device. O.S. will not show Security Device. TCG EFI protocol and INT1A interface will not be available.",
+        "AttributeName": "TCG003",
+        "Value": [
+          {
+            "ValueName": "Disable",
+            "ValueDisplayName": "Disable"
+          },
+          {
+            "ValueName": "Enable",
+            "ValueDisplayName": "Enable"
+          }
+        ],
+        "ReadOnly": false,
+        "ResetRequired": true,
+        "Type": "Enumeration"
+      },
+      {
+        "DefaultValue": "Disabled",
+        "UefiNamespaceId": "x-UEFI-AMI",
+        "DisplayName": "  Disable Block Sid",
+        "HelpText": "  Override to allow SID authentication in TCG Storage device",
+        "AttributeName": "TCG023",
+        "Value": [
+          {
+            "ValueName": "Enabled",
+            "ValueDisplayName": "Enabled"
+          },
+          {
+            "ValueName": "Disabled",
+            "ValueDisplayName": "Disabled"
+          }
+        ],
+        "ReadOnly": false,
+        "ResetRequired": true,
+        "Type": "Enumeration"
+      }
+    ]
+  },
+  "@odata.type": "#AttributeRegistry.v1_3_1.AttributeRegistry",
+  "@odata.id": "/redfish/v1/Registries/BiosAttributeRegistryProt0.208.208.0.json",
+  "Language": "en-US",
+  "@odata.etag": "\"1627746301\"",
+  "Id": "BiosAttributeRegistryProt0.208.208.0",
+  "Description": "This registry defines a representation of BIOS Attribute instances"
+}

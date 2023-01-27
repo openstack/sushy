@@ -1,0 +1,7 @@
+---
+fixes:
+  - |
+    In some cases registries might not be available because the
+    our check for the registry language did not account for a
+    possible country suffix. The logic was improved to take it
+    into account.
