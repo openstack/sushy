@@ -594,7 +594,12 @@ class ResourceBase(object, metaclass=abc.ABCMeta):
         for key, registry in registries.items():
             if (registry
                     and self._attribute_registry in (key, registry.identity)):
-                if language != registry.language:
+                # NOTE(iurygregory): some registries may have "en-US"
+                # as their language, in this case we can check if the
+                # registry language starts with the requested language.
+                registry_language = registry.language.lower().split('-', 1)[0]
+                if (language != registry.language
+                        and language.lower() != registry_language):
                     LOG.debug('Found %(descr)s but its language %(reg_lang)s '
                               'does not match the requested %(lang)s',
                               {'descr': description,

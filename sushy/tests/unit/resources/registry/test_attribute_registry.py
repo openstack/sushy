@@ -67,3 +67,41 @@ class AttributeRegistryTestCase(base.TestCase):
                           {'ValueDisplayName': 'Disabled',
                            'ValueName': 'Disabled'}],
                          attributes.allowable_values)
+
+    def test__parse_attributes_zt(self):
+        self.conn = mock.Mock()
+        with open('sushy/tests/unit/json_samples/'
+                  'bios_attribute_registry_zthardware.json') as f:
+            self.json_doc = json.load(f)
+
+        self.conn.get.return_value.json.return_value = self.json_doc
+        self.registry = attribute_registry.AttributeRegistry(
+            self.conn,
+            '/redfish/v1/Registries/'
+            'BiosAttributeRegistryProt0.208.208.0.json',
+            redfish_version='1.0.2')
+
+        self.registry._parse_attributes(self.json_doc)
+        self.assertEqual('BiosAttributeRegistryProt0.208.208.0',
+                         self.registry.identity)
+        self.assertEqual('Prot0 BIOS Attribute Registry', self.registry.name)
+        self.assertEqual('en-US', self.registry.language)
+        self.assertEqual('This registry defines a representation of '
+                         'BIOS Attribute instances',
+                         self.registry.description)
+        self.assertEqual('208.208.0', self.registry.registry_version)
+        self.assertEqual('AMI', self.registry.owning_entity)
+
+        attributes = self.registry.registry_entries.attributes[0]
+        self.assertEqual('TCG003', attributes.name)
+        self.assertEqual('TPM SUPPORT', attributes.display_name)
+        self.assertEqual('Enable', attributes.default_value)
+        self.assertIsNone(attributes.immutable)
+        self.assertEqual(False, attributes.read_only)
+        self.assertEqual('Enumeration', attributes.attribute_type)
+        self.assertEqual(True, attributes.reset_required)
+        self.assertEqual([{'ValueDisplayName': 'Disable',
+                           'ValueName': 'Disable'},
+                          {'ValueDisplayName': 'Enable',
+                           'ValueName': 'Enable'}],
+                         attributes.allowable_values)

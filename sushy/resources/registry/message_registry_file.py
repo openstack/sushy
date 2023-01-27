@@ -119,8 +119,14 @@ class MessageRegistryFile(base.ResourceBase):
         # NOTE (etingof): as per RFC5646, languages are case-insensitive
         language = language.lower()
 
+        # NOTE(iurygregory): some registries may have "en-US" as their
+        # language, in this case we can check if the registry language
+        # starts with the requested language.
         locations = [
-            l for l in self.location if l.language.lower() == language]
+            l for l in self.location
+            if l.language.lower().split('-', 1)[0] == language
+            or l.language == language
+        ]
 
         locations += [
             l for l in self.location if l.language.lower() == 'default']
