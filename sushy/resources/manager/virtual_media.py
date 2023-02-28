@@ -111,6 +111,10 @@ class VirtualMedia(base.ResourceBase):
 
         Try to determine if it happened due to missing TransferProtocolType.
         """
+        if (error.code.endswith('GeneralError')
+           and 'TransferProtocolType' in error.detail):
+            return True
+
         return (
             (error.code.endswith(".ActionParameterMissing")
              or error.code.endswith(".PropertyMissing"))
