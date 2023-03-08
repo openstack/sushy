@@ -341,3 +341,89 @@ class BiosTestCase(base.TestCase):
         self.sys_bios._attribute_registry = "Unknown"
         registry = self.sys_bios.get_attribute_registry()
         self.assertIsNone(registry)
+
+
+class BiosZTTestCase(base.TestCase):
+
+    def setUp(self):
+        super(BiosZTTestCase, self).setUp()
+        self.conn = mock.Mock()
+        with open('sushy/tests/unit/json_samples/bios_zt.json') as f:
+            self.bios_json = json.load(f)
+        # NOTE(iurygregory): ZT Hardware doesn't have Settings for Bios.
+
+        self.conn.get.return_value.json.side_effect = [self.bios_json]
+
+        registries = {}
+        conn = mock.Mock()
+        # Note(iurygregory): re-use message registry for now.
+        with open('sushy/tests/unit/json_samples/message_registry.json') as f:
+            conn.get.return_value.json.return_value = json.load(f)
+            msg_reg = message_registry.MessageRegistry(
+                conn, '/redfish/v1/Registries/Test',
+                redfish_version='1.0.2')
+
+            registries['Test.1.0'] = msg_reg
+
+        with open('sushy/tests/unit/json_samples/'
+                  'bios_attribute_registry_zthardware.json') as f:
+            conn.get.return_value.json.return_value = json.load(f)
+            self.bios_reg = attribute_registry.AttributeRegistry(
+                conn,
+                '/redfish/v1/Registries/BiosAttributeRegistryProt0.208.208.0',
+                redfish_version='1.3.1')
+
+            registries['BiosAttributeRegistryProt0.208.208.0'] = self.bios_reg
+
+        self.sys_bios = bios.Bios(
+            self.conn, '/redfish/v1/Systems/Self/Bios',
+            registries=registries,
+            redfish_version='1.0.2')
+
+    def test__parse_attributes(self):
+        self.sys_bios._parse_attributes(self.bios_json)
+        self.assertEqual('1.0.2', self.sys_bios.redfish_version)
+        self.assertEqual('Bios', self.sys_bios.identity)
+        self.assertEqual('Current BIOS Settings',
+                         self.sys_bios.name)
+        self.assertEqual(self.sys_bios.description,
+                         'Current BIOS Settings')
+        self.assertEqual('BiosAttributeRegistryProt0.208.208.0',
+                         self.sys_bios._attribute_registry)
+
+    def test_get_attribute_registry_no_lang(self):
+
+        registry = self.sys_bios.get_attribute_registry(language='zh')
+        self.assertIsNone(registry)
+
+    def test_get_attribute_registry(self):
+
+        registry = self.sys_bios.get_attribute_registry(language="en")
+        registry2 = self.sys_bios.get_attribute_registry(language="en-US")
+
+        self.assertEqual(registry.name, 'Prot0 BIOS Attribute Registry')
+        self.assertEqual(registry.description, 'This registry defines a '
+                         'representation of BIOS Attribute instances')
+        self.assertEqual(registry.language, 'en-US')
+        self.assertEqual(registry.registry_entries.attributes[0].name,
+                         'TCG003')
+        self.assertEqual(registry.registry_entries.attributes[0].display_name,
+                         'TPM SUPPORT')
+        self.assertEqual(registry.registry_entries.attributes[0].read_only,
+                         False)
+        self.assertEqual(registry.registry_entries.attributes[0].
+                         attribute_type, 'Enumeration')
+
+        self.assertEqual(registry.name, registry2.name)
+        self.assertEqual(registry.description, registry2.description)
+        self.assertEqual(registry.language, registry2.language)
+        self.assertEqual(registry.registry_entries.attributes[0].name,
+                         registry2.registry_entries.attributes[0].name)
+        self.assertEqual(registry.registry_entries.attributes[0].display_name,
+                         registry2.registry_entries.attributes[0].display_name)
+        self.assertEqual(registry.registry_entries.attributes[0].read_only,
+                         registry2.registry_entries.attributes[0].read_only)
+        self.assertEqual(registry.registry_entries.attributes[0].
+                         attribute_type,
+                         registry2.registry_entries.attributes[0].
+                         attribute_type)
