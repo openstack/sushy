@@ -1,0 +1,16 @@
+{
+  "error": {
+    "code": "Base.1.4.0.GeneralError",
+    "message": "See ExtendedInfo for more information.",
+    "@Message.ExtendedInfo": [
+      {
+        "@odata.type": "Message.v1_0_6.Message",
+        "MessageId": "Base.1.4.0.GeneralError",
+        "Message": "'TransferMethod' property which is mandatory to complete the action is missing in the request body.",
+        "MessageArgs": [],
+        "Severity": "Critical"
+      }
+    ]
+  }
+}
+

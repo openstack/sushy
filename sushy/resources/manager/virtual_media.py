@@ -121,6 +121,16 @@ class VirtualMedia(base.ResourceBase):
             and "#/TransferProtocolType" in error.related_properties
         )
 
+    def is_transfer_method_required(self, error=None):
+        """Check the response code and body and in case of failure
+
+        Try to determine if it happened due to missing TransferMethod
+        """
+        if (error.code.endswith('GeneralError')
+                and 'TransferMethod' in error.detail):
+            return True
+        return False
+
     def insert_media(self, image, inserted=True, write_protected=True,
                      username=None, password=None, transfer_method=None):
         """Attach remote media to virtual media
@@ -186,7 +196,18 @@ class VirtualMedia(base.ResourceBase):
                         payload['TransferProtocolType'] = "HTTPS"
                     elif payload['Image'].startswith('http://'):
                         payload['TransferProtocolType'] = "HTTP"
-                    self._conn.post(target_uri, data=payload)
+
+                    # NOTE (iurygregory) we try to handle the case where a
+                    # a TransferMethod is also required in the payload.
+                    try:
+                        self._conn.post(target_uri, data=payload)
+                    except exceptions.HTTPError as error2:
+                        if self.is_transfer_method_required(error2):
+                            payload['TransferMethod'] = "Stream"
+                            self._conn.post(target_uri, data=payload)
+                        else:
+                            raise
+
                 else:
                     raise
         self.invalidate()
