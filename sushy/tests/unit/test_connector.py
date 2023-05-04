@@ -445,6 +445,43 @@ class ConnectorOpTestCase(base.TestCase):
         self.assertEqual(0, mock_sleep.call_count)
         self.assertEqual(1, self.request.call_count)
 
+    @mock.patch('time.sleep', autospec=True)
+    def test_op_retry_on_server_400_ilo_not_ready(self, mock_sleep):
+        response_info = {"error": {"@Message.ExtendedInfo": [
+            {'MessageId': 'iLO.2.15.InvalidOperationForSystemState'}]}}
+        mock_error = mock.Mock()
+        mock_error.status_code = 400
+        mock_error.json.return_value = response_info
+        self.request.return_value.status_code = (
+            http_client.INTERNAL_SERVER_ERROR)
+        self.request.return_value.json.side_effect =\
+            exceptions.ServerSideError(
+                method='DELETE', url='http://foo.bar', response=mock_error)
+
+        self.assertRaises(exceptions.ServerSideError, self.conn._op, 'DELETE',
+                          'http://foo.bar')
+        self.assertEqual(10, mock_sleep.call_count)
+        self.assertEqual(11, self.request.call_count)
+
+    @mock.patch('time.sleep', autospec=True)
+    def test_op_retry_on_server_400_ilo_not_ready_other_error(self,
+                                                              mock_sleep):
+        response_info = {"error": {"@Message.ExtendedInfo": [
+            {'MessageId': 'iLO.Invalid'}]}}
+        mock_error = mock.Mock()
+        mock_error.status_code = 400
+        mock_error.json.return_value = response_info
+        self.request.return_value.status_code = (
+            http_client.INTERNAL_SERVER_ERROR)
+        self.request.return_value.json.side_effect =\
+            exceptions.ServerSideError(
+                method='DELETE', url='http://foo.bar', response=mock_error)
+
+        self.assertRaises(exceptions.ServerSideError, self.conn._op, 'DELETE',
+                          'http://foo.bar')
+        self.assertEqual(0, mock_sleep.call_count)
+        self.assertEqual(1, self.request.call_count)
+
     def test_access_error(self):
         self.conn._auth = None
 

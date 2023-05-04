@@ -1,0 +1,10 @@
+---
+fixes:
+  - |
+    An issue was encountered on some HPE iLO supported machines where the
+    Baseboard Management Controller would respond with a HTTP 400 error
+    and an error message indicating the requested operation was invalid
+    for the then system state. For example, attempting to change the power
+    state via the BMC shortly after previously changing the power state.
+    We now attempt to retry within the permitted number of retries when
+    this error is encountered.

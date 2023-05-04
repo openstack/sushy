@@ -94,12 +94,17 @@ class Connector(object):
 
     def check_retry_on_exception(self, exception_msg):
         """Checks whether retry on exception is required."""
-        if ('SYS518' in str(exception_msg)):
+        retry = False
+        exc_str = str(exception_msg)
+        if 'SYS518' in exc_str:
             LOG.debug('iDRAC is not yet ready after previous operation. '
-                      'Error: %(err)s', {'err': str(exception_msg)})
-            return True
-        else:
-            return False
+                      'Error: %(err)s', {'err': exc_str})
+            retry = True
+        elif 'iLO.2.15.InvalidOperationForSystemState' in exc_str:
+            LOG.debug('iLO is not ready after previous operation. '
+                      'Error: %(error)s', {'err': exc_str})
+            retry = True
+        return retry
 
     def _op(self, method, path='', data=None, headers=None, blocking=False,
             timeout=60, server_side_retries_left=None,
@@ -226,7 +231,7 @@ class Connector(object):
                 or self.check_retry_on_exception(e.message))
                     and server_side_retries_left > 0):
                 LOG.warning('Got server side error %s in response to a '
-                            'GET request, retrying after %d seconds. Retries '
+                            'request, retrying after %d seconds. Retries '
                             'left %d.',
                             e, self._server_side_retries_delay,
                             server_side_retries_left)
@@ -239,7 +244,25 @@ class Connector(object):
                     **extra_session_req_kwargs)
             else:
                 raise
-
+        except exceptions.BadRequestError as e:
+            if (method.lower() != 'get'
+                    and self.check_retry_on_exception(e.message)
+                    and server_side_retries_left > 0):
+                LOG.warning('Server has indicated a BadRequest for %s but '
+                            'the response payload is a known retriable '
+                            'condition and we will retry in %d seconds. '
+                            'Retries left  %d.',
+                            e, self._server_side_retries_delay,
+                            server_side_retries_left)
+                time.sleep(self._server_side_retries_delay)
+                server_side_retries_left -= 1
+                return self._op(
+                    method, path, data=data, headers=headers,
+                    blocking=blocking, timeout=timeout,
+                    server_side_retries_left=server_side_retries_left,
+                    **extra_session_req_kwargs)
+            else:
+                raise
         if blocking and response.status_code == 202:
             if not response.headers.get('Location'):
                 m = ('HTTP response for %(method)s request to %(url)s '
