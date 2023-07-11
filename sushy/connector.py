@@ -117,7 +117,11 @@ class Connector(object):
         :param data: Optional JSON data.
         :param headers: Optional dictionary of headers.
         :param blocking: Whether to block for asynchronous operations.
-        :param timeout: Max time in seconds to wait for blocking async call.
+        :param timeout: Max time in seconds to wait for blocking async call or
+                        for requests library to connect and read. If a custom
+                        timeout for requests is provided in
+                        extra_session_req_kwargs, it will be used instead for
+                        those calls.
         :param server_side_retries_left: Remaining retries. If not provided
             will use limit provided by instance's server_side_retries
         :param extra_session_req_kwargs: Optional keyword argument to pass
@@ -127,7 +131,6 @@ class Connector(object):
         :raises: ConnectionError
         :raises: HTTPError
         """
-
         if server_side_retries_left is None:
             server_side_retries_left = self._server_side_retries
 
@@ -153,6 +156,7 @@ class Connector(object):
             response = self._session.request(method, url, json=data,
                                              headers=headers,
                                              verify=self._verify,
+                                             timeout=timeout,
                                              **extra_session_req_kwargs)
         except requests.exceptions.RequestException as e:
             # Capture any general exception by looking for the parent
@@ -211,6 +215,7 @@ class Connector(object):
                         method, url, json=data,
                         headers=headers,
                         verify=self._verify,
+                        timeout=timeout,
                         **extra_session_req_kwargs)
                 except exceptions.HTTPError as retry_exc:
                     LOG.error("Failure occured while attempting to retry "

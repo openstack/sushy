@@ -178,7 +178,7 @@ class ConnectorOpTestCase(base.TestCase):
         self.conn._op('GET', path='fake/path', headers=self.headers)
         self.request.assert_called_once_with(
             'GET', 'http://foo.bar:1234/fake/path',
-            headers=self.headers, json=None, verify=True)
+            headers=self.headers, json=None, verify=True, timeout=60)
 
     def test_response_callback(self):
         mock_response_callback = mock.MagicMock()
@@ -193,21 +193,21 @@ class ConnectorOpTestCase(base.TestCase):
         self.request.assert_called_once_with(
             'GET', 'http://foo.bar:1234/fake/path',
             headers=self.headers, json=None, allow_redirects=False,
-            verify=True)
+            verify=True, timeout=60)
 
     def test_ok_post(self):
         self.conn._op('POST', path='fake/path', data=self.data.copy(),
                       headers=self.headers)
         self.request.assert_called_once_with(
             'POST', 'http://foo.bar:1234/fake/path',
-            json=self.data, headers=self.headers, verify=True)
+            json=self.data, headers=self.headers, verify=True, timeout=60)
 
     def test_ok_put(self):
         self.conn._op('PUT', path='fake/path', data=self.data.copy(),
                       headers=self.headers)
         self.request.assert_called_once_with(
             'PUT', 'http://foo.bar:1234/fake/path',
-            json=self.data, headers=self.headers, verify=True)
+            json=self.data, headers=self.headers, verify=True, timeout=60)
 
     def test_ok_delete(self):
         expected_headers = self.headers.copy()
@@ -215,7 +215,7 @@ class ConnectorOpTestCase(base.TestCase):
         self.conn._op('DELETE', path='fake/path', headers=self.headers.copy())
         self.request.assert_called_once_with(
             'DELETE', 'http://foo.bar:1234/fake/path',
-            headers=expected_headers, json=None, verify=True)
+            headers=expected_headers, json=None, verify=True, timeout=60)
 
     def test_ok_post_with_session(self):
         self.conn._session.headers = {}
@@ -227,7 +227,7 @@ class ConnectorOpTestCase(base.TestCase):
                       data=self.data)
         self.request.assert_called_once_with(
             'POST', 'http://foo.bar:1234/fake/path',
-            json=self.data, headers=expected_headers, verify=True)
+            json=self.data, headers=expected_headers, verify=True, timeout=60)
         self.assertEqual(self.conn._session.headers,
                          {'X-Auth-Token': 'asdf1234'})
 
@@ -240,7 +240,7 @@ class ConnectorOpTestCase(base.TestCase):
         self.conn._op('GET', path=path, headers=headers)
         self.request.assert_called_once_with(
             'GET', 'http://foo.bar:1234' + path,
-            headers=expected_headers, json=None, verify=True)
+            headers=expected_headers, json=None, verify=True, timeout=60)
 
     def test_odata_version_header_redfish_no_headers(self):
         path = '/redfish/v1/bar'
@@ -248,7 +248,7 @@ class ConnectorOpTestCase(base.TestCase):
         self.conn._op('GET', path=path)
         self.request.assert_called_once_with(
             'GET', 'http://foo.bar:1234' + path,
-            headers=expected_headers, json=None, verify=True)
+            headers=expected_headers, json=None, verify=True, timeout=60)
 
     def test_odata_version_header_redfish_existing_header(self):
         path = '/redfish/v1/foo'
@@ -257,7 +257,7 @@ class ConnectorOpTestCase(base.TestCase):
         self.conn._op('GET', path=path, headers=headers)
         self.request.assert_called_once_with(
             'GET', 'http://foo.bar:1234' + path,
-            headers=expected_headers, json=None, verify=True)
+            headers=expected_headers, json=None, verify=True, timeout=60)
 
     def test_timed_out_session_unable_to_create_session(self):
         self.conn._auth.can_refresh_session.return_value = False
