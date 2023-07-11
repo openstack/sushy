@@ -1,0 +1,5 @@
+fixes:
+  - Fixes bug where sushy would not pass a read/connect timeout through to
+    requests when making requests to a redfish service. This means that an
+    ill-timed failure could cause python processes calling sushy to freeze
+    indefinately.
