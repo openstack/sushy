@@ -294,13 +294,16 @@ class VirtualMediaTestCase(base.TestCase):
         self.assertTrue(self.sys_virtual_media._is_stale)
 
     def test_set_verify_certificate(self):
+        self.conn.get.return_value.headers = {'Allow': 'GET,HEAD',
+                                              'ETag': '3d7b8a7360bf2941d'}
         with mock.patch.object(
                 self.sys_virtual_media, 'invalidate',
                 autospec=True) as invalidate_mock:
             self.sys_virtual_media.set_verify_certificate(True)
             self.sys_virtual_media._conn.patch.assert_called_once_with(
                 "/redfish/v1/Managers/BMC/VirtualMedia/Floppy1",
-                data={'VerifyCertificate': True})
+                data={'VerifyCertificate': True},
+                etag='3d7b8a7360bf2941d')
 
             invalidate_mock.assert_called_once_with()
 

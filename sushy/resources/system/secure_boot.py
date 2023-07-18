@@ -144,4 +144,6 @@ class SecureBoot(base.ResourceBase):
             raise exceptions.InvalidParameterValueError(
                 "Expected a boolean for 'enabled', got %r" % enabled)
 
-        self._conn.patch(self.path, data={'SecureBootEnable': enabled})
+        etag = self._get_etag()
+        self._conn.patch(self.path, data={'SecureBootEnable': enabled},
+                         etag=etag)

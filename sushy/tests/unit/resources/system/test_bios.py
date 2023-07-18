@@ -119,6 +119,10 @@ class BiosTestCase(base.TestCase):
                          attributes.get('maintenance_window'))
 
     def test_set_attribute_apply_time(self):
+        self.conn.get.return_value.json.side_effect = [
+            self.bios_json,
+            self.bios_json]
+
         self.sys_bios.set_attribute(
             'ProcTurboMode', 'Disabled',
             res_cons.ApplyTime.IN_MAINTENANCE_WINDOW_ON_RESET,
@@ -131,9 +135,15 @@ class BiosTestCase(base.TestCase):
                       '@odata.type': '#Settings.v1_0_0.PreferredApplyTime',
                       'ApplyTime': 'InMaintenanceWindowOnReset',
                       'MaintenanceWindowStartTime': '2020-09-01T04:30:00',
-                      'MaintenanceWindowDurationInSeconds': 600}})
+                      'MaintenanceWindowDurationInSeconds': 600}},
+            etag='9234ac83b9700123cc32')
 
     def test_set_attribute_on_refresh(self):
+        self.conn.get.return_value.json.side_effect = [
+            self.bios_settings_json,
+            self.bios_json,
+            self.bios_settings_json]
+
         self.conn.get.reset_mock()
         # make it to instantiate pending attributes
         self.sys_bios.pending_attributes
@@ -150,6 +160,9 @@ class BiosTestCase(base.TestCase):
         self.assertTrue(self.conn.get.called)
 
     def test_set_attributes(self):
+        self.conn.get.return_value.json.side_effect = [
+            self.bios_json]
+
         self.sys_bios.set_attributes(
             {'ProcTurboMode': 'Disabled', 'UsbControl': 'UsbDisabled'},
             res_cons.ApplyTime.AT_MAINTENANCE_WINDOW_START,
@@ -163,9 +176,15 @@ class BiosTestCase(base.TestCase):
                       '@odata.type': '#Settings.v1_0_0.PreferredApplyTime',
                       'ApplyTime': 'AtMaintenanceWindowStart',
                       'MaintenanceWindowStartTime': '2020-09-01T04:30:00',
-                      'MaintenanceWindowDurationInSeconds': 600}})
+                      'MaintenanceWindowDurationInSeconds': 600}},
+            etag='9234ac83b9700123cc32')
 
     def test_set_attributes_on_refresh(self):
+        self.conn.get.return_value.json.side_effect = [
+            self.bios_settings_json,
+            self.bios_json,
+            self.bios_settings_json]
+
         self.conn.get.reset_mock()
         # make it to instantiate pending attributes
         self.sys_bios.pending_attributes

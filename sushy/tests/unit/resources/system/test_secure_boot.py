@@ -29,6 +29,7 @@ class SecureBootTestCase(base.TestCase):
             self.secure_boot_json = json.load(f)
 
         self.conn.get.return_value.json.return_value = self.secure_boot_json
+        self.conn.get.return_value.headers = {'ETag': 'b26ae716a2c1f39f'}
         self.secure_boot = secure_boot.SecureBoot(
             self.conn, '/redfish/v1/Systems/437XR1138R2/SecureBoot',
             registries={}, redfish_version='1.1.0')
@@ -79,7 +80,8 @@ class SecureBootTestCase(base.TestCase):
         self.secure_boot.set_enabled(True)
         self.conn.patch.assert_called_once_with(
             '/redfish/v1/Systems/437XR1138R2/SecureBoot',
-            data={'SecureBootEnable': True})
+            data={'SecureBootEnable': True},
+            etag='b26ae716a2c1f39f')
 
     def test_set_enabled_wrong_type(self):
         self.assertRaises(exceptions.InvalidParameterValueError,

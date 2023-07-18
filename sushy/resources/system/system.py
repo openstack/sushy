@@ -342,9 +342,10 @@ class System(base.ResourceBase):
                 parameter='state', value=state,
                 valid_values=' ,'.join(i.value for i in res_cons.IndicatorLED))
 
+        etag = self._get_etag()
         data = {'IndicatorLED': state}
 
-        self._conn.patch(self.path, data=data)
+        self._conn.patch(self.path, data=data, etag=etag)
         self.invalidate()
 
     def _get_processor_collection_path(self):
