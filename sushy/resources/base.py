@@ -593,7 +593,7 @@ class ResourceBase(object, metaclass=abc.ABCMeta):
 
         for key, registry in registries.items():
             if (registry
-                    and self._attribute_registry in (key, registry.identity)):
+                    and identity in (key, registry.identity)):
                 # NOTE(iurygregory): some registries may have "en-US"
                 # as their language, in this case we can check if the
                 # registry language starts with the requested language.
