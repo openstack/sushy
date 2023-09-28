@@ -1,0 +1,10 @@
+---
+features:
+  - |
+    Adds a ``boot_progress`` mapped object to the System object. Inside of
+    this object, a ``last_state`` value maps to values provided by the
+    ``sushy.BootProgressState`` enum.
+    Also exposes, for information purposes, the ``last_boot_seconds_count``,
+    ``last_state_updated_at``, and ``oem_last_state`` values, which map to
+    the DMTF Redfish values ``LastBootTimeSeconds``, ``LastStateTime``,
+    and ``OemLastState`` fields for the ``BootProgress`` object.

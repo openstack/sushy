@@ -165,6 +165,44 @@ BOOT_SOURCE_ENABLED_ONCE = BootSourceOverrideEnabled.ONCE
 BOOT_SOURCE_ENABLED_CONTINUOUS = BootSourceOverrideEnabled.CONTINUOUS
 
 
+class BootProgressStates(enum.Enum):
+    """Boot System Progress Indicator constants"""
+    # Added in ComputerSystem 1.15.0
+
+    NONE = 'None'
+    """The system is not booting."""
+
+    PRIMARY_PROCESSOR = 'PrimaryProcessorInitializationStarted'
+    """Initialization of the Primary Processor has started."""
+
+    BUS = 'BusInitializationStarted'
+    """Initalization of the buses has started."""
+
+    MEMORY = 'MemoryInitializationStarted'
+    """Initalization of memory has started."""
+
+    SECONDARY_PROCESSOR = 'SecondaryProcessorInitializationStarted'
+    """Secondary Prcessors have started initialization."""
+
+    PCI_RESOURCE_CONFIG = 'PCIResourceConfigStarted'
+    """Initalizatoin of PCI Resources has started."""
+
+    HARDWARE_COMPLETE = 'SystemHardwareInitializationComplete'
+    """Hardware Initialization is completed."""
+
+    SETUP = 'SetupEntered'
+    """System is in the Setup utility."""
+
+    OS_BOOT_STARTED = 'OSBootStarted'
+    """Boot of the Operating Sysem has started."""
+
+    OS_RUNNING = 'OSRunning'
+    """Operating System Running."""
+
+    OEM = 'OEM'
+    """OEM Defined Boot Progress State."""
+
+
 class SystemType(enum.Enum):
     """System type constants"""
 

@@ -19,6 +19,8 @@
 import collections
 import logging
 
+from dateutil import parser
+
 from sushy import exceptions
 from sushy.resources import base
 from sushy.resources.chassis import chassis
@@ -57,6 +59,23 @@ class BootField(base.CompositeField):
     target = base.MappedField('BootSourceOverrideTarget', sys_cons.BootSource)
 
     http_boot_uri = base.Field('HttpBootUri')
+
+
+class BootProgressField(base.CompositeField):
+
+    last_boot_seconds_count = base.Field('LastBootTimeSeconds',
+                                         adapter=utils.int_or_none)
+    """The number of seconds the last boot took to reach OSRunning."""
+
+    last_state = base.MappedField('LastState', sys_cons.BootProgressStates)
+    """The last recorded boot progress states."""
+
+    last_state_updated_at = base.Field('LastStateTime',
+                                       adapter=parser.parse)
+    """The date-time value when the last state field was updated."""
+
+    oem_last_state = base.Field('OemLastState')
+    """The OEM last state time to describe OEM specific state information."""
 
 
 class MemorySummaryField(base.CompositeField):
@@ -139,6 +158,9 @@ class System(base.ResourceBase):
     """
 
     _actions = ActionsField('Actions', required=True)
+
+    boot_progress = BootProgressField('BootProgress')
+    """The last updated boot progress indicator"""
 
     def __init__(self, connector, identity, redfish_version=None,
                  registries=None, root=None):

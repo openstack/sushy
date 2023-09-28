@@ -43,6 +43,12 @@
         "UefiTargetBootSourceOverride": "/0x31/0x33/0x01/0x01",
         "HttpBootUri": "https://Contoso.lan/boot.iso"
     },
+    "BootProgress": {
+        "LastBootTimeSeconds": 66,
+         "LastState": "OSRunning",
+        "LastStateTime": "2017-05-03T23:12:37-05:00",
+        "OemLastState": "OS foo running."
+    },
     "TrustedModules": [
         {
             "FirmwareVersion": "1.13b",

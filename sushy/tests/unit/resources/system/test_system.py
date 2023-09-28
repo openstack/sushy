@@ -82,6 +82,14 @@ class SystemTestCase(base.TestCase):
                          .maintenance_window_start_time)
         for oem_vendor in self.sys_inst.oem_vendors:
             self.assertIn(oem_vendor, ('Contoso', 'Chipwise'))
+        self.assertEqual(sushy.BootProgressStates.OS_RUNNING,
+                         self.sys_inst.boot_progress.last_state)
+        self.assertEqual(66,
+                         self.sys_inst.boot_progress.last_boot_seconds_count)
+        self.assertEqual(parser.parse('2017-05-03T23:12:37-05:00'),
+                         self.sys_inst.boot_progress.last_state_updated_at)
+        self.assertEqual("OS foo running.",
+                         self.sys_inst.boot_progress.oem_last_state)
 
     def test__parse_attributes_return(self):
         attributes = self.sys_inst._parse_attributes(self.json_doc)
