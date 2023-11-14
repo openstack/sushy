@@ -149,6 +149,10 @@ class Bios(base.ResourceBase):
         payload = utils.process_apply_time_input(
             payload, apply_time, maint_window_start_time,
             maint_window_duration)
+        # NOTE(vanou): To retrieve current ETag value of @Redfish.Settings
+        # but not update cached _pending_settings_resource, because cached
+        # property is only this one and re-cache is not required
+        self.refresh(force=False)
         self._settings.commit(self._conn,
                               payload)
         utils.cache_clear(self, force_refresh=False,

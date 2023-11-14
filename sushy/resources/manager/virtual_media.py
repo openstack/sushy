@@ -248,8 +248,10 @@ class VirtualMedia(base.ResourceBase):
                 parameter='verify_certificate', value=verify_certificate,
                 valid_values='boolean (True, False)')
 
+        etag = self._get_etag()
         self._conn.patch(self.path,
-                         data={'VerifyCertificate': verify_certificate})
+                         data={'VerifyCertificate': verify_certificate},
+                         etag=etag)
         self.invalidate()
 
     @property

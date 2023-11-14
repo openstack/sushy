@@ -97,6 +97,10 @@ class StorageController(base.ResourceBase):
         payload = utils.process_apply_time_input(
             payload, apply_time, maint_window_start_time,
             maint_window_duration)
+        # NOTE(vanou): To retrieve current ETag value of @Redfish.Settings
+        # but not update cached pending_settings, because cached property is
+        # only this one and re-cache this is not required
+        self.refresh(force=False)
         r = self._settings.commit(self._conn, payload)
         utils.cache_clear(self, force_refresh=False,
                           only_these=['pending_settings'])

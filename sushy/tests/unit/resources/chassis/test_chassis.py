@@ -34,6 +34,7 @@ class ChassisTestCase(base.TestCase):
             self.json_doc = json.load(f)
 
         self.conn.get.return_value.json.return_value = self.json_doc
+        self.conn.get.return_value.headers = {'ETag': 'd37f7bcd528e4d59'}
 
         self.chassis = chassis.Chassis(self.conn, '/redfish/v1/Chassis/Blade1',
                                        redfish_version='1.8.0')
@@ -144,7 +145,8 @@ class ChassisTestCase(base.TestCase):
             self.chassis.set_indicator_led(sushy.IndicatorLED.BLINKING)
             self.chassis._conn.patch.assert_called_once_with(
                 '/redfish/v1/Chassis/Blade1',
-                data={'IndicatorLED': 'Blinking'})
+                data={'IndicatorLED': 'Blinking'},
+                etag='d37f7bcd528e4d59')
 
             invalidate_mock.assert_called_once_with()
 

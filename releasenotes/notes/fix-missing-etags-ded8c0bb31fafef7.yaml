@@ -1,0 +1,6 @@
+---
+fixes:
+  - |
+    Fixes missing ETag in PATCH operation against Redfish resources with
+    backward compatibility for Redfish implementation which doesn't work
+    with ETag in header.

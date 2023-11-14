@@ -65,6 +65,8 @@ class ControllerTestCase(base.TestCase):
                          self.controller.supported_apply_times)
 
     def test_update(self):
+        self.conn.get.return_value.json.side_effect = [
+            self.json_doc, self.json_doc]
         mock_response = mock.Mock()
         mock_response.status_code = http_client.ACCEPTED
         mock_response.headers = {'Content-Length': 42,
@@ -81,7 +83,8 @@ class ControllerTestCase(base.TestCase):
             data={'ControllerRates': {'ConsistencyCheckRatePercent': 30},
                   '@Redfish.SettingsApplyTime': {
                       '@odata.type': '#Settings.v1_0_0.PreferredApplyTime',
-                      'ApplyTime': 'OnReset'}})
+                      'ApplyTime': 'OnReset'}},
+            etag=None)
         self.assertIsInstance(tm, taskmonitor.TaskMonitor)
         self.assertEqual('/Task/545', tm.task_monitor_uri)
 

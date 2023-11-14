@@ -83,13 +83,15 @@ class DriveTestCase(base.TestCase):
         self.assertEqual('3', volumes[1].identity)
 
     def test_set_indicator_led(self):
+        self.conn.get.return_value.headers = {'ETag': 'a3b01b63f80a4913'}
         with mock.patch.object(
                 self.stor_drive, 'invalidate',
                 autospec=True) as invalidate_mock:
             self.stor_drive.set_indicator_led(sushy.IndicatorLED.BLINKING)
             self.stor_drive._conn.patch.assert_called_once_with(
                 '/redfish/v1/Systems/437XR1138/Storage/1/Drives/'
-                '32ADF365C6C1B7BD', data={'IndicatorLED': 'Blinking'})
+                '32ADF365C6C1B7BD', data={'IndicatorLED': 'Blinking'},
+                etag='a3b01b63f80a4913')
 
             invalidate_mock.assert_called_once_with()
 

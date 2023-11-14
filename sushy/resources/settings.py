@@ -170,7 +170,7 @@ class SettingsField(base.CompositeField):
         :returns: Response object
         """
 
-        return connector.patch(self.resource_uri, data=value)
+        return connector.patch(self.resource_uri, data=value, etag=self._etag)
 
     @property
     def resource_uri(self):
