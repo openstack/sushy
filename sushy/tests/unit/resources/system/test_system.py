@@ -245,7 +245,8 @@ class SystemTestCase(base.TestCase):
                         sushy.BootSource.UTILITIES,
                         sushy.BootSource.DIAGS,
                         sushy.BootSource.SD_CARD,
-                        sushy.BootSource.UEFI_TARGET])
+                        sushy.BootSource.UEFI_TARGET,
+                        sushy.BootSource.UEFI_HTTP])
         self.assertEqual(expected, values)
         self.assertIsInstance(values, set)
 
@@ -479,6 +480,57 @@ class SystemTestCase(base.TestCase):
             data={'Boot': {'BootSourceOverrideMode': 'UEFI'}},
             etag='"3d7b838291941d"')
 
+    def test_set_system_boot_options_httpbooturi(self):
+        self.sys_inst.set_system_boot_options(
+            sushy.BootSource.UEFI_HTTP,
+            enabled=sushy.BootSourceOverrideEnabled.ONCE,
+            mode=sushy.BootSourceOverrideMode.UEFI,
+            http_boot_uri='http://test.lan/test_image.iso'
+            )
+        self.sys_inst._conn.patch.assert_called_once_with(
+            '/redfish/v1/Systems/437XR1138R2',
+            data={'Boot': {'BootSourceOverrideTarget': 'UefiHttp',
+                           'BootSourceOverrideEnabled': 'Once',
+                           'BootSourceOverrideMode': 'UEFI',
+                           'HttpBootUri': 'http://test.lan/test_image.iso'}},
+            etag=mock.ANY)
+
+    def test_set_system_boot_options_httpboot(self):
+        self.sys_inst.set_system_boot_options(
+            sushy.BootSource.UEFI_HTTP,
+            enabled=sushy.BootSourceOverrideEnabled.ONCE,
+            mode=sushy.BootSourceOverrideMode.UEFI
+            )
+        self.sys_inst._conn.patch.assert_called_once_with(
+            '/redfish/v1/Systems/437XR1138R2',
+            data={'Boot': {'BootSourceOverrideTarget': 'UefiHttp',
+                           'BootSourceOverrideEnabled': 'Once',
+                           'BootSourceOverrideMode': 'UEFI',
+                           'HttpBootUri': None}},
+            etag=mock.ANY)
+
+    def test_set_system_boot_options_httpboot_unset(self):
+        self.sys_inst._settings = mock.Mock()
+        self.sys_inst._settings.resource_uri = 'meow'
+        settings_body = json.dumps(
+            {'Boot': {'HttpBootUri': 'http://foo.bar'}}
+        )
+
+        get_settings = mock.MagicMock()
+        get_settings.json.return_value = settings_body
+        self.conn.get.side_effect = get_settings
+
+        self.sys_inst.set_system_boot_options(
+            sushy.BootSource.HDD,
+            mode=sushy.BootSourceOverrideMode.UEFI
+            )
+        self.sys_inst._conn.patch.assert_called_once_with(
+            '/redfish/v1/Systems/437XR1138R2',
+            data={'Boot': {'BootSourceOverrideTarget': 'Hdd',
+                           'BootSourceOverrideMode': 'UEFI',
+                           'HttpBootUri': None}},
+            etag=mock.ANY)
+
     def test_set_system_boot_source(self):
         self.sys_inst.set_system_boot_source(
             sushy.BootSource.PXE,
@@ -513,6 +565,16 @@ class SystemTestCase(base.TestCase):
             data={'Boot': {'BootSourceOverrideEnabled': 'Once',
                            'BootSourceOverrideTarget': 'Hdd'}},
             etag='81802dbf61beb0bd')
+
+    def test_set_system_boot_unsets_http_boot_uri(self):
+        self.sys_inst.set_system_boot_source(
+            sushy.BootSource.HDD,
+            enabled=sushy.BootSourceOverrideEnabled.ONCE)
+        self.sys_inst._conn.patch.assert_called_once_with(
+            '/redfish/v1/Systems/437XR1138R2',
+            data={'Boot': {'BootSourceOverrideEnabled': 'Once',
+                           'BootSourceOverrideTarget': 'Hdd'}},
+            etag=mock.ANY)
 
     def test_set_system_boot_source_invalid_target(self):
         self.assertRaises(exceptions.InvalidParameterValueError,

@@ -1,0 +1,9 @@
+---
+features:
+  - |
+    Adds functionality to the ``set_system_boot_options`` method
+    permitting an ``http_boot_uri`` option to be set.
+  - |
+    Adds an ``http_boot_uri`` option to the System boot object,
+    permitting an API client user to view what the BMC's
+    redfish ``HttpBootUri`` setting is.
