@@ -100,7 +100,7 @@ class Connector(object):
             LOG.debug('iDRAC is not yet ready after previous operation. '
                       'Error: %(err)s', {'err': exc_str})
             retry = True
-        elif 'iLO.2.15.InvalidOperationForSystemState' in exc_str:
+        elif 'iLO' in exc_str and 'InvalidOperationForSystemState' in exc_str:
             LOG.debug('iLO is not ready after previous operation. '
                       'Error: %(error)s', {'err': exc_str})
             retry = True
