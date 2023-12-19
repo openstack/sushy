@@ -97,6 +97,7 @@ class Connector(object):
 
     def _op(self, method, path='', data=None, headers=None, blocking=False,
             timeout=60, server_side_retries=_SERVER_SIDE_RETRIES,
+            allow_reauth=True,
             **extra_session_req_kwargs):
         """Generic RESTful request handler.
 
@@ -107,6 +108,8 @@ class Connector(object):
         :param headers: Optional dictionary of headers.
         :param blocking: Whether to block for asynchronous operations.
         :param timeout: Max time in seconds to wait for blocking async call.
+        :param allow_reauth: Whether to allow refreshing the authentication
+            token.
         :param extra_session_req_kwargs: Optional keyword argument to pass
          requests library arguments which would pass on to requests session
          object.
@@ -162,6 +165,10 @@ class Connector(object):
                 LOG.error('Authentication to the session service failed. '
                           'Please check credentials and try again.')
                 raise
+            if not allow_reauth:
+                LOG.error("Failure occured while attempting to retry "
+                          "request after refreshing the session: %s", e)
+                raise
             if self._auth is not None:
                 # self._session.auth value is only set when basic auth is used
                 if self._session.auth is not None:
@@ -188,16 +195,12 @@ class Connector(object):
                     raise
                 LOG.debug("Authentication refreshed successfully, "
                           "retrying the call.")
-                try:
-                    response = self._session.request(
-                        method, url, json=data,
-                        headers=headers,
-                        **extra_session_req_kwargs)
-                except exceptions.HTTPError as retry_exc:
-                    LOG.error("Failure occured while attempting to retry "
-                              "request after refreshing the session. Error: "
-                              "%s", retry_exc.message)
-                    raise
+                return self._op(
+                    method, path, data=data, headers=headers,
+                    blocking=blocking, timeout=timeout,
+                    server_side_retries=server_side_retries - 1,
+                    allow_reauth=False,
+                    **extra_session_req_kwargs)
             else:
                 if method == 'GET' and url.endswith('SessionService'):
                     LOG.debug('HTTP GET of SessionService failed %s, '
