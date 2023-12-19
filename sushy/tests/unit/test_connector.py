@@ -335,6 +335,46 @@ class ConnectorOpTestCase(base.TestCase):
         self.auth.authenticate.assert_called_once()
         self.assertEqual(response.json, third_response.json)
 
+    def test_timed_out_session_fail_after_reestablish(self):
+        self.auth._session_key = 'asdf1234'
+        self.auth.get_session_key.return_value = 'asdf1234'
+        self.conn._auth = self.auth
+        self.session = mock.Mock(spec=requests.Session)
+        self.session.auth = None
+        self.conn._session = self.session
+        self.request = self.session.request
+        first_response = mock.MagicMock()
+        first_response.status_code = http_client.FORBIDDEN
+        second_response = mock.MagicMock()
+        second_response.status_code = http_client.BAD_REQUEST
+        self.request.side_effect = [first_response, second_response]
+        self.assertRaises(exceptions.BadRequestError,
+                          self.conn._op,
+                          'POST', path='fake/path', data=self.data,
+                          headers=self.headers)
+        self.auth.refresh_session.assert_called_with()
+        self.auth.can_refresh_session.assert_called_with()
+
+    def test_timed_out_session_fail_after_reestablish_no_recursion(self):
+        self.auth._session_key = 'asdf1234'
+        self.auth.get_session_key.return_value = 'asdf1234'
+        self.conn._auth = self.auth
+        self.session = mock.Mock(spec=requests.Session)
+        self.session.auth = None
+        self.conn._session = self.session
+        self.request = self.session.request
+        first_response = mock.MagicMock()
+        first_response.status_code = http_client.FORBIDDEN
+        second_response = mock.MagicMock()
+        second_response.status_code = http_client.FORBIDDEN
+        self.request.side_effect = [first_response, second_response]
+        self.assertRaises(exceptions.AccessError,
+                          self.conn._op,
+                          'POST', path='fake/path', data=self.data,
+                          headers=self.headers)
+        self.auth.refresh_session.assert_called_with()
+        self.auth.can_refresh_session.assert_called_with()
+
     def test_connection_error(self):
         self.request.side_effect = requests.exceptions.ConnectionError
         self.assertRaises(exceptions.ConnectionError, self.conn._op, 'GET')
