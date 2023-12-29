@@ -27,6 +27,7 @@ from sushy.resources.chassis import chassis
 from sushy.resources import common
 from sushy.resources import constants as res_cons
 from sushy.resources.manager import manager
+from sushy.resources.manager import virtual_media
 from sushy.resources import settings
 from sushy.resources.system import bios
 from sushy.resources.system import constants as sys_cons
@@ -547,6 +548,18 @@ class System(base.ResourceBase):
             utils.get_sub_resource_path_by(self, 'SecureBoot'),
             redfish_version=self.redfish_version,
             registries=self.registries, root=self.root)
+
+    @property
+    @utils.cache_it
+    def virtual_media(self):
+        """Property to reference `VirtualMedia` instance
+
+        :returns: A `VirtualMediaCollection` instance.
+        """
+        return virtual_media.VirtualMediaCollection(
+            self._conn, utils.get_sub_resource_path_by(self, 'VirtualMedia'),
+            redfish_version=self.redfish_version, registries=self.registries,
+            root=self.root)
 
 
 class SystemCollection(base.ResourceCollectionBase):

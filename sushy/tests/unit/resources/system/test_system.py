@@ -23,6 +23,7 @@ from sushy import exceptions
 from sushy.resources.chassis import chassis
 from sushy.resources import constants as res_cons
 from sushy.resources.manager import manager
+from sushy.resources.manager import virtual_media
 from sushy.resources.oem import fake
 from sushy.resources.system import bios
 from sushy.resources.system import processor
@@ -909,6 +910,85 @@ class SystemTestCase(base.TestCase):
                               fake.FakeOEMSystemExtension)
         self.assertIs(self.sys_inst, contoso_system_extn_inst._parent_resource)
         self.assertEqual('Contoso', contoso_system_extn_inst._vendor_id)
+
+    def test_no_virtual_media_attr(self):
+        with self.assertRaisesRegex(
+            exceptions.MissingAttributeError, 'attribute VirtualMedia'):
+            self.sys_inst.virtual_media
+
+
+class SystemWithVirtualMedia(base.TestCase):
+
+    def setUp(self):
+        super(SystemWithVirtualMedia, self).setUp()
+        self.conn = mock.Mock()
+        with open('sushy/tests/unit/json_samples/'
+                  'systemv1_20.json') as f:
+            self.json_doc = json.load(f)
+
+        self.conn.get.return_value.json.return_value = self.json_doc
+
+        self.sys_inst = system.System(
+            self.conn, '/redfish/v1/Systems/437XR1138R2',
+            redfish_version='1.0.2')
+
+    def test_virtual_media(self):
+        # | GIVEN |
+        with open('sushy/tests/unit/json_samples/'
+                  'virtual_mediav1_6.json') as f:
+            virtual_media_json = json.load(f)
+
+        with open('sushy/tests/unit/json_samples/'
+                  'virtual_media_collectionv1_6.json') as f:
+            virtual_media_collection_json = json.load(f)
+
+        self.conn.get.return_value.json.side_effect = [
+            virtual_media_collection_json, virtual_media_json]
+
+        # | WHEN |
+        actual_virtual_media = self.sys_inst.virtual_media
+
+        # | THEN |
+        self.assertIsInstance(actual_virtual_media,
+                              virtual_media.VirtualMediaCollection)
+        self.assertEqual(actual_virtual_media.name, 'Virtual Media Services')
+
+        member = actual_virtual_media.get_member(
+            '/redfish/v1/Systems/437XR1138R2/VirtualMedia/CD1')
+
+        self.assertEqual(member.image_name, 'mymedia-read-only')
+        self.assertTrue(member.inserted)
+        self.assertFalse(member.write_protected)
+        self.assertTrue(member.verify_certificate)
+
+    def test_virtual_media_on_refresh(self):
+        # | GIVEN |
+        with open('sushy/tests/unit/json_samples/'
+                  'virtual_media_collectionv1_6.json') as f:
+            self.conn.get.return_value.json.return_value = json.load(f)
+
+        # | WHEN & THEN |
+        actual_virtual_media = self.sys_inst.virtual_media
+        self.assertIsInstance(actual_virtual_media,
+                              virtual_media.VirtualMediaCollection)
+
+        with open('sushy/tests/unit/json_samples/systemv1_20.json', 'r') as f:
+            self.conn.get.return_value.json.return_value = json.loads(f.read())
+
+        self.sys_inst.invalidate()
+        self.sys_inst.refresh(force=False)
+
+        self.assertTrue(actual_virtual_media._is_stale)
+
+        # | GIVEN |
+        with open('sushy/tests/unit/json_samples/'
+                  'virtual_media_collectionv1_6.json') as f:
+            self.conn.get.return_value.json.return_value = json.load(f)
+
+        # | WHEN & THEN |
+        self.assertIsInstance(self.sys_inst.virtual_media,
+                              virtual_media.VirtualMediaCollection)
+        self.assertFalse(actual_virtual_media._is_stale)
 
 
 class SystemCollectionTestCase(base.TestCase):

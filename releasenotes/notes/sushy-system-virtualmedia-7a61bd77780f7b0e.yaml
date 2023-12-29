@@ -1,0 +1,6 @@
+---
+features:
+  - |
+    Adds support for virtual media via ``System`` resource. For more
+    information, see `bug 2039458
+    <https://bugs.launchpad.net/sushy/+bug/2039458>`_.
