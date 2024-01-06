@@ -118,7 +118,8 @@ class VirtualMedia(base.ResourceBase):
         return (
             (error.code.endswith(".ActionParameterMissing")
              or error.code.endswith(".PropertyMissing"))
-            and "#/TransferProtocolType" in error.related_properties
+            and (("#/TransferProtocolType" in error.related_properties)
+                 or ("/TransferProtocolType" in error.related_properties))
         )
 
     def is_transfer_method_required(self, error=None):
