@@ -1,0 +1,98 @@
+{
+    "@odata.type": "#Manager.v1_18_0.Manager",
+    "Id": "BMC",
+    "Name": "Manager",
+    "ManagerType": "BMC",
+    "Description": "Contoso BMC",
+    "ServiceEntryPointUUID": "92384634-2938-2342-8820-489239905423",
+    "UUID": "58893887-8974-2487-2389-841168418919",
+    "Model": "Joo Janta 200",
+    "DateTime": "2015-03-13T04:14:33+06:00",
+    "DateTimeLocalOffset": "+06:00",
+    "Status": {
+      "State": "Enabled",
+      "Health": "OK"
+    },
+    "PowerState": "On",
+    "GraphicalConsole": {
+      "ServiceEnabled": true,
+      "MaxConcurrentSessions": 2,
+      "ConnectTypesSupported": [
+        "KVMIP"
+      ]
+    },
+    "SerialConsole": {
+      "ServiceEnabled": true,
+      "MaxConcurrentSessions": 1,
+      "ConnectTypesSupported": [
+        "Telnet",
+        "SSH",
+        "IPMI"
+      ]
+    },
+    "CommandShell": {
+      "ServiceEnabled": true,
+      "MaxConcurrentSessions": 4,
+      "ConnectTypesSupported": [
+        "Telnet",
+        "SSH"
+      ]
+    },
+    "FirmwareVersion": "1.45.455b66-rev4",
+    "AdditionalFirmwareVersions": {
+      "Bootloader": "v2022.01",
+      "Kernel": "Linux 5.13.0-30-generic arm71",
+      "Oem": {
+        "Contoso": {
+          "@odata.type": "#ContosoSoftwareInventory.v1_0_0.AdditionalVersions",
+          "ManagementApp": "1.30"
+        }
+      }
+    },
+    "NetworkProtocol": {
+      "@odata.id": "/redfish/v1/Managers/BMC/NetworkProtocol"
+    },
+    "EthernetInterfaces": {
+      "@odata.id": "/redfish/v1/Managers/BMC/EthernetInterfaces"
+    },
+    "HostInterfaces": {
+      "@odata.id": "/redfish/v1/Managers/BMC/HostInterfaces"
+    },
+    "SerialInterfaces": {
+      "@odata.id": "/redfish/v1/Managers/BMC/SerialInterfaces"
+    },
+    "LogServices": {
+      "@odata.id": "/redfish/v1/Managers/BMC/LogServices"
+    },
+    "DedicatedNetworkPorts": {
+      "@odata.id": "/redfish/v1/Managers/BMC/DedicatedNetworkPorts"
+    },
+    "SecurityPolicy": {
+      "@odata.id": "/redfish/v1/Managers/BMC/SecurityPolicy"
+    },
+    "Links": {
+      "ManagerForServers": [
+        {
+          "@odata.id": "/redfish/v1/Systems/437XR1138R2"
+        }
+      ],
+      "ManagerForChassis": [
+        {
+          "@odata.id": "/redfish/v1/Chassis/1U"
+        }
+      ],
+      "ManagerInChassis": {
+        "@odata.id": "/redfish/v1/Chassis/1U"
+      }
+    },
+    "Actions": {
+      "#Manager.Reset": {
+        "target": "/redfish/v1/Managers/BMC/Actions/Manager.Reset",
+        "ResetType@Redfish.AllowableValues": [
+          "ForceRestart",
+          "GracefulRestart"
+        ]
+      }
+    },
+    "@odata.id": "/redfish/v1/Managers/BMC"
+  }

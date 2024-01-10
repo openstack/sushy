@@ -1,0 +1,12 @@
+{
+    "@odata.type": "#VirtualMediaCollection.VirtualMediaCollection",
+    "Name": "Virtual Media Services",
+    "Description": "Virtual Media Service Settings",
+    "Members@odata.count": 1,
+    "Members": [
+      {
+        "@odata.id": "/redfish/v1/Systems/437XR1138R2/VirtualMedia/CD1"
+      }
+    ],
+    "@odata.id": "/redfish/v1/Systems/437XR1138R2/VirtualMedia"
+  }

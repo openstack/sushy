@@ -305,6 +305,26 @@ class ManagerTestCase(base.TestCase):
             '/redfish/v1/Chassis/1U', actual_chassis[0].path)
 
 
+class ManagerWithoutVirtualMedia(base.TestCase):
+
+    def setUp(self):
+        super(ManagerWithoutVirtualMedia, self).setUp()
+        self.conn = mock.Mock()
+        with open('sushy/tests/unit/json_samples/'
+                  'managerv1_18.json') as f:
+            self.json_doc = json.load(f)
+
+        self.conn.get.return_value.json.return_value = self.json_doc
+
+        self.manager = manager.Manager(self.conn, '/redfish/v1/Managers/BMC',
+                                       redfish_version='1.0.2')
+
+    def test_no_virtual_media_attr(self):
+        with self.assertRaisesRegex(
+            exceptions.MissingAttributeError, 'attribute VirtualMedia'):
+            self.manager.virtual_media
+
+
 class ManagerCollectionTestCase(base.TestCase):
 
     def setUp(self):
