@@ -207,6 +207,16 @@ class VirtualMediaTestCase(base.TestCase):
         retval = self.sys_virtual_media.is_transfer_protocol_required(error)
         self.assertTrue(retval)
 
+    def test_is_transfer_protocol_required_alt3(self):
+        with open('sushy/tests/unit/json_samples/'
+                  'transfer_proto_required_error3.json') as f:
+            response_obj = json.load(f)
+        response = mock.Mock(spec=['json', 'status_code'])
+        response.json.return_value = response_obj
+        error = exceptions.HTTPError('GET', 'VirtualMedia', response)
+        retval = self.sys_virtual_media.is_transfer_protocol_required(error)
+        self.assertTrue(retval)
+
     def test_is_transfer_method_required(self):
         with open('sushy/tests/unit/json_samples/'
                   'transfer_method_required_error.json') as f:
