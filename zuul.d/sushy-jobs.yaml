@@ -19,3 +19,10 @@
       - ^sushy/tests/.*$
     required-projects:
       - openstack/sushy
+
+- job:
+    name: sushy-tox-codespell
+    parent: openstack-tox
+    timeout: 7200
+    vars:
+      tox_envlist: codespell
