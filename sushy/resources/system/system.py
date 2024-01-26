@@ -339,7 +339,7 @@ class System(base.ResourceBase):
                 # to the intent of "use whatever the dhcp server says".
                 data['Boot']['HttpBootUri'] = None
             else:
-                # Explicilty set the URI.
+                # Explicitly set the URI.
                 data['Boot']['HttpBootUri'] = http_boot_uri
         elif not http_boot_uri:
             # We're not doing boot from URL, we should cleanup any setting

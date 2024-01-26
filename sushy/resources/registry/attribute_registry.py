@@ -67,7 +67,7 @@ class AttributeRegistryEntryField(base.CompositeField):
     attributes = AttributeListField('Attributes')
     """List of attributes in this registry"""
 
-    # Vendors may have aditional items such as Dependencies, Menus, etc.
+    # Vendors may have additional items such as Dependencies, Menus, etc.
     # Only get the attributes.
 
 

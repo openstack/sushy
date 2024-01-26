@@ -319,7 +319,7 @@
         },
         "AccountModified": {
             "Description": "Indicates that the account was successfully modified.",
-            "Message": "The account was successfully modifed.",
+            "Message": "The account was successfully modified.",
             "Severity": "OK",
             "NumberOfArgs": 0,
             "Resolution": "No resolution is required."

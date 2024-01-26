@@ -375,7 +375,7 @@ class BiosZTTestCase(base.TestCase):
 
         registries = {}
         conn = mock.Mock()
-        # Note(iurygregory): re-use message registry for now.
+        # Note(iurygregory): reuse message registry for now.
         with open('sushy/tests/unit/json_samples/message_registry.json') as f:
             conn.get.return_value.json.return_value = json.load(f)
             msg_reg = message_registry.MessageRegistry(

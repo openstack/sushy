@@ -23,7 +23,7 @@ Features
 * Changing systems boot device, frequency (Once or permanently) and mode
   (UEFI or BIOS)
 * Chassis management
-* OEM extention
+* OEM extension
 * Virtual media management
 * Session Management
 

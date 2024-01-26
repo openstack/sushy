@@ -187,7 +187,7 @@ class Connector(object):
                           'Please check credentials and try again.')
                 raise
             if not allow_reauth:
-                LOG.error("Failure occured while attempting to retry "
+                LOG.error("Failure occurred while attempting to retry "
                           "request after refreshing the session: %s", e)
                 raise
             if self._auth is not None:
@@ -211,7 +211,7 @@ class Connector(object):
                                     're-authenticate.')
                         self._auth.authenticate()
                 except exceptions.AccessError as refresh_exc:
-                    LOG.error("A failure occured while attempting to refresh "
+                    LOG.error("A failure occurred while attempting to refresh "
                               "the session. Error: %s", refresh_exc.message)
                     raise
                 LOG.debug("Authentication refreshed successfully, "

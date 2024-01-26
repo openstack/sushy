@@ -68,7 +68,7 @@ dynamic way. To run it do
   # Or, running with custom parameters
   sushy-emulator --port 8000 --libvirt-uri "qemu:///system"
 
-That's it, now you can test Sushy against the ``http://locahost:8000``
+That's it, now you can test Sushy against the ``http://localhost:8000``
 endpoint.
 
 

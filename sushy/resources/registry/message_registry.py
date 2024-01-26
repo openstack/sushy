@@ -89,7 +89,7 @@ class MessageRegistry(base.ResourceBase):
 
 
 def parse_message(message_registries, message_field):
-    """Parse the messages in registries and substitute any parms
+    """Parse the messages in registries and substitute any params
 
     Check only registries that support messages.
 

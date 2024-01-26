@@ -41,7 +41,7 @@ class AuthBase(object, metaclass=abc.ABCMeta):
         :param connector: Connector for http connections
         """
         # Set the root resource, and connector to use
-        # for normal opreations.
+        # for normal operations.
         self._root_resource = root_resource
         self._connector = connector
         self._connector.set_auth(self)
@@ -275,8 +275,8 @@ class SessionOrBasicAuth(SessionAuth):
             # Previously we would silently eat the failure as SushyError
             # and fallback as it is a general fault. Callers on direct
             # invocations through a connector _op method call can still
-            # receieve these exceptions, and applicaitons like Ironic do
-            # consider a client re-use disqualifier if there has been
+            # receive these exceptions, and applications like Ironic do
+            # consider a client reuse disqualifier if there has been
             # a connection failure, so it is okay for us to fix the behavior
             # here.
             raise

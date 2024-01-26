@@ -528,7 +528,7 @@
             "Resolution": "No resolution is required."
         },
         "ResourceTypeIncompatible": {
-            "Description": "Indicates that the resource type of the operation does not match that for the operation destination.  Examples of when this can happen include during a POST to a collection using the wrong resource type, an update where the @odata.types do not match or on a major version incompatability.",
+            "Description": "Indicates that the resource type of the operation does not match that for the operation destination.  Examples of when this can happen include during a POST to a collection using the wrong resource type, an update where the @odata.types do not match or on a major version incompatibility.",
             "Message": "The @odata.type of the request body %1 is incompatible with the @odata.type of the resource which is %2.",
             "Severity": "Critical",
             "NumberOfArgs": 2,

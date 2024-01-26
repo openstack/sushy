@@ -176,10 +176,10 @@ class BootProgressStates(enum.Enum):
     """Initialization of the Primary Processor has started."""
 
     BUS = 'BusInitializationStarted'
-    """Initalization of the buses has started."""
+    """Initialization of the buses has started."""
 
     MEMORY = 'MemoryInitializationStarted'
-    """Initalization of memory has started."""
+    """Initialization of memory has started."""
 
     SECONDARY_PROCESSOR = 'SecondaryProcessorInitializationStarted'
     """Secondary Prcessors have started initialization."""
@@ -194,7 +194,7 @@ class BootProgressStates(enum.Enum):
     """System is in the Setup utility."""
 
     OS_BOOT_STARTED = 'OSBootStarted'
-    """Boot of the Operating Sysem has started."""
+    """Boot of the Operating System has started."""
 
     OS_RUNNING = 'OSRunning'
     """Operating System Running."""

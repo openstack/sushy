@@ -395,7 +395,7 @@ class Sushy(base.ResourceBase):
             links_url = self.json.get('Links')
             sessions_uri = links_url['Sessions']['@odata.id']
             # Save the session URL for post detection and prevention
-            # of recursive autentication attempts.
+            # of recursive authentication attempts.
             self._conn._sessions_uri = sessions_uri
             return sessions_uri
         except (TypeError, KeyError):
