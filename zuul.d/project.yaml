@@ -10,6 +10,8 @@
         - ironic-cross-sushy
         - sushy-tempest-bios-redfish-pxe
         - sushy-tempest-uefi-redfish-vmedia
+        - sushy-tox-codespell:
+            voting: false
     gate:
       jobs:
         - ironic-cross-sushy
