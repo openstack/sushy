@@ -21,6 +21,7 @@ from sushy.resources import common
 from sushy.resources import constants as res_cons
 from sushy.resources.manager import constants as mgr_cons
 from sushy.resources.manager import virtual_media
+from sushy.resources.system import ethernet_interface
 from sushy import utils
 
 
@@ -236,6 +237,21 @@ class Manager(base.ResourceBase):
                                 redfish_version=self.redfish_version,
                                 registries=self.registries, root=self.root)
                 for path in paths]
+
+    @property
+    @utils.cache_it
+    def ethernet_interfaces(self):
+        """Property to reference `EthernetInterfaceCollection` instance
+
+        It is set once when the first time it is queried. On refresh,
+        this property is marked as stale (greedy-refresh not done).
+        Here the actual refresh of the sub-resource happens, if stale.
+        """
+        return ethernet_interface.EthernetInterfaceCollection(
+            self._conn,
+            utils.get_sub_resource_path_by(self, "EthernetInterfaces"),
+            redfish_version=self.redfish_version,
+            registries=self.registries, root=self.root)
 
 
 class ManagerCollection(base.ResourceCollectionBase):

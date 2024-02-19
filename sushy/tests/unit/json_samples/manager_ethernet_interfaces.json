@@ -1,0 +1,46 @@
+{
+    "@odata.type": "#EthernetInterface.v1_4_0.EthernetInterface",
+    "Id": "1",
+    "Name": "Ethernet Interface",
+    "Description": "Manager NIC 1",
+    "Status": {
+        "State": "Enabled",
+        "Health": "OK"
+    },
+    "PermanentMACAddress": "B4:AC:57:49:90:CA",
+    "MACAddress": "B4:AC:57:49:90:CA",
+    "SpeedMbps": 1000,
+    "FullDuplex": true,
+    "HostName": "web483",
+    "FQDN": "web483.contoso.com",
+    "IPv6DefaultGateway": "f82f:ff01:1bb0:7750::1",
+    "NameServers": [
+        "names.contoso.com"
+    ],
+    "IPv4Addresses": [{
+        "Address": "192.168.0.5",
+        "SubnetMask": "255.255.252.0",
+        "AddressOrigin": "Static",
+        "Gateway": "192.168.0.1"
+    }],
+    "IPv4StaticAddresses": [{
+        "Address": "192.168.0.5",
+        "SubnetMask": "255.255.252.0",
+        "AddressOrigin": "Static"
+    }],
+    "IPv6Addresses": [{
+        "Address": "f82f:ff01:1bb0:7750::2",
+        "PrefixLength": 64,
+        "AddressOrigin": "Static",
+        "AddressState": "Preferred"
+    }],
+    "IPv6StaticAddresses": [{
+        "Address": "f82f:ff01:1bb0:7750::2",
+        "PrefixLength": 64
+    }],
+    "VLANs": {
+        "@odata.id": "/redfish/v1/Managers/1/EthernetInterfaces/1/VLANs"
+    },
+    "@odata.context": "/redfish/v1/$metadata#EthernetInterface.EthernetInterface",
+    "@odata.id": "/redfish/v1/Managers/1/EthernetInterfaces/1"
+}
