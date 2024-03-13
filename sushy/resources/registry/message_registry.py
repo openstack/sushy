@@ -93,7 +93,7 @@ def parse_message(message_registries, message_field):
 
     Check only registries that support messages.
 
-    :param registries: dict of Message Registries
+    :param message_registries: dict of Message Registries
     :param message_field: settings.MessageListField to parse
 
     :returns: parsed settings.MessageListField with missing attributes filled
