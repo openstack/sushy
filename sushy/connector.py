@@ -51,15 +51,6 @@ class Connector(object):
         # By default, we ask HTTP server to shut down HTTP connection we've
         # just used.
         self._session.headers['Connection'] = 'close'
-        # NOTE(TheJulia): Depending on the BMC, offering compression as an
-        # acceptable response changes the ETag behavior to offering an
-        # automatic "weak" ETag response, which is appropriate because the
-        # body content *may* not be a byte for byte match given compression.
-        # Overall, the value of compression is less than the value of concise
-        # interaction with the BMC. Setting to identity basically means
-        # "without modification or compression". By default, python-requests
-        # indicates responses can be compressed.
-        self._session.headers['Accept-Encoding'] = 'identity'
 
         if username or password:
             LOG.warning('Passing username and password to Connector is '
@@ -115,7 +106,8 @@ class Connector(object):
             PUT, PATCH, etc...
         :param path: The sub-URI or absolute URL path to the resource.
         :param data: Optional JSON data.
-        :param headers: Optional dictionary of headers.
+        :param headers: Optional dictionary of headers. Use None value
+                        to remove a default header.
         :param blocking: Whether to block for asynchronous operations.
         :param timeout: Max time in seconds to wait for blocking async call or
                         for requests library to connect and read. If a custom
@@ -138,12 +130,25 @@ class Connector(object):
 
         url = path if urlparse.urlparse(path).netloc else urlparse.urljoin(
             self._url, path)
-        headers = headers or {}
+        headers = (headers or {}).copy()
         lc_headers = [k.lower() for k in headers]
         if data is not None and 'content-type' not in lc_headers:
             headers['Content-Type'] = 'application/json'
         if 'odata-version' not in lc_headers:
             headers['OData-Version'] = '4.0'
+        # NOTE(TheJulia): Depending on the BMC, offering compression as an
+        # acceptable response changes the ETag behavior to offering an
+        # automatic "weak" ETag response, which is appropriate because the
+        # body content *may* not be a byte for byte match given compression.
+        # Overall, the value of compression is less than the value of concise
+        # interaction with the BMC. Setting to identity basically means
+        # "without modification or compression". By default, python-requests
+        # indicates responses can be compressed.
+        if 'accept-encoding' not in lc_headers:
+            headers['Accept-Encoding'] = 'identity'
+        # Allow removing default headers
+        headers = {k: v for k, v in headers.items() if v is not None}
+
         # TODO(lucasagomes): We should mask the data to remove sensitive
         # information
         LOG.debug('HTTP request: %(method)s %(url)s; headers: %(headers)s; '
@@ -261,6 +266,21 @@ class Connector(object):
                             server_side_retries_left)
                 time.sleep(self._server_side_retries_delay)
                 server_side_retries_left -= 1
+                return self._op(
+                    method, path, data=data, headers=headers,
+                    blocking=blocking, timeout=timeout,
+                    server_side_retries_left=server_side_retries_left,
+                    **extra_session_req_kwargs)
+            else:
+                raise
+        except exceptions.NotAcceptableError as e:
+            # NOTE(dtantsur): some HPE Gen 10 Plus machines do not allow
+            # identity encoding when fetching registries.
+            if (method.lower() == 'get'
+                    and headers.get('Accept-Encoding') == 'identity'):
+                LOG.warning('Server has indicated a NotAcceptable for %s, '
+                            'retrying without identity encoding', e)
+                headers = dict(headers, **{'Accept-Encoding': None})
                 return self._op(
                     method, path, data=data, headers=headers,
                     blocking=blocking, timeout=timeout,
