@@ -160,6 +160,10 @@ class AccessError(HTTPError):
     pass
 
 
+class NotAcceptableError(HTTPError):
+    pass
+
+
 class MissingXAuthToken(HTTPError):
     message = ('No X-Auth-Token returned from remote host when '
                'attempting to establish a session. Error: %(error)s')
@@ -176,6 +180,8 @@ def raise_for_response(method, url, response):
     elif response.status_code in (http_client.UNAUTHORIZED,
                                   http_client.FORBIDDEN):
         raise AccessError(method, url, response)
+    elif response.status_code == http_client.NOT_ACCEPTABLE:
+        raise NotAcceptableError(method, url, response)
     elif response.status_code >= http_client.INTERNAL_SERVER_ERROR:
         raise ServerSideError(method, url, response)
     else:

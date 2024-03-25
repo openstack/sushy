@@ -168,17 +168,24 @@ class ConnectorOpTestCase(base.TestCase):
             server_side_retries=10, server_side_retries_delay=3)
         self.conn._auth = mock_auth
         self.data = {'fake': 'data'}
-        self.headers = {'X-Fake': 'header'}
+        self.headers = {'Accept-Encoding': 'identity', 'OData-Version': '4.0'}
         self.session = mock.Mock(spec=requests.Session)
         self.conn._session = self.session
         self.request = self.session.request
         self.request.return_value.status_code = http_client.OK
 
     def test_ok_get(self):
-        self.conn._op('GET', path='fake/path', headers=self.headers)
+        self.conn._op('GET', path='fake/path')
         self.request.assert_called_once_with(
             'GET', 'http://foo.bar:1234/fake/path',
             headers=self.headers, json=None, verify=True, timeout=60)
+
+    def test_ok_get_with_headers(self):
+        self.conn._op('GET', path='fake/path', headers={'answer': '42'})
+        self.request.assert_called_once_with(
+            'GET', 'http://foo.bar:1234/fake/path',
+            headers=dict(self.headers, answer='42'),
+            json=None, verify=True, timeout=60)
 
     def test_response_callback(self):
         mock_response_callback = mock.MagicMock()
@@ -188,34 +195,42 @@ class ConnectorOpTestCase(base.TestCase):
         self.assertEqual(1, mock_response_callback.call_count)
 
     def test_ok_get_url_redirect_false(self):
-        self.conn._op('GET', path='fake/path', headers=self.headers,
-                      allow_redirects=False)
+        self.conn._op('GET', path='fake/path', allow_redirects=False)
         self.request.assert_called_once_with(
             'GET', 'http://foo.bar:1234/fake/path',
             headers=self.headers, json=None, allow_redirects=False,
             verify=True, timeout=60)
 
     def test_ok_post(self):
-        self.conn._op('POST', path='fake/path', data=self.data.copy(),
-                      headers=self.headers)
+        self.conn._op('POST', path='fake/path', data=self.data.copy())
         self.request.assert_called_once_with(
             'POST', 'http://foo.bar:1234/fake/path',
-            json=self.data, headers=self.headers, verify=True, timeout=60)
+            json=self.data,
+            headers=dict(self.headers, **{'Content-Type': 'application/json'}),
+            verify=True, timeout=60)
+
+    def test_ok_post_with_headers(self):
+        self.conn._op('POST', path='fake/path', data=self.data.copy(),
+                      headers={'answer': 42})
+        self.request.assert_called_once_with(
+            'POST', 'http://foo.bar:1234/fake/path',
+            json=self.data,
+            headers=dict(self.headers, **{'Content-Type': 'application/json',
+                                          'answer': 42}),
+            verify=True, timeout=60)
 
     def test_ok_put(self):
-        self.conn._op('PUT', path='fake/path', data=self.data.copy(),
-                      headers=self.headers)
+        self.conn._op('PUT', path='fake/path', data=self.data.copy())
         self.request.assert_called_once_with(
             'PUT', 'http://foo.bar:1234/fake/path',
-            json=self.data, headers=self.headers, verify=True, timeout=60)
+            headers=dict(self.headers, **{'Content-Type': 'application/json'}),
+            json=self.data, verify=True, timeout=60)
 
     def test_ok_delete(self):
-        expected_headers = self.headers.copy()
-        expected_headers['OData-Version'] = '4.0'
-        self.conn._op('DELETE', path='fake/path', headers=self.headers.copy())
+        self.conn._op('DELETE', path='fake/path')
         self.request.assert_called_once_with(
             'DELETE', 'http://foo.bar:1234/fake/path',
-            headers=expected_headers, json=None, verify=True, timeout=60)
+            headers=self.headers, json=None, verify=True, timeout=60)
 
     def test_ok_post_with_session(self):
         self.conn._session.headers = {}
@@ -242,22 +257,23 @@ class ConnectorOpTestCase(base.TestCase):
             'GET', 'http://foo.bar:1234' + path,
             headers=expected_headers, json=None, verify=True, timeout=60)
 
-    def test_odata_version_header_redfish_no_headers(self):
-        path = '/redfish/v1/bar'
-        expected_headers = {'OData-Version': '4.0'}
-        self.conn._op('GET', path=path)
-        self.request.assert_called_once_with(
-            'GET', 'http://foo.bar:1234' + path,
-            headers=expected_headers, json=None, verify=True, timeout=60)
-
     def test_odata_version_header_redfish_existing_header(self):
         path = '/redfish/v1/foo'
         headers = {'OData-Version': '3.0'}
-        expected_headers = dict(headers)
+        expected_headers = dict(self.headers, **headers)
         self.conn._op('GET', path=path, headers=headers)
         self.request.assert_called_once_with(
             'GET', 'http://foo.bar:1234' + path,
             headers=expected_headers, json=None, verify=True, timeout=60)
+
+    def test_remove_header_accept_encoding(self):
+        path = '/redfish/v1/foo'
+        headers = {'Accept-Encoding': None}
+        self.headers.pop('Accept-Encoding')
+        self.conn._op('GET', path=path, headers=headers)
+        self.request.assert_called_once_with(
+            'GET', 'http://foo.bar:1234' + path,
+            headers=self.headers, json=None, verify=True, timeout=60)
 
     def test_timed_out_session_unable_to_create_session(self):
         self.conn._auth.can_refresh_session.return_value = False
@@ -522,6 +538,29 @@ class ConnectorOpTestCase(base.TestCase):
         self.assertEqual(0, mock_sleep.call_count)
         self.assertEqual(1, self.request.call_count)
 
+    def test_op_retry_without_identity(self):
+        self.request.side_effect = [
+            mock.Mock(status_code=http_client.NOT_ACCEPTABLE),
+            mock.Mock(status_code=http_client.OK),
+        ]
+        self.conn._op('GET', 'http://foo.bar')
+
+        self.assertEqual(2, self.request.call_count)
+        headers_no_accept = self.headers.copy()
+        headers_no_accept.pop('Accept-Encoding')
+        self.request.assert_has_calls([
+            mock.call('GET', 'http://foo.bar', headers=self.headers,
+                      json=None, verify=True, timeout=60),
+            mock.call('GET', 'http://foo.bar', headers=headers_no_accept,
+                      json=None, verify=True, timeout=60),
+        ])
+
+    def test_op_retry_without_identity_fails(self):
+        self.request.return_value.status_code = http_client.NOT_ACCEPTABLE
+        self.assertRaises(exceptions.NotAcceptableError, self.conn._op,
+                          'GET', 'http://foo.bar')
+        self.assertEqual(2, self.request.call_count)
+
     def test_access_error(self):
         self.conn._auth = None
 
@@ -715,8 +754,7 @@ class ConnectorOpTestCase(base.TestCase):
             '/redfish/v1/Systems/1',
             data={'Boot': {'BootSourceOverrideTarget': 'Cd',
                            'BootSourceOverrideEnabled': 'Once'}},
-            headers={'X-Fake': 'header',
-                     'If-Match': '"3d7b8a7360bf2941d"'},
+            headers=dict(self.headers, **{'If-Match': '"3d7b8a7360bf2941d"'}),
             blocking=False,
             timeout=60)
 
@@ -738,8 +776,8 @@ class ConnectorOpTestCase(base.TestCase):
             '/redfish/v1/Systems/1',
             data={'Boot': {'BootSourceOverrideTarget': 'Cd',
                            'BootSourceOverrideEnabled': 'Once'}},
-            headers={'X-Fake': 'header',
-                     'If-Match': 'W/"3d7b8a7360bf2941d"'},
+            headers=dict(self.headers,
+                         **{'If-Match': 'W/"3d7b8a7360bf2941d"'}),
             blocking=False,
             timeout=60)
 
@@ -759,7 +797,7 @@ class ConnectorOpTestCase(base.TestCase):
             '/redfish/v1/Systems/1',
             data={'Boot': {'BootSourceOverrideTarget': 'Cd',
                            'BootSourceOverrideEnabled': 'Once'}},
-            headers={'X-Fake': 'header'},
+            headers=self.headers,
             blocking=False,
             timeout=60)
 
@@ -787,8 +825,7 @@ class ConnectorOpTestCase(base.TestCase):
             '/redfish/v1/Systems/1',
             data={'Boot': {'BootSourceOverrideTarget': 'Cd',
                            'BootSourceOverrideEnabled': 'Once'}},
-            headers={'X-Fake': 'header',
-                     'If-Match': '"3d7b8a7360bf2941d"'},
+            headers=dict(self.headers, **{'If-Match': '"3d7b8a7360bf2941d"'}),
             blocking=False,
             timeout=60)
 
@@ -818,7 +855,7 @@ class ConnectorOpTestCase(base.TestCase):
             '/redfish/v1/Systems/1',
             data={'Boot': {'BootSourceOverrideTarget': 'Cd',
                            'BootSourceOverrideEnabled': 'Once'}},
-            headers={'X-Fake': 'header'},
+            headers=self.headers,
             blocking=False,
             timeout=60)
 
@@ -846,7 +883,7 @@ class ConnectorOpTestCase(base.TestCase):
             '/redfish/v1/Systems/1',
             data={'Boot': {'BootSourceOverrideTarget': 'Cd',
                            'BootSourceOverrideEnabled': 'Once'}},
-            headers={'X-Fake': 'header'},
+            headers=self.headers,
             blocking=False,
             timeout=60)
 
