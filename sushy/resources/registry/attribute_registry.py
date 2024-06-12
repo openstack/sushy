@@ -44,7 +44,7 @@ class AttributeListField(base.ListField):
     """An indication of whether this attribute is read-only"""
 
     reset_required = base.Field('ResetRequired', adapter=bool)
-    """An indication of whether this attribute is read-only"""
+    """Whether a System reset is required to change this attribute"""
 
     lower_bound = base.Field('LowerBound')
     """The lower limit for an integer attribute"""
