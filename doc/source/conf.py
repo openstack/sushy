@@ -50,7 +50,7 @@ pygments_style = 'native'
 
 # openstackdocstheme options
 openstackdocs_repo_name = 'openstack/sushy'
-openstackdocs_use_storyboard = True
+openstackdocs_use_storyboard = False
 openstackdocs_pdf_link = True
 
 # -- Options for HTML output --------------------------------------------------
