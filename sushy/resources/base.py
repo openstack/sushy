@@ -423,9 +423,13 @@ class JsonDataReader(AbstractDataReader):
     def get_data(self):
         """Gets JSON file from URI directly"""
         data = self._conn.get(path=self._path)
-
-        json_data = data.json() if data.content else {}
-
+        try:
+            json_data = data.json() if data.content else {}
+        except Exception as exc:
+            LOG.error("Unable to parse JSON in response. %(exc)s. The server "
+                      "returned:\n%(data)s",
+                      {'exc': exc, 'data': data.content})
+            raise
         return FieldData(data.status_code, data.headers, json_data)
 
 
