@@ -1,0 +1,5 @@
+---
+fixes:
+  - |
+    Some hardware vendors set MAC addresses to the empty string which is not
+    valid so skip including those ethernet_interfaces.

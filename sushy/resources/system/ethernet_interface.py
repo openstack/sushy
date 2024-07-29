@@ -69,7 +69,7 @@ class EthernetInterfaceCollection(base.ResourceCollectionBase):
         """
         mac_dict = {}
         for eth in self.get_members():
-            if eth.mac_address is not None and eth.status is not None:
+            if eth.mac_address and eth.status is not None:
                 if eth.status.health == res_cons.Health.OK:
                     mac_dict[eth.mac_address] = eth.status.state
         return mac_dict
