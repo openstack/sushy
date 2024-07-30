@@ -22,7 +22,12 @@ import json
 import logging
 import zipfile
 
-import pkg_resources
+try:
+    from importlib import resources
+    if not hasattr(resources, 'files'):
+        import importlib_resources as resources
+except ImportError:
+    import importlib_resources as resources
 
 from sushy import exceptions
 from sushy.resources import constants
@@ -486,9 +491,9 @@ class JsonPackagedFileReader(AbstractDataReader):
     def get_data(self):
         """Gets JSON file from packaged file denoted by path"""
 
-        with pkg_resources.resource_stream(self._resource_package_name,
-                                           self._path) as resource:
-            json_data = json.loads(resource.read().decode(encoding='utf-8'))
+        ref = resources.files(self._resource_package_name).joinpath(self._path)
+        with ref.open(encoding='utf-8') as fp:
+            json_data = json.load(fp)
             return FieldData(None, None, json_data)
 
 

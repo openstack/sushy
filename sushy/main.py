@@ -16,7 +16,14 @@ import collections
 import logging
 import os
 
-import pkg_resources
+try:
+    from importlib import resources
+
+    if not hasattr(resources, "files"):
+        import importlib_resources as resources
+except ImportError:
+    import importlib_resources as resources
+
 import requests
 
 from sushy import auth as sushy_auth
@@ -41,7 +48,7 @@ from sushy import utils
 
 LOG = logging.getLogger(__name__)
 
-STANDARD_REGISTRY_PATH = 'standard_registries/'
+STANDARD_REGISTRY_PATH = 'standard_registries'
 
 
 class ProtocolFeaturesSupportedField(base.CompositeField):
@@ -568,18 +575,17 @@ class Sushy(base.ResourceBase):
         :returns: list of MessageRegistry
         """
 
-        message_registries = []
-        resource_package_name = __name__
-        for json_file in pkg_resources.resource_listdir(
-                resource_package_name, STANDARD_REGISTRY_PATH):
-            # Not using path.join according to pkg_resources docs
-            mes_reg = message_registry.MessageRegistry(
-                None, STANDARD_REGISTRY_PATH + json_file,
-                reader=base.JsonPackagedFileReader(
-                    resource_package_name))
-            message_registries.append(mes_reg)
-
-        return message_registries
+        return [
+            message_registry.MessageRegistry(
+                None,
+                os.path.join(STANDARD_REGISTRY_PATH, json_file.name),
+                reader=base.JsonPackagedFileReader(__package__),
+            )
+            for json_file in resources.files(__package__)
+            .joinpath(STANDARD_REGISTRY_PATH)
+            .iterdir()
+            if json_file.is_file()
+        ]
 
     @property
     @utils.cache_it
