@@ -125,7 +125,6 @@ class StorageTestCase(base.TestCase):
         self.assertEqual(1, len(controllers))
         controller = controllers[0]
         self.assertEqual('0', controller.member_id)
-        self.assertEqual('Contoso Integrated RAID', controller.name)
         self.assertEqual(res_cons.Health.OK, controller.status.health)
         self.assertEqual(res_cons.State.ENABLED, controller.status.state)
         identifiers = controller.identifiers

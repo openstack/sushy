@@ -34,7 +34,7 @@ class StorageControllersListField(base.ListField):
     member_id = base.Field('MemberId', required=True)
     """Uniquely identifies the member within the collection."""
 
-    name = base.Field('Name', required=True)
+    name = base.Field('Name')
     """The name of the storage controller"""
 
     status = common.StatusField('Status')

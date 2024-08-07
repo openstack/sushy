@@ -17,7 +17,6 @@
             "@odata.id": "/redfish/v1/Systems/437XR1138R2/Storage/1#/StorageControllers/0",
             "@odata.type": "#Storage.v1_3_0.StorageController",
             "MemberId": "0",
-            "Name": "Contoso Integrated RAID",
             "Status": {
                 "@odata.type": "#Resource.Status",
                 "State": "Enabled",

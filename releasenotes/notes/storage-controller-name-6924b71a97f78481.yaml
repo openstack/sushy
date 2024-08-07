@@ -1,0 +1,5 @@
+---
+fixes:
+  - |
+    The ``Name`` field of a StorageControllers sub-field of a Storage resource
+    is no longer mandatory.
