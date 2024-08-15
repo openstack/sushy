@@ -507,9 +507,21 @@ class System(base.ResourceBase):
         :raises: MissingAttributeError if '@odata.id' field is missing.
         :returns: A list of `Manager` instances
         """
-        paths = utils.get_sub_resource_path_by(
-            self, ["Links", "ManagedBy"], is_collection=True)
-
+        try:
+            paths = utils.get_sub_resource_path_by(
+                self, ["Links", "ManagedBy"], is_collection=True)
+        except exceptions.MissingAttributeError as exc_orig:
+            LOG.warning('Unable to find ManagedBy attribute for System %s, '
+                        'retrying with Managers attribute', self.identity)
+            try:
+                paths = utils.get_sub_resource_path_by(
+                    self, ["Links", "Managers"], is_collection=True)
+            except exceptions.MissingAttributeError:
+                LOG.error('Both ManagedBy and Managers attributes missing for '
+                          'System %s, aborting', self.identity)
+                # NOTE(janders) last_error may record only Managers and not
+                # ManagedBy MissingAttributeError with this approach
+                raise exc_orig
         return [manager.Manager(self._conn, path,
                                 redfish_version=self.redfish_version,
                                 registries=self.registries, root=self.root)

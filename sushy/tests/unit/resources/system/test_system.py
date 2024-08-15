@@ -890,6 +890,33 @@ class SystemTestCase(base.TestCase):
         self.assertEqual(
             '/redfish/v1/Managers/BMC', actual_managers[0].path)
 
+    def test_managers_retry(self):
+        with open('sushy/tests/unit/json_samples/'
+                  'system_managedby_missing_manager_present.json') as f:
+            settings_obj = json.load(f)
+        self.json_doc.update(settings_obj)
+        self.sys_inst._parse_attributes(self.json_doc)
+
+        # | GIVEN |
+        with open('sushy/tests/unit/json_samples/'
+                  'manager.json') as f:
+            self.conn.get.return_value.json.return_value = json.load(f)
+
+        # | WHEN & THEN |
+        actual_managers = self.sys_inst.managers
+        self.assertIsInstance(actual_managers[0], manager.Manager)
+        self.assertEqual(
+            '/redfish/v1/Managers/BMC', actual_managers[0].path)
+
+    def test_managers_missing_ref(self):
+        # | GIVEN |
+        del self.json_doc['Links']['ManagedBy']
+
+        # | WHEN & THEN |
+        with self.assertRaisesRegex(
+            exceptions.MissingAttributeError, 'attribute Links/ManagedBy'):
+            self.sys_inst.managers
+
     def test_chassis(self):
         # | GIVEN |
         with open('sushy/tests/unit/json_samples/'
