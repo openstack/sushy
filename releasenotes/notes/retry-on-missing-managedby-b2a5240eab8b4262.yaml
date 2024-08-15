@@ -1,0 +1,6 @@
+---
+fixes:
+  - |
+    Adds the ability to retry an attempt to determine a Manager for a System
+    when ManagedBy attribute is missing but Managers attribute is present.
+    This resolves issues with certain hardware models such as Huawei 1288H.
