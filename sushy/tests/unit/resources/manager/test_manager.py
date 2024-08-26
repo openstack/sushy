@@ -17,6 +17,7 @@ from unittest import mock
 import sushy
 from sushy import exceptions
 from sushy.resources.chassis import chassis
+from sushy.resources import constants as res_cons
 from sushy.resources.manager import manager
 from sushy.resources.manager import virtual_media
 from sushy.resources.system import system
@@ -303,6 +304,25 @@ class ManagerTestCase(base.TestCase):
         self.assertIsInstance(actual_chassis[0], chassis.Chassis)
         self.assertEqual(
             '/redfish/v1/Chassis/1U', actual_chassis[0].path)
+
+    def test_ethernet_interfaces(self):
+        self.conn.get.return_value.json.reset_mock()
+        eth_coll_return_value = None
+        eth_return_value = None
+        with open('sushy/tests/unit/json_samples/'
+                  'manager_ethernet_interfaces_collection.json') as f:
+            eth_coll_return_value = json.load(f)
+        with open('sushy/tests/unit/json_samples/'
+                  'manager_ethernet_interfaces.json') as f:
+            eth_return_value = json.load(f)
+
+        self.conn.get.return_value.json.side_effect = [eth_coll_return_value,
+                                                       eth_return_value]
+
+        actual_macs = self.manager.ethernet_interfaces.summary
+        expected_macs = (
+            {'B4:AC:57:49:90:CA': res_cons.State.ENABLED})
+        self.assertEqual(expected_macs, actual_macs)
 
 
 class ManagerWithoutVirtualMedia(base.TestCase):
