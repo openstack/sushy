@@ -3,4 +3,4 @@ features:
   - |
     Adds "SessionService" and "Sessions" to the library.
   - |
-    Adds the abillity to specify authentication type on creation of root sushy object.
+    Adds the ability to specify authentication type on creation of root sushy object.
