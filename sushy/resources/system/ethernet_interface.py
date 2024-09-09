@@ -26,7 +26,7 @@ LOG = logging.getLogger(__name__)
 class EthernetInterface(base.ResourceBase):
     """This class adds the EthernetInterface resource"""
 
-    identity = base.Field('Id', required=True)
+    identity = base.Field('Id')
     """The Ethernet Interface identity string"""
 
     name = base.Field('Name')
