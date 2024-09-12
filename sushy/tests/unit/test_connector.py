@@ -59,7 +59,7 @@ class ConnectorMethodsTestCase(base.TestCase):
                       headers=self.headers.copy())
         mock__op.assert_called_once_with(mock.ANY, 'GET', 'fake/path',
                                          data=self.data, headers=self.headers,
-                                         blocking=False, timeout=60)
+                                         blocking=False, timeout=None)
 
     @mock.patch.object(connector.Connector, '_op', autospec=True)
     def test_get_blocking(self, mock__op):
@@ -67,7 +67,7 @@ class ConnectorMethodsTestCase(base.TestCase):
                       headers=self.headers.copy(), blocking=True)
         mock__op.assert_called_once_with(mock.ANY, 'GET', 'fake/path',
                                          data=self.data, headers=self.headers,
-                                         blocking=True, timeout=60)
+                                         blocking=True, timeout=None)
 
     @mock.patch.object(connector.Connector, '_op', autospec=True)
     def test_post(self, mock__op):
@@ -75,7 +75,7 @@ class ConnectorMethodsTestCase(base.TestCase):
                        headers=self.headers.copy())
         mock__op.assert_called_once_with(mock.ANY, 'POST', 'fake/path',
                                          data=self.data, headers=self.headers,
-                                         blocking=False, timeout=60)
+                                         blocking=False, timeout=None)
 
     @mock.patch.object(connector.Connector, '_op', autospec=True)
     def test_post_blocking(self, mock__op):
@@ -91,15 +91,15 @@ class ConnectorMethodsTestCase(base.TestCase):
                         headers=self.headers.copy())
         mock__op.assert_called_once_with(mock.ANY, 'PATCH', 'fake/path',
                                          data=self.data, headers=self.headers,
-                                         blocking=False, timeout=60)
+                                         blocking=False, timeout=None)
 
     @mock.patch.object(connector.Connector, '_op', autospec=True)
     def test_patch_blocking(self, mock__op):
-        self.conn.patch(path='fake/path', data=self.data.copy(),
+        self.conn.patch(path='fake/path', data=self.data.copy(), timeout=120,
                         headers=self.headers.copy(), blocking=True)
         mock__op.assert_called_once_with(mock.ANY, 'PATCH', 'fake/path',
                                          data=self.data, headers=self.headers,
-                                         blocking=True, timeout=60)
+                                         blocking=True, timeout=120)
 
     @mock.patch.object(connector.Connector, '_op', autospec=True)
     def test_put(self, mock__op):
@@ -107,15 +107,15 @@ class ConnectorMethodsTestCase(base.TestCase):
                       headers=self.headers.copy())
         mock__op.assert_called_once_with(mock.ANY, 'PUT', 'fake/path',
                                          data=self.data, headers=self.headers,
-                                         blocking=False, timeout=60)
+                                         blocking=False, timeout=None)
 
     @mock.patch.object(connector.Connector, '_op', autospec=True)
     def test_put_blocking(self, mock__op):
-        self.conn.put(path='fake/path', data=self.data.copy(),
+        self.conn.put(path='fake/path', data=self.data.copy(), timeout=120,
                       headers=self.headers.copy(), blocking=True)
         mock__op.assert_called_once_with(mock.ANY, 'PUT', 'fake/path',
                                          data=self.data, headers=self.headers,
-                                         blocking=True, timeout=60)
+                                         blocking=True, timeout=120)
 
     @mock.patch.object(connector.Connector, '_op', autospec=True)
     def test_delete(self, mock__op):
@@ -123,15 +123,15 @@ class ConnectorMethodsTestCase(base.TestCase):
                          headers=self.headers.copy())
         mock__op.assert_called_once_with(mock.ANY, 'DELETE', 'fake/path',
                                          data=self.data, headers=self.headers,
-                                         blocking=False, timeout=60)
+                                         blocking=False, timeout=None)
 
     @mock.patch.object(connector.Connector, '_op', autospec=True)
     def test_delete_blocking(self, mock__op):
-        self.conn.delete(path='fake/path', data=self.data.copy(),
+        self.conn.delete(path='fake/path', data=self.data.copy(), timeout=120,
                          headers=self.headers.copy(), blocking=True)
         mock__op.assert_called_once_with(mock.ANY, 'DELETE', 'fake/path',
                                          data=self.data, headers=self.headers,
-                                         blocking=True, timeout=60)
+                                         blocking=True, timeout=120)
 
     def test_set_auth(self):
         mock_auth = mock.MagicMock()
@@ -186,6 +186,13 @@ class ConnectorOpTestCase(base.TestCase):
             'GET', 'http://foo.bar:1234/fake/path',
             headers=dict(self.headers, answer='42'),
             json=None, verify=True, timeout=60)
+
+    def test_ok_get_default_timeout(self):
+        self.conn._default_request_timeout = 42
+        self.conn._op('GET', path='fake/path')
+        self.request.assert_called_once_with(
+            'GET', 'http://foo.bar:1234/fake/path',
+            headers=self.headers, json=None, verify=True, timeout=42)
 
     def test_response_callback(self):
         mock_response_callback = mock.MagicMock()
