@@ -1,0 +1,56 @@
+---
+repos:
+  - repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: v4.5.0
+    hooks:
+      - id: trailing-whitespace
+      - id: mixed-line-ending
+        args: ['--fix', 'lf']
+        exclude: |
+          (?x)(
+          .*.svg$|
+          )
+      - id: fix-byte-order-marker
+      - id: check-merge-conflict
+      - id: debug-statements
+      - id: check-json
+        files: .*\.json$
+      - id: check-yaml
+        files: .*\.(yaml|yml)$
+        exclude: releasenotes/.*$
+  - repo: https://github.com/Lucas-C/pre-commit-hooks
+    rev: v1.5.4
+    hooks:
+      - id: remove-tabs
+        exclude: '.*\.(svg)$'
+  - repo: https://opendev.org/openstack/hacking
+    rev: 6.1.0
+    hooks:
+      - id: hacking
+        additional_dependencies: []
+        exclude: '^(doc|releasenotes|tools)/.*$'
+  - repo: https://github.com/codespell-project/codespell
+    rev: v2.2.6
+    hooks:
+    - id: codespell
+      args: [--write-changes]
+  - repo: https://github.com/sphinx-contrib/sphinx-lint
+    rev: v1.0.0
+    hooks:
+      - id: sphinx-lint
+        args: [--enable=default-role]
+        files: ^doc/|releasenotes|api-ref
+  - repo: https://opendev.org/openstack/bashate
+    rev: 2.1.0
+    hooks:
+      - id: bashate
+        args: ["-iE006,E044", "-eE005,E042"]
+        name: bashate
+        description: This hook runs bashate for linting shell scripts
+        entry: bashate
+        language: python
+        types: [shell]
+  - repo: https://github.com/PyCQA/doc8
+    rev: v1.1.2
+    hooks:
+      - id: doc8

@@ -3,6 +3,7 @@
     parent: ironic-tempest-bios-redfish-pxe
     irrelevant-files:
       - ^.*\.rst$
+      - ^\.pre-commit-config\.yaml$
       - ^doc/.*$
       - ^test-requirements.txt$
       - ^sushy/tests/.*$
@@ -14,15 +15,9 @@
     parent: ironic-tempest-uefi-redfish-vmedia
     irrelevant-files:
       - ^.*\.rst$
+      - ^\.pre-commit-config\.yaml$
       - ^doc/.*$
       - ^test-requirements.txt$
       - ^sushy/tests/.*$
     required-projects:
       - openstack/sushy
-
-- job:
-    name: sushy-tox-codespell
-    parent: openstack-tox
-    timeout: 7200
-    vars:
-      tox_envlist: codespell
