@@ -41,7 +41,8 @@
       "RemoteDrive",
       "UefiBootNext"
     ],
-    "UefiTargetBootSourceOverride": ""
+    "UefiTargetBootSourceOverride": "",
+    "HttpBootUri": null
   },
   "Description": "System Self",
   "Id": "Self",

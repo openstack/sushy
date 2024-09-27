@@ -504,6 +504,35 @@ class SystemTestCase(base.TestCase):
                            'HttpBootUri': 'http://test.lan/test_image.iso'}},
             etag=mock.ANY)
 
+    def test_set_system_boot_options_httpboot_settings(self):
+
+        with open('sushy/tests/unit/json_samples/settings-nokia.json') as f:
+            settings_obj = json.load(f)
+
+        self.json_doc.update(settings_obj)
+        self.sys_inst._parse_attributes(self.json_doc)
+
+        with open('sushy/tests/unit/json_samples/'
+                  'settings-body-nokia.json') as f:
+            settings_body = json.load(f)
+
+        get_settings = mock.MagicMock(headers={'ETag': '"3d7b838291941d"'})
+        get_settings.json.return_value = settings_body
+        get_system = mock.MagicMock(headers={'ETag': '"222"'})
+        self.conn.get.side_effect = [get_settings, get_system]
+
+        self.sys_inst.set_system_boot_options(
+            sushy.BootSource.UEFI_HTTP,
+            enabled=sushy.BootSourceOverrideEnabled.ONCE,
+            http_boot_uri='http://test.lan/test_image.iso'
+            )
+        self.sys_inst._conn.patch.assert_called_once_with(
+            '/redfish/v1/Systems/Self/SD',
+            data={'Boot': {'BootSourceOverrideTarget': 'UefiHttp',
+                           'BootSourceOverrideEnabled': 'Once',
+                           'HttpBootUri': 'http://test.lan/test_image.iso'}},
+            etag=mock.ANY)
+
     def test_set_system_boot_options_httpboot(self):
         self.sys_inst.set_system_boot_options(
             sushy.BootSource.UEFI_HTTP,

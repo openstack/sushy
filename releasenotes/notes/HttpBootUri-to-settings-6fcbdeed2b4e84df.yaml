@@ -1,0 +1,6 @@
+---
+fixes:
+  - |
+    PATCH 'HttpBootUri' against SettingsURI if present. If not,
+    fall back to System URI.
+

@@ -337,9 +337,11 @@ class System(base.ResourceBase):
             if not http_boot_uri:
                 # This should clear out any old entries, as no URI translates
                 # to the intent of "use whatever the dhcp server says".
-                data['Boot']['HttpBootUri'] = None
+                http_boot_uri = None
+
+            if (settings_resp and "HttpBootUri" in settings_boot_section):
+                settings_data['Boot']['HttpBootUri'] = http_boot_uri
             else:
-                # Explicitly set the URI.
                 data['Boot']['HttpBootUri'] = http_boot_uri
         elif not http_boot_uri:
             # We're not doing boot from URL, we should cleanup any setting
