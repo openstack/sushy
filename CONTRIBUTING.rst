@@ -10,8 +10,18 @@ submitted for review via the Gerrit tool:
 
    http://docs.openstack.org/infra/manual/developers.html#development-workflow
 
-Pull requests submitted through GitHub will be ignored.
+Sushy is a project under the Bare Metal (ironic) program and shares many
+common elements of the developer experience with ironic. You can find useful
+information about running unit tests or integrated testing environments in the
+ironic developer quickstart:
 
-Bugs should be filed in StoryBoard, not GitHub:
+   https://docs.openstack.org/ironic/latest/contributor/dev-quickstart.html
 
-   https://storyboard.openstack.org/#!/project/960
+Bugs should be filed in launchpad, not GitHub:
+
+   https://bugs.launchpad.net/sushy
+
+
+This repo is mirrored to Github. Issues, Pull Requests, and other Github
+features of this repo are not used. https://opendev.org/openstack/sushy is
+the canonical version of this repo.
