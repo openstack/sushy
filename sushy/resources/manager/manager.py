@@ -22,6 +22,7 @@ from sushy.resources import constants as res_cons
 from sushy.resources.manager import constants as mgr_cons
 from sushy.resources.manager import virtual_media
 from sushy.resources.system import ethernet_interface
+from sushy.resources.system.network import switch_connection
 from sushy import utils
 
 
@@ -251,6 +252,16 @@ class Manager(base.ResourceBase):
             self._conn,
             utils.get_sub_resource_path_by(self, "EthernetInterfaces"),
             redfish_version=self.redfish_version,
+            registries=self.registries, root=self.root)
+
+    @property
+    @utils.cache_it
+    def dell_switch_connections(self):
+        paths = utils.get_sub_resource_path_by(
+            self, ["Links", "Oem", "Dell", "DellSwitchConnectionCollection"],
+            is_collection=False)
+        return switch_connection.DellSwitchConnectionCollection(
+            self._conn, paths, redfish_version=self.redfish_version,
             registries=self.registries, root=self.root)
 
 

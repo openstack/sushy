@@ -304,10 +304,17 @@ class Sushy(base.ResourceBase):
         if identity is None:
             chassis_collection = self.get_chassis_collection()
             listed_chassis = chassis_collection.get_members()
-            if len(listed_chassis) != 1:
+            invalid = True
+            errmsg = 'Chassis count is not exactly one'
+            if "Dell" in self.oem_vendors:
+                invalid = len(listed_chassis) > 2
+                errmsg = 'Chassis count does not match expected vendor type'
+            else:
+                invalid = len(listed_chassis) != 1
+            if invalid:
                 raise exceptions.UnknownDefaultError(
                     entity='Chassis',
-                    error='Chassis count is not exactly one')
+                    error=errmsg)
 
             identity = listed_chassis[0].path
 

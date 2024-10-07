@@ -17,7 +17,7 @@
 from sushy.resources import base
 from sushy.resources import common
 from sushy.resources.system.network import constants
-from sushy.resources.system.network import port
+from sushy.resources.system.network import network_port
 from sushy import utils
 
 
@@ -173,11 +173,10 @@ class NetworkDeviceFunction(base.ResourceBase):
         paths = utils.get_sub_resource_path_by(
             self, "AssignablePhysicalPorts", is_collection=True)
 
-        return [port.NetworkPort(self._conn, path,
-                                 redfish_version=self.redfish_version,
-                                 registries=self.registries,
-                                 root=self.root
-                                 )
+        return [network_port.NetworkPort(self._conn, path,
+                                         redfish_version=self.redfish_version,
+                                         registries=self.registries,
+                                         root=self.root)
                 for path in paths]
 
 

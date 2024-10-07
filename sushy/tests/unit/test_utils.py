@@ -20,6 +20,7 @@ from unittest import mock
 import sushy
 from sushy import exceptions
 from sushy.resources import base as resource_base
+from sushy.resources.manager import manager
 from sushy.resources.system import system
 from sushy.tests.unit import base
 from sushy import utils
@@ -82,6 +83,25 @@ class UtilsTestCase(base.TestCase):
         value = utils.get_sub_resource_path_by(self.sys_inst,
                                                subresource_path,
                                                is_collection=True)
+        self.assertEqual(expected_result, value)
+
+    def test_get_sub_resource_path_by_for_switch(self):
+        subresource_path = ["Links", "Oem", "Dell",
+                            "DellSwitchConnectionCollection"]
+        expected_result = ('/redfish/v1/Systems/System.Embedded.1'
+                           '/NetworkPorts/Oem/Dell/DellSwitchConnections')
+        with open('sushy/tests/unit/json_samples/dell_manager.json') as f:
+            manager_json = json.load(f)
+        with open('sushy/tests/unit/json_samples'
+                  '/dell_switch_connection.json') as f:
+            switch_json = json.load(f)
+        self.conn.get.return_value.json.return_value = manager_json
+        self.sys_inst = manager.Manager(self.conn,
+                                        '/redfish/v1/Manager/iDRAC.Embedded.1',
+                                        redfish_version='1.0.2')
+        self.conn.get.return_value.json.return_value = switch_json
+        value = utils.get_sub_resource_path_by(self.sys_inst,
+                                               subresource_path)
         self.assertEqual(expected_result, value)
 
     def test_get_sub_resource_path_by_fails(self):

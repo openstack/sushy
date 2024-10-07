@@ -15,7 +15,7 @@ from unittest import mock
 
 from sushy.resources import constants as res_cons
 from sushy.resources.system.network import constants as net_cons
-from sushy.resources.system.network import port
+from sushy.resources.system.network import network_port
 from sushy.tests.unit import base
 
 
@@ -29,28 +29,30 @@ class NetworkPortTestCase(base.TestCase):
 
         self.conn.get.return_value.json.return_value = self.json_doc
 
-        self.port = port.NetworkPort(
+        self.network_port = network_port.NetworkPort(
             self.conn, '/redfish/v1/Chassis/System.Embedded.1/NetworkAdapters/'
                        '/NIC.Integrated.1/NetworkPorts/NIC.Integrated.1-1',
             redfish_version='1.0.2')
 
     def test__parse_attributes(self):
-        self.port._parse_attributes(self.json_doc)
-        self.assertEqual('1.0.2', self.port.redfish_version)
-        self.assertEqual('NIC.Integrated.1-1', self.port.identity)
-        self.assertEqual('Network Port View', self.port.name)
-        self.assertEqual('Network Port View', self.port.description)
-        self.assertEqual(res_cons.State.ENABLED, self.port.status.state)
-        self.assertEqual(res_cons.Health.OK, self.port.status.health)
-        self.assertEqual(res_cons.Health.OK, self.port.status.health_rollup)
+        self.network_port._parse_attributes(self.json_doc)
+        self.assertEqual('1.0.2', self.network_port.redfish_version)
+        self.assertEqual('NIC.Integrated.1-1', self.network_port.identity)
+        self.assertEqual('Network Port View', self.network_port.name)
+        self.assertEqual('Network Port View', self.network_port.description)
+        self.assertEqual(res_cons.State.ENABLED,
+                         self.network_port.status.state)
+        self.assertEqual(res_cons.Health.OK, self.network_port.status.health)
+        self.assertEqual(res_cons.Health.OK,
+                         self.network_port.status.health_rollup)
         self.assertEqual(['01:02:03:04:05:06'],
-                         self.port.associated_network_addresses)
-        self.assertEqual(10000, self.port.current_link_speed_mbps)
+                         self.network_port.associated_network_addresses)
+        self.assertEqual(10000, self.network_port.current_link_speed_mbps)
         self.assertEqual(net_cons.FlowControl.NONE,
-                         self.port.flow_control_configuration)
+                         self.network_port.flow_control_configuration)
         self.assertEqual(net_cons.FlowControl.NONE,
-                         self.port.flow_control_status)
-        self.assertEqual(net_cons.LinkStatus.UP, self.port.link_status)
+                         self.network_port.flow_control_status)
+        self.assertEqual(net_cons.LinkStatus.UP, self.network_port.link_status)
 
 
 class NetworkPortCollectionTestCase(base.TestCase):
@@ -64,7 +66,7 @@ class NetworkPortCollectionTestCase(base.TestCase):
 
         self.conn.get.return_value.json.return_value = self.json_doc
 
-        self.port_col = port.NetworkPortCollection(
+        self.port_col = network_port.NetworkPortCollection(
             self.conn, '/redfish/v1/Chassis/System.Embedded.1/NetworkAdapters/'
                        'NIC.Integrated.1/NetworkPorts',
             redfish_version='1.0.2')
@@ -79,7 +81,7 @@ class NetworkPortCollectionTestCase(base.TestCase):
         ),
             self.port_col.members_identities)
 
-    @mock.patch.object(port, 'NetworkPort', autospec=True)
+    @mock.patch.object(network_port, 'NetworkPort', autospec=True)
     def test_get_member(self, NetworkPort_mock):
         self.port_col.get_member(
             '/redfish/v1/Chassis/System.Embedded.1/NetworkAdapters/'
@@ -92,7 +94,7 @@ class NetworkPortCollectionTestCase(base.TestCase):
             redfish_version=self.port_col.redfish_version, registries=None,
             root=self.port_col.root)
 
-    @mock.patch.object(port, 'NetworkPort', autospec=True)
+    @mock.patch.object(network_port, 'NetworkPort', autospec=True)
     def test_get_members(self, NetworkPort_mock):
         members = self.port_col.get_members()
         NetworkPort_mock.assert_has_calls([
