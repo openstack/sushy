@@ -67,7 +67,11 @@
   "NetworkPorts": {
     "@odata.id": "/redfish/v1/Chassis/System.Embedded.1/NetworkAdapters/NIC.Integrated.1/NetworkPorts"
   },
+  "NetworkPorts@Redfish.Deprecated": "Please migrate to use /redfish/v1/Chassis/System.Embedded.1/NetworkAdapters/{NetworkAdaptersId}/Ports",
   "PartNumber": "0R887V",
+  "Ports": {
+      "@odata.id": "/redfish/v1/Chassis/System.Embedded.1/NetworkAdapters/NIC.Integrated.1/Ports"
+  },
   "SerialNumber": "IL7403101N00ZJ",
   "Status": {
     "Health": "OK",

@@ -118,3 +118,22 @@ class LinkStatus(enum.Enum):
 
     TRAINING = 'Training'
     """This physical link on this interface is training."""
+
+
+class PortLinkStatus(enum.Enum):
+
+    LINKUP = 'LinkUp'
+    """The port is enabled and link is good (up)."""
+
+    LINKDOWN = 'LinkDown'
+    """The port is enabled but link is down."""
+
+    NOLINK = 'NoLink'
+    """The port is enabled but have no connectivity."""
+
+    STARTING = 'Starting'
+    """This link on this interface is starting.  A physical link has been
+    established, but the port is not able to transfer data."""
+
+    TRAINING = 'Training'
+    """This physical link on this interface is training."""
