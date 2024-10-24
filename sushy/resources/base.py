@@ -17,17 +17,11 @@ import abc
 import collections
 import copy
 import enum
+from importlib import resources
 import io
 import json
 import logging
 import zipfile
-
-try:
-    from importlib import resources
-    if not hasattr(resources, 'files'):
-        import importlib_resources as resources
-except ImportError:
-    import importlib_resources as resources
 
 from sushy import exceptions
 from sushy.resources import constants

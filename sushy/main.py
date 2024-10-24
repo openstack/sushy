@@ -13,16 +13,9 @@
 #    License for the specific language governing permissions and limitations
 #    under the License.
 import collections
+from importlib import resources
 import logging
 import os
-
-try:
-    from importlib import resources
-
-    if not hasattr(resources, "files"):
-        import importlib_resources as resources
-except ImportError:
-    import importlib_resources as resources
 
 import requests
 
