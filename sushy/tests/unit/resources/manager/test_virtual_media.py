@@ -119,6 +119,31 @@ class VirtualMediaTestCase(base.TestCase):
         )
         self.assertTrue(self.sys_virtual_media._is_stale)
 
+    def test_insert_media_credentials_required(self):
+        self.assertFalse(self.sys_virtual_media._is_stale)
+        with open('sushy/tests/unit/json_samples/'
+                  'credentials_required_error.json') as f:
+            response_obj = json.load(f)
+        response = mock.Mock(spec=['json', 'status_code'])
+        response.json.return_value = response_obj
+        error = exceptions.HTTPError('GET', 'VirtualMedia', response)
+
+        self.sys_virtual_media._conn.post.side_effect = [error, None]
+
+        self.assertFalse(self.sys_virtual_media._is_stale)
+        self.sys_virtual_media.insert_media(
+            "https://www.dmtf.org/freeImages/Sardine.img", True, False)
+
+        self.sys_virtual_media._conn.post.assert_called_with(
+            ("/redfish/v1/Managers/BMC/VirtualMedia/Floppy1/Actions"
+             "/VirtualMedia.InsertMedia"),
+            data={"Image": "https://www.dmtf.org/freeImages/Sardine.img",
+                  "WriteProtected": False, "UserName": "none",
+                  "Password": "none"}
+        )
+        self.assertEqual(self.sys_virtual_media._conn.post.call_count, 2)
+        self.assertTrue(self.sys_virtual_media._is_stale)
+
     def test_insert_media_transfer_method(self):
         self.assertFalse(self.sys_virtual_media._is_stale)
         self.sys_virtual_media.insert_media(
