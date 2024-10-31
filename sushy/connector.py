@@ -34,7 +34,8 @@ class Connector(object):
     def __init__(
             self, url, username=None, password=None, verify=True,
             response_callback=None, server_side_retries=0,
-            server_side_retries_delay=0):
+            server_side_retries_delay=0,
+            default_request_timeout=60):
         self._url = url
         self._verify = verify
         self._session = requests.Session()
@@ -42,6 +43,7 @@ class Connector(object):
         self._auth = None
         self._server_side_retries = server_side_retries
         self._server_side_retries_delay = server_side_retries_delay
+        self._default_request_timeout = default_request_timeout
 
         # NOTE(TheJulia): In order to help prevent recursive post operations
         # by allowing us to understand that we should stop authentication.
@@ -98,7 +100,7 @@ class Connector(object):
         return retry
 
     def _op(self, method, path='', data=None, headers=None, blocking=False,
-            timeout=60, server_side_retries_left=None, allow_reauth=True,
+            timeout=None, server_side_retries_left=None, allow_reauth=True,
             **extra_session_req_kwargs):
         """Generic RESTful request handler.
 
@@ -110,10 +112,9 @@ class Connector(object):
                         to remove a default header.
         :param blocking: Whether to block for asynchronous operations.
         :param timeout: Max time in seconds to wait for blocking async call or
-                        for requests library to connect and read. If a custom
-                        timeout for requests is provided in
-                        extra_session_req_kwargs, it will be used instead for
-                        those calls.
+                        for requests library to connect and read. Timeouts
+                        should never be disabled: set to a large enough value
+                        instead.
         :param server_side_retries_left: Remaining retries. If not provided
             will use limit provided by instance's server_side_retries
         :param allow_reauth: Whether to allow refreshing the authentication
@@ -127,6 +128,8 @@ class Connector(object):
         """
         if server_side_retries_left is None:
             server_side_retries_left = self._server_side_retries
+
+        timeout = timeout or self._default_request_timeout
 
         url = path if urlparse.urlparse(path).netloc else urlparse.urljoin(
             self._url, path)
@@ -308,7 +311,7 @@ class Connector(object):
         return response
 
     def get(self, path='', data=None, headers=None, blocking=False,
-            timeout=60, **extra_session_req_kwargs):
+            timeout=None, **extra_session_req_kwargs):
         """HTTP GET method.
 
         :param path: Optional sub-URI path to the resource.
@@ -316,6 +319,7 @@ class Connector(object):
         :param headers: Optional dictionary of headers.
         :param blocking: Whether to block for asynchronous operations.
         :param timeout: Max time in seconds to wait for blocking async call.
+                        Defaults to default_request_timeout on Connector.
         :param extra_session_req_kwargs: Optional keyword argument to pass
          requests library arguments which would pass on to requests session
          object.
@@ -328,7 +332,7 @@ class Connector(object):
                         **extra_session_req_kwargs)
 
     def post(self, path='', data=None, headers=None, blocking=False,
-             timeout=60, **extra_session_req_kwargs):
+             timeout=None, **extra_session_req_kwargs):
         """HTTP POST method.
 
         :param path: Optional sub-URI path to the resource.
@@ -336,6 +340,7 @@ class Connector(object):
         :param headers: Optional dictionary of headers.
         :param blocking: Whether to block for asynchronous operations.
         :param timeout: Max time in seconds to wait for blocking async call.
+                        Defaults to default_request_timeout on Connector.
         :param extra_session_req_kwargs: Optional keyword argument to pass
          requests library arguments which would pass on to requests session
          object.
@@ -348,7 +353,8 @@ class Connector(object):
                         **extra_session_req_kwargs)
 
     def _etag_handler(self, path='', data=None, headers=None, etag=None,
-                      blocking=False, timeout=60, **extra_session_req_kwargs):
+                      blocking=False, timeout=None,
+                      **extra_session_req_kwargs):
         """eTag handler containing workarounds for PATCH requests with eTags.
 
         :param path: Optional sub-URI path to the resource.
@@ -357,6 +363,7 @@ class Connector(object):
         :param etag: eTag string.
         :param blocking: Whether to block for asynchronous operations.
         :param timeout: Max time in seconds to wait for blocking async call.
+                        Defaults to default_request_timeout on Connector.
         :param extra_session_req_kwargs: Optional keyword argument to pass
          requests library arguments which would pass on to requests session
          object.
@@ -427,7 +434,7 @@ class Connector(object):
         return response
 
     def patch(self, path='', data=None, headers=None, etag=None,
-              blocking=False, timeout=60, **extra_session_req_kwargs):
+              blocking=False, timeout=None, **extra_session_req_kwargs):
         """HTTP PATCH method.
 
         :param path: Optional sub-URI path to the resource.
@@ -436,6 +443,7 @@ class Connector(object):
         :param etag: Optional eTag string.
         :param blocking: Whether to block for asynchronous operations.
         :param timeout: Max time in seconds to wait for blocking async call.
+                        Defaults to default_request_timeout on Connector.
         :param extra_session_req_kwargs: Optional keyword argument to pass
          requests library arguments which would pass on to requests session
          object.
@@ -449,7 +457,7 @@ class Connector(object):
                                   **extra_session_req_kwargs)
 
     def put(self, path='', data=None, headers=None, blocking=False,
-            timeout=60, **extra_session_req_kwargs):
+            timeout=None, **extra_session_req_kwargs):
         """HTTP PUT method.
 
         :param path: Optional sub-URI path to the resource.
@@ -457,6 +465,7 @@ class Connector(object):
         :param headers: Optional dictionary of headers.
         :param blocking: Whether to block for asynchronous operations.
         :param timeout: Max time in seconds to wait for blocking async call.
+                        Defaults to default_request_timeout on Connector.
         :param extra_session_req_kwargs: Optional keyword argument to pass
          requests library arguments which would pass on to requests session
          object.
@@ -469,7 +478,7 @@ class Connector(object):
                         **extra_session_req_kwargs)
 
     def delete(self, path='', data=None, headers=None, blocking=False,
-               timeout=60, **extra_session_req_kwargs):
+               timeout=None, **extra_session_req_kwargs):
         """HTTP DELETE method.
 
         :param path: Optional sub-URI path to the resource.
@@ -477,6 +486,7 @@ class Connector(object):
         :param headers: Optional dictionary of headers.
         :param blocking: Whether to block for asynchronous operations.
         :param timeout: Max time in seconds to wait for blocking async call.
+                        Defaults to default_request_timeout on Connector.
         :param extra_session_req_kwargs: Optional keyword argument to pass
          requests library arguments which would pass on to requests session
          object.
