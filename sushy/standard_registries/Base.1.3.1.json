@@ -90,7 +90,7 @@
            "Severity": "Warning",
            "NumberOfArgs": 2,
            "ParamTypes": [
-                "string", 
+                "string",
                 "string"
            ],
            "Resolution": "Correct the value for the property in the request body and resubmit the request if the operation failed."
@@ -523,7 +523,7 @@
                 "number"
             ],
             "Resolution": "Resubmit the request with an appropriate string length."
-        }, 
+        },
         "SessionTerminated": {
             "Description": "Indicates that the DELETE operation on the Session resource resulted in the successful termination of the session.",
             "Message": "The session was successfully terminated.",
