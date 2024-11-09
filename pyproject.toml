@@ -4,3 +4,15 @@ build-backend = "pbr.build"
 
 [tool.doc8]
 ignore = ["D001"]
+
+[tool.ruff.lint]
+select = [
+    "S",        # flake8-bandit
+]
+
+[tool.ruff.lint.per-file-ignores]
+"sushy/tests/**/*.py" = [
+    "S104",     # disable 'hardcoded_bind_all_interfaces' for tests
+    "S105",     # disable 'hardcoded_password_string' for tests
+    "S106",     # disable 'hardcoded_password_funcarg' for tests
+]
