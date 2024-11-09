@@ -34,7 +34,7 @@ def main():
     args = parser.parse_args()
 
     if args.url.startswith("https://") or args.url.startswith("http://"):
-        resp = requests.get(args.url)
+        resp = requests.get(args.url, timeout=30)
         resp.raise_for_status()
         content = resp.json()
     else:
