@@ -227,7 +227,7 @@ class VirtualMedia(base.ResourceBase):
                     if payload.get('UserName') is None and \
                             self.is_credentials_required(error):
                         payload['UserName'] = "none"
-                        payload['Password'] = "none"
+                        payload['Password'] = "none"  # noqa:S105
                         continue
                     raise
         self.invalidate()
