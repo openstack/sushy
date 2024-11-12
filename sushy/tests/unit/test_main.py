@@ -40,7 +40,7 @@ class MainTestCase(base.TestCase):
     @mock.patch.object(connector, 'Connector', autospec=True)
     @mock.patch.object(sessionservice, 'SessionService', autospec=True)
     def setUp(self, mock_session_service, mock_connector, mock_auth):
-        super(MainTestCase, self).setUp()
+        super().setUp()
         self.conn = mock.Mock()
         self.sess_serv = mock.Mock()
         self.sess_serv.create_session.return_value = (None, None)
@@ -561,7 +561,7 @@ class MainTestCase(base.TestCase):
 class BareMinimumMainTestCase(base.TestCase):
 
     def setUp(self):
-        super(BareMinimumMainTestCase, self).setUp()
+        super().setUp()
         self.conn = mock.MagicMock()
         with open('sushy/tests/unit/json_samples/'
                   'bare_minimum_root.json') as f:

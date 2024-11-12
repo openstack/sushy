@@ -27,7 +27,7 @@ from sushy.tests.unit import base
 class TaskMonitorTestCase(base.TestCase):
 
     def setUp(self):
-        super(TaskMonitorTestCase, self).setUp()
+        super().setUp()
         self.conn = mock.Mock()
 
         with open('sushy/tests/unit/json_samples/task.json') as f:

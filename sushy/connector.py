@@ -29,7 +29,7 @@ from sushy import utils
 LOG = logging.getLogger(__name__)
 
 
-class Connector(object):
+class Connector:
 
     def __init__(
             self, url, username=None, password=None, verify=True,
@@ -293,9 +293,8 @@ class Connector(object):
                 raise
         if blocking and response.status_code == 202:
             if not response.headers.get('Location'):
-                m = ('HTTP response for %(method)s request to %(url)s '
-                     'returned status 202, but no Location header'
-                     % {'method': method, 'url': url})
+                m = (f'HTTP response for {method} request to {url} '
+                     'returned status 202, but no Location header')
                 raise exceptions.ConnectionError(url=url, error=m)
 
             mon = TaskMonitor.from_response(self, response, path)

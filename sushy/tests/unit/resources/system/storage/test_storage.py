@@ -40,7 +40,7 @@ STORAGE_VOLUME_FILE_NAMES = [
 class StorageTestCase(base.TestCase):
 
     def setUp(self):
-        super(StorageTestCase, self).setUp()
+        super().setUp()
         self.conn = mock.Mock()
         with open('sushy/tests/unit/json_samples/storage.json') as f:
             self.json_doc = json.load(f)
@@ -254,7 +254,7 @@ class StorageTestCase(base.TestCase):
 class StorageCollectionTestCase(base.TestCase):
 
     def setUp(self):
-        super(StorageCollectionTestCase, self).setUp()
+        super().setUp()
         self.conn = mock.Mock()
         with open('sushy/tests/unit/json_samples/'
                   'storage_collection.json') as f:

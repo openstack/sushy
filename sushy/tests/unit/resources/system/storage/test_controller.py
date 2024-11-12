@@ -23,7 +23,7 @@ from sushy.tests.unit import base
 class ControllerTestCase(base.TestCase):
 
     def setUp(self):
-        super(ControllerTestCase, self).setUp()
+        super().setUp()
         self.conn = mock.Mock()
         with open('sushy/tests/unit/json_samples/'
                   'storage_controller.json') as f:
@@ -92,7 +92,7 @@ class ControllerTestCase(base.TestCase):
 class ControllerCollectionTestCase(base.TestCase):
 
     def setUp(self):
-        super(ControllerCollectionTestCase, self).setUp()
+        super().setUp()
         self.conn = mock.Mock()
         with open('sushy/tests/unit/json_samples/'
                   'storage_controller_collection.json') as f:

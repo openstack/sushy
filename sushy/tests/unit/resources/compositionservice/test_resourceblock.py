@@ -24,7 +24,7 @@ from sushy.tests.unit import base
 class ResourceBlockTestCase(base.TestCase):
 
     def setUp(self):
-        super(ResourceBlockTestCase, self).setUp()
+        super().setUp()
         self.conn = mock.Mock()
         with open('sushy/tests/unit/json_samples/resourceblock.json') as f:
             self.json_doc = json.load(f)
@@ -70,7 +70,7 @@ class ResourceBlockTestCase(base.TestCase):
 class ResourceBlockCollectionTestCase(base.TestCase):
 
     def setUp(self):
-        super(ResourceBlockCollectionTestCase, self).setUp()
+        super().setUp()
         self.conn = mock.Mock()
         with open('sushy/tests/unit/json_samples/'
                   'resourceblock_collection.json') as f:

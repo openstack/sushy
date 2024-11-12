@@ -22,9 +22,9 @@ from sushy.tests.unit import base
 class FakeOEMSystemExtensionTestCase(base.TestCase):
 
     def setUp(self):
-        super(FakeOEMSystemExtensionTestCase, self).setUp()
+        super().setUp()
         self.conn = mock.MagicMock()
-        with open('sushy/tests/unit/json_samples/system.json', 'r') as f:
+        with open('sushy/tests/unit/json_samples/system.json') as f:
             self.conn.get.return_value.json.return_value = json.loads(f.read())
 
         self.sys_instance = system.System(

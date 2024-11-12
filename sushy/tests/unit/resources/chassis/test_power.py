@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 
 # Licensed under the Apache License, Version 2.0 (the "License"); you may
 # not use this file except in compliance with the License. You may obtain
@@ -24,7 +23,7 @@ from sushy.tests.unit import base
 class PowerTestCase(base.TestCase):
 
     def setUp(self):
-        super(PowerTestCase, self).setUp()
+        super().setUp()
         self.conn = mock.Mock()
         with open('sushy/tests/unit/json_samples/power.json') as f:
             self.json_doc = json.load(f)

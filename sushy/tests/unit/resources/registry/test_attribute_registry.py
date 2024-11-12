@@ -23,7 +23,7 @@ from sushy.tests.unit import base
 class AttributeRegistryTestCase(base.TestCase):
 
     def setUp(self):
-        super(AttributeRegistryTestCase, self).setUp()
+        super().setUp()
         self.conn = mock.Mock()
         with open('sushy/tests/unit/json_samples/'
                   'bios_attribute_registry.json') as f:

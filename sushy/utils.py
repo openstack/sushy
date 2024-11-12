@@ -118,7 +118,7 @@ def get_sub_resource_path_by(resource, subresource_name, is_collection=False):
     except (TypeError, KeyError):
         attribute = '/'.join(subresource_name)
         if is_collection:
-            attribute += '[%s]' % len(elements)
+            attribute += f'[{len(elements)}]'
         attribute += '/@odata.id'
         raise exceptions.MissingAttributeError(
             attribute=attribute, resource=resource.path)

@@ -5,6 +5,10 @@ build-backend = "pbr.build"
 [tool.doc8]
 ignore = ["D001"]
 
+[tool.ruff]
+line-length = 79
+target-version = "py37"
+
 [tool.ruff.lint]
 select = [
     "E",        # pycodestyle (error)
@@ -12,6 +16,7 @@ select = [
     "G",        # flake8-logging-format
     "LOG",      # flake8-logging
     "S",        # flake8-bandit
+    "UP",       # pyupgrade
 ]
 
 [tool.ruff.lint.per-file-ignores]

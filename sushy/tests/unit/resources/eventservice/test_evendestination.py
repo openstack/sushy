@@ -20,7 +20,7 @@ from sushy.tests.unit import base
 class EventDestinationTestCase(base.TestCase):
 
     def setUp(self):
-        super(EventDestinationTestCase, self).setUp()
+        super().setUp()
         self.conn = mock.Mock()
         with open('sushy/tests/unit/json_samples/eventdestination1.json') as f:
             self.json_doc = json.load(f)
@@ -53,10 +53,10 @@ class EventDestinationTestCase(base.TestCase):
 class EventDestinationCollectionTestCase(base.TestCase):
 
     def setUp(self):
-        super(EventDestinationCollectionTestCase, self).setUp()
+        super().setUp()
         self.conn = mock.Mock()
         with open('sushy/tests/unit/json_samples/'
-                  'eventdestination_collection.json', 'r') as f:
+                  'eventdestination_collection.json') as f:
             self.conn.get.return_value.json.return_value = json.loads(f.read())
         self.eventdestination = eventdestination.EventDestinationCollection(
             self.conn, '/redfish/v1/EventService/Subscriptions',
@@ -77,7 +77,7 @@ class EventDestinationCollectionTestCase(base.TestCase):
         members = self.eventdestination.get_members()
         calls = [
             mock.call(self.eventdestination._conn,
-                      '/redfish/v1/EventService/Subscriptions/%s' % member,
+                      f'/redfish/v1/EventService/Subscriptions/{member}',
                       redfish_version=self.eventdestination.redfish_version,
                       registries=None,
                       root=self.eventdestination.root)

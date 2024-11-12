@@ -23,7 +23,7 @@ from sushy.tests.unit import base
 class SecureBootTestCase(base.TestCase):
 
     def setUp(self):
-        super(SecureBootTestCase, self).setUp()
+        super().setUp()
         self.conn = mock.Mock()
         with open('sushy/tests/unit/json_samples/secure_boot.json') as f:
             self.secure_boot_json = json.load(f)

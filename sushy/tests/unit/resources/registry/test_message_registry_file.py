@@ -24,7 +24,7 @@ from sushy.tests.unit import base
 class MessageRegistryFileTestCase(base.TestCase):
 
     def setUp(self):
-        super(MessageRegistryFileTestCase, self).setUp()
+        super().setUp()
         self.conn = mock.Mock()
         with open('sushy/tests/unit/json_samples/'
                   'message_registry_file.json') as f:
@@ -276,7 +276,7 @@ class MessageRegistryFileTestCase(base.TestCase):
 class BiosRegistryTestCase(base.TestCase):
 
     def setUp(self):
-        super(BiosRegistryTestCase, self).setUp()
+        super().setUp()
         self.conn = mock.Mock()
         with open('sushy/tests/unit/json_samples/'
                   'bios_attribute_registry_file.json') as f:
@@ -314,7 +314,7 @@ class BiosRegistryTestCase(base.TestCase):
 class MessageRegistryFileCollectionTestCase(base.TestCase):
 
     def setUp(self):
-        super(MessageRegistryFileCollectionTestCase, self).setUp()
+        super().setUp()
         self.conn = mock.Mock()
         with open('sushy/tests/unit/json_samples/'
                   'message_registry_file_collection.json') as f:

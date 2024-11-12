@@ -22,7 +22,7 @@ from sushy.tests.unit import base
 class EthernetInterfaceTestCase(base.TestCase):
 
     def setUp(self):
-        super(EthernetInterfaceTestCase, self).setUp()
+        super().setUp()
         self.conn = mock.Mock()
         with open('sushy/tests/unit/json_samples/'
                   'ethernet_interfaces.json') as f:
@@ -52,7 +52,7 @@ class EthernetInterfaceTestCase(base.TestCase):
 class EthernetInterfaceCollectionTestCase(base.TestCase):
 
     def setUp(self):
-        super(EthernetInterfaceCollectionTestCase, self).setUp()
+        super().setUp()
         self.conn = mock.Mock()
         with open('sushy/tests/unit/json_samples/'
                   'ethernet_interfaces_collection.json') as f:

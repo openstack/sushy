@@ -23,7 +23,7 @@ from sushy.tests.unit import base
 class EventServiceTestCase(base.TestCase):
 
     def setUp(self):
-        super(EventServiceTestCase, self).setUp()
+        super().setUp()
         self.conn = mock.Mock()
         with open('sushy/tests/unit/json_samples/eventservice.json') as f:
             self.json_doc = json.load(f)

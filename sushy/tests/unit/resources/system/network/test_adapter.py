@@ -25,7 +25,7 @@ from sushy.tests.unit import base
 class NetworkAdapterTestCase(base.TestCase):
 
     def setUp(self):
-        super(NetworkAdapterTestCase, self).setUp()
+        super().setUp()
         self.conn = mock.Mock()
         with open('sushy/tests/unit/json_samples/network_adapter.json') as f:
             self.json_doc = json.load(f)
@@ -151,7 +151,7 @@ class NetworkAdapterTestCase(base.TestCase):
 class NetworkAdapterCollectionTestCase(base.TestCase):
 
     def setUp(self):
-        super(NetworkAdapterCollectionTestCase, self).setUp()
+        super().setUp()
         self.conn = mock.Mock()
         with open('sushy/tests/unit/json_samples/'
                   'network_adapter_collection.json') as f:

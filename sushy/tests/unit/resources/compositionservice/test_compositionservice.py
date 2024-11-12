@@ -24,7 +24,7 @@ from sushy.tests.unit import base
 class CompositionServiceTestCase(base.TestCase):
 
     def setUp(self):
-        super(CompositionServiceTestCase, self).setUp()
+        super().setUp()
         self.conn = mock.Mock()
         with open(
             'sushy/tests/unit/json_samples/compositionservice.json') as f:

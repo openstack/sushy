@@ -42,7 +42,7 @@ class Bios(base.ResourceBase):
             parsing messages of attribute update status
         :param root: Sushy root object. Empty for Sushy root itself.
         """
-        super(Bios, self).__init__(
+        super().__init__(
             connector, path, redfish_version=redfish_version,
             registries=registries, root=root)
 

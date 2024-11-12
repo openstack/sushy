@@ -22,7 +22,7 @@ from sushy.tests.unit import base
 class NetworkPortTestCase(base.TestCase):
 
     def setUp(self):
-        super(NetworkPortTestCase, self).setUp()
+        super().setUp()
         self.conn = mock.Mock()
         with open('sushy/tests/unit/json_samples/network_port.json') as f:
             self.json_doc = json.load(f)
@@ -56,7 +56,7 @@ class NetworkPortTestCase(base.TestCase):
 class NetworkPortCollectionTestCase(base.TestCase):
 
     def setUp(self):
-        super(NetworkPortCollectionTestCase, self).setUp()
+        super().setUp()
         self.conn = mock.Mock()
         with open('sushy/tests/unit/json_samples/'
                   'network_port_collection.json') as f:

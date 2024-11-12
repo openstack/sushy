@@ -75,7 +75,7 @@ class EventService(base.ResourceBase):
             that needs registries to parse messages.
         :param root: Sushy root object. Empty for Sushy root itself.
         """
-        super(EventService, self).__init__(
+        super().__init__(
             connector, identity, redfish_version=redfish_version,
             registries=registries, root=root)
 

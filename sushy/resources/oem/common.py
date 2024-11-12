@@ -25,7 +25,7 @@ _global_extn_mgrs_by_resource = {}
 
 def _raise(m, ep, e):
     raise exceptions.ExtensionError(
-        error='Failed to load entry point target: %(error)s' % {'error': e})
+        error=f'Failed to load entry point target: {e}')
 
 
 def _create_extension_manager(namespace):
@@ -56,10 +56,8 @@ def _create_extension_manager(namespace):
                    'target': extension.entry_point_target})
 
     if not extension_manager.names():
-        m = (('No extensions found for "%(resource)s" under namespace '
-              '"%(namespace)s"') %
-             {'resource': resource_name,
-              'namespace': namespace})
+        m = (f'No extensions found for "{resource_name}" under namespace '
+             f'"{namespace}"')
         LOG.error(m)
         raise exceptions.ExtensionError(error=m)
 

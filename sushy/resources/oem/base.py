@@ -40,7 +40,7 @@ class OEMResourceBase(base.ResourceBase):
         self._parent_resource = None
         self._vendor_id = None
 
-        super(OEMResourceBase, self).__init__(
+        super().__init__(
             connector, path,
             redfish_version=redfish_version, registries=registries,
             reader=reader, root=root)
@@ -79,4 +79,4 @@ class OEMResourceBase(base.ResourceBase):
 
         oem_json.update(oem_actions_json)
 
-        super(OEMResourceBase, self)._parse_attributes(oem_json)
+        super()._parse_attributes(oem_json)

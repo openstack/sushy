@@ -25,7 +25,7 @@ from sushy.tests.unit import base
 class SettingsFieldTestCase(base.TestCase):
 
     def setUp(self):
-        super(SettingsFieldTestCase, self).setUp()
+        super().setUp()
         with open('sushy/tests/unit/json_samples/settings.json') as f:
             self.json = json.load(f)
 

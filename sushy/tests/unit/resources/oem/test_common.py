@@ -32,7 +32,7 @@ class FauxResourceOEMExtension(oem_base.OEMResourceBase):
 class ResourceOEMCommonMethodsTestCase(base.TestCase):
 
     def setUp(self):
-        super(ResourceOEMCommonMethodsTestCase, self).setUp()
+        super().setUp()
         # We use ExtensionManager.make_test_instance() and instantiate the
         # test instance outside of the test cases in setUp. Inside of the
         # test cases we set this as the return value of the mocked
@@ -66,7 +66,7 @@ class ResourceOEMCommonMethodsTestCase(base.TestCase):
                 [self.contoso_extn_dup, self.faux_extn_dup]))
 
     def tearDown(self):
-        super(ResourceOEMCommonMethodsTestCase, self).tearDown()
+        super().tearDown()
         if oem_common._global_extn_mgrs_by_resource:
             oem_common._global_extn_mgrs_by_resource = {}
 

@@ -26,7 +26,7 @@ from sushy.tests.unit import base
 class ProcessorTestCase(base.TestCase):
 
     def setUp(self):
-        super(ProcessorTestCase, self).setUp()
+        super().setUp()
         self.conn = mock.Mock()
         with open('sushy/tests/unit/json_samples/processor.json') as f:
             self.json_doc = json.load(f)
@@ -102,7 +102,7 @@ class ProcessorTestCase(base.TestCase):
 class ProcessorCollectionTestCase(base.TestCase):
 
     def setUp(self):
-        super(ProcessorCollectionTestCase, self).setUp()
+        super().setUp()
         self.conn = mock.Mock()
         with open('sushy/tests/unit/json_samples/'
                   'processor_collection.json') as f:

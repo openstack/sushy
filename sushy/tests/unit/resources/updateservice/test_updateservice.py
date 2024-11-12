@@ -26,7 +26,7 @@ from sushy.tests.unit import base
 class UpdateServiceTestCase(base.TestCase):
 
     def setUp(self):
-        super(UpdateServiceTestCase, self).setUp()
+        super().setUp()
         self.conn = mock.Mock()
         with open('sushy/tests/unit/json_samples/updateservice.json') as f:
             self.json_doc = json.load(f)
@@ -194,7 +194,7 @@ class UpdateServiceTestCase(base.TestCase):
 class UpdateServiceNoInvTestCase(base.TestCase):
 
     def setUp(self):
-        super(UpdateServiceNoInvTestCase, self).setUp()
+        super().setUp()
         self.conn = mock.Mock()
         no_inv_json = 'sushy/tests/unit/json_samples/updateservice_no_inv.json'
         with open(no_inv_json) as f:

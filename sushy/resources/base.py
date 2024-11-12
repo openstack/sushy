@@ -32,7 +32,7 @@ from sushy import utils
 LOG = logging.getLogger(__name__)
 
 
-class Field(object):
+class Field:
     """Definition for fields fetched from JSON."""
 
     def __init__(self, path, required=False, default=None,
@@ -139,7 +139,7 @@ class CompositeField(collections.abc.Mapping, Field, metaclass=abc.ABCMeta):
     """Base class for fields consisting of several sub-fields."""
 
     def __init__(self, *args, **kwargs):
-        super(CompositeField, self).__init__(*args, **kwargs)
+        super().__init__(*args, **kwargs)
         self._subfields = dict(_collect_fields(self))
 
     def _load(self, body, resource, nested_in=None):
@@ -151,7 +151,7 @@ class CompositeField(collections.abc.Mapping, Field, metaclass=abc.ABCMeta):
         :returns: a new object with sub-fields attached to it.
         """
         nested_in = (nested_in or []) + self._path
-        value = super(CompositeField, self)._load(body, resource)
+        value = super()._load(body, resource)
         if value is None:
             return None
 
@@ -185,7 +185,7 @@ class ListField(Field):
     """Base class for fields consisting of a list of several sub-fields."""
 
     def __init__(self, *args, **kwargs):
-        super(ListField, self).__init__(*args, **kwargs)
+        super().__init__(*args, **kwargs)
         self._subfields = dict(_collect_fields(self))
 
     def _load(self, body, resource, nested_in=None):
@@ -197,7 +197,7 @@ class ListField(Field):
         :returns: a new list object containing subfields.
         """
         nested_in = (nested_in or []) + self._path
-        values = super(ListField, self)._load(body, resource)
+        values = super()._load(body, resource)
         if values is None:
             return None
 
@@ -227,7 +227,7 @@ class DictionaryField(Field):
     """Base class for fields consisting of dictionary of several sub-fields."""
 
     def __init__(self, *args, **kwargs):
-        super(DictionaryField, self).__init__(*args, **kwargs)
+        super().__init__(*args, **kwargs)
         self._subfields = dict(_collect_fields(self))
 
     def _load(self, body, resource, nested_in=None):
@@ -239,7 +239,7 @@ class DictionaryField(Field):
         :returns: a new dictionary object containing subfields.
         """
         nested_in = (nested_in or []) + self._path
-        values = super(DictionaryField, self)._load(body, resource)
+        values = super()._load(body, resource)
         if values is None:
             return None
 
@@ -288,7 +288,7 @@ class MappedField(Field):
             raise TypeError("The mapping argument must be a mapping or "
                             "an enumeration")
 
-        super(MappedField, self).__init__(
+        super().__init__(
             field, required=required, default=default, adapter=adapter)
 
 
@@ -323,7 +323,7 @@ class MappedListField(Field):
                             "an enumeration")
 
         self._mapping_adapter = adapter
-        super(MappedListField, self).__init__(
+        super().__init__(
             field, required=required, default=default,
             adapter=lambda x: x)
 
@@ -336,7 +336,7 @@ class MappedListField(Field):
         :returns: a new list object containing the mapped values.
         """
         nested_in = (nested_in or []) + self._path
-        values = super(MappedListField, self)._load(body, resource)
+        values = super()._load(body, resource)
 
         if values is None:
             return
@@ -375,7 +375,7 @@ class MessageListField(ListField):
     """
 
 
-class FieldData(object):
+class FieldData:
     """Contains data to be used when constructing Fields"""
 
     def __init__(self, status_code, headers, json_doc):
@@ -400,7 +400,7 @@ class FieldData(object):
         return self._json_doc
 
 
-class AbstractDataReader(object, metaclass=abc.ABCMeta):
+class AbstractDataReader(metaclass=abc.ABCMeta):
 
     def set_connection(self, connector, path):
         """Sets mandatory connection parameters
@@ -506,7 +506,7 @@ def get_reader(connector, path, reader=None):
     return reader
 
 
-class ResourceBase(object, metaclass=abc.ABCMeta):
+class ResourceBase(metaclass=abc.ABCMeta):
 
     redfish_version = None
     """The Redfish version"""

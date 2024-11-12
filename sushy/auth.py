@@ -20,7 +20,7 @@ from sushy import exceptions
 LOG = logging.getLogger(__name__)
 
 
-class AuthBase(object, metaclass=abc.ABCMeta):
+class AuthBase(metaclass=abc.ABCMeta):
 
     def __init__(self, username=None, password=None):
         """A class representing a base Sushy authentication mechanism
@@ -129,8 +129,7 @@ class SessionAuth(AuthBase):
         self._session_auth_previously_successful = False
         """Our reminder for tracking if session auth has previously worked."""
 
-        super(SessionAuth, self).__init__(username,
-                                          password)
+        super().__init__(username, password)
 
     def get_session_key(self):
         """Returns the session key.
@@ -224,7 +223,7 @@ class SessionAuth(AuthBase):
 class SessionOrBasicAuth(SessionAuth):
 
     def __init__(self, username=None, password=None):
-        super(SessionOrBasicAuth, self).__init__(username, password)
+        super().__init__(username, password)
         self.basic_auth = BasicAuth(username=username, password=password)
 
     def _fallback_to_basic_authentication(self):
@@ -241,7 +240,7 @@ class SessionOrBasicAuth(SessionAuth):
         """
         try:
             # Attempt session based authentication
-            super(SessionOrBasicAuth, self)._do_authenticate()
+            super()._do_authenticate()
         except exceptions.AccessError as e:
             if (not self.can_refresh_session()
                     and not self._session_auth_previously_successful):
@@ -297,4 +296,4 @@ class SessionOrBasicAuth(SessionAuth):
         we simply return our BasicAuthentication requests.Session.
         """
         if self.can_refresh_session():
-            super(SessionOrBasicAuth, self).refresh_session()
+            super().refresh_session()

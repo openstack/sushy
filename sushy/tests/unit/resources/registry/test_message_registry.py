@@ -28,7 +28,7 @@ from sushy.tests.unit import base
 class MessageRegistryTestCase(base.TestCase):
 
     def setUp(self):
-        super(MessageRegistryTestCase, self).setUp()
+        super().setUp()
         self.conn = mock.Mock()
         with open('sushy/tests/unit/json_samples/message_registry.json') as f:
             self.json_doc = json.load(f)
