@@ -9,6 +9,8 @@ ignore = ["D001"]
 select = [
     "E",        # pycodestyle (error)
     "F",        # pyflakes
+    "G",        # flake8-logging-format
+    "LOG",      # flake8-logging
     "S",        # flake8-bandit
 ]
 

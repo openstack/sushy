@@ -103,7 +103,7 @@ class Field(object):
 
                 logging.warning(
                     'Applying default "%s" on required, but missing '
-                    'attribute "%s"' % (self._default, path))
+                    'attribute "%s"', self._default, path)
 
             # Do not run the adapter on the default value
             return self._default

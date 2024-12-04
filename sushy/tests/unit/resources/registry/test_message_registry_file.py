@@ -269,8 +269,8 @@ class MessageRegistryFileTestCase(base.TestCase):
         self.reg_file._parse_attributes(self.json_doc)
         self.assertEqual('UNKNOWN.0.0', self.reg_file.registry)
         mock_log.assert_called_with(
-            'Applying default "UNKNOWN.0.0" on required, but missing '
-            'attribute "[\'Registry\']"')
+            'Applying default "%s" on required, but missing '
+            'attribute "%s"', 'UNKNOWN.0.0', ['Registry'])
 
 
 class BiosRegistryTestCase(base.TestCase):
