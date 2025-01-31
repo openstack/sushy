@@ -1,0 +1,38 @@
+{
+    "@odata.context": "/redfish/v1/$metadata#Task.Task",
+    "@odata.id": "/redfish/v1/TaskService/Tasks/JID_257309938313",
+    "@odata.type": "#Task.v1_4_3.Task",
+    "Description": "Server Configuration and other Tasks running on iDRAC are listed here",
+    "Id": "JID_257309938313",
+    "Messages": [
+        {
+            "Message": "Task successfully scheduled.",
+            "MessageArgs": [],
+            "MessageArgs@odata.count": 0,
+            "MessageId": "IDRAC.2.5.JCP001"
+        }
+    ],
+    "Messages@odata.count": 1,
+    "Name": "Configure: RAID.Integrated.1-1",
+    "Oem": {
+        "Dell": {
+            "@odata.type": "#DellJob.v1_1_0.DellJob",
+            "CompletionTime": null,
+            "Description": "Job Instance",
+            "EndTime": "TIME_NA",
+            "Id": "JID_257309938313",
+            "JobState": "Scheduled",
+            "JobType": "RAIDConfiguration",
+            "Message": "Task successfully scheduled.",
+            "MessageArgs": [],
+            "MessageId": "IDRAC.2.5.JCP001",
+            "Name": "Configure: RAID.Integrated.1-1",
+            "PercentComplete": 0,
+            "StartTime": "TIME_NOW",
+            "TargetSettingsURI": null
+        }
+    },
+    "PercentComplete": 0,
+    "TaskState": "Starting",
+    "TaskStatus": "OK"
+}

@@ -1,0 +1,17 @@
+{
+   "@odata.context": "/redfish/v1/$metadata#DelliDRACCard.DelliDRACCardService",
+   "@odata.id": "/redfish/v1/Dell/Managers/iDRAC.Embedded.1/DelliDRACCardService",
+   "@odata.type": "#DelliDRACCardService.v1_1_0.DelliDRACCardService",
+   "Actions": {
+      "#DelliDRACCardService.iDRACReset": {
+         "Force@Redfish.AllowableValues": [
+            "Graceful",
+            "Force"
+         ],
+         "target": "/redfish/v1/Dell/Managers/iDRAC.Embedded.1/DelliDRACCardService/Actions/DelliDRACCardService.iDRACReset"
+      }
+   },
+   "Description": "The DelliDRACCardService resource provides some actions to support iDRAC configurations.",
+   "Id": "DelliDRACCardService",
+   "Name": "DelliDRACCardService"
+}

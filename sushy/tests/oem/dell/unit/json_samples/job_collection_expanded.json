@@ -1,0 +1,29 @@
+{
+   "@odata.context": "/redfish/v1/$metadata#DellJobCollection.DellJobCollection",
+   "@odata.id": "/redfish/v1/Managers/iDRAC.Embedded.1/Jobs",
+   "@odata.type": "#DellJobCollection.DellJobCollection",
+   "Description": "Collection of Job Instances",
+   "Id": "JobQueue",
+   "Members": [
+               {
+                "@odata.context": "/redfish/v1/$metadata#DellJob.DellJob",
+                "@odata.id": "/redfish/v1/Managers/iDRAC.Embedded.1/Jobs/RID_878460711202",
+                "@odata.type": "#DellJob.v1_0_2.DellJob",
+                "CompletionTime": "2020-04-25T15:21:33",
+                "Description": "Job Instance",
+                "EndTime": "TIME_NA",
+                "Id": "RID_878460711202",
+                "JobState": "Running",
+                "JobType": "RebootForce",
+                "Message": "Reboot is complete.",
+                "MessageArgs": [ ],
+                "MessageArgs@odata.count": 0,
+                "MessageId": "RED030",
+                "Name": "Reboot3",
+                "PercentComplete": 100,
+                "StartTime": "TIME_NOW",
+                "TargetSettingsURI": null
+           }
+   ],
+   "Name": "JobQueue"
+}

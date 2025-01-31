@@ -1,0 +1,1435 @@
+{
+  "SystemConfiguration": {
+    "Comments": [
+      {
+        "Comment": "Export type is Normal,JSON,Selective"
+      },
+      {
+        "Comment": "Exported configuration may contain commented attributes. Attributes may be commented due to dependency, destructive nature, preserving server identity or for security reasons."
+      }
+    ],
+    "Model": "PowerEdge R7525",
+    "ServiceTag": "C6DCS33",
+    "TimeStamp": "Wed Feb  3 06:53:31 2021",
+    "Components": [
+      {
+        "FQDD": "NIC.Integrated.1-4-1",
+        "Attributes": [
+          {
+            "Name": "BlnkLeds",
+            "Value": "0",
+            "Set On Import": "True",
+            "Comment": "Read and Write"
+          },
+          {
+            "Name": "VirtMacAddr",
+            "Value": "00:00:00:00:00:00",
+            "Set On Import": "False",
+            "Comment": "Read and Write"
+          },
+          {
+            "Name": "VirtualizationMode",
+            "Value": "NONE",
+            "Set On Import": "True",
+            "Comment": "Read and Write"
+          },
+          {
+            "Name": "LegacyBootProto",
+            "Value": "NONE",
+            "Set On Import": "True",
+            "Comment": "Read and Write"
+          },
+          {
+            "Name": "LnkSpeed",
+            "Value": "AutoNeg",
+            "Set On Import": "True",
+            "Comment": "Read and Write"
+          },
+          {
+            "Name": "WakeOnLan",
+            "Value": "Disabled",
+            "Set On Import": "True",
+            "Comment": "Read and Write"
+          },
+          {
+            "Name": "VLanId",
+            "Value": "0",
+            "Set On Import": "False",
+            "Comment": "Read and Write"
+          },
+          {
+            "Name": "NumberVFAdvertised",
+            "Value": "8",
+            "Set On Import": "False",
+            "Comment": "Read and Write"
+          }
+        ]
+      },
+      {
+        "FQDD": "NIC.Integrated.1-2-1",
+        "Attributes": [
+          {
+            "Name": "BlnkLeds",
+            "Value": "0",
+            "Set On Import": "True",
+            "Comment": "Read and Write"
+          },
+          {
+            "Name": "VirtMacAddr",
+            "Value": "00:00:00:00:00:00",
+            "Set On Import": "False",
+            "Comment": "Read and Write"
+          },
+          {
+            "Name": "VirtualizationMode",
+            "Value": "NONE",
+            "Set On Import": "True",
+            "Comment": "Read and Write"
+          },
+          {
+            "Name": "LegacyBootProto",
+            "Value": "NONE",
+            "Set On Import": "True",
+            "Comment": "Read and Write"
+          },
+          {
+            "Name": "LnkSpeed",
+            "Value": "AutoNeg",
+            "Set On Import": "True",
+            "Comment": "Read and Write"
+          },
+          {
+            "Name": "WakeOnLan",
+            "Value": "Disabled",
+            "Set On Import": "True",
+            "Comment": "Read and Write"
+          },
+          {
+            "Name": "VLanId",
+            "Value": "0",
+            "Set On Import": "False",
+            "Comment": "Read and Write"
+          },
+          {
+            "Name": "NumberVFAdvertised",
+            "Value": "8",
+            "Set On Import": "False",
+            "Comment": "Read and Write"
+          }
+        ]
+      },
+      {
+        "FQDD": "NIC.Integrated.1-3-1",
+        "Attributes": [
+          {
+            "Name": "BlnkLeds",
+            "Value": "0",
+            "Set On Import": "True",
+            "Comment": "Read and Write"
+          },
+          {
+            "Name": "VirtMacAddr",
+            "Value": "00:00:00:00:00:00",
+            "Set On Import": "False",
+            "Comment": "Read and Write"
+          },
+          {
+            "Name": "VirtualizationMode",
+            "Value": "NONE",
+            "Set On Import": "True",
+            "Comment": "Read and Write"
+          },
+          {
+            "Name": "LegacyBootProto",
+            "Value": "PXE",
+            "Set On Import": "True",
+            "Comment": "Read and Write"
+          },
+          {
+            "Name": "LnkSpeed",
+            "Value": "AutoNeg",
+            "Set On Import": "True",
+            "Comment": "Read and Write"
+          },
+          {
+            "Name": "WakeOnLan",
+            "Value": "Disabled",
+            "Set On Import": "True",
+            "Comment": "Read and Write"
+          },
+          {
+            "Name": "VLanId",
+            "Value": "0",
+            "Set On Import": "False",
+            "Comment": "Read and Write"
+          },
+          {
+            "Name": "NumberVFAdvertised",
+            "Value": "8",
+            "Set On Import": "False",
+            "Comment": "Read and Write"
+          }
+        ]
+      },
+      {
+        "FQDD": "NIC.Integrated.1-1-1",
+        "Attributes": [
+          {
+            "Name": "BlnkLeds",
+            "Value": "0",
+            "Set On Import": "True",
+            "Comment": "Read and Write"
+          },
+          {
+            "Name": "VirtMacAddr",
+            "Value": "00:00:00:00:00:00",
+            "Set On Import": "False",
+            "Comment": "Read and Write"
+          },
+          {
+            "Name": "VirtualizationMode",
+            "Value": "NONE",
+            "Set On Import": "True",
+            "Comment": "Read and Write"
+          },
+          {
+            "Name": "LegacyBootProto",
+            "Value": "NONE",
+            "Set On Import": "True",
+            "Comment": "Read and Write"
+          },
+          {
+            "Name": "LnkSpeed",
+            "Value": "AutoNeg",
+            "Set On Import": "True",
+            "Comment": "Read and Write"
+          },
+          {
+            "Name": "WakeOnLan",
+            "Value": "Disabled",
+            "Set On Import": "True",
+            "Comment": "Read and Write"
+          },
+          {
+            "Name": "VLanId",
+            "Value": "0",
+            "Set On Import": "False",
+            "Comment": "Read and Write"
+          },
+          {
+            "Name": "NumberVFAdvertised",
+            "Value": "8",
+            "Set On Import": "False",
+            "Comment": "Read and Write"
+          }
+        ]
+      },
+      {
+        "FQDD": "NIC.Embedded.1-1-1",
+        "Attributes": [
+          {
+            "Name": "BlnkLeds",
+            "Value": "0",
+            "Set On Import": "True",
+            "Comment": "Read and Write"
+          },
+          {
+            "Name": "EEEControl",
+            "Value": "Enabled",
+            "Set On Import": "True",
+            "Comment": "Read and Write"
+          },
+          {
+            "Name": "VirtMacAddr",
+            "Value": "F4:02:70:B8:A6:7A",
+            "Set On Import": "False",
+            "Comment": "Read and Write"
+          },
+          {
+            "Name": "TcpIpViaDHCP",
+            "Value": "Enabled",
+            "Set On Import": "True",
+            "Comment": "Read and Write"
+          },
+          {
+            "Name": "IpAutoConfig",
+            "Value": "Enabled",
+            "Set On Import": "True",
+            "Comment": "Read and Write"
+          },
+          {
+            "Name": "IscsiViaDHCP",
+            "Value": "Disabled",
+            "Set On Import": "True",
+            "Comment": "Read and Write"
+          },
+          {
+            "Name": "ChapAuthEnable",
+            "Value": "Disabled",
+            "Set On Import": "True",
+            "Comment": "Read and Write"
+          },
+          {
+            "Name": "IscsiTgtBoot",
+            "Value": "Enabled",
+            "Set On Import": "True",
+            "Comment": "Read and Write"
+          },
+          {
+            "Name": "DhcpVendId",
+            "Value": "BRCM ISAN",
+            "Set On Import": "True",
+            "Comment": "Read and Write"
+          },
+          {
+            "Name": "LnkUpDelayTime",
+            "Value": "0",
+            "Set On Import": "True",
+            "Comment": "Read and Write"
+          },
+          {
+            "Name": "TcpTimestmp",
+            "Value": "Disabled",
+            "Set On Import": "True",
+            "Comment": "Read and Write"
+          },
+          {
+            "Name": "FirstHddTarget",
+            "Value": "Disabled",
+            "Set On Import": "True",
+            "Comment": "Read and Write"
+          },
+          {
+            "Name": "LunBusyRetryCnt",
+            "Value": "0",
+            "Set On Import": "True",
+            "Comment": "Read and Write"
+          },
+          {
+            "Name": "IpVer",
+            "Value": "IPv4",
+            "Set On Import": "True",
+            "Comment": "Read and Write"
+          },
+          {
+            "Name": "IscsiInitiatorIpAddr",
+            "Value": "0.0.0.0",
+            "Set On Import": "False",
+            "Comment": "Read and Write"
+          },
+          {
+            "Name": "IscsiInitiatorSubnet",
+            "Value": "0.0.0.0",
+            "Set On Import": "False",
+            "Comment": "Read and Write"
+          },
+          {
+            "Name": "IscsiInitiatorSubnetPrefix",
+            "Value": "0",
+            "Set On Import": "False",
+            "Comment": "Read and Write"
+          },
+          {
+            "Name": "IscsiInitiatorGateway",
+            "Value": "0.0.0.0",
+            "Set On Import": "False",
+            "Comment": "Read and Write"
+          },
+          {
+            "Name": "IscsiInitiatorPrimDns",
+            "Value": "0.0.0.0",
+            "Set On Import": "False",
+            "Comment": "Read and Write"
+          },
+          {
+            "Name": "IscsiInitiatorSecDns",
+            "Value": "0.0.0.0",
+            "Set On Import": "False",
+            "Comment": "Read and Write"
+          },
+          {
+            "Name": "IscsiInitiatorName",
+            "Value": "iqn.1995-05.com.broadcom.iscsiboot",
+            "Set On Import": "False",
+            "Comment": "Read and Write"
+          },
+          {
+            "Name": "IscsiInitiatorChapId",
+            "Value": "",
+            "Set On Import": "False",
+            "Comment": "Read and Write"
+          },
+          {
+            "Name": "IscsiInitiatorChapPwd",
+            "Value": "",
+            "Set On Import": "False",
+            "Comment": "Read and Write"
+          },
+          {
+            "Name": "ConnectFirstTgt",
+            "Value": "Disabled",
+            "Set On Import": "False",
+            "Comment": "Read and Write"
+          },
+          {
+            "Name": "FirstTgtIpAddress",
+            "Value": "0.0.0.0",
+            "Set On Import": "False",
+            "Comment": "Read and Write"
+          },
+          {
+            "Name": "FirstTgtTcpPort",
+            "Value": "3260",
+            "Set On Import": "False",
+            "Comment": "Read and Write"
+          },
+          {
+            "Name": "FirstTgtBootLun",
+            "Value": "0",
+            "Set On Import": "False",
+            "Comment": "Read and Write"
+          },
+          {
+            "Name": "FirstTgtIscsiName",
+            "Value": "",
+            "Set On Import": "False",
+            "Comment": "Read and Write"
+          },
+          {
+            "Name": "FirstTgtChapId",
+            "Value": "",
+            "Set On Import": "False",
+            "Comment": "Read and Write"
+          },
+          {
+            "Name": "FirstTgtChapPwd",
+            "Value": "",
+            "Set On Import": "False",
+            "Comment": "Read and Write"
+          },
+          {
+            "Name": "ConnectSecondTgt",
+            "Value": "Disabled",
+            "Set On Import": "False",
+            "Comment": "Read and Write"
+          },
+          {
+            "Name": "SecondTgtIpAddress",
+            "Value": "0.0.0.0",
+            "Set On Import": "False",
+            "Comment": "Read and Write"
+          },
+          {
+            "Name": "SecondTgtTcpPort",
+            "Value": "3260",
+            "Set On Import": "False",
+            "Comment": "Read and Write"
+          },
+          {
+            "Name": "SecondTgtBootLun",
+            "Value": "0",
+            "Set On Import": "False",
+            "Comment": "Read and Write"
+          },
+          {
+            "Name": "SecondTgtIscsiName",
+            "Value": "",
+            "Set On Import": "False",
+            "Comment": "Read and Write"
+          },
+          {
+            "Name": "SecondTgtChapId",
+            "Value": "",
+            "Set On Import": "False",
+            "Comment": "Read and Write"
+          },
+          {
+            "Name": "SecondTgtChapPwd",
+            "Value": "",
+            "Set On Import": "False",
+            "Comment": "Read and Write"
+          },
+          {
+            "Name": "SecondaryDeviceMacAddr",
+            "Value": "00:00:00:00:00:00",
+            "Set On Import": "False",
+            "Comment": "Read and Write"
+          },
+          {
+            "Name": "UseIndTgtPortal",
+            "Value": "Disabled",
+            "Set On Import": "False",
+            "Comment": "Read and Write"
+          },
+          {
+            "Name": "UseIndTgtName",
+            "Value": "Disabled",
+            "Set On Import": "False",
+            "Comment": "Read and Write"
+          },
+          {
+            "Name": "BootOptionROM",
+            "Value": "Enabled",
+            "Set On Import": "True",
+            "Comment": "Read and Write"
+          },
+          {
+            "Name": "LegacyBootProto",
+            "Value": "NONE",
+            "Set On Import": "True",
+            "Comment": "Read and Write"
+          },
+          {
+            "Name": "BootStrapType",
+            "Value": "AutoDetect",
+            "Set On Import": "True",
+            "Comment": "Read and Write"
+          },
+          {
+            "Name": "HideSetupPrompt",
+            "Value": "Disabled",
+            "Set On Import": "True",
+            "Comment": "Read and Write"
+          },
+          {
+            "Name": "BannerMessageTimeout",
+            "Value": "5",
+            "Set On Import": "True",
+            "Comment": "Read and Write"
+          },
+          {
+            "Name": "LnkSpeed",
+            "Value": "AutoNeg",
+            "Set On Import": "True",
+            "Comment": "Read and Write"
+          },
+          {
+            "Name": "WakeOnLan",
+            "Value": "Disabled",
+            "Set On Import": "True",
+            "Comment": "Read and Write"
+          },
+          {
+            "Name": "VLanMode",
+            "Value": "Disabled",
+            "Set On Import": "True",
+            "Comment": "Read and Write"
+          },
+          {
+            "Name": "VLanId",
+            "Value": "1",
+            "Set On Import": "False",
+            "Comment": "Read and Write"
+          },
+          {
+            "Name": "PermitTotalPortShutdown",
+            "Value": "Disabled",
+            "Set On Import": "True",
+            "Comment": "Read and Write"
+          }
+        ]
+      },
+      {
+        "FQDD": "NIC.Slot.1-2-1",
+        "Attributes": [
+          {
+            "Name": "BlnkLeds",
+            "Value": "0",
+            "Set On Import": "True",
+            "Comment": "Read and Write"
+          },
+          {
+            "Name": "VirtMacAddr",
+            "Value": "00:00:00:00:00:00",
+            "Set On Import": "False",
+            "Comment": "Read and Write"
+          },
+          {
+            "Name": "VirtualizationMode",
+            "Value": "NONE",
+            "Set On Import": "True",
+            "Comment": "Read and Write"
+          },
+          {
+            "Name": "NParEP",
+            "Value": "Disabled",
+            "Set On Import": "False",
+            "Comment": "Read and Write"
+          },
+          {
+            "Name": "LegacyBootProto",
+            "Value": "NONE",
+            "Set On Import": "True",
+            "Comment": "Read and Write"
+          },
+          {
+            "Name": "VLanId",
+            "Value": "0",
+            "Set On Import": "False",
+            "Comment": "Read and Write"
+          },
+          {
+            "Name": "NumberVFAdvertised",
+            "Value": "64",
+            "Set On Import": "False",
+            "Comment": "Read and Write"
+          },
+          {
+            "Name": "INTEL_LLDPAgent",
+            "Value": "Enabled",
+            "Set On Import": "True",
+            "Comment": "Read and Write"
+          },
+          {
+            "Name": "TcpIpViaDHCP",
+            "Value": "Disabled",
+            "Set On Import": "True",
+            "Comment": "Read and Write"
+          },
+          {
+            "Name": "IscsiViaDHCP",
+            "Value": "Disabled",
+            "Set On Import": "False",
+            "Comment": "Read and Write"
+          },
+          {
+            "Name": "ChapAuthEnable",
+            "Value": "Disabled",
+            "Set On Import": "True",
+            "Comment": "Read and Write"
+          },
+          {
+            "Name": "ChapMutualAuth",
+            "Value": "Disabled",
+            "Set On Import": "False",
+            "Comment": "Read and Write"
+          },
+          {
+            "Name": "IscsiInitiatorIpAddr",
+            "Value": "0.0.0.0",
+            "Set On Import": "False",
+            "Comment": "Read and Write"
+          },
+          {
+            "Name": "IscsiInitiatorSubnet",
+            "Value": "0.0.0.0",
+            "Set On Import": "False",
+            "Comment": "Read and Write"
+          },
+          {
+            "Name": "IscsiInitiatorGateway",
+            "Value": "0.0.0.0",
+            "Set On Import": "False",
+            "Comment": "Read and Write"
+          },
+          {
+            "Name": "IscsiInitiatorName",
+            "Value": "",
+            "Set On Import": "False",
+            "Comment": "Read and Write"
+          },
+          {
+            "Name": "IscsiInitiatorChapId",
+            "Value": "",
+            "Set On Import": "False",
+            "Comment": "Read and Write"
+          },
+          {
+            "Name": "IscsiInitiatorChapPwd",
+            "Value": "",
+            "Set On Import": "False",
+            "Comment": "Read and Write"
+          },
+          {
+            "Name": "FirstTgtIpAddress",
+            "Value": "0.0.0.0",
+            "Set On Import": "False",
+            "Comment": "Read and Write"
+          },
+          {
+            "Name": "FirstTgtTcpPort",
+            "Value": "3260",
+            "Set On Import": "False",
+            "Comment": "Read and Write"
+          },
+          {
+            "Name": "FirstTgtBootLun",
+            "Value": "0",
+            "Set On Import": "False",
+            "Comment": "Read and Write"
+          },
+          {
+            "Name": "FirstTgtIscsiName",
+            "Value": "",
+            "Set On Import": "False",
+            "Comment": "Read and Write"
+          },
+          {
+            "Name": "FirstTgtChapPwd",
+            "Value": "",
+            "Set On Import": "False",
+            "Comment": "Read and Write"
+          },
+          {
+            "Name": "VFDistribution",
+            "Value": "64:0:0:0:0:0:0:0",
+            "Set On Import": "False",
+            "Comment": "Read and Write"
+          }
+        ]
+      },
+      {
+        "FQDD": "NIC.Slot.1-1-1",
+        "Attributes": [
+          {
+            "Name": "BlnkLeds",
+            "Value": "0",
+            "Set On Import": "True",
+            "Comment": "Read and Write"
+          },
+          {
+            "Name": "VirtMacAddr",
+            "Value": "00:00:00:00:00:00",
+            "Set On Import": "False",
+            "Comment": "Read and Write"
+          },
+          {
+            "Name": "VirtualizationMode",
+            "Value": "NONE",
+            "Set On Import": "True",
+            "Comment": "Read and Write"
+          },
+          {
+            "Name": "NParEP",
+            "Value": "Disabled",
+            "Set On Import": "False",
+            "Comment": "Read and Write"
+          },
+          {
+            "Name": "LegacyBootProto",
+            "Value": "NONE",
+            "Set On Import": "True",
+            "Comment": "Read and Write"
+          },
+          {
+            "Name": "VLanId",
+            "Value": "0",
+            "Set On Import": "False",
+            "Comment": "Read and Write"
+          },
+          {
+            "Name": "NumberVFAdvertised",
+            "Value": "64",
+            "Set On Import": "False",
+            "Comment": "Read and Write"
+          },
+          {
+            "Name": "INTEL_LLDPAgent",
+            "Value": "Enabled",
+            "Set On Import": "True",
+            "Comment": "Read and Write"
+          },
+          {
+            "Name": "TcpIpViaDHCP",
+            "Value": "Disabled",
+            "Set On Import": "True",
+            "Comment": "Read and Write"
+          },
+          {
+            "Name": "IscsiViaDHCP",
+            "Value": "Disabled",
+            "Set On Import": "False",
+            "Comment": "Read and Write"
+          },
+          {
+            "Name": "ChapAuthEnable",
+            "Value": "Disabled",
+            "Set On Import": "True",
+            "Comment": "Read and Write"
+          },
+          {
+            "Name": "ChapMutualAuth",
+            "Value": "Disabled",
+            "Set On Import": "False",
+            "Comment": "Read and Write"
+          },
+          {
+            "Name": "IscsiInitiatorIpAddr",
+            "Value": "0.0.0.0",
+            "Set On Import": "False",
+            "Comment": "Read and Write"
+          },
+          {
+            "Name": "IscsiInitiatorSubnet",
+            "Value": "0.0.0.0",
+            "Set On Import": "False",
+            "Comment": "Read and Write"
+          },
+          {
+            "Name": "IscsiInitiatorGateway",
+            "Value": "0.0.0.0",
+            "Set On Import": "False",
+            "Comment": "Read and Write"
+          },
+          {
+            "Name": "IscsiInitiatorName",
+            "Value": "",
+            "Set On Import": "False",
+            "Comment": "Read and Write"
+          },
+          {
+            "Name": "IscsiInitiatorChapId",
+            "Value": "",
+            "Set On Import": "False",
+            "Comment": "Read and Write"
+          },
+          {
+            "Name": "IscsiInitiatorChapPwd",
+            "Value": "",
+            "Set On Import": "False",
+            "Comment": "Read and Write"
+          },
+          {
+            "Name": "FirstTgtIpAddress",
+            "Value": "0.0.0.0",
+            "Set On Import": "False",
+            "Comment": "Read and Write"
+          },
+          {
+            "Name": "FirstTgtTcpPort",
+            "Value": "3260",
+            "Set On Import": "False",
+            "Comment": "Read and Write"
+          },
+          {
+            "Name": "FirstTgtBootLun",
+            "Value": "0",
+            "Set On Import": "False",
+            "Comment": "Read and Write"
+          },
+          {
+            "Name": "FirstTgtIscsiName",
+            "Value": "",
+            "Set On Import": "False",
+            "Comment": "Read and Write"
+          },
+          {
+            "Name": "FirstTgtChapPwd",
+            "Value": "",
+            "Set On Import": "False",
+            "Comment": "Read and Write"
+          },
+          {
+            "Name": "VFDistribution",
+            "Value": "64:0:0:0:0:0:0:0",
+            "Set On Import": "False",
+            "Comment": "Read and Write"
+          }
+        ]
+      },
+      {
+        "FQDD": "NIC.Embedded.2-1-1",
+        "Attributes": [
+          {
+            "Name": "BlnkLeds",
+            "Value": "0",
+            "Set On Import": "True",
+            "Comment": "Read and Write"
+          },
+          {
+            "Name": "EEEControl",
+            "Value": "Enabled",
+            "Set On Import": "True",
+            "Comment": "Read and Write"
+          },
+          {
+            "Name": "VirtMacAddr",
+            "Value": "F4:02:70:B8:A6:7B",
+            "Set On Import": "False",
+            "Comment": "Read and Write"
+          },
+          {
+            "Name": "TcpIpViaDHCP",
+            "Value": "Enabled",
+            "Set On Import": "True",
+            "Comment": "Read and Write"
+          },
+          {
+            "Name": "IpAutoConfig",
+            "Value": "Enabled",
+            "Set On Import": "True",
+            "Comment": "Read and Write"
+          },
+          {
+            "Name": "IscsiViaDHCP",
+            "Value": "Disabled",
+            "Set On Import": "True",
+            "Comment": "Read and Write"
+          },
+          {
+            "Name": "ChapAuthEnable",
+            "Value": "Disabled",
+            "Set On Import": "True",
+            "Comment": "Read and Write"
+          },
+          {
+            "Name": "IscsiTgtBoot",
+            "Value": "Enabled",
+            "Set On Import": "True",
+            "Comment": "Read and Write"
+          },
+          {
+            "Name": "DhcpVendId",
+            "Value": "BRCM ISAN",
+            "Set On Import": "True",
+            "Comment": "Read and Write"
+          },
+          {
+            "Name": "LnkUpDelayTime",
+            "Value": "0",
+            "Set On Import": "True",
+            "Comment": "Read and Write"
+          },
+          {
+            "Name": "TcpTimestmp",
+            "Value": "Disabled",
+            "Set On Import": "True",
+            "Comment": "Read and Write"
+          },
+          {
+            "Name": "FirstHddTarget",
+            "Value": "Disabled",
+            "Set On Import": "True",
+            "Comment": "Read and Write"
+          },
+          {
+            "Name": "LunBusyRetryCnt",
+            "Value": "0",
+            "Set On Import": "True",
+            "Comment": "Read and Write"
+          },
+          {
+            "Name": "IpVer",
+            "Value": "IPv4",
+            "Set On Import": "True",
+            "Comment": "Read and Write"
+          },
+          {
+            "Name": "IscsiInitiatorIpAddr",
+            "Value": "0.0.0.0",
+            "Set On Import": "False",
+            "Comment": "Read and Write"
+          },
+          {
+            "Name": "IscsiInitiatorSubnet",
+            "Value": "0.0.0.0",
+            "Set On Import": "False",
+            "Comment": "Read and Write"
+          },
+          {
+            "Name": "IscsiInitiatorSubnetPrefix",
+            "Value": "0",
+            "Set On Import": "False",
+            "Comment": "Read and Write"
+          },
+          {
+            "Name": "IscsiInitiatorGateway",
+            "Value": "0.0.0.0",
+            "Set On Import": "False",
+            "Comment": "Read and Write"
+          },
+          {
+            "Name": "IscsiInitiatorPrimDns",
+            "Value": "0.0.0.0",
+            "Set On Import": "False",
+            "Comment": "Read and Write"
+          },
+          {
+            "Name": "IscsiInitiatorSecDns",
+            "Value": "0.0.0.0",
+            "Set On Import": "False",
+            "Comment": "Read and Write"
+          },
+          {
+            "Name": "IscsiInitiatorName",
+            "Value": "iqn.1995-05.com.broadcom.iscsiboot",
+            "Set On Import": "False",
+            "Comment": "Read and Write"
+          },
+          {
+            "Name": "IscsiInitiatorChapId",
+            "Value": "",
+            "Set On Import": "False",
+            "Comment": "Read and Write"
+          },
+          {
+            "Name": "IscsiInitiatorChapPwd",
+            "Value": "",
+            "Set On Import": "False",
+            "Comment": "Read and Write"
+          },
+          {
+            "Name": "ConnectFirstTgt",
+            "Value": "Disabled",
+            "Set On Import": "False",
+            "Comment": "Read and Write"
+          },
+          {
+            "Name": "FirstTgtIpAddress",
+            "Value": "0.0.0.0",
+            "Set On Import": "False",
+            "Comment": "Read and Write"
+          },
+          {
+            "Name": "FirstTgtTcpPort",
+            "Value": "3260",
+            "Set On Import": "False",
+            "Comment": "Read and Write"
+          },
+          {
+            "Name": "FirstTgtBootLun",
+            "Value": "0",
+            "Set On Import": "False",
+            "Comment": "Read and Write"
+          },
+          {
+            "Name": "FirstTgtIscsiName",
+            "Value": "",
+            "Set On Import": "False",
+            "Comment": "Read and Write"
+          },
+          {
+            "Name": "FirstTgtChapId",
+            "Value": "",
+            "Set On Import": "False",
+            "Comment": "Read and Write"
+          },
+          {
+            "Name": "FirstTgtChapPwd",
+            "Value": "",
+            "Set On Import": "False",
+            "Comment": "Read and Write"
+          },
+          {
+            "Name": "ConnectSecondTgt",
+            "Value": "Disabled",
+            "Set On Import": "False",
+            "Comment": "Read and Write"
+          },
+          {
+            "Name": "SecondTgtIpAddress",
+            "Value": "0.0.0.0",
+            "Set On Import": "False",
+            "Comment": "Read and Write"
+          },
+          {
+            "Name": "SecondTgtTcpPort",
+            "Value": "3260",
+            "Set On Import": "False",
+            "Comment": "Read and Write"
+          },
+          {
+            "Name": "SecondTgtBootLun",
+            "Value": "0",
+            "Set On Import": "False",
+            "Comment": "Read and Write"
+          },
+          {
+            "Name": "SecondTgtIscsiName",
+            "Value": "",
+            "Set On Import": "False",
+            "Comment": "Read and Write"
+          },
+          {
+            "Name": "SecondTgtChapId",
+            "Value": "",
+            "Set On Import": "False",
+            "Comment": "Read and Write"
+          },
+          {
+            "Name": "SecondTgtChapPwd",
+            "Value": "",
+            "Set On Import": "False",
+            "Comment": "Read and Write"
+          },
+          {
+            "Name": "SecondaryDeviceMacAddr",
+            "Value": "00:00:00:00:00:00",
+            "Set On Import": "False",
+            "Comment": "Read and Write"
+          },
+          {
+            "Name": "UseIndTgtPortal",
+            "Value": "Disabled",
+            "Set On Import": "False",
+            "Comment": "Read and Write"
+          },
+          {
+            "Name": "UseIndTgtName",
+            "Value": "Disabled",
+            "Set On Import": "False",
+            "Comment": "Read and Write"
+          },
+          {
+            "Name": "BootOptionROM",
+            "Value": "Enabled",
+            "Set On Import": "True",
+            "Comment": "Read and Write"
+          },
+          {
+            "Name": "LegacyBootProto",
+            "Value": "NONE",
+            "Set On Import": "True",
+            "Comment": "Read and Write"
+          },
+          {
+            "Name": "BootStrapType",
+            "Value": "AutoDetect",
+            "Set On Import": "True",
+            "Comment": "Read and Write"
+          },
+          {
+            "Name": "HideSetupPrompt",
+            "Value": "Disabled",
+            "Set On Import": "True",
+            "Comment": "Read and Write"
+          },
+          {
+            "Name": "BannerMessageTimeout",
+            "Value": "5",
+            "Set On Import": "True",
+            "Comment": "Read and Write"
+          },
+          {
+            "Name": "LnkSpeed",
+            "Value": "AutoNeg",
+            "Set On Import": "True",
+            "Comment": "Read and Write"
+          },
+          {
+            "Name": "WakeOnLan",
+            "Value": "Disabled",
+            "Set On Import": "True",
+            "Comment": "Read and Write"
+          },
+          {
+            "Name": "VLanMode",
+            "Value": "Disabled",
+            "Set On Import": "True",
+            "Comment": "Read and Write"
+          },
+          {
+            "Name": "VLanId",
+            "Value": "1",
+            "Set On Import": "False",
+            "Comment": "Read and Write"
+          },
+          {
+            "Name": "PermitTotalPortShutdown",
+            "Value": "Disabled",
+            "Set On Import": "True",
+            "Comment": "Read and Write"
+          }
+        ]
+      },
+      {
+        "FQDD": "NIC.Slot.2-2-1",
+        "Attributes": [
+          {
+            "Name": "BlnkLeds",
+            "Value": "0",
+            "Set On Import": "True",
+            "Comment": "Read and Write"
+          },
+          {
+            "Name": "VirtMacAddr",
+            "Value": "00:00:00:00:00:00",
+            "Set On Import": "False",
+            "Comment": "Read and Write"
+          },
+          {
+            "Name": "VirtualizationMode",
+            "Value": "NONE",
+            "Set On Import": "True",
+            "Comment": "Read and Write"
+          },
+          {
+            "Name": "NParEP",
+            "Value": "Disabled",
+            "Set On Import": "False",
+            "Comment": "Read and Write"
+          },
+          {
+            "Name": "LegacyBootProto",
+            "Value": "NONE",
+            "Set On Import": "True",
+            "Comment": "Read and Write"
+          },
+          {
+            "Name": "VLanId",
+            "Value": "0",
+            "Set On Import": "False",
+            "Comment": "Read and Write"
+          },
+          {
+            "Name": "NumberVFAdvertised",
+            "Value": "64",
+            "Set On Import": "False",
+            "Comment": "Read and Write"
+          },
+          {
+            "Name": "INTEL_LLDPAgent",
+            "Value": "Enabled",
+            "Set On Import": "True",
+            "Comment": "Read and Write"
+          },
+          {
+            "Name": "TcpIpViaDHCP",
+            "Value": "Disabled",
+            "Set On Import": "True",
+            "Comment": "Read and Write"
+          },
+          {
+            "Name": "IscsiViaDHCP",
+            "Value": "Disabled",
+            "Set On Import": "False",
+            "Comment": "Read and Write"
+          },
+          {
+            "Name": "ChapAuthEnable",
+            "Value": "Disabled",
+            "Set On Import": "True",
+            "Comment": "Read and Write"
+          },
+          {
+            "Name": "ChapMutualAuth",
+            "Value": "Disabled",
+            "Set On Import": "False",
+            "Comment": "Read and Write"
+          },
+          {
+            "Name": "IscsiInitiatorIpAddr",
+            "Value": "0.0.0.0",
+            "Set On Import": "False",
+            "Comment": "Read and Write"
+          },
+          {
+            "Name": "IscsiInitiatorSubnet",
+            "Value": "0.0.0.0",
+            "Set On Import": "False",
+            "Comment": "Read and Write"
+          },
+          {
+            "Name": "IscsiInitiatorGateway",
+            "Value": "0.0.0.0",
+            "Set On Import": "False",
+            "Comment": "Read and Write"
+          },
+          {
+            "Name": "IscsiInitiatorName",
+            "Value": "",
+            "Set On Import": "False",
+            "Comment": "Read and Write"
+          },
+          {
+            "Name": "IscsiInitiatorChapId",
+            "Value": "",
+            "Set On Import": "False",
+            "Comment": "Read and Write"
+          },
+          {
+            "Name": "IscsiInitiatorChapPwd",
+            "Value": "",
+            "Set On Import": "False",
+            "Comment": "Read and Write"
+          },
+          {
+            "Name": "FirstTgtIpAddress",
+            "Value": "0.0.0.0",
+            "Set On Import": "False",
+            "Comment": "Read and Write"
+          },
+          {
+            "Name": "FirstTgtTcpPort",
+            "Value": "3260",
+            "Set On Import": "False",
+            "Comment": "Read and Write"
+          },
+          {
+            "Name": "FirstTgtBootLun",
+            "Value": "0",
+            "Set On Import": "False",
+            "Comment": "Read and Write"
+          },
+          {
+            "Name": "FirstTgtIscsiName",
+            "Value": "",
+            "Set On Import": "False",
+            "Comment": "Read and Write"
+          },
+          {
+            "Name": "FirstTgtChapPwd",
+            "Value": "",
+            "Set On Import": "False",
+            "Comment": "Read and Write"
+          },
+          {
+            "Name": "VFDistribution",
+            "Value": "64:0:0:0:0:0:0:0",
+            "Set On Import": "False",
+            "Comment": "Read and Write"
+          }
+        ]
+      },
+      {
+        "FQDD": "NIC.Slot.2-1-1",
+        "Attributes": [
+          {
+            "Name": "BlnkLeds",
+            "Value": "0",
+            "Set On Import": "True",
+            "Comment": "Read and Write"
+          },
+          {
+            "Name": "VirtMacAddr",
+            "Value": "00:00:00:00:00:00",
+            "Set On Import": "False",
+            "Comment": "Read and Write"
+          },
+          {
+            "Name": "VirtualizationMode",
+            "Value": "NONE",
+            "Set On Import": "True",
+            "Comment": "Read and Write"
+          },
+          {
+            "Name": "NParEP",
+            "Value": "Disabled",
+            "Set On Import": "False",
+            "Comment": "Read and Write"
+          },
+          {
+            "Name": "LegacyBootProto",
+            "Value": "NONE",
+            "Set On Import": "True",
+            "Comment": "Read and Write"
+          },
+          {
+            "Name": "VLanId",
+            "Value": "0",
+            "Set On Import": "False",
+            "Comment": "Read and Write"
+          },
+          {
+            "Name": "NumberVFAdvertised",
+            "Value": "64",
+            "Set On Import": "False",
+            "Comment": "Read and Write"
+          },
+          {
+            "Name": "INTEL_LLDPAgent",
+            "Value": "Enabled",
+            "Set On Import": "True",
+            "Comment": "Read and Write"
+          },
+          {
+            "Name": "TcpIpViaDHCP",
+            "Value": "Disabled",
+            "Set On Import": "True",
+            "Comment": "Read and Write"
+          },
+          {
+            "Name": "IscsiViaDHCP",
+            "Value": "Disabled",
+            "Set On Import": "False",
+            "Comment": "Read and Write"
+          },
+          {
+            "Name": "ChapAuthEnable",
+            "Value": "Disabled",
+            "Set On Import": "True",
+            "Comment": "Read and Write"
+          },
+          {
+            "Name": "ChapMutualAuth",
+            "Value": "Disabled",
+            "Set On Import": "False",
+            "Comment": "Read and Write"
+          },
+          {
+            "Name": "IscsiInitiatorIpAddr",
+            "Value": "0.0.0.0",
+            "Set On Import": "False",
+            "Comment": "Read and Write"
+          },
+          {
+            "Name": "IscsiInitiatorSubnet",
+            "Value": "0.0.0.0",
+            "Set On Import": "False",
+            "Comment": "Read and Write"
+          },
+          {
+            "Name": "IscsiInitiatorGateway",
+            "Value": "0.0.0.0",
+            "Set On Import": "False",
+            "Comment": "Read and Write"
+          },
+          {
+            "Name": "IscsiInitiatorName",
+            "Value": "",
+            "Set On Import": "False",
+            "Comment": "Read and Write"
+          },
+          {
+            "Name": "IscsiInitiatorChapId",
+            "Value": "",
+            "Set On Import": "False",
+            "Comment": "Read and Write"
+          },
+          {
+            "Name": "IscsiInitiatorChapPwd",
+            "Value": "",
+            "Set On Import": "False",
+            "Comment": "Read and Write"
+          },
+          {
+            "Name": "FirstTgtIpAddress",
+            "Value": "0.0.0.0",
+            "Set On Import": "False",
+            "Comment": "Read and Write"
+          },
+          {
+            "Name": "FirstTgtTcpPort",
+            "Value": "3260",
+            "Set On Import": "False",
+            "Comment": "Read and Write"
+          },
+          {
+            "Name": "FirstTgtBootLun",
+            "Value": "0",
+            "Set On Import": "False",
+            "Comment": "Read and Write"
+          },
+          {
+            "Name": "FirstTgtIscsiName",
+            "Value": "",
+            "Set On Import": "False",
+            "Comment": "Read and Write"
+          },
+          {
+            "Name": "FirstTgtChapPwd",
+            "Value": "",
+            "Set On Import": "False",
+            "Comment": "Read and Write"
+          },
+          {
+            "Name": "VFDistribution",
+            "Value": "64:0:0:0:0:0:0:0",
+            "Set On Import": "False",
+            "Comment": "Read and Write"
+          }
+        ]
+      }
+    ]
+  }
+}
