@@ -95,7 +95,7 @@ class Connector(object):
             retry = True
         elif 'iLO' in exc_str and 'InvalidOperationForSystemState' in exc_str:
             LOG.debug('iLO is not ready after previous operation. '
-                      'Error: %(error)s', {'err': exc_str})
+                      'Error: %(err)s', {'err': exc_str})
             retry = True
         return retry
 
