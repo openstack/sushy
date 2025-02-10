@@ -62,7 +62,7 @@ class Fabric(base.ResourceBase):
             used in any resource that needs registries to parse messages
         :param root: Sushy root object. Empty for Sushy root itself.
         """
-        super(Fabric, self).__init__(
+        super().__init__(
             connector, identity, redfish_version=redfish_version,
             registries=registries, root=root)
 
@@ -93,6 +93,6 @@ class FabricCollection(base.ResourceCollectionBase):
             used in any resource that needs registries to parse messages
         :param root: Sushy root object. Empty for Sushy root itself.
         """
-        super(FabricCollection, self).__init__(
+        super().__init__(
             connector, path, redfish_version=redfish_version,
             registries=registries, root=root)

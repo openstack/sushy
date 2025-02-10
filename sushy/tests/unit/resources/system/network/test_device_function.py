@@ -22,7 +22,7 @@ from sushy.tests.unit import base
 class NetworkDeviceFunctionTestCase(base.TestCase):
 
     def setUp(self):
-        super(NetworkDeviceFunctionTestCase, self).setUp()
+        super().setUp()
         self.conn = mock.Mock()
         with open('sushy/tests/unit/json_samples/'
                   'network_device_function.json') as f:
@@ -101,7 +101,7 @@ class NetworkDeviceFunctionTestCase(base.TestCase):
 class NetworkDeviceFunctionCollectionTestCase(base.TestCase):
 
     def setUp(self):
-        super(NetworkDeviceFunctionCollectionTestCase, self).setUp()
+        super().setUp()
         self.conn = mock.Mock()
         with open('sushy/tests/unit/json_samples/'
                   'network_device_function_collection.json') as f:

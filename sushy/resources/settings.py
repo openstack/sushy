@@ -40,7 +40,7 @@ NO_UPDATES = 4
 """No updates made"""
 
 
-class SettingsUpdate(object):
+class SettingsUpdate:
     """Contains Settings update status and details of the update"""
 
     def __init__(self, status, messages):
@@ -77,7 +77,7 @@ class MaintenanceWindowField(base.CompositeField):
 
 class SettingsApplyTimeField(base.CompositeField):
     def __init__(self):
-        super(SettingsApplyTimeField, self).__init__(
+        super().__init__(
             path="@Redfish.SettingsApplyTime")
 
     apply_time = base.Field('ApplyTime', adapter=str)
@@ -109,7 +109,7 @@ class SettingsField(base.CompositeField):
     """
 
     def __init__(self):
-        super(SettingsField, self).__init__(path="@Redfish.Settings")
+        super().__init__(path="@Redfish.Settings")
 
     time = base.Field('Time')
     """Indicates the time the settings were applied to the server"""

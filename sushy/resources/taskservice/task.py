@@ -75,7 +75,7 @@ class Task(base.ResourceBase):
         :param field_data: the data to use populating the fields
         :param root: Sushy root object. Empty for Sushy root itself.
         """
-        super(Task, self).__init__(
+        super().__init__(
             connector, identity, redfish_version, registries,
             json_doc=json_doc, root=root)
 

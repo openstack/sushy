@@ -26,7 +26,7 @@ from sushy.tests.unit import base
 class SessionServiceTestCase(base.TestCase):
 
     def setUp(self):
-        super(SessionServiceTestCase, self).setUp()
+        super().setUp()
         self.conn = mock.MagicMock()
         with open('sushy/tests/unit/json_samples/session_service.json') as f:
             self.json_doc = json.load(f)

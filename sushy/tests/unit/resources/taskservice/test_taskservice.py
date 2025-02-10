@@ -24,7 +24,7 @@ from sushy.tests.unit import base
 class TaskServiceTestCase(base.TestCase):
 
     def setUp(self):
-        super(TaskServiceTestCase, self).setUp()
+        super().setUp()
         self.conn = mock.Mock()
         with open('sushy/tests/unit/json_samples/taskservice.json') as f:
             self.json_doc = json.load(f)

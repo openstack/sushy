@@ -72,7 +72,7 @@ class BaseResource2(resource_base.ResourceBase):
 class ResourceBaseTestCase(base.TestCase):
 
     def setUp(self):
-        super(ResourceBaseTestCase, self).setUp()
+        super().setUp()
         self.conn = mock.Mock()
         self.conn.get.return_value.json.return_value = (
             copy.deepcopy(BASE_RESOURCE_JSON))
@@ -194,8 +194,8 @@ class TestResource(resource_base.ResourceBase):
         :param registries: Dict of Redfish Message Registry objects to be
             used in any resource that needs registries to parse messages.
         """
-        super(TestResource, self).__init__(connector, 'Fakes/%s' % identity,
-                                           redfish_version, registries, root)
+        super().__init__(connector, f'Fakes/{identity}',
+                         redfish_version, registries, root)
         self.identity = identity
 
     def _parse_attributes(self, json_doc):
@@ -219,14 +219,14 @@ class TestResourceCollection(resource_base.ResourceCollectionBase):
         :param registries: Dict of Redfish Message Registry objects to be
             used in any resource that needs registries to parse messages.
         """
-        super(TestResourceCollection, self).__init__(
+        super().__init__(
             connector, 'Fakes', redfish_version, registries, root)
 
 
 class ResourceCollectionBaseTestCase(base.TestCase):
 
     def setUp(self):
-        super(ResourceCollectionBaseTestCase, self).setUp()
+        super().setUp()
         self.conn = mock.MagicMock()
         self.test_resource_collection = TestResourceCollection(
             self.conn, redfish_version='1.0.x', registries=None)
@@ -389,7 +389,7 @@ class ComplexResource(resource_base.ResourceBase):
 
 class FieldTestCase(base.TestCase):
     def setUp(self):
-        super(FieldTestCase, self).setUp()
+        super().setUp()
         self.conn = mock.Mock()
         self.json = copy.deepcopy(TEST_JSON)
         self.conn.get.return_value.json.return_value = self.json
@@ -493,7 +493,7 @@ class PartialKeyResource(resource_base.ResourceBase):
 
 class FieldPartialKeyTestCase(base.TestCase):
     def setUp(self):
-        super(FieldPartialKeyTestCase, self).setUp()
+        super().setUp()
         self.conn = mock.Mock()
         self.json = copy.deepcopy(TEST_JSON)
         self.conn.get.return_value.json.return_value = self.json

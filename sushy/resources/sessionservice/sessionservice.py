@@ -60,7 +60,7 @@ class SessionService(base.ResourceBase):
         """
         # Populating the base resource so session interactions can
         # occur based on the contents of it.
-        super(SessionService, self).__init__(
+        super().__init__(
             connector, identity, redfish_version=redfish_version,
             registries=registries, root=root)
 

@@ -31,7 +31,7 @@ class SushyError(Exception):
         if self.message and kwargs:
             self.message = self.message % kwargs
 
-        super(SushyError, self).__init__(self.message)
+        super().__init__(self.message)
 
 
 class ConnectionError(SushyError):
@@ -116,13 +116,13 @@ class HTTPError(SushyError):
             self.extended_info = self.body.get('@Message.ExtendedInfo')
             message = self._get_most_severe_msg(self.extended_info or [{}])
             self.detail = message or self.detail
-            error = '%s: %s' % (self.code, self.detail or 'unknown error.')
+            error = '{}: {}'.format(self.code, self.detail or 'unknown error.')
         kwargs = {'method': method, 'url': url, 'code': self.status_code,
                   'error': error, 'ext_info': self.extended_info}
         LOG.debug('HTTP response for %(method)s %(url)s: '
                   'status code: %(code)s, error: %(error)s, '
                   'extended: %(ext_info)s', kwargs)
-        super(HTTPError, self).__init__(**kwargs)
+        super().__init__(**kwargs)
 
     @staticmethod
     def _get_most_severe_msg(extended_info):

@@ -30,7 +30,7 @@ class ConnectorMethodsTestCase(base.TestCase):
     @mock.patch.object(sushy_auth, 'SessionOrBasicAuth', autospec=True)
     def setUp(self, mock_auth):
         mock_auth.get_session_key.return_value = None
-        super(ConnectorMethodsTestCase, self).setUp()
+        super().setUp()
         self.conn = connector.Connector(
             'http://foo.bar:1234', verify=True)
         self.conn._auth = mock_auth
@@ -162,7 +162,7 @@ class ConnectorOpTestCase(base.TestCase):
         mock_auth.get_session_key.return_value = None
         mock_auth._session_key = None
         self.auth = mock_auth
-        super(ConnectorOpTestCase, self).setUp()
+        super().setUp()
         self.conn = connector.Connector(
             'http://foo.bar:1234', verify=True,
             server_side_retries=10, server_side_retries_delay=3)
@@ -666,8 +666,8 @@ class ConnectorOpTestCase(base.TestCase):
             'HTTP GET of SessionService failed %s, '
             'this is expected prior to authentication', 'HTTP GET '
             'http://redfish/v1/SessionService returned code '
-            '%s. unknown error Extended information: '
-            'None' % http_client.FORBIDDEN)
+            f'{http_client.FORBIDDEN!s}. unknown error Extended '
+            'information: None')
         self.assertEqual(http_client.FORBIDDEN, exc.status_code)
 
     def test_blocking_no_location_header(self):

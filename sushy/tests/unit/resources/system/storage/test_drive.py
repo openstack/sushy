@@ -23,7 +23,7 @@ from sushy.tests.unit import base
 class DriveTestCase(base.TestCase):
 
     def setUp(self):
-        super(DriveTestCase, self).setUp()
+        super().setUp()
         self.conn = mock.Mock()
         with open('sushy/tests/unit/json_samples/drive.json') as f:
             self.json_doc = json.load(f)

@@ -27,7 +27,7 @@ from sushy.tests.unit import base
 class VirtualMediaTestCase(base.TestCase):
 
     def setUp(self):
-        super(VirtualMediaTestCase, self).setUp()
+        super().setUp()
         self.conn = mock.Mock()
         self.conn.get.return_value.headers = {'Allow': 'GET,HEAD'}
         with open('sushy/tests/unit/json_samples/'
@@ -267,8 +267,8 @@ class VirtualMediaTestCase(base.TestCase):
         self.assertFalse(self.sys_virtual_media._is_stale)
         self.sys_virtual_media.eject_media()
         self.sys_virtual_media._conn.post.assert_called_once_with(
-            ("/redfish/v1/Managers/BMC/VirtualMedia/Floppy1/Actions"
-             "/VirtualMedia.EjectMedia"))
+            "/redfish/v1/Managers/BMC/VirtualMedia/Floppy1/Actions"
+            "/VirtualMedia.EjectMedia")
         self.assertTrue(self.sys_virtual_media._is_stale)
 
     def test_eject_media_fallback(self):

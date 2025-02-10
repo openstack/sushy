@@ -22,7 +22,7 @@ from sushy.tests.unit import base
 class PortTestCase(base.TestCase):
 
     def setUp(self):
-        super(PortTestCase, self).setUp()
+        super().setUp()
         self.conn = mock.Mock()
         with open('sushy/tests/unit/json_samples/port.json') as f:
             self.json_doc = json.load(f)
@@ -57,7 +57,7 @@ class PortTestCase(base.TestCase):
 class PortCollectionTestCase(base.TestCase):
 
     def setUp(self):
-        super(PortCollectionTestCase, self).setUp()
+        super().setUp()
         self.conn = mock.Mock()
         with open('sushy/tests/unit/json_samples/'
                   'port_collection.json') as f:

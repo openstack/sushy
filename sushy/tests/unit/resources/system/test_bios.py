@@ -31,7 +31,7 @@ from sushy.tests.unit import base
 class BiosTestCase(base.TestCase):
 
     def setUp(self):
-        super(BiosTestCase, self).setUp()
+        super().setUp()
         self.conn = mock.Mock()
         with open('sushy/tests/unit/json_samples/bios.json') as f:
             self.bios_json = json.load(f)
@@ -365,7 +365,7 @@ class BiosTestCase(base.TestCase):
 class BiosZTTestCase(base.TestCase):
 
     def setUp(self):
-        super(BiosZTTestCase, self).setUp()
+        super().setUp()
         self.conn = mock.Mock()
         with open('sushy/tests/unit/json_samples/bios_zt.json') as f:
             self.bios_json = json.load(f)

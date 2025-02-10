@@ -86,7 +86,7 @@ class ResourceBlock(base.ResourceBase):
             used in any resource that needs registries to parse messages
         :param root: Sushy root object. Empty for Sushy root itself.
         """
-        super(ResourceBlock, self).__init__(
+        super().__init__(
             connector, identity, redfish_version=redfish_version,
             registries=registries, root=root)
 
@@ -115,6 +115,6 @@ class ResourceBlockCollection(base.ResourceCollectionBase):
             used in any resource that needs registries to parse messages
         :param root: Sushy root object. Empty for Sushy root itself.
         """
-        super(ResourceBlockCollection, self).__init__(
+        super().__init__(
             connector, identity, redfish_version=redfish_version,
             registries=registries, root=root)

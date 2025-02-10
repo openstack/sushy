@@ -198,7 +198,7 @@ class Sushy(base.ResourceBase):
                                                  password=password)
         self._auth = auth
 
-        super(Sushy, self).__init__(
+        super().__init__(
             connector or sushy_connector.Connector(
                 base_url, verify=verify,
                 server_side_retries=server_side_retries,
@@ -227,7 +227,7 @@ class Sushy(base.ResourceBase):
 
         :param json_doc: parsed JSON document in form of Python types
         """
-        super(Sushy, self)._parse_attributes(json_doc)
+        super()._parse_attributes(json_doc)
         self.redfish_version = json_doc.get('RedfishVersion')
 
     def get_system_collection(self):

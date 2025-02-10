@@ -23,7 +23,7 @@ from sushy.tests.unit import base
 class SoftwareInventoryTestCase(base.TestCase):
 
     def setUp(self):
-        super(SoftwareInventoryTestCase, self).setUp()
+        super().setUp()
         conn = mock.Mock()
         with open(
             'sushy/tests/unit/json_samples/softwareinventory.json') as f:
@@ -76,7 +76,7 @@ class SoftwareInventoryTestCase(base.TestCase):
 class SoftwareInventoryCollectionTestCase(base.TestCase):
 
     def setUp(self):
-        super(SoftwareInventoryCollectionTestCase, self).setUp()
+        super().setUp()
         conn = mock.Mock()
         with open('sushy/tests/unit/json_samples/'
                   'firmwareinventory_collection.json') as f:

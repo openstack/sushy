@@ -27,7 +27,7 @@ from sushy.resources.taskservice import task
 LOG = logging.getLogger(__name__)
 
 
-class TaskMonitor(object):
+class TaskMonitor:
     def __init__(self,
                  connector,
                  task_monitor_uri,
@@ -191,10 +191,8 @@ class TaskMonitor(object):
                        'sleep': self.sleep_for})
             time.sleep(self.sleep_for)
             if time.time() >= timeout_at and self.check_is_processing:
-                m = ('Timeout waiting for task monitor %(url)s '
-                     '(timeout = %(timeout)s)'
-                     % {'url': self.task_monitor_uri,
-                        'timeout': timeout_sec})
+                m = (f'Timeout waiting for task monitor '
+                     f'{self.task_monitor_uri} (timeout = {timeout_sec})')
                 raise exceptions.ConnectionError(url=self.task_monitor_uri,
                                                  error=m)
 

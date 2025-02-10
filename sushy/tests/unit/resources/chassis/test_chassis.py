@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 
 # Licensed under the Apache License, Version 2.0 (the "License"); you may
 # not use this file except in compliance with the License. You may obtain
@@ -28,7 +27,7 @@ from sushy.tests.unit import base
 class ChassisTestCase(base.TestCase):
 
     def setUp(self):
-        super(ChassisTestCase, self).setUp()
+        super().setUp()
         self.conn = mock.Mock()
         with open('sushy/tests/unit/json_samples/chassis.json') as f:
             self.json_doc = json.load(f)
@@ -226,7 +225,7 @@ class ChassisTestCase(base.TestCase):
 class ChassisCollectionTestCase(base.TestCase):
 
     def setUp(self):
-        super(ChassisCollectionTestCase, self).setUp()
+        super().setUp()
         self.conn = mock.Mock()
         with open('sushy/tests/unit/json_samples/'
                   'chassis_collection.json') as f:

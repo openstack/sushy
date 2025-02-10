@@ -36,7 +36,7 @@ from sushy.tests.unit import base
 class SystemTestCase(base.TestCase):
 
     def setUp(self):
-        super(SystemTestCase, self).setUp()
+        super().setUp()
         self.conn = mock.Mock()
         self.conn.get.return_value.headers = {'Allow': 'GET,HEAD'}
         with open('sushy/tests/unit/json_samples/system.json') as f:
@@ -339,8 +339,7 @@ class SystemTestCase(base.TestCase):
     def test_set_system_boot_options_invalid_enabled(self):
         with self.assertRaisesRegex(
             exceptions.InvalidParameterValueError,
-            '"enabled" value.*{0}'.format(
-                list(sushy.BootSourceOverrideEnabled))):
+            f'"enabled" value.*{list(sushy.BootSourceOverrideEnabled)}'):
 
             self.sys_inst.set_system_boot_options(
                 sushy.BootSource.HDD,
@@ -622,8 +621,7 @@ class SystemTestCase(base.TestCase):
     def test_set_system_boot_source_invalid_enabled(self):
         with self.assertRaisesRegex(
             exceptions.InvalidParameterValueError,
-            '"enabled" value.*{0}'.format(
-                list(sushy.BootSourceOverrideEnabled))):
+            f'"enabled" value.*{list(sushy.BootSourceOverrideEnabled)}'):
 
             self.sys_inst.set_system_boot_source(
                 sushy.BootSource.HDD,
@@ -976,7 +974,7 @@ class SystemTestCase(base.TestCase):
 class SystemWithVirtualMedia(base.TestCase):
 
     def setUp(self):
-        super(SystemWithVirtualMedia, self).setUp()
+        super().setUp()
         self.conn = mock.Mock()
         with open('sushy/tests/unit/json_samples/'
                   'systemv1_20.json') as f:
@@ -1028,7 +1026,7 @@ class SystemWithVirtualMedia(base.TestCase):
         self.assertIsInstance(actual_virtual_media,
                               virtual_media.VirtualMediaCollection)
 
-        with open('sushy/tests/unit/json_samples/systemv1_20.json', 'r') as f:
+        with open('sushy/tests/unit/json_samples/systemv1_20.json') as f:
             self.conn.get.return_value.json.return_value = json.loads(f.read())
 
         self.sys_inst.invalidate()
@@ -1050,7 +1048,7 @@ class SystemWithVirtualMedia(base.TestCase):
 class SystemCollectionTestCase(base.TestCase):
 
     def setUp(self):
-        super(SystemCollectionTestCase, self).setUp()
+        super().setUp()
         self.conn = mock.Mock()
         with open('sushy/tests/unit/json_samples/'
                   'system_collection.json') as f:

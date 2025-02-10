@@ -52,7 +52,7 @@ class UtilsTestCase(base.TestCase):
         self.assertEqual(True, utils.bool_or_none(True))
 
     def setUp(self):
-        super(UtilsTestCase, self).setUp()
+        super().setUp()
         self.conn = mock.MagicMock()
         with open('sushy/tests/unit/json_samples/system.json') as f:
             system_json = json.load(f)
@@ -178,7 +178,7 @@ class BaseResource(resource_base.ResourceBase):
 class CacheTestCase(base.TestCase):
 
     def setUp(self):
-        super(CacheTestCase, self).setUp()
+        super().setUp()
         self.conn = mock.Mock()
         self.res = BaseResource(connector=self.conn, path='/Foo',
                                 redfish_version='1.0.2')

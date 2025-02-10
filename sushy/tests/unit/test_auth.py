@@ -29,7 +29,7 @@ class BasicAuthTestCase(base.TestCase):
     @mock.patch.object(main, 'Sushy', autospec=True)
     @mock.patch.object(connector, 'Connector', autospec=True)
     def setUp(self, mock_connector, mock_root):
-        super(BasicAuthTestCase, self).setUp()
+        super().setUp()
         self.username = 'TestUsername'
         self.password = 'TestP@$$W0RD'
         self.base_auth = auth.BasicAuth(self.username,
@@ -78,7 +78,7 @@ class SessionAuthTestCase(base.TestCase):
     @mock.patch.object(main, 'Sushy', autospec=True)
     @mock.patch.object(connector, 'Connector', autospec=True)
     def setUp(self, mock_connector, mock_root):
-        super(SessionAuthTestCase, self).setUp()
+        super().setUp()
         self.username = 'TestUsername'
         self.password = 'TestP@$$W0RD'
         self.sess_key = 'TestingKey'
@@ -217,7 +217,7 @@ class SessionOrBasicAuthTestCase(base.TestCase):
     @mock.patch.object(main, 'Sushy', autospec=True)
     @mock.patch.object(connector, 'Connector', autospec=True)
     def setUp(self, mock_connector, mock_root):
-        super(SessionOrBasicAuthTestCase, self).setUp()
+        super().setUp()
         self.username = 'TestUsername'
         self.password = 'TestP@$$W0RD'
         self.sess_key = 'TestingKey'

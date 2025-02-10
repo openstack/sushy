@@ -22,7 +22,7 @@ from sushy.tests.unit import base
 class EndpointTestCase(base.TestCase):
 
     def setUp(self):
-        super(EndpointTestCase, self).setUp()
+        super().setUp()
         self.conn = mock.Mock()
         with open('sushy/tests/unit/json_samples/'
                   'endpoint.json') as f:

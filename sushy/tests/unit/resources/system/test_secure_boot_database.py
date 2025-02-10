@@ -22,7 +22,7 @@ from sushy.tests.unit import base
 class SecureBootDatabaseTestCase(base.TestCase):
 
     def setUp(self):
-        super(SecureBootDatabaseTestCase, self).setUp()
+        super().setUp()
         self.conn = mock.Mock()
         with open('sushy/tests/unit/json_samples/'
                   'secure_boot_database.json') as f:
@@ -86,7 +86,7 @@ class SecureBootDatabaseTestCase(base.TestCase):
 class SecureBootDatabaseCollectionTestCase(base.TestCase):
 
     def setUp(self):
-        super(SecureBootDatabaseCollectionTestCase, self).setUp()
+        super().setUp()
         self.conn = mock.Mock()
         with open('sushy/tests/unit/json_samples/'
                   'secure_boot_database_collection.json') as f:
@@ -131,7 +131,7 @@ class SecureBootDatabaseCollectionTestCase(base.TestCase):
         calls = [
             mock.call(self.collection._conn,
                       '/redfish/v1/Systems/437XR1138R2/SecureBoot'
-                      '/SecureBootDatabases/%s' % member,
+                      f'/SecureBootDatabases/{member}',
                       redfish_version=self.collection.redfish_version,
                       registries=None,
                       root=self.collection.root)

@@ -23,7 +23,7 @@ from sushy.tests.unit import base
 class ResourceZoneTestCase(base.TestCase):
 
     def setUp(self):
-        super(ResourceZoneTestCase, self).setUp()
+        super().setUp()
         self.conn = mock.Mock()
         with open('sushy/tests/unit/json_samples/resourcezone.json') as f:
             self.json_doc = json.load(f)
@@ -59,7 +59,7 @@ class ResourceZoneTestCase(base.TestCase):
 class ResourceZoneCollectionTestCase(base.TestCase):
 
     def setUp(self):
-        super(ResourceZoneCollectionTestCase, self).setUp()
+        super().setUp()
         self.conn = mock.Mock()
         with open('sushy/tests/unit/json_samples/'
                   'resourcezone_collection.json') as f:

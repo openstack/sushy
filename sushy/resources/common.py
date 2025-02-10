@@ -25,8 +25,7 @@ class IdRefField(base.CompositeField):
 
 class OperationApplyTimeSupportField(base.CompositeField):
     def __init__(self):
-        super(OperationApplyTimeSupportField, self).__init__(
-            path="@Redfish.OperationApplyTimeSupport")
+        super().__init__(path="@Redfish.OperationApplyTimeSupport")
 
     maintenance_window_duration_in_seconds = base.Field(
         'MaintenanceWindowDurationInSeconds', adapter=int)

@@ -22,7 +22,7 @@ from sushy.tests.unit import base
 class SimpleStorageTestCase(base.TestCase):
 
     def setUp(self):
-        super(SimpleStorageTestCase, self).setUp()
+        super().setUp()
         self.conn = mock.Mock()
         with open('sushy/tests/unit/json_samples/'
                   'simple_storage.json') as f:
@@ -54,7 +54,7 @@ class SimpleStorageTestCase(base.TestCase):
 class SimpleStorageCollectionTestCase(base.TestCase):
 
     def setUp(self):
-        super(SimpleStorageCollectionTestCase, self).setUp()
+        super().setUp()
         self.conn = mock.Mock()
         with open('sushy/tests/unit/json_samples/'
                   'simple_storage_collection.json') as f:

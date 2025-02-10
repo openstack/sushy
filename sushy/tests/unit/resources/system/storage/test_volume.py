@@ -27,7 +27,7 @@ from sushy.tests.unit import base
 class VolumeTestCase(base.TestCase):
 
     def setUp(self):
-        super(VolumeTestCase, self).setUp()
+        super().setUp()
         self.conn = mock.Mock()
         with open('sushy/tests/unit/json_samples/volume.json') as f:
             self.json_doc = json.load(f)
@@ -189,7 +189,7 @@ class VolumeTestCase(base.TestCase):
 class VolumeCollectionTestCase(base.TestCase):
 
     def setUp(self):
-        super(VolumeCollectionTestCase, self).setUp()
+        super().setUp()
         self.conn = mock.Mock()
         with open('sushy/tests/unit/json_samples/'
                   'volume_collection.json') as f:

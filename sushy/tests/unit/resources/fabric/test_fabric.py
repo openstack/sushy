@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 
 # Licensed under the Apache License, Version 2.0 (the "License"); you may
 # not use this file except in compliance with the License. You may obtain
@@ -25,7 +24,7 @@ from sushy.tests.unit import base
 class FabricTestCase(base.TestCase):
 
     def setUp(self):
-        super(FabricTestCase, self).setUp()
+        super().setUp()
         self.conn = mock.Mock()
         with open('sushy/tests/unit/json_samples/fabric.json') as f:
             self.json_doc = json.load(f)
@@ -87,7 +86,7 @@ class FabricTestCase(base.TestCase):
         self.assertIsInstance(endpts, endpoint.EndpointCollection)
 
         # On refreshing the fabric instance...
-        with open('sushy/tests/unit/json_samples/fabric.json', 'r') as f:
+        with open('sushy/tests/unit/json_samples/fabric.json') as f:
             self.conn.get.return_value.json.return_value = json.loads(f.read())
 
         self.fabric.invalidate()
@@ -110,7 +109,7 @@ class FabricTestCase(base.TestCase):
 class FabricCollectionTestCase(base.TestCase):
 
     def setUp(self):
-        super(FabricCollectionTestCase, self).setUp()
+        super().setUp()
         self.conn = mock.Mock()
         with open('sushy/tests/unit/json_samples/'
                   'fabric_collection.json') as f:

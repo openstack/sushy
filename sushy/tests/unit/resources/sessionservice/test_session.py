@@ -24,7 +24,7 @@ from sushy.tests.unit import base
 class SessionTestCase(base.TestCase):
 
     def setUp(self):
-        super(SessionTestCase, self).setUp()
+        super().setUp()
         self.conn = mock.Mock()
         self.auth = mock.Mock()
         with open('sushy/tests/unit/json_samples/session.json') as f:
@@ -64,7 +64,7 @@ class SessionTestCase(base.TestCase):
 class SessionCollectionTestCase(base.TestCase):
 
     def setUp(self):
-        super(SessionCollectionTestCase, self).setUp()
+        super().setUp()
         self.conn = mock.Mock()
         with open('sushy/tests/unit/json_samples/'
                   'session_collection.json') as f:

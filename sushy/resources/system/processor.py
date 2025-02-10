@@ -103,7 +103,7 @@ class Processor(base.ResourceBase):
             used in any resource that needs registries to parse messages
         :param root: Sushy root object. Empty for Sushy root itself.
         """
-        super(Processor, self).__init__(
+        super().__init__(
             connector, identity, redfish_version=redfish_version,
             registries=registries, root=root)
 
@@ -169,7 +169,7 @@ class ProcessorCollection(base.ResourceCollectionBase):
             used in any resource that needs registries to parse messages
         :param root: Sushy root object. Empty for Sushy root itself.
         """
-        super(ProcessorCollection, self).__init__(
+        super().__init__(
             connector, path, redfish_version=redfish_version,
             registries=registries,
             root=root)

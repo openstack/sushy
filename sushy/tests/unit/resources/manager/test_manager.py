@@ -27,7 +27,7 @@ from sushy.tests.unit import base
 class ManagerTestCase(base.TestCase):
 
     def setUp(self):
-        super(ManagerTestCase, self).setUp()
+        super().setUp()
         self.conn = mock.Mock()
         with open('sushy/tests/unit/json_samples/manager.json') as f:
             self.json_doc = json.load(f)
@@ -262,7 +262,7 @@ class ManagerTestCase(base.TestCase):
         self.assertIsInstance(vrt_media, virtual_media.VirtualMediaCollection)
 
         # On refreshing the manager instance...
-        with open('sushy/tests/unit/json_samples/manager.json', 'r') as f:
+        with open('sushy/tests/unit/json_samples/manager.json') as f:
             self.conn.get.return_value.json.return_value = json.loads(f.read())
 
         self.manager.invalidate()
@@ -328,7 +328,7 @@ class ManagerTestCase(base.TestCase):
 class ManagerWithoutVirtualMedia(base.TestCase):
 
     def setUp(self):
-        super(ManagerWithoutVirtualMedia, self).setUp()
+        super().setUp()
         self.conn = mock.Mock()
         with open('sushy/tests/unit/json_samples/'
                   'managerv1_18.json') as f:
@@ -348,7 +348,7 @@ class ManagerWithoutVirtualMedia(base.TestCase):
 class ManagerCollectionTestCase(base.TestCase):
 
     def setUp(self):
-        super(ManagerCollectionTestCase, self).setUp()
+        super().setUp()
         self.conn = mock.Mock()
         with open('sushy/tests/unit/json_samples/'
                   'manager_collection.json') as f:
