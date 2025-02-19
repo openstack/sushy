@@ -28,7 +28,7 @@ def _raise(m, ep, e):
         error=f'Failed to load entry point target: {e}')
 
 
-def _create_extension_manager(namespace):
+def _create_extension_manager(namespace: str, resource_name: str):
     """Create the resource specific ExtensionManager instance.
 
     Use stevedore to find all vendor extensions of resource from their
@@ -38,10 +38,6 @@ def _create_extension_manager(namespace):
     :returns: the ExtensionManager instance
     :raises ExtensionError: on resource OEM extension load error.
     """
-    # namespace format is:
-    # ``sushy.resources.<underscore_joined_resource_name>.oems``
-    resource_name = namespace.split('.')[-2]
-
     extension_manager = (
         stevedore.ExtensionManager(namespace=namespace,
                                    propagate_map_exceptions=True,
@@ -65,7 +61,7 @@ def _create_extension_manager(namespace):
 
 
 @utils.synchronized
-def _get_extension_manager_of_resource(resource_name):
+def _get_extension_manager_of_resource(resource_name: str):
     """Get the resource specific ExtensionManager instance.
 
     :param resource_name: The name of the resource e.g.
@@ -76,9 +72,9 @@ def _get_extension_manager_of_resource(resource_name):
     global _global_extn_mgrs_by_resource
 
     if resource_name not in _global_extn_mgrs_by_resource:
-        resource_namespace = 'sushy.resources.' + resource_name + '.oems'
+        resource_namespace = f'sushy.resources.{resource_name}.oems'
         _global_extn_mgrs_by_resource[resource_name] = (
-            _create_extension_manager(resource_namespace)
+            _create_extension_manager(resource_namespace, resource_name)
         )
     return _global_extn_mgrs_by_resource[resource_name]
 

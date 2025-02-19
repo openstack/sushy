@@ -67,21 +67,22 @@ class ResourceOEMCommonMethodsTestCase(base.TestCase):
 
     def tearDown(self):
         super().tearDown()
-        if oem_common._global_extn_mgrs_by_resource:
-            oem_common._global_extn_mgrs_by_resource = {}
 
+    @mock.patch.dict(oem_common._global_extn_mgrs_by_resource, {}, clear=True)
     @mock.patch.object(stevedore, 'ExtensionManager', autospec=True)
     def test__create_extension_manager(self, ExtensionManager_mock):
         system_resource_oem_ns = 'sushy.resources.system.oems'
         ExtensionManager_mock.return_value = self.fake_ext_mgr
 
-        result = oem_common._create_extension_manager(system_resource_oem_ns)
+        result = oem_common._create_extension_manager(
+            system_resource_oem_ns, 'system')
 
         self.assertEqual(self.fake_ext_mgr, result)
         ExtensionManager_mock.assert_called_once_with(
             system_resource_oem_ns, propagate_map_exceptions=True,
             on_load_failure_callback=oem_common._raise)
 
+    @mock.patch.dict(oem_common._global_extn_mgrs_by_resource, {}, clear=True)
     @mock.patch.object(stevedore, 'ExtensionManager', autospec=True)
     def test__create_extension_manager_no_extns(self, ExtensionManager_mock):
         system_resource_oem_ns = 'sushy.resources.system.oems'
@@ -90,8 +91,9 @@ class ResourceOEMCommonMethodsTestCase(base.TestCase):
         self.assertRaisesRegex(
             exceptions.ExtensionError, 'No extensions found',
             oem_common._create_extension_manager,
-            system_resource_oem_ns)
+            system_resource_oem_ns, 'system')
 
+    @mock.patch.dict(oem_common._global_extn_mgrs_by_resource, {}, clear=True)
     @mock.patch.object(stevedore, 'ExtensionManager', autospec=True)
     def test__get_extension_manager_of_resource(self, ExtensionManager_mock):
         ExtensionManager_mock.return_value = self.fake_ext_mgr
@@ -111,10 +113,11 @@ class ResourceOEMCommonMethodsTestCase(base.TestCase):
             propagate_map_exceptions=True,
             on_load_failure_callback=oem_common._raise)
         for name, extension in result.items():
-            self.assertTrue(name in ('contoso', 'faux'))
-            self.assertTrue(extension in (self.contoso_extn,
-                                          self.faux_extn))
+            self.assertIn(name, ('contoso', 'faux'))
+            self.assertIn(extension, (self.contoso_extn,
+                                      self.faux_extn))
 
+    @mock.patch.dict(oem_common._global_extn_mgrs_by_resource, {}, clear=True)
     @mock.patch.object(stevedore, 'ExtensionManager', autospec=True)
     def test_get_resource_extension_by_vendor(self, ExtensionManager_mock):
         oem_resource_mock = mock.Mock()
@@ -153,6 +156,7 @@ class ResourceOEMCommonMethodsTestCase(base.TestCase):
         self.assertFalse(ExtensionManager_mock.called)
         ExtensionManager_mock.reset_mock()
 
+    @mock.patch.dict(oem_common._global_extn_mgrs_by_resource, {}, clear=True)
     @mock.patch.object(stevedore, 'ExtensionManager', autospec=True)
     def test_get_resource_extension_by_vendor_fail(
             self, ExtensionManager_mock):
@@ -168,6 +172,7 @@ class ResourceOEMCommonMethodsTestCase(base.TestCase):
             oem_common.get_resource_extension_by_vendor,
             'sushy.resources.system.oems', 'Faux', resource_instance_mock)
 
+    @mock.patch.dict(oem_common._global_extn_mgrs_by_resource, {}, clear=True)
     @mock.patch.object(stevedore, 'ExtensionManager', autospec=True)
     def test_get_resource_extension_by_vendor_different_resources(
             self, ExtensionManager_mock):
