@@ -1,0 +1,7 @@
+---
+prelude: >
+    sushy-oem-idrac has been merged into this package, removing the need
+    to install it separately.
+upgrade:
+  - |
+    You must uninstall sushy-oem-idrac as a separate package when upgrading.

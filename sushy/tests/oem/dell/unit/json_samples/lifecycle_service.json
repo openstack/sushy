@@ -1,0 +1,13 @@
+{
+   "@odata.context": "/redfish/v1/$metadata#DellLCService.DellLCService",
+   "@odata.id": "/redfish/v1/Dell/Managers/iDRAC.Embedded.1/DellLCService",
+   "@odata.type": "#DellLCService.v1_1_0.DellLCService",
+   "Actions": {
+      "#DellLCService.GetRemoteServicesAPIStatus": {
+         "target": "/redfish/v1/Dell/Managers/iDRAC.Embedded.1/DellLCService/Actions/DellLCService.GetRemoteServicesAPIStatus"
+      }
+   },
+   "Description": "The DellLCService resource provides some actions to support Lifecycle Controller functionality.",
+   "Id": "DellLCService",
+   "Name": "DellLCService"
+}

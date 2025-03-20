@@ -1,0 +1,68 @@
+{
+    "@odata.context": "/redfish/v1/$metadata#ServiceRoot.ServiceRoot",
+    "@odata.id": "/redfish/v1",
+    "@odata.type": "#ServiceRoot.v1_3_0.ServiceRoot",
+    "AccountService": {
+        "@odata.id": "/redfish/v1/Managers/iDRAC.Embedded.1/AccountService"
+    },
+    "Chassis": {
+        "@odata.id": "/redfish/v1/Chassis"
+    },
+    "Description": "Root Service",
+    "EventService": {
+        "@odata.id": "/redfish/v1/EventService"
+    },
+    "Fabrics": {
+        "@odata.id": "/redfish/v1/Fabrics"
+    },
+    "Id": "RootService",
+    "JsonSchemas": {
+        "@odata.id": "/redfish/v1/JSONSchemas"
+    },
+    "Links": {
+        "Sessions": {
+            "@odata.id": "/redfish/v1/Sessions"
+        }
+    },
+    "Managers": {
+        "@odata.id": "/redfish/v1/Managers"
+    },
+    "Name": "Root Service",
+    "Oem": {
+        "Dell": {
+            "@odata.context": "/redfish/v1/$metadata#DellServiceRoot.DellServiceRoot",
+            "@odata.type": "#DellServiceRoot.v1_0_0.ServiceRootSummary",
+            "IsBranded": 0,
+            "ManagerMACAddress": "4c:d9:8f:20:73:84",
+            "ServiceTag": "GTS7DV2"
+        }
+    },
+    "Product": "Integrated Dell Remote Access Controller",
+    "ProtocolFeaturesSupported": {
+        "ExpandQuery": {
+            "ExpandAll": true,
+            "Levels": true,
+            "Links": true,
+            "MaxLevels": 1,
+            "NoLinks": true
+        },
+        "FilterQuery": true,
+        "SelectQuery": true
+    },
+    "RedfishVersion": "1.4.0",
+    "Registries": {
+        "@odata.id": "/redfish/v1/Registries"
+    },
+    "SessionService": {
+        "@odata.id": "/redfish/v1/SessionService"
+    },
+    "Systems": {
+        "@odata.id": "/redfish/v1/Systems"
+    },
+    "Tasks": {
+        "@odata.id": "/redfish/v1/TaskService"
+    },
+    "UpdateService": {
+        "@odata.id": "/redfish/v1/UpdateService"
+    }
+}

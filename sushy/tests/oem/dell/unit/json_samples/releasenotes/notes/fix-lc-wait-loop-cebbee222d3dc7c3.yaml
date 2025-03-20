@@ -1,0 +1,6 @@
+---
+fixes:
+  - |
+    Resolves the issue where wait for Lifecycle Controller job ends prematurely
+    due to iDRAC BMC raising a different exception type than the code
+    previously expected by using the correct exception class.

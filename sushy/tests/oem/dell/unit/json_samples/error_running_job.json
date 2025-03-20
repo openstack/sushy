@@ -1,0 +1,18 @@
+{
+  "error":  {
+  "@Message.ExtendedInfo": [
+    {
+      "Message": "A job operation is already running. Retry the operation after the existing job is completed.",
+      "MessageArgs": "[]",
+      "MessageArgs@odata.count": 0,
+      "MessageId": "IDRAC.2.8.RAC0679",
+      "RelatedProperties": [],
+      "RelatedProperties@odata.count": 0,
+      "Resolution": "Wait until the running job is completed or delete the scheduled job and retry the operation",
+      "Severity": "Warning"
+    }
+  ],
+  "code": "IDRAC.2.8.RAC0679",
+  "message": "Wait until the running job is completed or delete the scheduled job and retry the operation."
+  }
+}

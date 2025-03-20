@@ -1,0 +1,18 @@
+{
+  "error":  {
+    "@Message.ExtendedInfo":    [
+      {
+        "Message": "Unable to perform the import or export operation because there are pending attribute changes or a configuration job is in progress.",
+        "MessageArgs": "[]",
+        "MessageArgs@odata.count": 0,
+        "MessageId": "IDRAC.2.8.LC068",
+        "RelatedProperties": [],
+        "RelatedProperties@odata.count": 0,
+        "Resolution": "Apply or cancel any pending attribute changes. Changes can be applied by creating a targeted configuration job, or the changes can be cancelled by invoking the DeletePendingConfiguration method. If a configuration job is in progress, wait until it is completed before retrying the import or export system configuration operation.",
+        "Severity": "Warning"
+      }
+    ],
+  "code": "IDRAC.2.8.LC068",
+  "message": "Unable to perform the import or export operation because there are pending attribute changes or a configuration job is in progress."
+  }
+}

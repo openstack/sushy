@@ -1,0 +1,13 @@
+{
+   "@odata.context": "/redfish/v1/$metadata#DellJobService.DellJobService",
+   "@odata.id": "/redfish/v1/Dell/Managers/iDRAC.Embedded.1/DellJobService",
+   "@odata.type": "#DellJobService.v1_1_0.DellJobService",
+   "Actions": {
+      "#DellJobService.DeleteJobQueue": {
+         "target": "/redfish/v1/Dell/Managers/iDRAC.Embedded.1/DellJobService/Actions/DellJobService.DeleteJobQueue"
+      }
+   },
+   "Description": "The DellJobService resource provides some actions to support Job management functionality.",
+   "Id": "Job Service",
+   "Name": "DellJobService"
+}
