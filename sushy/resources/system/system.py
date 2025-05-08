@@ -120,6 +120,9 @@ class System(base.ResourceBase):
     manufacturer = base.Field('Manufacturer')
     """The system manufacturer"""
 
+    model = base.Field('Model')
+    """The system model"""
+
     name = base.Field('Name')
     """The system name"""
 
@@ -157,6 +160,7 @@ class System(base.ResourceBase):
     of a Resource
     Ref: http://redfish.dmtf.org/schemas/DSP0266_1.7.0.html#settings-resource
     """
+    _supermicro_models_cd_vmedia = frozenset(['ars-111gl-nhr'])
 
     _actions = ActionsField('Actions', required=True)
 
@@ -281,14 +285,20 @@ class System(base.ResourceBase):
 
             target = sys_cons.BootSource(target)
             # NOTE(janders) on SuperMicro X11 and X12 machines, virtual media
-            # is presented as an "USB CD" drive as opposed to a CD drive. Both
+            # is presented as an "USB CD" drive as opposed to a CD drive.
+            # On Supermicro ARS-111GL-NHR however, a more common "CD" device
+            # is used. On both "families" of hardware, both "USB CD" and "CD"
             # are present in the list of boot devices, however only selecting
-            # UsbCd as the boot source results in a successful boot from
-            # vMedia. If "CD" is selected, boot fails even if vMedia is
+            # the appropriate one for the platform as the boot source results
+            # in a successful boot from vMedia. Unless the appropriate option
+            # for a given model is selected, boot fails even if vMedia is
             # inserted. This code detects a case where a SuperMicro machine is
             # about to attempt boot from CD and overrides the boot device to
-            # UsbCd instead which makes boot from vMedia work as expected.
+            # UsbCd if required, depending on the model. This makes boot from
+            # vMedia work as expected on both variants.
             if (self.manufacturer and self.manufacturer.lower() == 'supermicro'
+                    and self.model.lower() not in
+                    self._supermicro_models_cd_vmedia
                     and target == sys_cons.BootSource.CD
                     and sys_cons.BootSource.USB_CD.value
                     in self.boot.allowed_values):

@@ -361,6 +361,23 @@ class SystemTestCase(base.TestCase):
                            'BootSourceOverrideTarget': 'UsbCd'}},
             etag='81802dbf61beb0bd')
 
+    def test_set_system_boot_options_supermicro_usb_cd_boot_ars111glnhr(self):
+        (self.json_doc["Boot"]
+         ["BootSourceOverrideTarget@Redfish.AllowableValues"]).append("UsbCd")
+        self.sys_inst._parse_attributes(self.json_doc)
+
+        self.sys_inst.manufacturer = "supermicro"
+        self.sys_inst.model = "ARS-111GL-NHR"
+        self.sys_inst.set_system_boot_options(
+            target=sushy.BootSource.CD,
+            enabled=sushy.BootSourceOverrideEnabled.ONCE)
+
+        self.sys_inst._conn.patch.assert_called_once_with(
+            '/redfish/v1/Systems/437XR1138R2',
+            data={'Boot': {'BootSourceOverrideEnabled': 'Once',
+                           'BootSourceOverrideTarget': 'Cd'}},
+            etag='81802dbf61beb0bd')
+
     def test_set_system_boot_options_supermicro_no_usb_cd_boot(self):
 
         self.sys_inst.manufacturer = "supermicro"

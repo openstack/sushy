@@ -1,0 +1,6 @@
+---
+fixes:
+  - |
+    Fixes incompatibility with SuperMicro ars-111gl-nhr which uses 'Cd' device
+    string for virtual media boot as opposed to 'UsbCd' typical to most
+    SuperMicro servers.
