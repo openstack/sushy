@@ -1,0 +1,9 @@
+---
+features:
+  - |
+    Adds ``set_datetime`` method to the ``Manager`` resource, allowing
+    clients to update the BMC's ``DateTime`` and ``DateTimeLocalOffset``
+    fields via Redfish PATCH. This enables management of time settings
+    on Redfish-compliant BMCs through sushy.
+
+

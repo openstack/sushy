@@ -324,6 +324,23 @@ class ManagerTestCase(base.TestCase):
             {'B4:AC:57:49:90:CA': res_cons.State.ENABLED})
         self.assertEqual(expected_macs, actual_macs)
 
+    def test_set_datetime(self):
+        self.manager.refresh = mock.Mock()
+        self.datetime_value = '2025-06-11T10:00:00+00:00'
+        self.datetimelocaloffset_value = '+00:00'
+
+        self.manager.set_datetime(
+            datetime=self.datetime_value,
+            datetime_local_offset=self.datetimelocaloffset_value)
+
+        self.manager._conn.patch.assert_called_once_with(
+            '/redfish/v1/Managers/BMC',
+            data={
+                'DateTime': self.datetime_value,
+                'DateTimeLocalOffset': self.datetimelocaloffset_value})
+
+        self.manager.refresh.assert_called_once_with(force=True)
+
 
 class ManagerWithoutVirtualMedia(base.TestCase):
 
