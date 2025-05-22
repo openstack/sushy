@@ -83,7 +83,7 @@ class DellManagerExtension(oem_base.OEMResourceBase):
 
     ACTION_DATA = {
         'ShareParameters': {
-            'Target': 'ALL'
+            'Target': ['ALL']
         },
         'ImportBuffer': None
     }
@@ -395,7 +395,7 @@ VFDD\
 
         action_data = {
             'ShareParameters': {
-                'Target': target
+                'Target': [target]
             },
             'ExportFormat': "JSON",
             'ExportUse': export_use,
