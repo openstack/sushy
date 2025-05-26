@@ -50,6 +50,8 @@ class NetworkAdapterTestCase(base.TestCase):
         self.assertEqual(res_cons.STATE_ENABLED, self.adapter.status.state)
         self.assertEqual(res_cons.HEALTH_OK, self.adapter.status.health)
         self.assertEqual(res_cons.HEALTH_OK, self.adapter.status.health_rollup)
+        self.assertEqual('14.25.80.0',
+                         self.adapter.controllers[0].firmware_package_version)
 
     def test_network_ports(self):
         self.conn.get.return_value.json.reset_mock()

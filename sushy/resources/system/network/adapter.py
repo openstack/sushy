@@ -22,6 +22,11 @@ from sushy.resources.system import port
 from sushy import utils
 
 
+class ControllersListField(base.ListField):
+    firmware_package_version = base.Field('FirmwarePackageVersion')
+    """The version of the user-facing firmware package."""
+
+
 class NetworkAdapter(base.ResourceBase):
     description = base.Field('Description')
     """Human-readable description of the resource"""
@@ -46,6 +51,9 @@ class NetworkAdapter(base.ResourceBase):
 
     status = common.StatusField("Status")
     """The status"""
+
+    controllers = ControllersListField('Controllers', default=[])
+    """A network controller ASIC that makes up part of a NetworkAdapter."""
 
     @property
     @utils.cache_it
