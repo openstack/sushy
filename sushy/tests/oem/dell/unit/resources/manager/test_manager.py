@@ -71,7 +71,7 @@ class ManagerTestCase(BaseTestCase):
         self.conn.post.assert_called_once_with(
             '/redfish/v1/Managers/iDRAC.Embedded.1/Actions/Oem/EID_674_Manager'
             '.ImportSystemConfiguration',
-            data={'ShareParameters': {'Target': 'ALL'},
+            data={'ShareParameters': {'Target': ['ALL']},
                   'ImportBuffer':
                   '<SystemConfiguration><Component FQDD="iDRAC.Embedded.1">'
                   '<Attribute Name="ServerBoot.1#BootOnce">Enabled'
@@ -88,7 +88,7 @@ class ManagerTestCase(BaseTestCase):
         self.conn.post.assert_called_once_with(
             '/redfish/v1/Managers/iDRAC.Embedded.1/Actions/Oem/EID_674_Manager'
             '.ImportSystemConfiguration',
-            data={'ShareParameters': {'Target': 'ALL'},
+            data={'ShareParameters': {'Target': ['ALL']},
                   'ImportBuffer':
                   '<SystemConfiguration><Component FQDD="iDRAC.Embedded.1">'
                   '<Attribute Name="ServerBoot.1#BootOnce">Enabled'
@@ -123,7 +123,7 @@ class ManagerTestCase(BaseTestCase):
         self.conn.post.assert_called_with(
             '/redfish/v1/Managers/iDRAC.Embedded.1/Actions/Oem/EID_674_Manager'
             '.ImportSystemConfiguration',
-            data={'ShareParameters': {'Target': 'ALL'},
+            data={'ShareParameters': {'Target': ['ALL']},
                   'ImportBuffer':
                   '<SystemConfiguration><Component FQDD="iDRAC.Embedded.1">'
                   '<Attribute Name="ServerBoot.1#BootOnce">Enabled'
@@ -158,7 +158,7 @@ class ManagerTestCase(BaseTestCase):
         self.conn.post.assert_called_with(
             '/redfish/v1/Managers/iDRAC.Embedded.1/Actions/Oem/EID_674_Manager'
             '.ImportSystemConfiguration',
-            data={'ShareParameters': {'Target': 'ALL'},
+            data={'ShareParameters': {'Target': ['ALL']},
                   'ImportBuffer':
                   '<SystemConfiguration><Component FQDD="iDRAC.Embedded.1">'
                   '<Attribute Name="ServerBoot.1#BootOnce">Enabled'
@@ -227,7 +227,7 @@ class ManagerTestCase(BaseTestCase):
         self.conn.post.assert_called_once_with(
             '/redfish/v1/Managers/iDRAC.Embedded.1/Actions/Oem/EID_674_Manager'
             '.ExportSystemConfiguration', data={'ShareParameters':
-                                                {'Target': 'ALL'},
+                                                {'Target': ['ALL']},
                                                 'ExportFormat': 'JSON',
                                                 'ExportUse': 'Default',
                                                 'IncludeInExport': 'Default'})
@@ -244,7 +244,7 @@ class ManagerTestCase(BaseTestCase):
         self.conn.post.assert_called_once_with(
             '/redfish/v1/Managers/iDRAC.Embedded.1/Actions/Oem/EID_674_Manager'
             '.ExportSystemConfiguration', data={'ShareParameters':
-                                                {'Target': 'RAID'},
+                                                {'Target': ['RAID']},
                                                 'ExportFormat': 'JSON',
                                                 'ExportUse': 'Clone',
                                                 'IncludeInExport':
@@ -309,7 +309,7 @@ class ManagerTestCase(BaseTestCase):
         self.conn.post.assert_called_once_with(
             '/redfish/v1/Managers/iDRAC.Embedded.1/Actions/Oem/EID_674_Manager'
             '.ExportSystemConfiguration', data={'ShareParameters':
-                                                {'Target': 'RAID'},
+                                                {'Target': ['RAID']},
                                                 'ExportFormat': 'JSON',
                                                 'ExportUse': 'Clone',
                                                 'IncludeInExport':
@@ -552,7 +552,7 @@ class ManagerTestCase(BaseTestCase):
         self.conn.post.assert_called_once_with(
             '/redfish/v1/Managers/iDRAC.Embedded.1/Actions/Oem/EID_674_Manager'
             '.ImportSystemConfiguration', data={'ShareParameters':
-                                                {'Target': 'ALL'},
+                                                {'Target': ['ALL']},
                                                 'ImportBuffer':
                                                 '{"key": "value"}',
                                                 'ShutdownType': 'NoReboot'})

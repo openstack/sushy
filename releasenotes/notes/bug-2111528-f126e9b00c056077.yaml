@@ -1,0 +1,5 @@
+---
+fixes:
+  - |
+    Fix the Target property in the Dell OEM, it should be an array
+    as a value instead of a string.
