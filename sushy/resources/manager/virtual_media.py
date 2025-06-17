@@ -14,6 +14,7 @@
 # https://redfish.dmtf.org/schemas/VirtualMedia.v1_2_0.json
 
 from http import client as http_client
+import logging
 
 from sushy import exceptions
 from sushy.resources import base
@@ -21,6 +22,8 @@ from sushy.resources.certificateservice import certificate
 from sushy.resources import common
 from sushy.resources.manager import constants as mgr_cons
 from sushy import utils
+
+LOG = logging.getLogger(__name__)
 
 
 class ActionsField(base.CompositeField):
@@ -258,7 +261,25 @@ class VirtualMedia(base.ResourceBase):
             if response.status_code in (
                     http_client.UNSUPPORTED_MEDIA_TYPE,
                     http_client.BAD_REQUEST):
-                self._conn.post(target_uri, data={})
+                try:
+                    self._conn.post(target_uri, data={})
+                except exceptions.HTTPError as vmd_exc:
+                    if (vmd_exc.status_code >= 500
+                        or vmd_exc.status_code in {http_client.BAD_REQUEST,
+                                                   http_client.CONFLICT}):
+                        LOG.warning('Received exception "%(exception)s" '
+                                    'while attempting to eject virtual media:'
+                                    ' %(id)s. Refreshing the resource.',
+                                    {'exception': vmd_exc,
+                                     'id': self.identity})
+                        self.refresh(force=True)
+                        if not self.inserted:
+                            LOG.debug("No image inserted on Virtual Media %s",
+                                      self.identity)
+                            pass
+                        else:
+                            raise
+
         self.invalidate()
 
     def set_verify_certificate(self, verify_certificate):

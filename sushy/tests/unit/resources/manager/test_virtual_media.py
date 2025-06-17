@@ -328,6 +328,33 @@ class VirtualMediaTestCase(base.TestCase):
         self.sys_virtual_media._conn.post.assert_has_calls(post_calls)
         self.assertTrue(self.sys_virtual_media._is_stale)
 
+    def test_eject_media_fail_but_media_is_ejected(self):
+        target_uri = ("/redfish/v1/Managers/BMC/VirtualMedia/Floppy1/Actions"
+                      "/VirtualMedia.EjectMedia")
+        self.conn.post.side_effect = [
+            exceptions.HTTPError(
+                method='POST', url=target_uri, response=mock.MagicMock(
+                    status_code=http_client.UNSUPPORTED_MEDIA_TYPE)),
+            exceptions.HTTPError(
+                method='POST', url=target_uri, response=mock.MagicMock(
+                    status_code=http_client.INTERNAL_SERVER_ERROR))
+        ]
+
+        self.sys_virtual_media.inserted = True
+
+        def fake_refresh(force=False):
+            self.sys_virtual_media.inserted = False
+
+        self.sys_virtual_media.refresh = mock.Mock(side_effect=fake_refresh)
+
+        self.sys_virtual_media.eject_media()
+        post_calls = [
+            mock.call(target_uri),
+            mock.call(target_uri, data={})]
+
+        self.sys_virtual_media.refresh.assert_called_once_with(force=True)
+        self.sys_virtual_media._conn.post.assert_has_calls(post_calls)
+
     def test_set_verify_certificate(self):
         self.conn.get.return_value.headers = {'Allow': 'GET,HEAD',
                                               'ETag': '3d7b8a7360bf2941d'}
