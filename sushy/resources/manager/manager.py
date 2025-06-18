@@ -83,7 +83,24 @@ class Manager(base.ResourceBase):
     uuid = base.Field('UUID')
     """The manager UUID"""
 
+    datetime = base.Field('DateTime')
+    """The manager datetime"""
+
+    datetimelocaloffset = base.Field('DateTimeLocalOffset')
+    """The manager datatimelocaloffset"""
+
     _actions = ActionsField('Actions')
+
+    def set_datetime(self, datetime=None, datetime_local_offset=None):
+        """Set the BMC DateTime and/or DateTimeLocalOffset."""
+        patch = {}
+        if datetime is not None:
+            patch['DateTime'] = datetime
+        if datetime_local_offset is not None:
+            patch['DateTimeLocalOffset'] = datetime_local_offset
+
+        self._conn.patch(self.path, data=patch)
+        self.refresh(force=True)
 
     def __init__(self, connector, identity, redfish_version=None,
                  registries=None, root=None):
