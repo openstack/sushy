@@ -16,10 +16,10 @@ import json
 from unittest import mock
 
 from oslotest.base import BaseTestCase
-from sushy import exceptions
-from sushy import taskmonitor
 
+from sushy import exceptions
 from sushy.oem.dell.resources.system import raid_service
+from sushy import taskmonitor
 
 
 class DellRaidService(BaseTestCase):

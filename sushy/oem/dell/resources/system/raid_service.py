@@ -15,11 +15,10 @@
 import logging
 
 from sushy import exceptions
+from sushy.oem.dell import constants
 from sushy.resources import base
 from sushy.resources import common
 from sushy import taskmonitor
-
-from sushy.oem.dell import constants
 
 LOG = logging.getLogger(__name__)
 

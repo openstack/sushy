@@ -17,6 +17,7 @@ import json
 from unittest import mock
 
 from oslotest.base import BaseTestCase
+
 from sushy import main
 
 

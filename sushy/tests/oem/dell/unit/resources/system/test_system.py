@@ -16,8 +16,8 @@ import json
 from unittest import mock
 
 from oslotest.base import BaseTestCase
-from sushy import exceptions
 
+from sushy import exceptions
 from sushy.oem.dell.resources.system import constants as sys_cons
 from sushy.oem.dell.resources.system import raid_service
 from sushy.oem.dell.resources.system import system as oem_system

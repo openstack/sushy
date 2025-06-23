@@ -14,10 +14,9 @@
 
 import logging
 
+from sushy.oem.dell.resources.taskservice import constants as ts_cons
 from sushy.resources import base
 from sushy.resources.oem import base as oem_base
-
-from sushy.oem.dell.resources.taskservice import constants as ts_cons
 
 LOG = logging.getLogger(__name__)
 

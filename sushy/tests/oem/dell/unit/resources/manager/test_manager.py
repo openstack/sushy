@@ -20,16 +20,16 @@ from unittest import mock
 
 from oslotest.base import BaseTestCase
 import requests
-import sushy
-from sushy.resources.manager import manager
-from sushy.taskmonitor import TaskMonitor
 
+import sushy
 from sushy.oem.dell.resources.manager import constants as mgr_cons
 from sushy.oem.dell.resources.manager import idrac_card_service as idrac_card
 from sushy.oem.dell.resources.manager import job_collection as jc
 from sushy.oem.dell.resources.manager import job_service as job
 from sushy.oem.dell.resources.manager import lifecycle_service as lifecycle
 from sushy.oem.dell.resources.manager import manager as oem_manager
+from sushy.resources.manager import manager
+from sushy.taskmonitor import TaskMonitor
 
 
 class ManagerTestCase(BaseTestCase):

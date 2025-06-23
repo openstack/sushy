@@ -16,10 +16,10 @@ import json
 from unittest import mock
 
 from oslotest.base import BaseTestCase
-from sushy.resources.taskservice import task as sushy_task
 
 from sushy.oem.dell.resources.taskservice import constants as ts_cons
 from sushy.oem.dell.resources.taskservice import task
+from sushy.resources.taskservice import task as sushy_task
 
 
 class TaskTestCase(BaseTestCase):
