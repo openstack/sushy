@@ -20,6 +20,7 @@ import time
 from urllib import parse as urlparse
 
 import requests
+from requests import exceptions as req_exc
 from urllib3.exceptions import InsecureRequestWarning
 
 from sushy import exceptions
@@ -27,6 +28,15 @@ from sushy.taskmonitor import TaskMonitor
 from sushy import utils
 
 LOG = logging.getLogger(__name__)
+
+
+_RETRYABLE_EXCEPTIONS = (
+    req_exc.ConnectionError,
+    req_exc.ConnectTimeout,
+    req_exc.ReadTimeout,
+    req_exc.Timeout,
+    req_exc.ChunkedEncodingError,
+)
 
 
 class Connector:
@@ -162,21 +172,37 @@ class Connector:
                    'data': utils.sanitize(data),
                    'blocking': blocking, 'timeout': timeout,
                    'session': extra_session_req_kwargs})
-        try:
-            response = self._session.request(method, url, json=data,
-                                             headers=headers,
-                                             verify=self._verify,
-                                             timeout=timeout,
-                                             **extra_session_req_kwargs)
-        except requests.exceptions.RequestException as e:
-            # Capture any general exception by looking for the parent
-            # class of exceptions in the requests library.
-            # Specifically this will cover cases such as transport
-            # failures, connection timeouts, and encoding errors.
-            # Raising this as sushy ConnectionError allows users to
-            # understand something bad has happened, and to
-            # allow them to respond accordingly.
-            raise exceptions.ConnectionError(url=url, error=e)
+
+        retries = self._server_side_retries or 3
+        delay = self._server_side_retries_delay or 2
+
+        for attempt in range(retries):
+            try:
+                response = self._session.request(
+                    method, url, json=data,
+                    headers=headers,
+                    verify=self._verify,
+                    timeout=timeout,
+                    **extra_session_req_kwargs
+                )
+                break
+            except _RETRYABLE_EXCEPTIONS as e:
+                if attempt < retries - 1:
+                    LOG.warning(
+                        "Transient error during Redfish request to %s "
+                        "(attempt %d/%d): %s", url, attempt + 1, retries, e)
+                    time.sleep(delay)
+                else:
+                    raise exceptions.ConnectionError(url=url, error=e)
+            except requests.exceptions.RequestException as e:
+                # Capture any general exception by looking for the parent
+                # class of exceptions in the requests library.
+                # Specifically this will cover cases such as transport
+                # failures, connection timeouts, and encoding errors.
+                # Raising this as sushy ConnectionError allows users to
+                # understand something bad has happened, and to
+                # allow them to respond accordingly.
+                raise exceptions.ConnectionError(url=url, error=e)
 
         if self._response_callback:
             self._response_callback(response)

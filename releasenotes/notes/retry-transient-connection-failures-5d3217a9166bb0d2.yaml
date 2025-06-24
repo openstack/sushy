@@ -1,0 +1,9 @@
+---
+features:
+  - |
+    Redfish HTTP requests in Sushy now retry automatically on common
+    transient connection errors such as connection timeouts or refused
+    connections. This helps avoid deployment or teardown failures due
+    to temporary BMC unavailability. The number of retries and the
+    delay are controlled by the existing options
+    `server_side_retries` and `server_side_retries_delay`.

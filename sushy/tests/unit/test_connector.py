@@ -912,3 +912,23 @@ class ConnectorOpTestCase(base.TestCase):
                           'PATCH', target_uri, data,
                           self.headers,
                           blocking=False, timeout=60)
+
+    def test_retry_on_connection_error(self):
+        self.request.side_effect = [
+            requests.exceptions.ConnectionError("temporary issue"),
+            mock.Mock(status_code=200, headers={}, json=lambda: {})
+        ]
+
+        target_uri = '/redfish/v1/Systems/1'
+        result = self.conn.get(target_uri)
+        self.assertEqual(result.status_code, 200)
+        self.assertEqual(self.request.call_count, 2)
+
+    def test_raises_after_max_retries(self):
+        target_uri = '/redfish/v1/Systems/1'
+        self.request.side_effect = requests.exceptions.ConnectTimeout(
+            "timeout")
+        self.assertRaises(exceptions.ConnectionError, self.conn.get,
+                          target_uri)
+        self.assertEqual(self.request.call_count,
+                         self.conn._server_side_retries)
