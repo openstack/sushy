@@ -390,3 +390,145 @@ class StorageCollectionTestCase(base.TestCase):
         self.conn.get.return_value.json.side_effect = successive_return_values
 
         self.assertEqual(1073741824000, self.stor_col.max_volume_size_bytes)
+
+    @mock.patch.object(storage, 'Storage', autospec=True)
+    def test_get_members_with_multiple_storages(self, Storage_mock):
+        # Test collection with multiple storage members
+        with open('sushy/tests/unit/json_samples/'
+                  'storage_collection_multiple.json') as f:
+            multiple_storages_json = json.loads(f.read())
+
+        self.conn.get.return_value.json.return_value = multiple_storages_json
+
+        # Create a new collection instance to get fresh data
+        stor_col_multi = storage.StorageCollection(
+            self.conn, '/redfish/v1/Systems/437XR1138R2/Storage',
+            redfish_version='1.0.2')
+
+        members = stor_col_multi.get_members()
+
+        # Should call Storage constructor for each member
+        expected_calls = [
+            mock.call(self.conn, '/redfish/v1/Systems/437XR1138R2/Storage/1',
+                      redfish_version='1.0.2', registries=None, root=None),
+            mock.call(self.conn, '/redfish/v1/Systems/437XR1138R2/Storage/2',
+                      redfish_version='1.0.2', registries=None, root=None)
+        ]
+        Storage_mock.assert_has_calls(expected_calls)
+        self.assertEqual(2, len(members))
+
+    def test_get_members_expanded(self):
+        # Test with expanded JSON data containing full member objects
+        # This simulates a response from ?$expand=.($levels=1)
+        with open('sushy/tests/unit/json_samples/'
+                  'storage_collection_expanded.json') as f:
+            expanded_json = json.loads(f.read())
+
+        # Create collection with the URL that would have ?$expand appended
+        expanded_collection = storage.StorageCollection(
+            self.conn,
+            "/redfish/v1/Systems/1/Storage?$expand=.($levels=1)",
+            redfish_version="1.0.2",
+        )
+        expanded_collection._json = expanded_json
+
+        # Mock the Storage objects that will be created
+        mock_storage1 = mock.Mock(spec=storage.Storage)
+        mock_storage1.identity = "RAID-1"
+        mock_storage1.name = "RAID Controller"
+
+        mock_storage2 = mock.Mock(spec=storage.Storage)
+        mock_storage2.identity = "NVMe-1"
+        mock_storage2.name = "NVMe Storage Controller"
+
+        with mock.patch.object(
+            storage, "Storage", autospec=True
+        ) as mock_storage_cls:
+            # Make the constructor return our mocked instances
+            mock_storage_cls.side_effect = [
+                mock_storage1,
+                mock_storage2,
+            ]
+
+            members = expanded_collection.get_members()
+
+            # Verify it created Storage objects from expanded data
+            self.assertEqual(2, len(members))
+            self.assertEqual([mock_storage1, mock_storage2], members)
+
+            # Check that Storage was initialized with expanded JSON data
+            self.assertEqual(2, mock_storage_cls.call_count)
+
+            # Verify first member initialization with expanded data
+            first_call = mock_storage_cls.call_args_list[0]
+            self.assertEqual(expanded_collection._conn, first_call[0][0])
+            self.assertEqual(
+                "/redfish/v1/Systems/1/Storage/RAID-1", first_call[0][1]
+            )
+            # Check that expanded data was passed
+            self.assertEqual(
+                expanded_json["Members"][0], first_call[1]["json_doc"]
+            )
+
+            # Verify second member initialization with expanded data
+            second_call = mock_storage_cls.call_args_list[1]
+            self.assertEqual(expanded_collection._conn, second_call[0][0])
+            self.assertEqual(
+                "/redfish/v1/Systems/1/Storage/NVMe-1", second_call[0][1]
+            )
+            # Check that expanded data was passed
+            self.assertEqual(
+                expanded_json["Members"][1], second_call[1]["json_doc"]
+            )
+
+    def test_get_members_unexpanded(self):
+        # Test with unexpanded JSON data containing only references
+        # This simulates a normal response without ?$expand parameter
+        with open('sushy/tests/unit/json_samples/'
+                  'storage_collection.json') as f:
+            unexpanded_json = json.loads(f.read())
+
+        # Create collection without expand in URL
+        unexpanded_collection = storage.StorageCollection(
+            self.conn,
+            "/redfish/v1/Systems/1/Storage",
+            redfish_version="1.0.2",
+        )
+        unexpanded_collection._json = unexpanded_json
+
+        # Mock the parent get_members method which will fetch each member
+        # individually
+        mock_storage1 = mock.Mock(spec=storage.Storage)
+        mock_storage2 = mock.Mock(spec=storage.Storage)
+        with mock.patch.object(
+            storage.base.ResourceCollectionBase,
+            "get_members",
+            autospec=True,
+            return_value=[mock_storage1, mock_storage2],
+        ) as mock_super:
+            members = unexpanded_collection.get_members()
+
+            # Should fall back to parent implementation for individual fetches
+            mock_super.assert_called_once_with(unexpanded_collection)
+            self.assertEqual([mock_storage1, mock_storage2], members)
+
+    def test_get_members_no_json(self):
+        # Test when collection has no _json attribute
+        collection_no_json = storage.StorageCollection(
+            self.conn,
+            "/redfish/v1/Systems/437XR1138R2/Storage",
+            redfish_version="1.0.2",
+        )
+
+        # Mock the parent get_members method
+        with mock.patch.object(
+            storage.base.ResourceCollectionBase,
+            "get_members",
+            autospec=True,
+            return_value=["mock_member"],
+        ) as mock_super:
+            members = collection_no_json.get_members()
+
+            # Should fall back to parent implementation
+            mock_super.assert_called_once()
+            self.assertEqual(["mock_member"], members)

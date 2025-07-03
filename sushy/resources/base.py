@@ -688,15 +688,19 @@ class ResourceBase(metaclass=abc.ABCMeta):
         if not self._is_stale and not force:
             return
 
+        data_source = ""
         if json_doc:
             self._json = json_doc
+            data_source = "from expanded document"
         else:
             self._json = self._reader.get_data().json_doc
 
         attributes = self._parse_attributes(self._json)
-        LOG.debug('Received representation of %(type)s %(path)s: %(json)s',
+        LOG.debug('Received representation of %(type)s %(path)s%(source)s: '
+                  '%(json)s',
                   {'type': self.__class__.__name__,
                    'path': self._path,
+                   'source': data_source,
                    'json': (attributes if self._log_resource_body
                             else '<stripped>')})
         self._do_refresh(force)

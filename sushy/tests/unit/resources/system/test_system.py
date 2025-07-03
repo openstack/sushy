@@ -872,11 +872,11 @@ class SystemTestCase(base.TestCase):
         self.assertIsInstance(self.sys_inst.simple_storage,
                               simple_storage.SimpleStorageCollection)
 
-    def test_storage_for_missing_attr(self):
+    def test_simplestorage_for_missing_attr(self):
         self.sys_inst.json.pop('SimpleStorage')
         with self.assertRaisesRegex(
-                exceptions.MissingAttributeError, 'attribute Storage'):
-            self.sys_inst.storage
+                exceptions.MissingAttributeError, 'attribute SimpleStorage'):
+            self.sys_inst.simple_storage
 
     def test_storage(self):
         # | GIVEN |
@@ -972,6 +972,24 @@ class SystemTestCase(base.TestCase):
         self.assertIsInstance(actual_chassis[0], chassis.Chassis)
         self.assertEqual(
             '/redfish/v1/Chassis/1U', actual_chassis[0].path)
+
+    @mock.patch.object(chassis, 'Chassis', autospec=True)
+    def test_chassis_expanded(self, mock_chassis):
+        # Test accessing expanded chassis property
+        result = self.sys_inst.chassis_expanded
+        mock_chassis.assert_called_once_with(
+            self.conn, '/redfish/v1/Chassis/1U?$expand=.($levels=1)',
+            redfish_version=self.sys_inst.redfish_version,
+            registries=self.sys_inst.registries, root=self.sys_inst.root)
+        self.assertEqual([mock_chassis.return_value], result)
+
+    def test_chassis_missing_attr(self):
+        # Test missing chassis attribute
+        self.sys_inst._json['Links'].pop('Chassis')
+        self.assertRaisesRegex(
+            exceptions.MissingAttributeError,
+            'attribute Links/Chassis',
+            lambda: self.sys_inst.chassis)
 
     def test_get_oem_extension(self):
         # | WHEN |
@@ -1217,6 +1235,39 @@ class SystemTestCase(base.TestCase):
         self.assertIsNone(boot_field_instance.enabled)
         self.assertIsNone(boot_field_instance.mode)
         self.assertIsNone(boot_field_instance.target)
+
+    def test_storage_for_missing_attr(self):
+        self.sys_inst.json.pop('Storage')
+        with self.assertRaisesRegex(
+                exceptions.MissingAttributeError, 'attribute Storage'):
+            self.sys_inst.storage
+
+    @mock.patch('sushy.resources.system.storage.storage.StorageCollection',
+                autospec=True)
+    def test_storage_expanded(self, mock_storage_collection):
+        # Test accessing expanded storage property
+        result = self.sys_inst.storage_expanded
+        mock_storage_collection.assert_called_once_with(
+            self.conn,
+            '/redfish/v1/Systems/437XR1138R2/Storage?$expand=.($levels=1)',
+            redfish_version='1.0.2',
+            registries=None,
+            root=None)
+        self.assertIsNotNone(result)
+
+    @mock.patch('sushy.resources.system.simple_storage.'
+                'SimpleStorageCollection', autospec=True)
+    def test_simple_storage_expanded(self, mock_simple_storage_collection):
+        # Test accessing expanded simple_storage property
+        result = self.sys_inst.simple_storage_expanded
+        mock_simple_storage_collection.assert_called_once_with(
+            self.conn,
+            '/redfish/v1/Systems/437XR1138R2/SimpleStorage?'
+            '$expand=.($levels=1)',
+            redfish_version='1.0.2',
+            registries=None,
+            root=None)
+        self.assertIsNotNone(result)
 
 
 class SystemWithVirtualMedia(base.TestCase):
