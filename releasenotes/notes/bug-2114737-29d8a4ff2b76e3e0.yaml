@@ -1,0 +1,6 @@
+---
+fixes:
+  - |
+    Fixes an issue where the action to eject virtual media would fail
+    if the virtual media wasn't present. Now, if the virtual media is not
+    present, we will not raise an error.
