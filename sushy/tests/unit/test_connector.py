@@ -15,6 +15,7 @@
 
 from http import client as http_client
 import json
+import time
 from unittest import mock
 
 import requests
@@ -398,7 +399,8 @@ class ConnectorOpTestCase(base.TestCase):
         self.auth.refresh_session.assert_called_with()
         self.auth.can_refresh_session.assert_called_with()
 
-    def test_connection_error(self):
+    @mock.patch.object(time, 'sleep', autospec=True)
+    def test_connection_error(self, mock_sleep):
         self.request.side_effect = requests.exceptions.ConnectionError
         self.assertRaises(exceptions.ConnectionError, self.conn._op, 'GET')
 
@@ -724,7 +726,8 @@ class ConnectorOpTestCase(base.TestCase):
             {'err': error_msg}
         )
 
-    def test__op_raises_connection_error(self):
+    @mock.patch.object(time, 'sleep', autospec=True)
+    def test__op_raises_connection_error(self, mock_sleep):
 
         exception_list = [
             requests.exceptions.ChunkedEncodingError,
@@ -913,7 +916,8 @@ class ConnectorOpTestCase(base.TestCase):
                           self.headers,
                           blocking=False, timeout=60)
 
-    def test_retry_on_connection_error(self):
+    @mock.patch.object(time, 'sleep', autospec=True)
+    def test_retry_on_connection_error(self, mock_sleep):
         self.request.side_effect = [
             requests.exceptions.ConnectionError("temporary issue"),
             mock.Mock(status_code=200, headers={}, json=lambda: {})
@@ -924,7 +928,8 @@ class ConnectorOpTestCase(base.TestCase):
         self.assertEqual(result.status_code, 200)
         self.assertEqual(self.request.call_count, 2)
 
-    def test_raises_after_max_retries(self):
+    @mock.patch.object(time, 'sleep', autospec=True)
+    def test_raises_after_max_retries(self, mock_sleep):
         target_uri = '/redfish/v1/Systems/1'
         self.request.side_effect = requests.exceptions.ConnectTimeout(
             "timeout")
