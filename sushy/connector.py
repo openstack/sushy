@@ -396,7 +396,12 @@ class Connector:
         :raises: ConnectionError
         :raises: HTTPError
         """
-        if etag is not None:
+        # NOTE(janders) in case headers with empty-string eTag are passed in,
+        # disregard it.
+        if headers:
+            if headers.get('If-Match') == '':
+                del headers['If-Match']
+        if etag:
             if not headers:
                 headers = {}
             headers['If-Match'] = etag

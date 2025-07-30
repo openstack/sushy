@@ -898,6 +898,51 @@ class ConnectorOpTestCase(base.TestCase):
             timeout=60)
 
     @mock.patch.object(connector.Connector, '_op', autospec=True)
+    def test_etag_handler_emptystring_etag(self, mock__op):
+        self.headers_no_etag = self.headers.copy()
+        target_uri = '/redfish/v1/Systems/1'
+        response_200 = mock.MagicMock(spec=requests.Response)
+        response_200.status_code = http_client.OK
+
+        data = {'Boot': {'BootSourceOverrideTarget': 'Cd',
+                         'BootSourceOverrideEnabled': 'Once'}}
+        self.conn._etag_handler(path=target_uri, headers=self.headers,
+                                data=data, etag='',
+                                blocking=False, timeout=60)
+        mock__op.assert_called_with(
+            self.conn,
+            "PATCH",
+            '/redfish/v1/Systems/1',
+            data={'Boot': {'BootSourceOverrideTarget': 'Cd',
+                           'BootSourceOverrideEnabled': 'Once'}},
+            headers=self.headers_no_etag,
+            blocking=False,
+            timeout=60)
+
+    @mock.patch.object(connector.Connector, '_op', autospec=True)
+    def test_etag_handler_emptystring_etag_from_headers(self, mock__op):
+        self.headers_no_etag = self.headers.copy()
+        self.headers['If-Match'] = ''
+        target_uri = '/redfish/v1/Systems/1'
+        response_200 = mock.MagicMock(spec=requests.Response)
+        response_200.status_code = http_client.OK
+
+        data = {'Boot': {'BootSourceOverrideTarget': 'Cd',
+                         'BootSourceOverrideEnabled': 'Once'}}
+        self.conn._etag_handler(path=target_uri, headers=self.headers,
+                                data=data, etag=self.headers['If-Match'],
+                                blocking=False, timeout=60)
+        mock__op.assert_called_with(
+            self.conn,
+            "PATCH",
+            '/redfish/v1/Systems/1',
+            data={'Boot': {'BootSourceOverrideTarget': 'Cd',
+                           'BootSourceOverrideEnabled': 'Once'}},
+            headers=self.headers_no_etag,
+            blocking=False,
+            timeout=60)
+
+    @mock.patch.object(connector.Connector, '_op', autospec=True)
     def test_etag_handler_fail_other_exception(self, mock__op):
         self.headers['If-Match'] = 'W/"3d7b8a7360bf2941d"'
         target_uri = '/redfish/v1/Systems/1'

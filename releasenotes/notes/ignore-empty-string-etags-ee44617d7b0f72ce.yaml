@@ -1,0 +1,6 @@
+---
+fixes:
+  - |
+    Adds correct handling of BMC responses containing an empty string eTag.
+    This resolves issues where sending back an empty string eTag may trigger
+    HTTP 412 Precondition Failed error on some BMCs.
