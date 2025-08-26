@@ -61,6 +61,95 @@ class BootField(base.CompositeField):
 
     http_boot_uri = base.Field('HttpBootUri')
 
+    def _load(self, body, resource, nested_in=None):
+        """Load the boot field, checking Settings fallback for missing values.
+
+        Some newer BMCs move some boot values to a nested Settings field
+        which is defined by an attribute on the response body. So we need
+        to check there if any boot field values are None in the main
+        resource.
+        """
+        # Load the field normally first
+        instance = super()._load(body, resource, nested_in)
+
+        if instance is None:
+            return None
+
+        # Check if we have Settings available and any values might be missing
+        if (hasattr(resource, '_settings')
+                and resource._settings
+                and resource._settings.resource_uri):
+
+            try:
+                settings_resp = resource._conn.get(
+                    resource._settings.resource_uri)
+                settings_data = settings_resp.json()
+                settings_boot = settings_data.get('Boot', {})
+
+                if not settings_boot:
+                    return instance
+
+                # Check and populate allowed_values if missing
+                allowable_key = ('BootSourceOverrideTarget@'
+                                 'Redfish.AllowableValues')
+                if (instance.allowed_values is None
+                        and allowable_key in settings_boot):
+                    settings_allowed_values = settings_boot[allowable_key]
+                    if settings_allowed_values:
+                        instance.allowed_values = list(settings_allowed_values)
+
+                # Check and populate enabled if missing/None
+                if (instance.enabled is None
+                        and 'BootSourceOverrideEnabled' in settings_boot):
+                    enabled_value = settings_boot['BootSourceOverrideEnabled']
+                    if enabled_value:
+                        try:
+                            instance.enabled = (
+                                sys_cons.BootSourceOverrideEnabled(
+                                    enabled_value))
+                        except ValueError:
+                            pass  # Keep as None if value is not valid
+
+                # Check and populate mode if missing/None
+                if (instance.mode is None
+                        and 'BootSourceOverrideMode' in settings_boot):
+                    mode_value = settings_boot['BootSourceOverrideMode']
+                    if mode_value:
+                        try:
+                            instance.mode = sys_cons.BootSourceOverrideMode(
+                                mode_value)
+                        except ValueError:
+                            pass  # Keep as None if value is not valid
+
+                # Check and populate target if missing/None
+                if (instance.target is None
+                        and 'BootSourceOverrideTarget' in settings_boot):
+                    target_value = settings_boot['BootSourceOverrideTarget']
+                    if target_value:
+                        try:
+                            instance.target = sys_cons.BootSource(target_value)
+                        except ValueError:
+                            pass  # Keep as None if value is not valid
+
+                # Check and populate http_boot_uri if missing/None
+                if (instance.http_boot_uri is None
+                        and 'HttpBootUri' in settings_boot):
+                    instance.http_boot_uri = settings_boot['HttpBootUri']
+
+                if any([instance.allowed_values, instance.enabled,
+                        instance.mode, instance.target,
+                        instance.http_boot_uri]):
+                    LOG.debug('Retrieved boot field values from Settings '
+                              'resource for System %s',
+                              getattr(resource, 'identity', 'unknown'))
+
+            except Exception as exc:
+                LOG.warning('Failed to retrieve boot field values from '
+                            'Settings resource for System %s: %s',
+                            getattr(resource, 'identity', 'unknown'), exc)
+
+        return instance
+
 
 class BootProgressField(base.CompositeField):
 
