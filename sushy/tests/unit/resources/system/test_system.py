@@ -987,6 +987,237 @@ class SystemTestCase(base.TestCase):
             exceptions.MissingAttributeError, 'attribute VirtualMedia'):
             self.sys_inst.virtual_media
 
+    def test_boot_field_settings_fallback_allowed_values(self):
+        """Test BootField falls back to Settings for allowed_values."""
+        # Setup: Main Boot section missing allowed_values
+        boot_data_without_allowed_values = {
+            'BootSourceOverrideEnabled': 'Once',
+            'BootSourceOverrideTarget': 'Pxe',
+            'BootSourceOverrideMode': 'UEFI'
+        }
+
+        # Settings resource with allowed_values
+        settings_data = {
+            'Boot': {
+                'BootSourceOverrideTarget@Redfish.AllowableValues': [
+                    'None', 'Pxe', 'Cd', 'Usb', 'Hdd', 'UefiHttp'
+                ]
+            }
+        }
+
+        # Mock system data without allowed_values in main Boot section
+        system_data = self.json_doc.copy()
+        system_data['Boot'] = boot_data_without_allowed_values
+
+        # Mock settings response
+        settings_response = mock.Mock()
+        settings_response.json.return_value = settings_data
+
+        # Setup system with settings
+        self.sys_inst._settings = mock.Mock()
+        self.sys_inst._settings.resource_uri = '/redfish/v1/Systems/Self/SD'
+
+        # Mock the connector to return settings data when requested
+        self.conn.get.return_value = settings_response
+
+        # Create a new boot field instance
+        boot_field = system.BootField('Boot')
+        boot_field_instance = boot_field._load(system_data, self.sys_inst)
+
+        # Verify allowed_values was populated from Settings
+        expected_values = ['None', 'Pxe', 'Cd', 'Usb', 'Hdd', 'UefiHttp']
+        self.assertEqual(expected_values, boot_field_instance.allowed_values)
+
+        # Verify Settings URI was called
+        self.conn.get.assert_called_with('/redfish/v1/Systems/Self/SD')
+
+    def test_boot_field_settings_fallback_all_fields(self):
+        """Test BootField falls back to Settings for all missing fields."""
+        # Setup: Main Boot section with minimal data
+        boot_data_minimal = {}
+
+        # Settings resource with all boot values
+        settings_data = {
+            'Boot': {
+                'BootSourceOverrideTarget@Redfish.AllowableValues': [
+                    'None', 'Pxe', 'Cd', 'UefiHttp'
+                ],
+                'BootSourceOverrideEnabled': 'Continuous',
+                'BootSourceOverrideMode': 'Legacy',
+                'BootSourceOverrideTarget': 'Cd',
+                'HttpBootUri': 'https://example.com/boot.iso'
+            }
+        }
+
+        # Mock system data with empty Boot section
+        system_data = self.json_doc.copy()
+        system_data['Boot'] = boot_data_minimal
+
+        # Mock settings response
+        settings_response = mock.Mock()
+        settings_response.json.return_value = settings_data
+
+        # Setup system with settings
+        self.sys_inst._settings = mock.Mock()
+        self.sys_inst._settings.resource_uri = '/redfish/v1/Systems/Self/SD'
+
+        # Mock the connector to return settings data when requested
+        self.conn.get.return_value = settings_response
+
+        # Create a new boot field instance
+        boot_field = system.BootField('Boot')
+        boot_field_instance = boot_field._load(system_data, self.sys_inst)
+
+        # Verify all values were populated from Settings
+        self.assertEqual(['None', 'Pxe', 'Cd', 'UefiHttp'],
+                         boot_field_instance.allowed_values)
+        self.assertEqual(sushy.BootSourceOverrideEnabled.CONTINUOUS,
+                         boot_field_instance.enabled)
+        self.assertEqual(sushy.BootSourceOverrideMode.LEGACY,
+                         boot_field_instance.mode)
+        self.assertEqual(sushy.BootSource.CD, boot_field_instance.target)
+        self.assertEqual('https://example.com/boot.iso',
+                         boot_field_instance.http_boot_uri)
+
+    def test_boot_field_settings_fallback_partial_override(self):
+        """Test BootField only falls back for None values, not existing."""
+        # Setup: Main Boot section with some values
+        boot_data_partial = {
+            'BootSourceOverrideEnabled': 'Once',
+            'BootSourceOverrideTarget': 'Pxe',
+            # Missing allowed_values, mode, and http_boot_uri
+        }
+
+        # Settings resource with values
+        settings_data = {
+            'Boot': {
+                'BootSourceOverrideTarget@Redfish.AllowableValues': [
+                    'None', 'Pxe', 'Cd'
+                ],
+                'BootSourceOverrideEnabled': 'Continuous',  # No override
+                'BootSourceOverrideMode': 'UEFI',  # Should be used
+                'HttpBootUri': 'https://example.com/boot.iso'  # Should be used
+            }
+        }
+
+        # Mock system data with partial Boot section
+        system_data = self.json_doc.copy()
+        system_data['Boot'] = boot_data_partial
+
+        # Mock settings response
+        settings_response = mock.Mock()
+        settings_response.json.return_value = settings_data
+
+        # Setup system with settings
+        self.sys_inst._settings = mock.Mock()
+        self.sys_inst._settings.resource_uri = '/redfish/v1/Systems/Self/SD'
+
+        # Mock the connector to return settings data when requested
+        self.conn.get.return_value = settings_response
+
+        # Create a new boot field instance
+        boot_field = system.BootField('Boot')
+        boot_field_instance = boot_field._load(system_data, self.sys_inst)
+
+        # Verify existing values were NOT overridden
+        self.assertEqual(sushy.BootSourceOverrideEnabled.ONCE,
+                         boot_field_instance.enabled)
+        self.assertEqual(sushy.BootSource.PXE, boot_field_instance.target)
+
+        # Verify missing values were populated from Settings
+        self.assertEqual(['None', 'Pxe', 'Cd'],
+                         boot_field_instance.allowed_values)
+        self.assertEqual(sushy.BootSourceOverrideMode.UEFI,
+                         boot_field_instance.mode)
+        self.assertEqual('https://example.com/boot.iso',
+                         boot_field_instance.http_boot_uri)
+
+    def test_boot_field_no_settings_resource(self):
+        """Test BootField works normally when no Settings resource exists."""
+        # Setup: System without Settings resource
+        self.sys_inst._settings = None
+
+        # Use original test data (has allowed_values in main Boot section)
+        boot_field = system.BootField('Boot')
+        boot_field_instance = boot_field._load(self.json_doc, self.sys_inst)
+
+        # Verify normal loading behavior
+        expected_values = ["None", "Pxe", "Cd", "Usb", "Hdd", "BiosSetup",
+                           "Utilities", "Diags", "SDCard", "UefiTarget",
+                           "UefiHttp"]
+        self.assertEqual(expected_values, boot_field_instance.allowed_values)
+        self.assertEqual(sushy.BootSourceOverrideEnabled.ONCE,
+                         boot_field_instance.enabled)
+
+    @mock.patch.object(system.LOG, 'warning', autospec=True)
+    def test_boot_field_settings_fetch_error(self, mock_log):
+        """Test BootField handles Settings fetch errors gracefully."""
+        # Setup: Main Boot section missing allowed_values
+        boot_data_without_allowed_values = {
+            'BootSourceOverrideEnabled': 'Once',
+            'BootSourceOverrideTarget': 'Pxe'
+        }
+
+        system_data = self.json_doc.copy()
+        system_data['Boot'] = boot_data_without_allowed_values
+
+        # Setup system with settings but make the call fail
+        self.sys_inst._settings = mock.Mock()
+        self.sys_inst._settings.resource_uri = '/redfish/v1/Systems/Self/SD'
+
+        # Mock connector to raise exception on Settings fetch
+        self.conn.get.side_effect = Exception("Network error")
+
+        # Create a new boot field instance
+        boot_field = system.BootField('Boot')
+        boot_field_instance = boot_field._load(system_data, self.sys_inst)
+
+        # Verify the instance was still created but without fallback values
+        self.assertIsNotNone(boot_field_instance)
+        self.assertIsNone(boot_field_instance.allowed_values)
+
+        # Verify warning was logged
+        mock_log.assert_called_once()
+        self.assertIn('Failed to retrieve boot field values',
+                      str(mock_log.call_args))
+
+    def test_boot_field_settings_invalid_enum_values(self):
+        """Test BootField handles invalid enum values gracefully."""
+        # Setup: Main Boot section with minimal data
+        boot_data_minimal = {}
+
+        # Settings resource with invalid enum values
+        settings_data = {
+            'Boot': {
+                'BootSourceOverrideEnabled': 'InvalidValue',
+                'BootSourceOverrideMode': 'BadMode',
+                'BootSourceOverrideTarget': 'UnknownTarget'
+            }
+        }
+
+        system_data = self.json_doc.copy()
+        system_data['Boot'] = boot_data_minimal
+
+        # Mock settings response
+        settings_response = mock.Mock()
+        settings_response.json.return_value = settings_data
+
+        # Setup system with settings
+        self.sys_inst._settings = mock.Mock()
+        self.sys_inst._settings.resource_uri = '/redfish/v1/Systems/Self/SD'
+
+        # Mock the connector to return settings data when requested
+        self.conn.get.return_value = settings_response
+
+        # Create a new boot field instance
+        boot_field = system.BootField('Boot')
+        boot_field_instance = boot_field._load(system_data, self.sys_inst)
+
+        # Verify invalid enum values resulted in None (graceful handling)
+        self.assertIsNone(boot_field_instance.enabled)
+        self.assertIsNone(boot_field_instance.mode)
+        self.assertIsNone(boot_field_instance.target)
+
 
 class SystemWithVirtualMedia(base.TestCase):
 

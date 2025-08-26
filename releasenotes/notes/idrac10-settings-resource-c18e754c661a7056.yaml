@@ -1,0 +1,8 @@
+---
+fixes:
+  - |
+    Fixes an issue with the handling of idrac10 BMCs as it relates to the
+    ComputerSystem resource. Previously, sushy was not able to identify
+    the available boot target value. Now sushy is able to identify the boot
+    values from a settings sub-resource and provide the needful clarity so
+    consumers of the sushy library can identify available targets.
