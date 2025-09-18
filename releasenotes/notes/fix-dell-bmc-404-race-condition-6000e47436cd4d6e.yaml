@@ -1,0 +1,12 @@
+---
+fixes:
+  - |
+    An issue was encountered on Dell hardware where the Baseboard Management
+    Controller could respond with a HTTP 404 error temporarily during job
+    creation, causing operations to fail unnecessarily. This occurred due to
+    a race condition where the BMC had not yet finished creating the job
+    when the initial request was made. The Dell OEM http_call method now
+    automatically retries on 404 responses with configurable retry count
+    (default: 3 retries) and delay (default: 10 seconds) to handle this
+    transient condition gracefully. The retry behavior can be customized
+    using the ``max_404_retries`` and ``retry_404_delay`` parameters.
