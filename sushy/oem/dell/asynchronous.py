@@ -36,11 +36,30 @@ def http_call(conn, method, *args, **kwargs):
     handle = getattr(conn, method.lower())
 
     sleep_for = kwargs.pop('sushy_task_poll_period', TASK_POLL_PERIOD)
+    max_404_retries = kwargs.pop('max_404_retries', 3)
+    retry_404_delay = kwargs.pop('retry_404_delay', 10)
 
-    response = handle(*args, **kwargs)
+    # Retry initial call on 404 to handle BMC race condition
+    for attempt in range(max_404_retries + 1):
+        response = handle(*args, **kwargs)
 
-    LOG.debug('Finished HTTP %s with args %s %s, response is '
-              '%d', method, args or '', kwargs, response.status_code)
+        LOG.debug('Finished HTTP %s with args %s %s, response is '
+                  '%d', method, args or '', kwargs, response.status_code)
+
+        # If not 404 or last attempt, break out of retry loop
+        if response.status_code != 404 or attempt == max_404_retries:
+            break
+
+        LOG.warning('BMC returned 404 for HTTP %(method)s request to '
+                    '%(path)s - this may be a transient condition while '
+                    'BMC creates the job. Retrying in %(delay)d seconds '
+                    '(attempt %(current)d of %(total)d)',
+                    {'method': method.upper(),
+                     'path': args[0] if args else 'unknown',
+                     'delay': retry_404_delay,
+                     'current': attempt + 1,
+                     'total': max_404_retries})
+        time.sleep(retry_404_delay)
 
     location = None
     while response.status_code == 202:
