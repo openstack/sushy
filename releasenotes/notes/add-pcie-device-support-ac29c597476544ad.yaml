@@ -1,0 +1,10 @@
+---
+features:
+  - |
+    Adds comprehensive PCIeDevice resource support implementing the complete
+    Redfish PCIeDevice v1.19.0 specification. The new pcie_devices property
+    on System objects provides access to PCIe device collections with support
+    for both standard Redfish collections and embedded PCIeDevices (Dell iDRAC).
+
+    Features include full schema compliance, PCIe interface information and
+    slot details.

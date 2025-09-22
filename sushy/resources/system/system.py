@@ -32,6 +32,7 @@ from sushy.resources import settings
 from sushy.resources.system import bios
 from sushy.resources.system import constants as sys_cons
 from sushy.resources.system import ethernet_interface
+from sushy.resources.system import pcie_device
 from sushy.resources.system import processor
 from sushy.resources.system import secure_boot
 from sushy.resources.system import simple_storage as sys_simple_storage
@@ -673,6 +674,32 @@ class System(base.ResourceBase):
             self._conn, utils.get_sub_resource_path_by(self, 'VirtualMedia'),
             redfish_version=self.redfish_version, registries=self.registries,
             root=self.root)
+
+    @property
+    @utils.cache_it
+    def pcie_devices(self):
+        """Property to reference PCIeDeviceCollection instance"""
+        try:
+            pcie_path = utils.get_sub_resource_path_by(self, "PCIeDevices")
+            return pcie_device.PCIeDeviceCollection(
+                self._conn, pcie_path,
+                redfish_version=self.redfish_version,
+                registries=self.registries, root=self.root)
+        except exceptions.MissingAttributeError:
+            # Check if PCIeDevices is embedded in System JSON
+            if (hasattr(self, 'json') and self.json
+                    and 'PCIeDevices' in self.json):
+                pcie_devices_data = self.json['PCIeDevices']
+                if isinstance(pcie_devices_data, list) and pcie_devices_data:
+                    return pcie_device.PCIeDeviceCollection(
+                        self._conn, "/embedded",
+                        redfish_version=self.redfish_version,
+                        registries=self.registries, root=self.root,
+                        embedded_data=pcie_devices_data)
+            return pcie_device.PCIeDeviceCollection(
+                self._conn, "/empty",
+                redfish_version=self.redfish_version,
+                registries=self.registries, root=self.root)
 
 
 class SystemCollection(base.ResourceCollectionBase):
