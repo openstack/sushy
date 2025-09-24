@@ -16,6 +16,7 @@ import logging
 import time
 
 from dateutil import parser
+
 import sushy
 
 LOG = logging.getLogger(__name__)

@@ -16,10 +16,9 @@ import logging
 import secrets
 
 from sushy import exceptions
+from sushy.oem.dell.resources.manager import constants as mgr_cons
 from sushy.resources import base
 from sushy.resources import common
-
-from sushy.oem.dell.resources.manager import constants as mgr_cons
 
 LOG = logging.getLogger(__name__)
 

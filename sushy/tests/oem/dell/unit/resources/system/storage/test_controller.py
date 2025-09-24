@@ -16,11 +16,11 @@ import json
 from unittest import mock
 
 from oslotest.base import BaseTestCase
-import sushy
-from sushy.resources.system.storage import controller as sushy_constroller
 
+import sushy
 from sushy.oem.dell.resources.system.storage import constants as ctrl_cons
 from sushy.oem.dell.resources.system.storage import controller as oem_ctrl
+from sushy.resources.system.storage import controller as sushy_constroller
 
 
 class ControllerTestCase(BaseTestCase):

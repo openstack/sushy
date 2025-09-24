@@ -14,11 +14,10 @@
 
 import sushy
 from sushy import exceptions
-from sushy.resources.oem import base as oem_base
-from sushy import utils as sushy_utils
-
 from sushy.oem.dell.resources.system import constants as sys_cons
 from sushy.oem.dell.resources.system import raid_service
+from sushy.resources.oem import base as oem_base
+from sushy import utils as sushy_utils
 
 
 def _filter_disks_not_in_mode(controller_to_disks, mode):

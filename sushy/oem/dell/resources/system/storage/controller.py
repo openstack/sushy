@@ -13,10 +13,9 @@
 # under the License.
 
 import sushy
+from sushy.oem.dell.resources.system.storage import constants as s_cons
 from sushy.resources import base
 from sushy.resources.oem import base as oem_base
-
-from sushy.oem.dell.resources.system.storage import constants as s_cons
 
 
 class DellStorageController(base.CompositeField):

@@ -17,8 +17,8 @@
 from unittest import mock
 
 from oslotest.base import BaseTestCase
-import sushy
 
+import sushy
 from sushy.oem.dell.asynchronous import http_call
 
 

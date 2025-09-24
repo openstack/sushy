@@ -14,7 +14,6 @@ import os
 import sys
 
 import sushy
-
 from sushy.oem.dell import utils
 
 USERNAME = 'root'
