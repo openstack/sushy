@@ -1,0 +1,44 @@
+{
+    "@odata.context": "/redfish/v1/$metadata#PCIeFunction.PCIeFunction",
+    "@odata.etag": "\"1756839817\"",
+    "@odata.type": "#PCIeFunction.v1_5_0.PCIeFunction",
+    "@odata.id": "/redfish/v1/Chassis/System.Embedded.1/PCIeDevices/196-0/PCIeFunctions/196-0-1",
+    "ClassCode": "0x000002",
+    "Description": "BCM957414A4142CC 10Gb/25Gb Ethernet PCIe",
+    "DeviceClass": "NetworkController",
+    "DeviceId": "0x16d7",
+    "Enabled": true,
+    "FunctionId": 1,
+    "FunctionType": "Physical",
+    "FunctionProtocol": "PCIe",
+    "Id": "196-0-1",
+    "Links": {
+        "StorageControllers": [],
+        "StorageControllers@odata.count": 0,
+        "Drives": [],
+        "Drives@odata.count": 0,
+        "EthernetInterfaces": [
+            {
+                "@odata.id": "/redfish/v1/Systems/System.Embedded.1/EthernetInterfaces/NIC.Slot.1-2"
+            }
+        ],
+        "EthernetInterfaces@odata.count": 1,
+        "PCIeDevice": {
+            "@odata.id": "/redfish/v1/Chassis/System.Embedded.1/PCIeDevices/196-0"
+        }
+    },
+    "Name": "BCM957414A4142CC 10Gb/25Gb Ethernet PCIe",
+    "RevisionId": "0x01",
+    "Status": {
+        "State": "Enabled",
+        "Health": "OK",
+        "HealthRollup": "OK"
+    },
+    "SubsystemId": "0x1402",
+    "SubsystemVendorId": "0x14e4",
+    "VendorId": "0x14e4",
+    "BusNumber": "0x03",
+    "DeviceNumber": "0x00",
+    "FunctionNumber": "0x01",
+    "SegmentNumber": "0x0000"
+}

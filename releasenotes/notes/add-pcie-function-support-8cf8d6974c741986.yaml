@@ -1,0 +1,22 @@
+---
+features:
+  - |
+    Adds PCIe function support to Sushy with complete Redfish
+    PCIeFunction v1.6.0 specification compliance. This extends the existing
+    PCIe device support with detailed function-level information.
+
+    Features include:
+
+    * PCIeFunction resource with complete field specification including
+      function ID, type, protocol, device class, vendor/device IDs, and
+      PCI addressing fields
+    * PCIeFunctionCollection with caching and error handling capabilities
+    * Integration with existing PCIeDevice.pcie_functions property
+    * Handling of missing PCIeFunctions attribute for BMCs that
+      don't support function-level details
+    * Test coverage validated with real Dell PowerEdge hardware
+      via Ironic integration
+
+    This enhancement provides users with detailed insights into individual
+    PCIe functions within multi-function devices, enabling better hardware
+    inventory management and troubleshooting capabilities.
