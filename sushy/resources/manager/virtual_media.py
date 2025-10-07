@@ -140,8 +140,37 @@ class VirtualMedia(base.ResourceBase):
 
         Try to determine if it happened due to missing Credentials
         """
-        if (error.code.endswith('GeneralError')
-                and 'UserName' in error.detail):
+
+        # Accept broader variants seen on NVIDIA DGX where "code" may be absent
+        try:
+            body = error.response.json()
+        except Exception:
+            body = {}
+
+        # Structured path: @Message.ExtendedInfo entries
+        ext = (body.get('error', {}) or {}).get('@Message.ExtendedInfo',
+                                                []) or []
+        for m in ext:
+            mid = (m.get('MessageId') or '')
+            msg = (m.get('Message') or '')
+            if mid.endswith('ActionParameterMissing') and (
+                'UserName' in msg or 'Password' in msg):
+                return True
+
+        # Legacy/structured: error.code + message mentions UserName/Password
+        err_obj = (body.get('error') or {})
+        code = (err_obj.get('code') or '')
+        msg = (err_obj.get('message') or '')
+        if code.endswith('GeneralError') and (
+            'UserName' in msg or 'Password' in msg
+                or 'parameter missing' in msg):
+            return True
+
+        # Text fallback: common strings observed in the field
+        raw_msg = ((body.get('error') or {}).get('message') or '') + ' ' + (
+            error.detail or '')
+        if ('requires the parameter UserName' in raw_msg
+                or 'requires the parameter Password' in raw_msg):
             return True
         return False
 
