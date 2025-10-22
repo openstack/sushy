@@ -11,9 +11,9 @@
 #    WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
 #    License for the specific language governing permissions and limitations
 #    under the License.
-
 from http import client as http_client
 import json
+import types
 from unittest import mock
 
 import sushy
@@ -22,6 +22,18 @@ from sushy.resources.certificateservice import certificate
 from sushy.resources.manager import constants as mgr_cons
 from sushy.resources.manager import virtual_media
 from sushy.tests.unit import base
+
+
+class _FakeHTTPError(Exception):
+    """Mimics the object passed to is_credentials_required()."""
+
+    def __init__(self, status=400, json_body=None, detail=''):
+        super().__init__(detail)
+        self.detail = detail
+        self.response = types.SimpleNamespace(
+            status_code=status,
+            json=lambda: json_body if json_body is not None else {}
+        )
 
 
 class VirtualMediaTestCase(base.TestCase):
@@ -383,3 +395,80 @@ class VirtualMediaTestCase(base.TestCase):
             redfish_version='1.0.2',
             registries=self.sys_virtual_media.registries,
             root=self.sys_virtual_media.root)
+
+    def test_detects_extended_info_username(self):
+        body = {
+            "error": {
+                "@Message.ExtendedInfo": [{
+                    "MessageId": "Base.1.12.ActionParameterMissing",
+                    "Message": "The action requires the parameter UserName to "
+                               "be present."
+                }]
+            }
+        }
+        err = _FakeHTTPError(json_body=body)
+        self.assertTrue(self.sys_virtual_media.is_credentials_required(err))
+
+    def test_detects_extended_info_password(self):
+        body = {
+            "error": {
+                "@Message.ExtendedInfo": [{
+                    "MessageId": "Base.1.15.ActionParameterMissing",
+                    "Message": "The action requires the parameter Password to "
+                               "be present."
+                }]
+            }
+        }
+        err = _FakeHTTPError(json_body=body)
+        self.assertTrue(self.sys_virtual_media.is_credentials_required(err))
+
+    def test_detects_plain_message_when_code_absent(self):
+        body = {"error": {
+            "message": "InsertMedia requires the parameter UserName"}}
+        err = _FakeHTTPError(json_body=body, detail="")
+        self.assertTrue(self.sys_virtual_media.is_credentials_required(err))
+
+    def test_detects_detail_fallback(self):
+        err = _FakeHTTPError(json_body={},
+                             detail="requires the parameter Password")
+        self.assertTrue(self.sys_virtual_media.is_credentials_required(err))
+
+    def test_preserves_legacy_code_based_detection(self):
+        body = {
+            "error": {
+                "code": "Base.1.10.GeneralError",
+                "message": "Action parameter missing: UserName"
+            }
+        }
+        err = _FakeHTTPError(json_body=body)
+        self.assertTrue(self.sys_virtual_media.is_credentials_required(err))
+
+    def test_no_trigger_on_unrelated_parameter(self):
+        body = {
+            "error": {
+                "@Message.ExtendedInfo": [{
+                    "MessageId": "Base.1.12.ActionParameterMissing",
+                    "Message": "The action requires the parameter Timeout to "
+                               "be present."
+                }]
+            }
+        }
+        err = _FakeHTTPError(json_body=body)
+        self.assertFalse(self.sys_virtual_media.is_credentials_required(err))
+
+    def test_no_trigger_on_unrelated_error(self):
+        body = {
+            "error": {
+                "@Message.ExtendedInfo": [{
+                    "MessageId": "Base.1.12.ResourceMissingAtURI",
+                    "Message": "Resource missing"
+                }]
+            }
+        }
+        err = _FakeHTTPError(json_body=body)
+        self.assertFalse(self.sys_virtual_media.is_credentials_required(err))
+
+    def test_no_trigger_when_no_clues(self):
+        err = _FakeHTTPError(json_body={"error": {"message": "Bad Request"}},
+                             detail="")
+        self.assertFalse(self.sys_virtual_media.is_credentials_required(err))
