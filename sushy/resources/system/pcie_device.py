@@ -13,10 +13,13 @@
 # This is referred from Redfish standard schema.
 # https://redfish.dmtf.org/schemas/v1/PCIeDevice.v1_19_0.json
 # Per DMTF DSP0268_2025.2 Section 6.96 PCIeDevice 1.19.0
+# Per DMTF DSP0268_2025.2 Section 6.97 PCIeFunction 1.6.0
 import logging
 
+from sushy import exceptions
 from sushy.resources import base
 from sushy.resources import common
+from sushy.resources.system import constants as sys_cons
 from sushy import utils
 
 LOG = logging.getLogger(__name__)
@@ -50,14 +53,99 @@ class SlotField(base.CompositeField):
     pcie_type = base.Field('PCIeType')
     """The PCIe specification this slot supports."""
 
-    slot_type = base.Field('SlotType')
+    slot_type = base.MappedField('SlotType', sys_cons.SlotType)
     """The PCIe slot type."""
 
     hot_pluggable = base.Field('HotPluggable', adapter=bool)
     """An indication of whether this PCIe slot supports hotplug."""
 
-    lane_splitting = base.Field('LaneSplitting')
+    lane_splitting = base.MappedField('LaneSplitting',
+                                      sys_cons.LaneSplittingType)
     """The lane splitting strategy used in the PCIe slot."""
+
+
+class PCIeFunction(base.ResourceBase):
+    """Represents a PCIe function associated within a PCIe device."""
+
+    identity = base.Field('Id', required=True)
+    """The PCIe function identity string"""
+
+    name = base.Field('Name')
+    """The PCIe function name"""
+
+    description = base.Field('Description')
+    """The PCIe function description"""
+
+    function_id = base.Field('FunctionId', adapter=utils.int_or_none)
+    """The PCIe function number within a given PCIe device."""
+
+    function_type = base.MappedField('FunctionType', sys_cons.FunctionType)
+    """The type of the PCIe function (Physical or Virtual)."""
+
+    function_protocol = base.MappedField('FunctionProtocol',
+                                         sys_cons.FunctionProtocol)
+    """The PCIe function protocol (PCIe or CXL)."""
+
+    device_class = base.MappedField('DeviceClass', sys_cons.DeviceClass)
+    """The class for this PCIe function
+    (NetworkController, MassStorageController, etc.)."""
+
+    device_id = base.Field('DeviceId')
+    """The Device ID of this PCIe function."""
+
+    vendor_id = base.Field('VendorId')
+    """The Vendor ID of this PCIe function."""
+
+    subsystem_id = base.Field('SubsystemId')
+    """The Subsystem ID of this PCIe function."""
+
+    subsystem_vendor_id = base.Field('SubsystemVendorId')
+    """The Subsystem Vendor ID of this PCIe function."""
+
+    revision_id = base.Field('RevisionId')
+    """The Revision ID of this PCIe function."""
+
+    class_code = base.Field('ClassCode')
+    """The Class Code of this PCIe function."""
+
+    bus_number = base.Field('BusNumber')
+    """The bus number of this PCIe function."""
+
+    device_number = base.Field('DeviceNumber')
+    """The device number of this PCIe function."""
+
+    function_number = base.Field('FunctionNumber')
+    """The function number of this PCIe function."""
+
+    segment_number = base.Field('SegmentNumber')
+    """The segment number of this PCIe function."""
+
+    enabled = base.Field('Enabled', adapter=bool)
+    """An indication of whether this PCIe device function is enabled."""
+
+    status = common.StatusField('Status')
+    """The status and health of the resource and its subordinate resources."""
+
+    links = base.Field('Links')
+    """Links to related resources."""
+
+
+class PCIeFunctionCollection(base.ResourceCollectionBase):
+    """Represents a collection of PCIe functions associated with a device."""
+
+    @property
+    def _resource_type(self):
+        return PCIeFunction
+
+    @property
+    @utils.cache_it
+    def function_count(self):
+        """The number of PCIe functions in the collection.
+
+        Returns the cached value until it (or its parent resource)
+        is refreshed.
+        """
+        return len(self.get_members())
 
 
 class PCIeDevice(base.ResourceBase):
@@ -87,7 +175,7 @@ class PCIeDevice(base.ResourceBase):
     sku = base.Field('SKU')
     """The stock-keeping unit for this PCIe device."""
 
-    device_type = base.Field('DeviceType')
+    device_type = base.MappedField('DeviceType', sys_cons.PCIeDeviceType)
     """The device type for this PCIe device."""
 
     firmware_version = base.Field('FirmwareVersion')
@@ -107,6 +195,30 @@ class PCIeDevice(base.ResourceBase):
 
     links = base.Field('Links')
     """Links to related resources."""
+
+    @property
+    @utils.cache_it
+    def pcie_functions(self):
+        """Property to reference PCIeFunctionCollection instance
+
+        Returns a PCIeFunctionCollection representing the PCIe functions
+        associated with this PCIe device.
+
+        :raises: MissingAttributeError if PCIeFunctions is not supported
+        :returns: PCIeFunctionCollection instance
+        """
+        try:
+            return PCIeFunctionCollection(
+                self._conn,
+                utils.get_sub_resource_path_by(self, "PCIeFunctions"),
+                redfish_version=self.redfish_version,
+                registries=self.registries, root=self.root)
+        except exceptions.MissingAttributeError:
+            # Return empty collection if PCIeFunctions is not supported
+            return PCIeFunctionCollection(
+                self._conn, "/empty",
+                redfish_version=self.redfish_version,
+                registries=self.registries, root=self.root)
 
 
 class PCIeDeviceCollection(base.ResourceCollectionBase):

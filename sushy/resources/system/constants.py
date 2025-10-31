@@ -460,3 +460,164 @@ SECURE_BOOT_DEFAULT_RECOVERY_KEYS_DATABASE = \
     SecureBootDatabaseId.DEFAULT_RECOVERY_KEYS_DATABASE
 SECURE_BOOT_DEFAULT_TIMESTAMP_DATABASE = \
     SecureBootDatabaseId.DEFAULT_TIMESTAMP_DATABASE
+
+
+# PCIe Function related constants
+# Values come from the Redfish PCIeFunction json-schema 1.6.0:
+# https://redfish.dmtf.org/schemas/v1/PCIeFunction.v1_6_0.json
+
+class FunctionType(enum.Enum):
+    """PCIe function type constants"""
+
+    PHYSICAL = 'Physical'
+    """A physical PCIe function."""
+
+    VIRTUAL = 'Virtual'
+    """A virtual PCIe function."""
+
+
+class FunctionProtocol(enum.Enum):
+    """PCIe function protocol constants"""
+
+    PCIE = 'PCIe'
+    """A standard PCIe function."""
+
+    CXL = 'CXL'
+    """A PCIe function supporting CXL extensions."""
+
+
+class DeviceClass(enum.Enum):
+    """PCIe device class constants"""
+
+    UNCLASSIFIED_DEVICE = 'UnclassifiedDevice'
+    """An unclassified device."""
+
+    MASS_STORAGE_CONTROLLER = 'MassStorageController'
+    """A mass storage controller."""
+
+    NETWORK_CONTROLLER = 'NetworkController'
+    """A network controller."""
+
+    DISPLAY_CONTROLLER = 'DisplayController'
+    """A display controller."""
+
+    MULTIMEDIA_CONTROLLER = 'MultimediaController'
+    """A multimedia controller."""
+
+    MEMORY_CONTROLLER = 'MemoryController'
+    """A memory controller."""
+
+    BRIDGE = 'Bridge'
+    """A bridge."""
+
+    COMMUNICATION_CONTROLLER = 'CommunicationController'
+    """A communication controller."""
+
+    GENERIC_SYSTEM_PERIPHERAL = 'GenericSystemPeripheral'
+    """A generic system peripheral."""
+
+    INPUT_DEVICE_CONTROLLER = 'InputDeviceController'
+    """An input device controller."""
+
+    DOCKING_STATION = 'DockingStation'
+    """A docking station."""
+
+    PROCESSOR = 'Processor'
+    """A processor."""
+
+    SERIAL_BUS_CONTROLLER = 'SerialBusController'
+    """A serial bus controller."""
+
+    WIRELESS_CONTROLLER = 'WirelessController'
+    """A wireless controller."""
+
+    INTELLIGENT_CONTROLLER = 'IntelligentController'
+    """An intelligent controller."""
+
+    SATELLITE_COMMUNICATIONS_CONTROLLER = 'SatelliteCommunicationsController'
+    """A satellite communications controller."""
+
+    ENCRYPTION_CONTROLLER = 'EncryptionController'
+    """An encryption controller."""
+
+    SIGNAL_PROCESSING_CONTROLLER = 'SignalProcessingController'
+    """A signal processing controller."""
+
+    PROCESSING_ACCELERATORS = 'ProcessingAccelerators'
+    """A processing accelerator."""
+
+    NON_ESSENTIAL_INSTRUMENTATION = 'NonEssentialInstrumentation'
+    """A non-essential instrumentation."""
+
+    COPROCESSOR = 'Coprocessor'
+    """A coprocessor."""
+
+    UNASSIGNED_CLASS = 'UnassignedClass'
+    """An unassigned class."""
+
+    OTHER = 'Other'
+    """Other class of devices."""
+
+
+class PCIeDeviceType(enum.Enum):
+    """PCIe device type constants"""
+
+    SINGLE_FUNCTION = 'SingleFunction'
+    """A single-function PCIe device."""
+
+    MULTI_FUNCTION = 'MultiFunction'
+    """A multi-function PCIe device."""
+
+    SIMULATED = 'Simulated'
+    """A PCIe device that is not currently physically present, but is being
+    simulated by the PCIe infrastructure."""
+
+    RETIMER = 'Retimer'
+    """A PCIe retimer device."""
+
+
+class SlotType(enum.Enum):
+    """PCIe slot type constants"""
+
+    FULL_LENGTH = 'FullLength'
+    """Full-Length PCIe slot."""
+
+    HALF_LENGTH = 'HalfLength'
+    """Half-Length PCIe slot."""
+
+    LOW_PROFILE = 'LowProfile'
+    """Low-Profile or Slim PCIe slot."""
+
+    MINI = 'Mini'
+    """Mini PCIe slot."""
+
+    M2 = 'M2'
+    """PCIe M.2 slot."""
+
+    OEM = 'OEM'
+    """An OEM-specific slot."""
+
+    OCP3_SMALL = 'OCP3Small'
+    """Open Compute Project 3.0 small form factor slot."""
+
+    OCP3_LARGE = 'OCP3Large'
+    """Open Compute Project 3.0 large form factor slot."""
+
+    U2 = 'U2'
+    """U.2 / SFF-8639 slot or bay."""
+
+    EDSFF = 'EDSFF'
+    """EDSFF slot."""
+
+
+class LaneSplittingType(enum.Enum):
+    """PCIe lane splitting type constants"""
+
+    NONE = 'None'
+    """The slot has no lane splitting."""
+
+    BRIDGED = 'Bridged'
+    """The slot has a bridge to share the lanes with associated devices."""
+
+    BIFURCATED = 'Bifurcated'
+    """The slot is bifurcated to split the lanes with associated devices."""
