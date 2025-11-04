@@ -37,7 +37,11 @@ class DellStorageControllerExtension(oem_base.OEMResourceBase):
         :returns: TaskMonitor if controller mode changes applied and need to
             reboot, otherwise None
         """
-        controller_mode = self.dell_storage_controller.controller_mode
+        # Some controllers do not have controller_mode
+        try:
+            controller_mode = self.dell_storage_controller.controller_mode
+        except AttributeError:
+            return None
 
         # BOSS will have this empty, PERC will have something assigned
         if controller_mode and controller_mode != s_cons.ControllerMode.RAID:
