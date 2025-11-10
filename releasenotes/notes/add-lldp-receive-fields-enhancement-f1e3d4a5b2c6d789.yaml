@@ -1,0 +1,22 @@
+---
+features:
+  - |
+    Enhances the existing LLDPReceiveField class by adding new LLDP receive data
+    fields as specified in Redfish Port Schema v1.12.0. The existing class already
+    contained chassis_id and port_id fields, and this enhancement adds 9 additional
+    LLDP receive properties.
+
+    New LLDP receive fields added:
+    - chassis_id_subtype: IEEE 802 chassis ID subtype identification
+    - port_id_subtype: IEEE 802 port ID subtype with MAC address handling
+    - system_name: System name received from remote link partner
+    - system_description: System description from remote link partner
+    - system_capabilities: Network device capabilities mapping
+    - management_address_ipv4: IPv4 management address
+    - management_address_ipv6: IPv6 management address
+    - management_address_mac: MAC management address
+    - management_vlan_id: Management VLAN ID configuration (0-4095)
+
+    This enhancement provides LLDP receive information through
+    the EthernetField.lldp_receive property, enabling better network topology
+    discovery.

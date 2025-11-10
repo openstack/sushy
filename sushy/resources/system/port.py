@@ -10,7 +10,7 @@
 # License for the specific language governing permissions and limitations
 # under the License.
 # This is referred from Redfish standard schema.
-# https://redfish.dmtf.org/schemas/v1/Port.v1_8_0.json
+# https://redfish.dmtf.org/schemas/v1/Port.v1_12_0.json
 
 from sushy.resources import base
 from sushy.resources import common
@@ -18,11 +18,55 @@ from sushy.resources.system.network import constants
 
 
 class LLDPReceiveField(base.CompositeField):
+    """LLDP data being received on this link.
+
+    Based on DMTF Redfish Port Schema v1.12.0
+    https://redfish.dmtf.org/schemas/v1/Port.v1_12_0.json#/definitions/LLDPReceive
+    """
+
     chassis_id = base.Field("ChassisId")
     """chassis ID received from the remote partner across this link."""
 
+    chassis_id_subtype = base.MappedField("ChassisIdSubtype",
+                                          constants.IEEE802IdSubtype)
+    """The type of identifier used for the chassis ID"""
+
     port_id = base.Field("PortId")
     """A colon delimited string of hexadecimal octets identifying a port."""
+
+    port_id_subtype = base.MappedField("PortIdSubtype",
+                                       constants.IEEE802IdSubtype)
+    """The port ID subtype received from the remote partner"""
+
+    # TLV Type 3 - Time To Live not in current schema
+
+    # TLV Type 4 - Port Description ,not in schema
+
+    # TLV Type 5 - System Name
+    system_name = base.Field("SystemName")
+    """The system name received from the remote partner across this link."""
+
+    # TLV Type 6 - System Description
+    system_description = base.Field("SystemDescription")
+    """The system description received from the remote partner."""
+
+    # TLV Type 7 - System Capabilities
+    system_capabilities = base.MappedListField(
+        "SystemCapabilities", constants.LLDPSystemCapabilities)
+    """The system capabilities received from the remote partner."""
+
+    # TLV Type 8 - Management Addresses
+    management_address_ipv4 = base.Field("ManagementAddressIPv4")
+    """The IPv4 management address received from the remote partner."""
+
+    management_address_ipv6 = base.Field("ManagementAddressIPv6")
+    """The IPv6 management address received from the remote partner."""
+
+    management_address_mac = base.Field("ManagementAddressMAC")
+    """The management MAC address received from the remote partner."""
+
+    management_vlan_id = base.Field("ManagementVlanId", adapter=int)
+    """The management VLAN ID received from the remote partner (0-4095)."""
 
 
 class EthernetField(base.CompositeField):

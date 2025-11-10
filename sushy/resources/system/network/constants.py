@@ -137,3 +137,71 @@ class PortLinkStatus(enum.Enum):
 
     TRAINING = 'Training'
     """This physical link on this interface is training."""
+
+
+class IEEE802IdSubtype(enum.Enum):
+    """IEEE 802.1AB ID Subtypes for Chassis ID and Port ID.
+
+    Based on IEEE 802.1AB-2009 and DMTF Redfish Port Schema v1.12.0
+    """
+
+    CHASSIS_COMP = 'ChassisComp'
+    """Chassis component, based on entPhysicalAlias in RFC4133."""
+
+    IF_ALIAS = 'IfAlias'
+    """Interface alias, based on the ifAlias MIB object."""
+
+    PORT_COMP = 'PortComp'
+    """Port component, based on entPhysicalAlias in RFC4133."""
+
+    MAC_ADDR = 'MacAddr'
+    """MAC address, based on agent-detected unicast source (IEEE 802)."""
+
+    NETWORK_ADDR = 'NetworkAddr'
+    """Network address, based on agent-detected network address."""
+
+    IF_NAME = 'IfName'
+    """Interface name, based on the ifName MIB object."""
+
+    AGENT_ID = 'AgentId'
+    """Agent circuit ID, based on agent-local identifier (RFC3046)."""
+
+    LOCAL_ASSIGN = 'LocalAssign'
+    """Locally assigned, based on alphanumeric value."""
+
+    NOT_TRANSMITTED = 'NotTransmitted'
+    """No data to be sent to/received from remote partner."""
+
+
+class LLDPSystemCapabilities(enum.Enum):
+    """LLDP System Capabilities.
+
+    Based on IEEE 802.1AB and DMTF Redfish Port Schema v1.12.0
+    """
+
+    NONE = 'None'
+    """System capabilities are transmitted, but no capabilities are set."""
+
+    BRIDGE = 'Bridge'
+    """'bridge' capability."""
+
+    DOCSIS_CABLE_DEVICE = 'DOCSISCableDevice'
+    """'DOCSIS cable device' capability."""
+
+    OTHER = 'Other'
+    """'other' capability."""
+
+    REPEATER = 'Repeater'
+    """'repeater' capability."""
+
+    ROUTER = 'Router'
+    """'router' capability."""
+
+    STATION = 'Station'
+    """'station' capability."""
+
+    TELEPHONE = 'Telephone'
+    """'telephone' capability."""
+
+    WLAN_ACCESS_POINT = 'WLANAccessPoint'
+    """'WLAN access point' capability."""
