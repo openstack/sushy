@@ -140,8 +140,15 @@ class Chassis(base.ResourceBase):
 
     _actions = ActionsField('Actions')
 
+    # Optional fields for expanded chassis data
+    power_data = base.Field('Power')
+    """Raw power data when chassis is retrieved with $expand"""
+
+    thermal_data = base.Field('Thermal')
+    """Raw thermal data when chassis is retrieved with $expand"""
+
     def __init__(self, connector, identity, redfish_version=None,
-                 registries=None, root=None):
+                 registries=None, root=None, json_doc=None):
         """A class representing a Chassis
 
         :param connector: A Connector instance
@@ -151,10 +158,27 @@ class Chassis(base.ResourceBase):
         :param registries: Dict of Redfish Message Registry objects to be
             used in any resource that needs registries to parse messages
         :param root: Sushy root object. Empty for Sushy root itself.
+        :param json_doc: parsed JSON document in form of Python types.
         """
         super().__init__(
             connector, identity, redfish_version=redfish_version,
-            registries=registries, root=root)
+            registries=registries, root=root, json_doc=json_doc)
+
+    def _get_expanded_data(self, field_name):
+        """Get expanded data for a field, returning None if only a reference.
+
+        :param field_name: Name of the field to get expanded data for
+        :returns: Expanded data dict or None if unexpanded/reference-only
+        """
+        expanded_data = self._json.get(field_name) if self._json else None
+
+        # If expanded data only contains a reference (@odata.id),
+        # treat as unexpanded
+        if (expanded_data and isinstance(expanded_data, dict)
+                and list(expanded_data.keys()) == ['@odata.id']):
+            return None
+
+        return expanded_data
 
     def _get_reset_action_element(self):
         reset_action = self._actions.reset
@@ -274,7 +298,9 @@ class Chassis(base.ResourceBase):
             self._conn,
             utils.get_sub_resource_path_by(self, 'Power'),
             redfish_version=self.redfish_version, registries=self.registries,
-            root=self.root)
+            root=self.root,
+            json_doc=self._get_expanded_data('Power')
+        )
 
     @property
     @utils.cache_it
@@ -289,7 +315,9 @@ class Chassis(base.ResourceBase):
             self._conn,
             utils.get_sub_resource_path_by(self, 'Thermal'),
             redfish_version=self.redfish_version, registries=self.registries,
-            root=self.root)
+            root=self.root,
+            json_doc=self._get_expanded_data('Thermal')
+        )
 
     @property
     @utils.cache_it

@@ -1,0 +1,62 @@
+{
+    "@odata.type": "#StorageCollection.StorageCollection",
+    "@odata.id": "/redfish/v1/Systems/1/Storage",
+    "Name": "Storage Collection",
+    "Members@odata.count": 2,
+    "Members": [
+        {
+            "@odata.id": "/redfish/v1/Systems/1/Storage/RAID-1",
+            "@odata.type": "#Storage.v1_16_0.Storage",
+            "Id": "RAID-1",
+            "Name": "RAID Controller",
+            "Status": {"Health": "OK", "State": "Enabled"},
+            "StorageControllers": [
+                {
+                    "MemberId": "0",
+                    "Name": "LSI MegaRAID SAS 9361-8i",
+                    "Manufacturer": "LSI",
+                    "Model": "MegaRAID SAS 9361-8i",
+                    "SerialNumber": "SV12345678",
+                    "PartNumber": "LSI00417",
+                    "Status": {"Health": "OK", "State": "Enabled"},
+                    "SupportedRAIDTypes": ["RAID0", "RAID1", "RAID5", "RAID6", "RAID10"],
+                    "SpeedGbps": 12.0
+                }
+            ],
+            "Drives": [
+                {"@odata.id": "/redfish/v1/Systems/1/Storage/RAID-1/Drives/Drive1"},
+                {"@odata.id": "/redfish/v1/Systems/1/Storage/RAID-1/Drives/Drive2"}
+            ],
+            "Volumes": {
+                "@odata.id": "/redfish/v1/Systems/1/Storage/RAID-1/Volumes"
+            }
+        },
+        {
+            "@odata.id": "/redfish/v1/Systems/1/Storage/NVMe-1",
+            "@odata.type": "#Storage.v1_16_0.Storage",
+            "Id": "NVMe-1",
+            "Name": "NVMe Storage Controller",
+            "Status": {"Health": "OK", "State": "Enabled"},
+            "StorageControllers": [
+                {
+                    "MemberId": "0",
+                    "Name": "Samsung SSD 980 PRO",
+                    "Manufacturer": "Samsung",
+                    "Model": "SSD 980 PRO",
+                    "SerialNumber": "S6J9NX0T123456A",
+                    "PartNumber": "MZ-V8P1T0BW",
+                    "Status": {"Health": "OK", "State": "Enabled"},
+                    "SupportedRAIDTypes": [],
+                    "SpeedGbps": 32.0
+                }
+            ],
+            "Drives": [
+                {"@odata.id": "/redfish/v1/Systems/1/Storage/NVMe-1/Drives/Drive1"}
+            ],
+            "Volumes": {
+                "@odata.id": "/redfish/v1/Systems/1/Storage/NVMe-1/Volumes"
+            }
+        }
+    ],
+    "@odata.context": "/redfish/v1/$metadata#StorageCollection.StorageCollection"
+}

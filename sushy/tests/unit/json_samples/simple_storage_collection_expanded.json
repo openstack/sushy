@@ -1,0 +1,40 @@
+{
+    "@odata.type": "#SimpleStorageCollection.SimpleStorageCollection",
+    "@odata.id": "/redfish/v1/Systems/1/SimpleStorage",
+    "Name": "Simple Storage Collection",
+    "Members@odata.count": 2,
+    "Members": [
+        {
+            "@odata.id": "/redfish/v1/Systems/1/SimpleStorage/RAID-1",
+            "@odata.type": "#SimpleStorage.v1_3_2.SimpleStorage",
+            "Id": "RAID-1",
+            "Name": "RAID Controller",
+            "Status": {"Health": "OK", "State": "Enabled"},
+            "Devices": [
+                {
+                    "Name": "Drive 1",
+                    "Model": "SSD-500GB",
+                    "CapacityBytes": 500000000000,
+                    "Status": {"Health": "OK", "State": "Enabled"}
+                },
+                {
+                    "Name": "Drive 2",
+                    "Model": "SSD-1TB",
+                    "CapacityBytes": 1000000000000,
+                    "Status": {"Health": "OK", "State": "Enabled"}
+                }
+            ],
+            "Devices@odata.count": 2
+        },
+        {
+            "@odata.id": "/redfish/v1/Systems/1/SimpleStorage/AHCI-1",
+            "@odata.type": "#SimpleStorage.v1_3_2.SimpleStorage",
+            "Id": "AHCI-1",
+            "Name": "AHCI Controller",
+            "Status": {"Health": "OK", "State": "Enabled"},
+            "Devices": [],
+            "Devices@odata.count": 0
+        }
+    ],
+    "@odata.context": "/redfish/v1/$metadata#SimpleStorageCollection.SimpleStorageCollection"
+}

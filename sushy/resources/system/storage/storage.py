@@ -163,6 +163,24 @@ class StorageCollection(base.ResourceCollectionBase):
     def _resource_type(self):
         return Storage
 
+    @utils.cache_it
+    def get_members(self):
+        """Return Storage objects with expanded JSON data when available."""
+        storage_members = []
+        for member in self._json['Members']:
+            # If data only contains a reference (@odata.id),
+            # treat as unexpanded
+            if (isinstance(member, dict)
+                    and list(member.keys()) == ['@odata.id']):
+                return super().get_members()
+
+            storage = Storage(
+                self._conn, member['@odata.id'],
+                json_doc=member, redfish_version=self.redfish_version,
+                registries=self.registries, root=self.root)
+            storage_members.append(storage)
+        return storage_members
+
     @property
     @utils.cache_it
     def drives_sizes_bytes(self):

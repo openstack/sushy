@@ -111,6 +111,9 @@
     "SimpleStorage": {
         "@odata.id": "/redfish/v1/Systems/437XR1138R2/SimpleStorage"
     },
+    "Storage": {
+        "@odata.id": "/redfish/v1/Systems/437XR1138R2/Storage"
+    },
     "LogServices": {
         "@odata.id": "/redfish/v1/Systems/437XR1138R2/LogServices"
     },

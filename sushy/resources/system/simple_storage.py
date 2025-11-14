@@ -30,6 +30,9 @@ class DeviceListField(base.ListField):
     name = base.Field('Name', required=True)
     """The name of the storage device"""
 
+    model = base.Field('Model')
+    """The model of the storage device"""
+
     capacity_bytes = base.Field('CapacityBytes', adapter=utils.int_or_none)
     """The size of the storage device."""
 
@@ -61,6 +64,24 @@ class SimpleStorageCollection(base.ResourceCollectionBase):
     @property
     def _resource_type(self):
         return SimpleStorage
+
+    @utils.cache_it
+    def get_members(self):
+        """Return SimpleStorage objects using expanded JSON when available."""
+        members = []
+        for member in self._json['Members']:
+            # If data only contains a reference (@odata.id),
+            # treat as unexpanded
+            if (isinstance(member, dict)
+                    and list(member.keys()) == ['@odata.id']):
+                return super().get_members()
+
+            simple_storage = SimpleStorage(
+                self._conn, member['@odata.id'],
+                json_doc=member, redfish_version=self.redfish_version,
+                registries=self.registries, root=self.root)
+            members.append(simple_storage)
+        return members
 
     @property
     @utils.cache_it

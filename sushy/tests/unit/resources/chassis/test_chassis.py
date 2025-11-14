@@ -221,6 +221,26 @@ class ChassisTestCase(base.TestCase):
         self.assertIsInstance(self.chassis.network_adapters,
                               adapter.NetworkAdapterCollection)
 
+    def test_get_expanded_data_with_full_data(self):
+        # Test that expanded data is returned when present
+        expanded_data = {'Key': [{'Name': 'Val'}], 'List': []}
+        self.chassis._json = {'Power': expanded_data}
+        result = self.chassis._get_expanded_data('Power')
+        self.assertEqual(expanded_data, result)
+
+    def test_get_expanded_data_with_reference_only(self):
+        # Test that None is returned for reference-only data
+        reference_data = {'@odata.id': '/redfish/v1/Chassis/1/Power'}
+        self.chassis._json = {'Power': reference_data}
+        result = self.chassis._get_expanded_data('Power')
+        self.assertIsNone(result)
+
+    def test_get_expanded_data_missing_field(self):
+        # Test that None is returned when field is missing
+        self.chassis._json = {}
+        result = self.chassis._get_expanded_data('Power')
+        self.assertIsNone(result)
+
 
 class ChassisCollectionTestCase(base.TestCase):
 

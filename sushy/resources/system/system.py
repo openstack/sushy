@@ -42,6 +42,8 @@ from sushy import utils
 
 LOG = logging.getLogger(__name__)
 
+EXPAND_QUERY = '?$expand=.($levels=1)'
+
 
 class ActionsField(base.CompositeField):
     reset = common.ResetActionField('#ComputerSystem.Reset')
@@ -571,7 +573,31 @@ class System(base.ResourceBase):
         :returns: `SimpleStorageCollection` instance
         """
         return sys_simple_storage.SimpleStorageCollection(
-            self._conn, utils.get_sub_resource_path_by(self, "SimpleStorage"),
+            self._conn,
+            utils.get_sub_resource_path_by(self, "SimpleStorage"),
+            redfish_version=self.redfish_version,
+            registries=self.registries, root=self.root)
+
+    @property
+    @utils.cache_it
+    def simple_storage_expanded(self):
+        """A collection of simple storage with devices expanded.
+
+        This returns a reference to `SimpleStorageCollection` instance with
+        expanded data retrieved in a single request.
+
+        It is set once when the first time it is queried. On refresh,
+        this property is marked as stale (greedy-refresh not done).
+
+        :returns: `SimpleStorageCollection` instance with expanded data
+        :raises: MissingAttributeError if 'SimpleStorage/@odata.id' field
+            is missing.
+        """
+        path = utils.get_sub_resource_path_by(self, "SimpleStorage")
+        path = f'{path}{EXPAND_QUERY}'
+
+        return sys_simple_storage.SimpleStorageCollection(
+            self._conn, path,
             redfish_version=self.redfish_version,
             registries=self.registries, root=self.root)
 
@@ -594,7 +620,32 @@ class System(base.ResourceBase):
         :returns: `StorageCollection` instance
         """
         return sys_storage.StorageCollection(
-            self._conn, utils.get_sub_resource_path_by(self, "Storage"),
+            self._conn,
+            utils.get_sub_resource_path_by(self, "Storage"),
+            redfish_version=self.redfish_version,
+            registries=self.registries, root=self.root)
+
+    @property
+    @utils.cache_it
+    def storage_expanded(self):
+        """A collection of storage subsystems with expanded data.
+
+        This returns a reference to `StorageCollection` instance with
+        additional data (e.g controllers and drives) expanded in a single
+        request.
+
+        It is set once when the first time it is queried. On refresh,
+        this property is marked as stale (greedy-refresh not done).
+
+        :returns: `StorageCollection` instance with expanded data
+        :raises: MissingAttributeError if 'Storage/@odata.id' field
+            is missing.
+        """
+        path = utils.get_sub_resource_path_by(self, "Storage")
+        path = f'{path}{EXPAND_QUERY}'
+
+        return sys_storage.StorageCollection(
+            self._conn, path,
             redfish_version=self.redfish_version,
             registries=self.registries, root=self.root)
 
@@ -642,6 +693,26 @@ class System(base.ResourceBase):
         """
         paths = utils.get_sub_resource_path_by(
             self, ["Links", "Chassis"], is_collection=True)
+
+        return [chassis.Chassis(self._conn, path,
+                                redfish_version=self.redfish_version,
+                                registries=self.registries, root=self.root)
+                for path in paths]
+
+    @property
+    @utils.cache_it
+    def chassis_expanded(self):
+        """A list of chassis with expanded data.
+
+        Returns a list of `Chassis` objects with additional data
+        (e.g thermal and power) expanded in a single request.
+
+        :raises: MissingAttributeError if '@odata.id' field is missing.
+        :returns: A list of `Chassis` instances with expanded data
+        """
+        paths = utils.get_sub_resource_path_by(
+            self, ["Links", "Chassis"], is_collection=True)
+        paths = [f'{path}{EXPAND_QUERY}' for path in paths]
 
         return [chassis.Chassis(self._conn, path,
                                 redfish_version=self.redfish_version,
