@@ -13,10 +13,17 @@
         "FlowControlConfiguration": "None",
         "FlowControlStatus": "None",
         "LLDPReceive": {
-            "ChassisId": "Not Available",
-            "ChassisIdSubtype": null,
+            "ChassisId": "c4:7e:e0:e4:55:3f",
+            "ChassisIdSubtype": "MacAddr",
             "PortId": "0A:1B:2C:3D:4E:5F:6A:7B:8C:9D:0E:1F:2A",
-            "PortIdSubtype": null
+            "PortIdSubtype": "IfName",
+            "SystemName": "switch-00.example.com",
+            "SystemDescription": "Test Software, Version 00.00.00",
+            "SystemCapabilities": ["Bridge", "Router"],
+            "ManagementAddressIPv4": "192.168.1.1",
+            "ManagementAddressIPv6": "fe80::1",
+            "ManagementAddressMAC": "c4:7e:e0:e4:55:40",
+            "ManagementVlanId": 100
         },
         "WakeOnLANEnabled": false
     },

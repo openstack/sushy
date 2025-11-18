@@ -53,6 +53,80 @@ class PortTestCase(base.TestCase):
                          self.port.ethernet.flow_control_status)
         self.assertEqual(net_cons.PortLinkStatus.LINKUP, self.port.link_status)
 
+    def test_lldp_receive_all_fields(self):
+        """Test all enhanced LLDP fields are parsed correctly"""
+        self.port._parse_attributes(self.json_doc)
+
+        lldp = self.port.ethernet.lldp_receive
+
+        # Test TLV Type 1 - Chassis ID with subtype
+        self.assertEqual('c4:7e:e0:e4:55:3f', lldp.chassis_id)
+        self.assertEqual(net_cons.IEEE802IdSubtype.MAC_ADDR,
+                         lldp.chassis_id_subtype)
+
+        # Test TLV Type 2 - Port ID with subtype
+        self.assertEqual('0A:1B:2C:3D:4E:5F:6A:7B:8C:9D:0E:1F:2A',
+                         lldp.port_id)
+        self.assertEqual(net_cons.IEEE802IdSubtype.IF_NAME,
+                         lldp.port_id_subtype)
+
+        # Test TLV Type 5 - System Name
+        self.assertEqual('switch-00.example.com', lldp.system_name)
+
+        # Test TLV Type 6 - System Description
+        self.assertEqual('Test Software, Version 00.00.00',
+                         lldp.system_description)
+
+        # Test TLV Type 7 - System Capabilities
+        self.assertIsNotNone(lldp.system_capabilities)
+        self.assertEqual(2, len(lldp.system_capabilities))
+        self.assertIn(net_cons.LLDPSystemCapabilities.BRIDGE,
+                      lldp.system_capabilities)
+        self.assertIn(net_cons.LLDPSystemCapabilities.ROUTER,
+                      lldp.system_capabilities)
+
+        # Test TLV Type 8 - Management Addresses
+        self.assertEqual('192.168.1.1', lldp.management_address_ipv4)
+        self.assertEqual('fe80::1', lldp.management_address_ipv6)
+        self.assertEqual('c4:7e:e0:e4:55:40', lldp.management_address_mac)
+        self.assertEqual(100, lldp.management_vlan_id)
+
+    def test_lldp_receive_minimal_data(self):
+        """Test LLDP with minimal data (only mandatory fields)"""
+        minimal_doc = self.json_doc.copy()
+        minimal_doc['Ethernet']['LLDPReceive'] = {
+            "ChassisId": "aa:bb:cc:dd:ee:ff",
+            "PortId": "port-1"
+        }
+
+        self.port._parse_attributes(minimal_doc)
+        lldp = self.port.ethernet.lldp_receive
+
+        # Mandatory fields present
+        self.assertEqual('aa:bb:cc:dd:ee:ff', lldp.chassis_id)
+        self.assertEqual('port-1', lldp.port_id)
+
+        # Optional fields None
+        self.assertIsNone(lldp.chassis_id_subtype)
+        self.assertIsNone(lldp.port_id_subtype)
+        self.assertIsNone(lldp.system_name)
+        self.assertIsNone(lldp.system_description)
+        self.assertIsNone(lldp.system_capabilities)
+        self.assertIsNone(lldp.management_address_ipv4)
+
+    def test_lldp_receive_empty(self):
+        """Test empty LLDPReceive (Dell scenario)"""
+        empty_doc = self.json_doc.copy()
+        empty_doc['Ethernet']['LLDPReceive'] = {}
+
+        self.port._parse_attributes(empty_doc)
+        lldp = self.port.ethernet.lldp_receive
+
+        # All fields should be None
+        self.assertIsNone(lldp.chassis_id)
+        self.assertIsNone(lldp.port_id)
+        self.assertIsNone(lldp.system_name)
+
 
 class PortCollectionTestCase(base.TestCase):
 
