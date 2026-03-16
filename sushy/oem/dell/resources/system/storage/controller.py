@@ -35,7 +35,7 @@ class DellStorageControllerExtension(oem_base.OEMResourceBase):
         only RAID mode, and BOSS controller as it does not have controller
         mode.
         :returns: TaskMonitor if controller mode changes applied and need to
-            reboot, otherwise None
+        reboot, otherwise None
         """
         # Some controllers do not have controller_mode
         try:
