@@ -112,7 +112,8 @@ class Storage(base.ResourceBase):
         Returns the list of cached values until it (or its parent resource)
         is refreshed.
         """
-        return sorted(drv.capacity_bytes for drv in self.drives)
+        return sorted(drv.capacity_bytes for drv in self.drives
+                      if drv.capacity_bytes is not None)
 
     @property
     def drives_max_size_bytes(self):

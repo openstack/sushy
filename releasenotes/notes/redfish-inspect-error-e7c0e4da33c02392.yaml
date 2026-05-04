@@ -1,0 +1,9 @@
+---
+fixes:
+  - |
+    Fixes a ``TypeError`` raised by ``Storage.drives_sizes_bytes`` when one
+    or more drives report a null ``CapacityBytes`` in the Redfish API response
+    (e.g. empty drive bays). The property now filters out drives with no
+    reported capacity before sorting, consistent with the existing behaviour
+    of ``SimpleStorageCollection.disks_sizes_bytes``.
+    See `LP#2150858 <https://bugs.launchpad.net/sushy/+bug/2150858>`_.
