@@ -1,0 +1,8 @@
+---
+features:
+  - |
+    Adds an optional ``transfer_protocol`` argument to
+    ``VirtualMedia.insert_media``. When supplied, Sushy includes the
+    corresponding ``TransferProtocolType`` in the initial Redfish
+    ``InsertMedia`` request instead of relying on an error response before
+    adding it.

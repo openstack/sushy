@@ -175,6 +175,27 @@ class VirtualMediaTestCase(base.TestCase):
                           "https://www.dmtf.org/freeImages/Sardine.img",
                           True, False, transfer_method='quickly!')
 
+    def test_insert_media_transfer_protocol(self):
+        self.assertFalse(self.sys_virtual_media._is_stale)
+        self.sys_virtual_media.insert_media(
+            "https://www.dmtf.org/freeImages/Sardine.img", True, False,
+            transfer_protocol=(
+                mgr_cons.VirtualMediaTransferProtocolType.HTTPS))
+        self.sys_virtual_media._conn.post.assert_called_once_with(
+            ("/redfish/v1/Managers/BMC/VirtualMedia/Floppy1/Actions"
+             "/VirtualMedia.InsertMedia"),
+            data={"Image": "https://www.dmtf.org/freeImages/Sardine.img",
+                  "WriteProtected": False,
+                  "TransferProtocolType": "HTTPS"}
+        )
+        self.assertTrue(self.sys_virtual_media._is_stale)
+
+    def test_insert_media_transfer_protocol_wrong_input(self):
+        self.assertRaises(exceptions.InvalidParameterValueError,
+                          self.sys_virtual_media.insert_media,
+                          "https://www.dmtf.org/freeImages/Sardine.img",
+                          True, False, transfer_protocol='IPoIB')
+
     def test_insert_media_fallback(self):
         self.conn.get.return_value.headers = {'Allow': 'GET,HEAD,PATCH'}
         self.sys_virtual_media._actions.insert_media = None

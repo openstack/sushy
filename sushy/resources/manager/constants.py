@@ -148,6 +148,39 @@ class VirtualMediaType(enum.Enum):
     """A DVD-ROM format image."""
 
 
+# Values come from the Redfish VirtualMedia json-schema.
+# https://redfish.dmtf.org/schemas/VirtualMedia.v1_6_5.json#/definitions/TransferProtocolType
+class VirtualMediaTransferProtocolType(enum.Enum):
+    """Transfer Protocol Type constants."""
+
+    CIFS = 'CIFS'
+    """Common Internet File System (CIFS)."""
+
+    FTP = 'FTP'
+    """File Transfer Protocol (FTP)."""
+
+    HTTP = 'HTTP'
+    """Hypertext Transfer Protocol (HTTP)."""
+
+    HTTPS = 'HTTPS'
+    """Hypertext Transfer Protocol Secure (HTTPS)."""
+
+    NFS = 'NFS'
+    """Network File System (NFS)."""
+
+    OEM = 'OEM'
+    """A manufacturer-defined protocol."""
+
+    SCP = 'SCP'
+    """Secure Copy Protocol (SCP)."""
+
+    SFTP = 'SFTP'
+    """Secure File Transfer Protocol (SFTP)."""
+
+    TFTP = 'TFTP'
+    """Trivial File Transfer Protocol (TFTP)."""
+
+
 # Backward compatibility
 VIRTUAL_MEDIA_CD = VirtualMediaType.CD
 VIRTUAL_MEDIA_DVD = VirtualMediaType.DVD
