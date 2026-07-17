@@ -50,10 +50,10 @@ class CertificateTestCase(base.TestCase):
                           sushy.KeyUsage.SERVER_AUTHENTICATION],
                          self.cert.key_usage)
         self.assertEqual(datetime.datetime(2018, 9, 7, 13, 22, 5,
-                                           tzinfo=datetime.timezone.utc),
+                                           tzinfo=datetime.UTC),
                          self.cert.valid_not_before)
         self.assertEqual(datetime.datetime(2019, 9, 7, 13, 22, 5,
-                                           tzinfo=datetime.timezone.utc),
+                                           tzinfo=datetime.UTC),
                          self.cert.valid_not_after)
         self.assertTrue(self.cert.serial_number)
         self.assertTrue(self.cert.fingerprint)
