@@ -189,7 +189,8 @@ class VirtualMedia(base.ResourceBase):
         return False
 
     def insert_media(self, image, inserted=True, write_protected=True,
-                     username=None, password=None, transfer_method=None):
+                     username=None, password=None, transfer_method=None,
+                     transfer_protocol=None):
         """Attach remote media to virtual media
 
         :param image: a URI providing the location of the selected image
@@ -200,6 +201,8 @@ class VirtualMedia(base.ResourceBase):
         :param password: Password for the image URI.
         :param transfer_method: Transfer method (stream or upload) to use
             for the image.
+        :param transfer_protocol: Transfer protocol used to retrieve the
+            image. When supplied, it is included in the initial request.
         """
         target_uri, use_patch = self._get_insert_media_uri()
         # NOTE(janders) Inserted and WriteProtected attributes are optional
@@ -226,6 +229,18 @@ class VirtualMedia(base.ResourceBase):
                     parameter='transfer_method',
                     value=transfer_method,
                     valid_values=', '.join(map(str, mgr_cons.TransferMethod)))
+        if transfer_protocol is not None:
+            try:
+                payload['TransferProtocolType'] = (
+                    mgr_cons.VirtualMediaTransferProtocolType(
+                        transfer_protocol).value)
+            except ValueError:
+                raise exceptions.InvalidParameterValueError(
+                    parameter='transfer_protocol',
+                    value=transfer_protocol,
+                    valid_values=', '.join(
+                        protocol.value for protocol in
+                        mgr_cons.VirtualMediaTransferProtocolType))
 
         if use_patch:
             payload['Inserted'] = inserted
