@@ -74,6 +74,20 @@ class TaskMonitorTestCase(base.TestCase):
     def test_init_accepted_content(self):
         self.assertIsNotNone(self.task_monitor.task)
 
+    def test_init_accepted_content_no_task_id(self):
+        response = mock.Mock()
+        response.status_code = http_client.ACCEPTED
+        response.headers = {'Location': '/Task/545'}
+        response.content = b'{"Name": "Test"}'
+        response.json.return_value = {'Name': 'Test'}
+
+        task_monitor = taskmonitor.TaskMonitor(
+            self.conn, '/Task/545', response=response)
+
+        self.assertIsNone(task_monitor.task)
+        self.assertTrue(task_monitor.is_processing)
+        self.assertEqual('/Task/545', task_monitor.task_monitor_uri)
+
     def test_init_no_response(self):
         self.conn.reset_mock()
         self.conn.get.return_value.status_code = 202
@@ -119,6 +133,63 @@ class TaskMonitorTestCase(base.TestCase):
         self.conn.get.assert_called_with(path='/Task/545')
         self.assertEqual(1, self.conn.get.call_count)
         self.assertIsNotNone(self.task_monitor.task)
+
+    def test_refresh_content_no_task_id_no_task(self):
+        self.conn.reset_mock()
+        self.conn.get.return_value.status_code = http_client.ACCEPTED
+        self.conn.get.return_value.headers = {'Content-Length': 42}
+        self.conn.get.return_value.content = b'{"Name": "Test"}'
+        self.conn.get.return_value.json.return_value = {'Name': 'Test'}
+        self.task_monitor._task = None
+
+        self.task_monitor.refresh()
+
+        self.conn.get.assert_called_once_with(path='/Task/545')
+        self.assertIsNone(self.task_monitor.task)
+        self.assertTrue(self.task_monitor.is_processing)
+
+    def test_refresh_content_no_task_id_existing_task(self):
+        self.conn.reset_mock()
+        self.conn.get.return_value.status_code = http_client.ACCEPTED
+        self.conn.get.return_value.headers = {'Content-Length': 42}
+        self.conn.get.return_value.content = b'{"Name": "Test"}'
+        self.conn.get.return_value.json.return_value = {'Name': 'Test'}
+        existing_task = self.task_monitor.task
+
+        with mock.patch.object(existing_task, 'refresh',
+                               autospec=True) as mock_refresh:
+            self.task_monitor.refresh()
+
+        mock_refresh.assert_not_called()
+        self.assertIsNone(self.task_monitor.task)
+
+    def test_refresh_recovers_from_incomplete_task_response(self):
+        response = mock.Mock()
+        response.status_code = http_client.ACCEPTED
+        response.headers = {'Location': '/Task/545'}
+        response.content = b'{"Name": "Test"}'
+        response.json.return_value = {'Name': 'Test'}
+        task_monitor = taskmonitor.TaskMonitor(
+            self.conn, '/Task/545', response=response)
+
+        complete_response = mock.Mock()
+        complete_response.status_code = http_client.ACCEPTED
+        complete_response.headers = {'Content-Length': 42}
+        complete_response.content = json.dumps(self.json_doc).encode('utf-8')
+        complete_response.json.return_value = self.json_doc
+        done_response = mock.Mock()
+        done_response.status_code = http_client.OK
+        self.conn.get.side_effect = [complete_response, done_response]
+
+        task_monitor.refresh()
+
+        self.assertIsNotNone(task_monitor.task)
+        self.assertTrue(task_monitor.is_processing)
+
+        task_monitor.refresh()
+
+        self.assertIsNone(task_monitor.task)
+        self.assertFalse(task_monitor.is_processing)
 
     def test_refresh_done(self):
         self.conn.reset_mock()
@@ -275,8 +346,8 @@ class TaskMonitorTestCase(base.TestCase):
 
         self.assertIsInstance(tm, taskmonitor.TaskMonitor)
         self.assertEqual('/Task/545', tm.task_monitor_uri)
-        self.assertIsNotNone(tm.task)
-        self.assertEqual('545', tm.task.identity)
+        self.assertIsNone(tm.task)
+        self.assertTrue(tm.is_processing)
 
     def test_from_response_odata_id(self):
         response = mock.Mock()
@@ -294,6 +365,22 @@ class TaskMonitorTestCase(base.TestCase):
         self.assertEqual('/TaskMonitor/545', tm.task_monitor_uri)
         self.assertIsNotNone(tm.task)
         self.assertEqual('545', tm.task.identity)
+
+    def test_from_response_content_no_task_id(self):
+        response = mock.Mock()
+        response.content = b'{"Name": "Test"}'
+        response.json.return_value = {'Name': 'Test'}
+        response.headers = {'Location': '/TaskMonitor/'}
+        response.status_code = http_client.ACCEPTED
+
+        tm = taskmonitor.TaskMonitor.from_response(
+            self.conn, response,
+            '/redfish/v1/UpdateService/Actions/SimpleUpdate')
+
+        self.assertIsInstance(tm, taskmonitor.TaskMonitor)
+        self.assertEqual('/TaskMonitor/', tm.task_monitor_uri)
+        self.assertIsNone(tm.task)
+        self.assertTrue(tm.is_processing)
 
     def test_from_response_location_header_missing(self):
         response = mock.Mock()
