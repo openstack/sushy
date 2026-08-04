@@ -15,6 +15,7 @@ from http import client as http_client
 import json
 from unittest import mock
 
+from sushy import exceptions
 from sushy.resources import constants as res_cons
 from sushy.resources.taskservice import constants as ts_cons
 from sushy.resources.taskservice import task
@@ -60,6 +61,12 @@ class TaskTestCase(base.TestCase):
                          self.task.messages[0].message)
         self.assertEqual(res_cons.Severity.WARNING,
                          self.task.messages[0].severity)
+
+    def test_init_missing_identity_raises(self):
+        self.assertRaises(
+            exceptions.MissingAttributeError,
+            task.Task, self.conn, '/redfish/v1/TaskService/Tasks/545',
+            json_doc={'Name': 'Task without identity'})
 
     def test_is_processing_true(self):
         self.task.status_code = http_client.ACCEPTED

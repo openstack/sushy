@@ -51,14 +51,29 @@ class TaskMonitor:
         self._task = None
         self._response = response
 
-        if (self._response and self._response.content
+        if (self._response
                 and self._response.status_code == http_client.ACCEPTED):
-            self._task = task.Task(self._connector, self._task_monitor_uri,
-                                   redfish_version=self._redfish_version,
-                                   registries=self._registries,
-                                   json_doc=self._response.json())
+            json_doc = self._get_task_json_doc(self._response)
+            if json_doc:
+                self._task = task.Task(
+                    self._connector, self._task_monitor_uri,
+                    redfish_version=self._redfish_version,
+                    registries=self._registries, json_doc=json_doc)
         else:
             self.refresh()
+
+    @staticmethod
+    def _get_task_json_doc(response):
+        """Return a complete Task representation from a monitor response."""
+        if not response.content:
+            return None
+
+        json_doc = response.json()
+        # Some BMCs return partial Task payloads while the monitor remains 202.
+        if not json_doc.get('Id'):
+            return None
+
+        return json_doc
 
     def refresh(self):
         """Refresh the Task
@@ -71,19 +86,19 @@ class TaskMonitor:
         self._response = self._connector.get(path=self.task_monitor_uri)
 
         if self._response.status_code == http_client.ACCEPTED:
-            # A Task should have been returned, but wasn't
-            if not self._response.content:
+            json_doc = self._get_task_json_doc(self._response)
+            # A complete Task should have been returned, but wasn't.
+            if not json_doc:
                 self._task = None
                 return
 
-            # Assume that the body contains a Task since we got a 202
             if not self._task:
                 self._task = task.Task(self._connector, self._task_monitor_uri,
                                        redfish_version=self._redfish_version,
                                        registries=self._registries,
-                                       json_doc=self._response.json())
+                                       json_doc=json_doc)
             else:
-                self._task.refresh(json_doc=self._response.json())
+                self._task.refresh(json_doc=json_doc)
         else:
             self._task = None
 
