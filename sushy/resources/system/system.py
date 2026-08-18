@@ -349,15 +349,18 @@ class System(base.ResourceBase):
             a :py:class:`sushy.BootSourceOverrideMode` value. Optional.
         :param http_boot_uri: The requested HTTP Boot URI to transmit to the
             BMC. Only valid when BootSourceOverrideTarget is set to UefiHTTP,
-            when utilizing the ``target`` parameter. If no value is supplied,
-            and the target is set to UefiHTTP, then an empty value will be
-            sent to the BMC to remove any prior setting, allowing the host
-            to load configuration from DHCP.
+            when utilizing the ``target`` parameter. If no value is supplied
+            and the target is set to UefiHTTP, an existing value is cleared
+            only when the BMC advertises the HttpBootUri property. Otherwise
+            the property is omitted, allowing the host to load configuration
+            from DHCP.
             If not explicitly set, any value will be removed from a BMC when
             UefiHttp boot is not engaged.
 
         :raises: InvalidParameterValueError, if any information passed is
             invalid.
+        :raises: MissingAttributeError, if an explicit HTTP boot URI is
+            requested but the BMC does not advertise HttpBootUri.
         """
         data = collections.defaultdict(dict)
         settings_data = collections.defaultdict(dict)
@@ -368,6 +371,37 @@ class System(base.ResourceBase):
         else:
             settings_resp = None
             settings_boot_section = {}
+
+        main_boot_section = self.json.get('Boot') or {}
+
+        def _set_boot_property(name, value, require_advertised=False,
+                               only_if_set=False):
+            """Add a Boot property to the correct Redfish resource.
+
+            Prefer the Settings resource when it advertises the property,
+            otherwise use the main ComputerSystem resource. For standard boot
+            properties, preserve the existing fallback to ComputerSystem even
+            when the property is not present in the response. Properties such
+            as HttpBootUri can require explicit advertisement instead.
+
+            :returns: ``True`` when the property is supported or queued,
+                otherwise ``False``.
+            """
+            if settings_resp and name in settings_boot_section:
+                boot_data = settings_data
+                current_value = settings_boot_section.get(name)
+            elif name in main_boot_section:
+                boot_data = data
+                current_value = main_boot_section.get(name)
+            elif require_advertised:
+                return False
+            else:
+                boot_data = data
+                current_value = None
+
+            if not only_if_set or current_value is not None:
+                boot_data['Boot'][name] = value
+            return True
 
         if target is not None:
             valid_targets = self.get_allowed_system_boot_source_values()
@@ -394,12 +428,32 @@ class System(base.ResourceBase):
                           'machine. Overriding boot device from %s to %s.',
                           target, sys_cons.BootSource.USB_CD)
                 target = sys_cons.BootSource.USB_CD
-            if (settings_resp and "BootSourceOverrideTarget" in
-                    settings_boot_section):
-                settings_data['Boot']['BootSourceOverrideTarget'] = \
-                    target.value
-            else:
-                data['Boot']['BootSourceOverrideTarget'] = target.value
+            _set_boot_property('BootSourceOverrideTarget', target.value)
+
+            if target == sys_cons.BootSource.UEFI_HTTP:
+                # The http_boot_uri value *can* be set independently of the
+                # target, but the BMC will just ignore it unless the target
+                # is set. So we should only, and explicitly set it when we've
+                # been requested to boot from UefiHTTP.
+                if http_boot_uri:
+                    if not _set_boot_property(
+                            'HttpBootUri', http_boot_uri,
+                            require_advertised=True):
+                        raise exceptions.MissingAttributeError(
+                            attribute='HttpBootUri', resource=self.path)
+                else:
+                    # DHCP-based UEFI HTTP boot. Clear a prior explicit URI
+                    # only when the BMC advertises the property; otherwise
+                    # omit it.
+                    _set_boot_property(
+                        'HttpBootUri', None, require_advertised=True,
+                        only_if_set=True)
+            elif not http_boot_uri:
+                # We're switching to a non-HTTP target. Clear a previous URI
+                # only on the Redfish resource that actually advertises it.
+                _set_boot_property(
+                    'HttpBootUri', None, require_advertised=True,
+                    only_if_set=True)
 
         if enabled is not None:
             try:
@@ -408,11 +462,7 @@ class System(base.ResourceBase):
                 raise exceptions.InvalidParameterValueError(
                     parameter='enabled', value=enabled,
                     valid_values=list(sys_cons.BootSourceOverrideEnabled))
-            if (settings_resp and "BootSourceOverrideEnabled" in
-                    settings_boot_section):
-                settings_data['Boot']['BootSourceOverrideEnabled'] = fishy_freq
-            else:
-                data['Boot']['BootSourceOverrideEnabled'] = fishy_freq
+            _set_boot_property('BootSourceOverrideEnabled', fishy_freq)
 
         if mode is not None:
             try:
@@ -421,32 +471,7 @@ class System(base.ResourceBase):
                 raise exceptions.InvalidParameterValueError(
                     parameter='mode', value=mode,
                     valid_values=list(sys_cons.BootSourceOverrideMode))
-            if (settings_resp and "BootSourceOverrideMode" in
-                    settings_boot_section):
-                settings_data['Boot']['BootSourceOverrideMode'] = fishy_mode
-            else:
-                data['Boot']['BootSourceOverrideMode'] = fishy_mode
-
-        if target == sys_cons.BootSource.UEFI_HTTP:
-            # The http_boot_uri value *can* be set independently of the
-            # target, but the BMC will just ignore it unless the target
-            # is set. So we should only, and explicitly set it when we've
-            # been requested to boot from UefiHTTP.
-            if not http_boot_uri:
-                # This should clear out any old entries, as no URI translates
-                # to the intent of "use whatever the dhcp server says".
-                http_boot_uri = None
-
-            if (settings_resp and "HttpBootUri" in settings_boot_section):
-                settings_data['Boot']['HttpBootUri'] = http_boot_uri
-            else:
-                data['Boot']['HttpBootUri'] = http_boot_uri
-        elif not http_boot_uri:
-            # We're not doing boot from URL, we should cleanup any setting
-            # which may be from a prior step/call.
-            if settings_boot_section.get('HttpBootUri'):
-                # If the setting is present, and has any value, unset it.
-                data['Boot']['HttpBootUri'] = None
+            _set_boot_property('BootSourceOverrideMode', fishy_mode)
 
         # TODO(lucasagomes): Check the return code and response body ?
         #                    Probably we should call refresh() as well.
