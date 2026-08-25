@@ -677,4 +677,4 @@ class Sushy(base.ResourceBase):
             self._conn,
             task_monitor_uri,
             redfish_version=self.redfish_version,
-            registries=self.registries)
+            registries=self.lazy_registries)

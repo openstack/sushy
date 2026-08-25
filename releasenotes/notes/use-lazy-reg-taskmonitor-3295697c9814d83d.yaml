@@ -1,0 +1,5 @@
+---
+fixes:
+  - |
+    Postpones Redfish message registries download and processing when accessing
+    task monitors.
