@@ -41,6 +41,12 @@ class DellJobCollection(base.ResourceBase):
     def get_unfinished_jobs(self):
         """Get the unfinished jobs.
 
+        A job counts as finished only when the iDRAC reports it in one of
+        :py:data:`~sushy.oem.dell.constants.TERMINAL_JOB_STATES`. Every
+        other state, including states this library does not recognise, is
+        reported as unfinished so that a job the Lifecycle Controller is
+        still working on is never mistaken for a completed one.
+
         :returns: A list of unfinished jobs.
         """
         job_expand_uri = f'{self._path}{self._JOB_EXPAND}'
@@ -49,7 +55,11 @@ class DellJobCollection(base.ResourceBase):
         job_response = self._conn.get(job_expand_uri)
         data = job_response.json()
         for job in data['Members']:
-            if job['JobState'] in constants.INCOMPLETE_JOB_STATES:
+            job_state = job.get('JobState')
+            if job_state not in constants.TERMINAL_JOB_STATES:
+                LOG.debug('Job %(id)s is in state %(state)s, treating it '
+                          'as unfinished',
+                          {'id': job['Id'], 'state': job_state})
                 unfinished_jobs.append(job['Id'])
         LOG.info('Got unfinished jobs')
         return unfinished_jobs

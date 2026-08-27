@@ -15,6 +15,20 @@
 IDRAC_CONFIG_PENDING = 'LC068'
 IDRAC_JOB_RUNNING = 'RAC0679'
 NO_FOREIGN_CONFIG = 'STOR018'
+# Job states in which the Lifecycle Controller has stopped working on a
+# job: it will make no further progress without a new request. Any other
+# state means the job is still in flight, including transient ones such
+# as 'Downloading', 'RebootPending' and 'UserIntervention' (which iDRAC
+# uses for firmware that is staged but not yet flashed during POST), and
+# any state a future iDRAC firmware may introduce.
+TERMINAL_JOB_STATES = ['Completed',
+                       'CompletedWithErrors',
+                       'Failed',
+                       'RebootFailed']
+
+# Deprecated: an allowlist of only some of the incomplete job states, and
+# therefore unusable for deciding whether a job has finished. Retained
+# for backward compatibility; use TERMINAL_JOB_STATES instead.
 INCOMPLETE_JOB_STATES = ['Scheduled',
                          'Running',
                          'Paused']

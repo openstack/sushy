@@ -1,0 +1,32 @@
+---
+fixes:
+  - |
+    Fixes ``DellJobCollection.get_unfinished_jobs`` reporting a job as
+    finished while the Lifecycle Controller was still working on it. The
+    method matched an allowlist of three "incomplete" states
+    (``Scheduled``, ``Running`` and ``Paused``), so a job in any other
+    non-terminal state was silently omitted from the result. This
+    notably affected ``UserIntervention``, which iDRAC reports for
+    firmware that has been staged but not yet flashed during POST, and
+    which is not present in this library's ``JobState`` enumeration at
+    all. Callers polling for job completion could conclude that a
+    firmware update had been applied when the flash had not started. The
+    check is now inverted: only the terminal states listed in
+    ``sushy.oem.dell.constants.TERMINAL_JOB_STATES`` count as finished,
+    and any state the library does not recognise is treated as
+    unfinished.
+upgrade:
+  - |
+    ``DellJobCollection.get_unfinished_jobs`` now returns jobs in any
+    non-terminal state rather than only ``Scheduled``, ``Running`` and
+    ``Paused``. Callers using it to decide whether the BMC is busy will
+    see it report busy in more situations, which is the intended and
+    more conservative behaviour. Callers using it to decide whether a
+    specific job has finished will now get a correct answer for staged
+    firmware jobs.
+  - |
+    ``sushy.oem.dell.constants.INCOMPLETE_JOB_STATES`` is deprecated. It
+    is an allowlist of only some of the incomplete job states and cannot
+    be used to determine whether a job has finished. It is retained for
+    backward compatibility but is no longer used internally; use
+    ``sushy.oem.dell.constants.TERMINAL_JOB_STATES`` instead.
