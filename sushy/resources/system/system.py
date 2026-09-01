@@ -292,14 +292,15 @@ class System(base.ResourceBase):
         :returns: A set with the allowed values.
         """
         reset_action = self._get_reset_action_element()
+        allowed_values = reset_action.get_allowed_values(self)
 
-        if not reset_action.allowed_values:
+        if not allowed_values:
             LOG.warning('Could not figure out the allowed values for the '
                         'reset system action for System %s', self.identity)
             return set(res_cons.ResetType)
 
         return {v for v in res_cons.ResetType
-                if v.value in reset_action.allowed_values}
+                if v.value in allowed_values}
 
     def reset_system(self, value):
         """Reset the system.

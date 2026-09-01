@@ -10,10 +10,15 @@
 # License for the specific language governing permissions and limitations
 # under the License.
 
+import logging
+
 from dateutil import parser
 
+from sushy import exceptions
 from sushy.resources import base
 from sushy.resources import constants
+
+LOG = logging.getLogger(__name__)
 
 
 class IdRefField(base.CompositeField):
@@ -60,9 +65,76 @@ class ActionField(base.CompositeField):
     operation_apply_time_support = OperationApplyTimeSupportField()
 
 
+class ParametersListField(base.ListField):
+    """The parameters listed by an ActionInfo resource."""
+
+    name = base.Field('Name')
+    allowed_values = base.Field('AllowableValues', adapter=list)
+
+
+class ActionInfo(base.ResourceBase):
+    """The resource an action can point at to describe its parameters.
+
+    Services that do not annotate an action's allowable values on the action
+    itself link to one of these instead.
+    """
+
+    parameters = ParametersListField('Parameters', default=[])
+
+    @classmethod
+    def from_uri(cls, resource, uri):
+        """Fetch the ActionInfo resource an action points at.
+
+        :param resource: the resource the action belongs to, for its
+            connection to the BMC.
+        :param uri: the action's ``@Redfish.ActionInfo`` annotation.
+        :returns: an `ActionInfo`, or None if it cannot be read.
+        """
+        try:
+            return cls(resource._conn, uri,
+                       redfish_version=resource.redfish_version,
+                       registries=resource.registries, root=resource.root)
+
+        # A service can answer with something not shaped like an ActionInfo,
+        # which the field machinery raises TypeError rather than SushyError for
+        except (exceptions.SushyError, TypeError) as exc:
+            LOG.warning('Could not read the ActionInfo resource at %s: %s',
+                        uri, exc)
+            return None
+
+    def get_allowable_values(self, parameter):
+        """Get the values the given parameter accepts.
+
+        :param parameter: name of the parameter, e.g. ``ResetType``.
+        :returns: a list of allowed values, or None if this resource does not
+            constrain the parameter.
+        """
+        return next((p.allowed_values for p in self.parameters
+                     if p.name == parameter), None)
+
+
 class ResetActionField(ActionField):
     allowed_values = base.Field('ResetType@Redfish.AllowableValues',
                                 adapter=list)
+
+    action_info_uri = base.Field('@Redfish.ActionInfo')
+    """Where a service publishes the values instead of annotating them."""
+
+    def get_allowed_values(self, resource):
+        """Get the reset types this action accepts.
+
+        :param resource: the resource this action belongs to, used to fetch
+            the ActionInfo resource if the action points at one.
+        :returns: a list of allowed values, or None if the service does not
+            make them known.
+        """
+        if self.allowed_values or not self.action_info_uri:
+            return self.allowed_values
+
+        action_info = ActionInfo.from_uri(resource, self.action_info_uri)
+
+        return (action_info.get_allowable_values('ResetType')
+                if action_info else None)
 
 
 class InitializeActionField(ActionField):
