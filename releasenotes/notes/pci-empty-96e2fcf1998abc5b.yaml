@@ -1,0 +1,11 @@
+---
+fixes:
+  - |
+    Fixes Sushy trying to access non-existing ``/empty`` URL when PCIe
+    functions are not supported by the BMC. MissingAttributeError is raised
+    instead (as documented).
+
+    The code tries to return an empty collection instead of raising
+    MissingAttributeError as any other accessors. However, it did not work
+    in reality. Instead, out-of-band inspection would fail with
+    ``ResourceNotFoundError: Resource https://<host>/empty not found``.
