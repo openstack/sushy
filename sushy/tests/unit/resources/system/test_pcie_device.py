@@ -13,6 +13,7 @@
 import json
 from unittest import mock
 
+from sushy import exceptions
 from sushy.resources import constants as res_cons
 from sushy.resources.system import constants as sys_cons
 from sushy.resources.system import pcie_device
@@ -327,17 +328,9 @@ class PCIeDeviceFunctionsTestCase(base.TestCase):
     @mock.patch.object(pcie_device, 'PCIeFunctionCollection', autospec=True)
     @mock.patch('sushy.utils.get_sub_resource_path_by', autospec=True)
     def test_pcie_functions_missing_attribute(
-        self, mock_get_path, mock_collection):
-        from sushy import exceptions
-        # Simulate MissingAttributeError when PCIeFunctions is not supported
+            self, mock_get_path, mock_collection):
         mock_get_path.side_effect = exceptions.MissingAttributeError(
             attribute='PCIeFunctions', resource=self.pcie_dev._path)
 
-        _ = self.pcie_dev.pcie_functions
-        # Should create empty collection
-
-        mock_collection.assert_called_once_with(
-            self.pcie_dev._conn, "/empty",
-            redfish_version=self.pcie_dev.redfish_version,
-            registries=self.pcie_dev.registries,
-            root=self.pcie_dev.root)
+        with self.assertRaises(exceptions.MissingAttributeError):
+            self.pcie_dev.pcie_functions

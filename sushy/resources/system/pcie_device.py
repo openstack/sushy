@@ -16,7 +16,6 @@
 # Per DMTF DSP0268_2025.2 Section 6.97 PCIeFunction 1.6.0
 import logging
 
-from sushy import exceptions
 from sushy.resources import base
 from sushy.resources import common
 from sushy.resources.system import constants as sys_cons
@@ -207,18 +206,11 @@ class PCIeDevice(base.ResourceBase):
         :raises: MissingAttributeError if PCIeFunctions is not supported
         :returns: PCIeFunctionCollection instance
         """
-        try:
-            return PCIeFunctionCollection(
-                self._conn,
-                utils.get_sub_resource_path_by(self, "PCIeFunctions"),
-                redfish_version=self.redfish_version,
-                registries=self.registries, root=self.root)
-        except exceptions.MissingAttributeError:
-            # Return empty collection if PCIeFunctions is not supported
-            return PCIeFunctionCollection(
-                self._conn, "/empty",
-                redfish_version=self.redfish_version,
-                registries=self.registries, root=self.root)
+        return PCIeFunctionCollection(
+            self._conn,
+            utils.get_sub_resource_path_by(self, "PCIeFunctions"),
+            redfish_version=self.redfish_version,
+            registries=self.registries, root=self.root)
 
 
 class PCIeDeviceCollection(base.ResourceCollectionBase):
