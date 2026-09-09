@@ -14,7 +14,7 @@
 
 import logging
 
-from sushy.oem.dell import constants
+from sushy.oem.dell.resources.manager import job
 from sushy.resources import base
 
 LOG = logging.getLogger(__name__)
@@ -38,6 +38,52 @@ class DellJobCollection(base.ResourceBase):
         super().__init__(
             connector, identity, redfish_version, registries)
 
+    def get_jobs(self, job_ids=None):
+        """Get the status of jobs in this collection.
+
+        Performs a single GET of the expanded job collection and builds a
+        :class:`~sushy.oem.dell.resources.manager.job.DellJob` for each
+        member from the document that GET already returned, without
+        issuing any further requests.
+
+        :param job_ids: an optional list of job identities to filter by.
+            If given, only jobs whose ``Id`` is among them are returned,
+            preserving the order in which they appear in the collection.
+            If not given, all jobs in the collection are returned.
+        :returns: a list of :class:`~sushy.oem.dell.resources.manager.
+            job.DellJob` instances.
+        """
+        job_expand_uri = f'{self._path}{self._JOB_EXPAND}'
+        job_response = self._conn.get(job_expand_uri)
+        data = job_response.json()
+        jobs = []
+        for member in data['Members']:
+            job_id = member.get('Id')
+            if job_ids is not None and job_id not in job_ids:
+                continue
+            job_path = member.get('@odata.id', f'{self._path}/{job_id}')
+            jobs.append(job.DellJob(
+                self._conn, job_path, json_doc=member,
+                redfish_version=self.redfish_version,
+                registries=self.registries, root=self.root))
+        return jobs
+
+    def get_job(self, job_id):
+        """Get the status of a single job.
+
+        Unlike :py:meth:`get_jobs`, this performs its own GET of the job
+        resource rather than reading it out of the collection.
+
+        :param job_id: the identity of the job to fetch.
+        :returns: a :class:`~sushy.oem.dell.resources.manager.job.DellJob`
+            instance.
+        :raises: ResourceNotFoundError if no job with this identity exists.
+        """
+        return job.DellJob(
+            self._conn, f'{self._path}/{job_id}',
+            redfish_version=self.redfish_version,
+            registries=self.registries, root=self.root)
+
     def get_unfinished_jobs(self):
         """Get the unfinished jobs.
 
@@ -49,17 +95,12 @@ class DellJobCollection(base.ResourceBase):
 
         :returns: A list of unfinished jobs.
         """
-        job_expand_uri = f'{self._path}{self._JOB_EXPAND}'
         unfinished_jobs = []
-        LOG.debug('Getting unfinished jobs...')
-        job_response = self._conn.get(job_expand_uri)
-        data = job_response.json()
-        for job in data['Members']:
-            job_state = job.get('JobState')
-            if job_state not in constants.TERMINAL_JOB_STATES:
+        for dell_job in self.get_jobs():
+            if not dell_job.is_finished:
                 LOG.debug('Job %(id)s is in state %(state)s, treating it '
                           'as unfinished',
-                          {'id': job['Id'], 'state': job_state})
-                unfinished_jobs.append(job['Id'])
-        LOG.info('Got unfinished jobs')
+                          {'id': dell_job.identity,
+                           'state': dell_job.job_state})
+                unfinished_jobs.append(dell_job.identity)
         return unfinished_jobs

@@ -26,6 +26,13 @@ TERMINAL_JOB_STATES = ['Completed',
                        'Failed',
                        'RebootFailed']
 
+# The subset of TERMINAL_JOB_STATES in which the job did not do what it
+# was asked to: it failed outright, completed only partially, or could
+# not be applied because the required reboot failed.
+FAILED_JOB_STATES = ['CompletedWithErrors',
+                     'Failed',
+                     'RebootFailed']
+
 # Deprecated: an allowlist of only some of the incomplete job states, and
 # therefore unusable for deciding whether a job has finished. Retained
 # for backward compatibility; use TERMINAL_JOB_STATES instead.
