@@ -570,6 +570,27 @@ VFDD\
                                             self.redfish_version,
                                             self.registries)
 
+    @property
+    @sushy_utils.cache_it
+    def attribute_resources(self):
+        """Mapping of `DellAttributes` identity to the resource itself.
+
+        An iDRAC typically exposes ``iDRAC.Embedded.1``,
+        ``System.Embedded.1`` and ``LifecycleController.Embedded.1``, so
+        callers need to say which set of attributes they mean::
+
+            manager_oem.attribute_resources.get('iDRAC.Embedded.1')
+
+        Unlike :py:attr:`~attributes`, this can be looked up repeatedly. The
+        resources are keyed by their own ``Id`` rather than by their path,
+        which differs between iDRAC generations, so all of them are
+        retrieved. The result is cached until this manager is refreshed.
+
+        :returns: a dict mapping identity string to
+            :class:`sushy.oem.dell.resources.attributes.DellAttributes`.
+        """
+        return {resource.identity: resource for resource in self.attributes}
+
     def _wait_for_idrac_state(self, host, alive=True, required_count=3,
                               retries=24):
         """Wait for iDRAC to become reachable or not reachable.
