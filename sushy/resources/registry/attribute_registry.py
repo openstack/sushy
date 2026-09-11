@@ -20,6 +20,20 @@ from sushy.resources import base
 LOG = logging.getLogger(__name__)
 
 
+def _read_only_key(key, value=None, **context):
+    """Match the ReadOnly property regardless of how a vendor cases it.
+
+    The schema spells it ``ReadOnly``, but Dell's manager and BIOS attribute
+    registries spell it ``Readonly``, which would otherwise be missed and
+    leave every attribute reporting no read-only state at all.
+
+    :param key: candidate JSON key.
+    :param value: value of the candidate key, unused.
+    :returns: True if the key is the ReadOnly property.
+    """
+    return key.lower() == 'readonly'
+
+
 class AttributeListField(base.ListField):
 
     name = base.Field('AttributeName', required=True)
@@ -40,7 +54,7 @@ class AttributeListField(base.ListField):
     immutable = base.Field('Immutable', adapter=bool)
     """An indication of whether this attribute is immutable"""
 
-    read_only = base.Field('ReadOnly', adapter=bool)
+    read_only = base.Field(_read_only_key, adapter=bool)
     """An indication of whether this attribute is read-only"""
 
     reset_required = base.Field('ResetRequired', adapter=bool)
