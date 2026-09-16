@@ -103,6 +103,8 @@ class HTTPError(SushyError):
         self.status_code = response.status_code
         try:
             body = response.json()
+            if not isinstance(body, dict):
+                raise ValueError
         except ValueError:
             LOG.warning('Error response from %(method)s %(url)s '
                         'with status code %(code)s has no JSON body',
