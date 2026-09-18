@@ -108,7 +108,8 @@ class SystemTestCase(base.TestCase):
                           parser.parse('2016-03-07T14:44:30-05:05')},
                          attributes.get('maintenance_window'))
         self.assertEqual(
-            {'reset': {'allowed_values':
+            {'reset': {'action_info_uri': None,
+                       'allowed_values':
                        ['On', 'ForceOff', 'GracefulShutdown',
                         'GracefulRestart', 'ForceRestart', 'Nmi',
                         'ForceOn', 'PushPowerButton'],
@@ -206,6 +207,58 @@ class SystemTestCase(base.TestCase):
         self.assertEqual(expected, values)
         self.assertIsInstance(values, set)
         self.assertEqual(1, mock_log.call_count)
+
+    def _use_action_info(self, action_info=None, error=None):
+        """Move the allowed values into a separate ActionInfo resource.
+
+        :returns: the URI the reset action now points at.
+        """
+        uri = '/redfish/v1/Systems/437XR1138R2/ResetActionInfo'
+        action = self.json_doc['Actions']['#ComputerSystem.Reset']
+        action.pop('ResetType@Redfish.AllowableValues', None)
+        action['@Redfish.ActionInfo'] = uri
+
+        def _get(path=None, **kwargs):
+            if path == uri and error:
+                raise error
+            response = mock.Mock()
+            response.headers = {'Allow': 'GET,HEAD'}
+            response.json.return_value = (action_info if path == uri
+                                          else self.json_doc)
+            return response
+
+        self.conn.get.side_effect = _get
+        self.sys_inst.refresh(force=True)
+
+        return uri
+
+    def test_get_allowed_reset_system_values_from_action_info(self):
+        self._use_action_info(
+            {'Parameters': [{'Name': 'ResetType',
+                             'AllowableValues': ['ForceOff',
+                                                 'GracefulShutdown',
+                                                 'On', 'ForceRestart']}]})
+
+        values = self.sys_inst.get_allowed_reset_system_values()
+
+        self.assertEqual({sushy.ResetType.FORCE_OFF,
+                          sushy.ResetType.GRACEFUL_SHUTDOWN,
+                          sushy.ResetType.ON,
+                          sushy.ResetType.FORCE_RESTART}, values)
+
+    def test_get_allowed_reset_system_values_action_info_unusable(self):
+        fallback = set(sushy.ResetType)
+
+        for action_info, error in (
+                (None, exceptions.ConnectionError(url='/x', error='boom')),
+                ({'Parameters': 'not a list of parameters'}, None)):
+            uri = self._use_action_info(action_info, error)
+            self.conn.get.reset_mock()
+
+            self.assertEqual(
+                fallback, self.sys_inst.get_allowed_reset_system_values())
+            # the fallback came from trying the ActionInfo, not ignoring it
+            self.conn.get.assert_called_once_with(path=uri)
 
     def test_reset_action_operation_apply_time_support(self):
         support = self.sys_inst._actions.reset.operation_apply_time_support
