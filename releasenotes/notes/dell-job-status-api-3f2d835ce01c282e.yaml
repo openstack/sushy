@@ -1,0 +1,10 @@
+---
+features:
+  - |
+    Adds per-job status to the Dell OEM Lifecycle Controller job
+    collection. Individual jobs can now be read as ``DellJob`` resources
+    that expose their state and message and report whether the job has
+    finished and whether it failed, so callers can tell a successful job
+    from a failed one and see why it failed. Previously only the list of
+    unfinished job identities was available; ``get_unfinished_jobs()``
+    keeps its existing behaviour.

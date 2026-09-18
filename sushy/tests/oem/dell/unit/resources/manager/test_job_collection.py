@@ -17,6 +17,7 @@ from unittest import mock
 
 from oslotest.base import BaseTestCase
 
+from sushy import exceptions
 from sushy.oem.dell.resources.manager import job_collection
 
 
@@ -124,3 +125,60 @@ class DellJobCollectionTestCase(BaseTestCase):
     def test_get_unfinished_jobs_empty_queue(self):
         self._set_jobs([])
         self.assertEqual([], self.job_collection.get_unfinished_jobs())
+
+    def test_get_jobs(self):
+        self.conn.get.reset_mock()
+        jobs = self.job_collection.get_jobs()
+        target_uri = ('/redfish/v1/Managers/iDRAC.Embedded.1'
+                      '/Jobs?$expand=.($levels=1)')
+        self.conn.get.assert_called_once_with(target_uri)
+        self.assertEqual(1, len(jobs))
+        dell_job = jobs[0]
+        self.assertEqual('RID_878460711202', dell_job.identity)
+        self.assertEqual('Reboot3', dell_job.name)
+        self.assertEqual('Job Instance', dell_job.description)
+        self.assertEqual('Running', dell_job.job_state)
+        self.assertEqual('RebootForce', dell_job.job_type)
+        self.assertEqual('Reboot is complete.', dell_job.message)
+        self.assertEqual('RED030', dell_job.message_id)
+        self.assertEqual(100, dell_job.percent_complete)
+        self.assertEqual('TIME_NOW', dell_job.start_time)
+        self.assertEqual('TIME_NA', dell_job.end_time)
+        self.assertEqual('2020-04-25T15:21:33', dell_job.completion_time)
+        self.assertFalse(dell_job.is_finished)
+
+    def test_get_jobs_filters_by_job_ids(self):
+        expected = self._set_jobs(
+            ['Completed', 'UserIntervention', 'Failed', 'RebootPending'])
+        self.conn.get.reset_mock()
+        jobs = self.job_collection.get_jobs(
+            job_ids=[expected[3], expected[1]])
+        self.assertEqual([expected[1], expected[3]],
+                         [dell_job.identity for dell_job in jobs])
+        self.conn.get.assert_called_once()
+
+    def test_get_jobs_member_without_id_raises(self):
+        # Id is a required field of DellJob, so a member lacking it is a
+        # malformed response and surfaces as such rather than being
+        # silently dropped.
+        base_uri = '/redfish/v1/Managers/iDRAC.Embedded.1/Jobs'
+        no_id_member = {
+            '@odata.id': base_uri + '/JID_0', 'JobState': 'Completed'}
+        self.conn.get.return_value.json.return_value = {
+            'Id': 'JobQueue', 'Name': 'JobQueue',
+            'Members': [no_id_member]}
+        self.assertRaises(exceptions.MissingAttributeError,
+                          self.job_collection.get_jobs)
+
+    def test_get_job(self):
+        with open('sushy/tests/oem/dell/unit/json_samples/'
+                  'job.json') as f:
+            self.conn.get.return_value.json.return_value = json.load(f)
+        self.conn.get.reset_mock()
+        dell_job = self.job_collection.get_job('JID_878623579002')
+        target_uri = ('/redfish/v1/Managers/iDRAC.Embedded.1'
+                      '/Jobs/JID_878623579002')
+        self.conn.get.assert_called_once_with(path=target_uri)
+        self.assertEqual('JID_878623579002', dell_job.identity)
+        self.assertEqual('Completed', dell_job.job_state)
+        self.assertTrue(dell_job.is_finished)

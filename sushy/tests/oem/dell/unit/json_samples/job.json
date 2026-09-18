@@ -1,0 +1,19 @@
+{
+   "@odata.context": "/redfish/v1/$metadata#DellJob.DellJob",
+   "@odata.id": "/redfish/v1/Managers/iDRAC.Embedded.1/Jobs/JID_878623579002",
+   "@odata.type": "#DellJob.v1_0_2.DellJob",
+   "CompletionTime": "2024-06-01T15:21:33",
+   "Description": "Job Instance",
+   "EndTime": "TIME_NA",
+   "Id": "JID_878623579002",
+   "JobState": "Completed",
+   "JobType": "FirmwareUpdate",
+   "Message": "Job completed successfully.",
+   "MessageArgs": [ ],
+   "MessageArgs@odata.count": 0,
+   "MessageId": "PR19",
+   "Name": "Firmware Update: BIOS",
+   "PercentComplete": 100,
+   "StartTime": "2024-06-01T15:10:02",
+   "TargetSettingsURI": null
+}
