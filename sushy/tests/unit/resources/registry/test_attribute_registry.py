@@ -13,6 +13,7 @@
 #    under the License.
 
 
+import copy
 import json
 from unittest import mock
 
@@ -105,3 +106,32 @@ class AttributeRegistryTestCase(base.TestCase):
                           {'ValueDisplayName': 'Enable',
                            'ValueName': 'Enable'}],
                          attributes.allowable_values)
+
+    def test__parse_attributes_vendor_cased_read_only(self):
+        # Dell's registries spell the property "Readonly".
+        doc = copy.deepcopy(self.json_doc)
+        for attribute in doc['RegistryEntries']['Attributes']:
+            attribute['Readonly'] = attribute.pop('ReadOnly')
+        self.conn.get.return_value.json.return_value = doc
+
+        registry = attribute_registry.AttributeRegistry(
+            self.conn, '/redfish/v1/Test/Bios/BiosRegistry',
+            redfish_version='1.0.2')
+
+        attributes = registry.registry_entries.attributes[0]
+        self.assertEqual('SystemModelName', attributes.name)
+        self.assertEqual(True, attributes.read_only)
+        self.assertEqual(False,
+                         registry.registry_entries.attributes[1].read_only)
+
+    def test__parse_attributes_no_read_only(self):
+        doc = copy.deepcopy(self.json_doc)
+        for attribute in doc['RegistryEntries']['Attributes']:
+            del attribute['ReadOnly']
+        self.conn.get.return_value.json.return_value = doc
+
+        registry = attribute_registry.AttributeRegistry(
+            self.conn, '/redfish/v1/Test/Bios/BiosRegistry',
+            redfish_version='1.0.2')
+
+        self.assertIsNone(registry.registry_entries.attributes[0].read_only)

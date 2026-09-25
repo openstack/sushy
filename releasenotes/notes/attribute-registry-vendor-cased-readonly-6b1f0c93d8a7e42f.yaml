@@ -1,0 +1,8 @@
+---
+fixes:
+  - |
+    The ``ReadOnly`` property of an attribute registry entry is now read
+    whatever case a vendor uses for it. Dell's manager and BIOS attribute
+    registries spell it ``Readonly``, so every entry from an iDRAC previously
+    reported ``read_only`` as ``None`` rather than saying whether the
+    attribute could be changed.
