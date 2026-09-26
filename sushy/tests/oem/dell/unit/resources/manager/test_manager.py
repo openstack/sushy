@@ -679,3 +679,30 @@ class ManagerTestCase(BaseTestCase):
         result = oem_manager._is_reachable()
 
         self.assertFalse(result)
+
+    @mock.patch('sushy.resources.oem.common._global_extn_mgrs_by_resource', {})
+    def test_attribute_resources(self):
+        oem_manager = self.manager.get_oem_extension('Dell')
+        # Each DellAttributes resource names itself; the identity cannot be
+        # taken from the path, which differs between iDRAC generations.
+        identities = ['iDRAC.Embedded.1', 'System.Embedded.1',
+                      'LifecycleController.Embedded.1']
+
+        def get_attributes(path, *args, **kwargs):
+            response = mock.Mock()
+            response.status_code = 200
+            response.json.return_value = {
+                'Id': path.rsplit('/', 2)[-2],
+                'Attributes': {'SSH.1.Port': 22},
+            }
+            return response
+
+        oem_manager._conn.get = mock.Mock(side_effect=get_attributes)
+
+        resources = oem_manager.attribute_resources
+
+        self.assertEqual(sorted(identities), sorted(resources))
+        bmc = resources.get('iDRAC.Embedded.1')
+        self.assertEqual('iDRAC.Embedded.1', bmc.identity)
+        self.assertEqual({'SSH.1.Port': 22}, bmc.attributes)
+        self.assertIsNone(resources.get('Nonexistent.1'))
