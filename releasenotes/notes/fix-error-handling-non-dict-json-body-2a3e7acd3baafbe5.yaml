@@ -1,0 +1,7 @@
+---
+fixes:
+  - |
+    Fixes ``AttributeError: 'str' object has no attribute 'get'`` during
+    error handling. This occurs when a service returns an error response
+    whose JSON body is not an object (for example, a plain string or
+    ``null``) instead of a Redfish error object.

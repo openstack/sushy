@@ -485,6 +485,30 @@ class ConnectorOpTestCase(base.TestCase):
         self.assertIn('unsupported media type',
                       exc.extended_info['Resolution'])
 
+    def test_known_http_error_string_body(self):
+        self.request.return_value.status_code = http_client.BAD_REQUEST
+        self.request.return_value.json.return_value = 'EOF'
+
+        with self.assertRaisesRegex(exceptions.BadRequestError,
+                                    'unknown error') as cm:
+            self.conn._op('POST', 'http://foo.bar')
+        exc = cm.exception
+        self.assertEqual(http_client.BAD_REQUEST, exc.status_code)
+        self.assertIsNone(exc.body)
+        self.assertIsNone(exc.detail)
+
+    def test_known_http_error_null_body(self):
+        self.request.return_value.status_code = http_client.BAD_REQUEST
+        self.request.return_value.json.return_value = None
+
+        with self.assertRaisesRegex(exceptions.BadRequestError,
+                                    'unknown error') as cm:
+            self.conn._op('POST', 'http://foo.bar')
+        exc = cm.exception
+        self.assertEqual(http_client.BAD_REQUEST, exc.status_code)
+        self.assertIsNone(exc.body)
+        self.assertIsNone(exc.detail)
+
     @mock.patch('time.sleep', autospec=True)
     def test_not_found_error(self, mock_sleep):
         self.request.return_value.status_code = http_client.NOT_FOUND
