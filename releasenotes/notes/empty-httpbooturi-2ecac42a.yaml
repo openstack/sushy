@@ -1,0 +1,6 @@
+---
+fixes:
+  - |
+    Avoid sending a null ``HttpBootUri`` when the Redfish Settings resource
+    advertises the property with an empty value. The URI is already unset,
+    and some controllers reject the unnecessary PATCH.
