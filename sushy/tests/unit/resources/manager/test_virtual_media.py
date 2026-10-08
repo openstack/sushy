@@ -81,6 +81,29 @@ class VirtualMediaTestCase(base.TestCase):
                           sushy.VirtualMediaType.USB_STICK],
                          attributes.get('media_types'))
 
+    def test__parse_attributes_media_type_list(self):
+        with open('sushy/tests/unit/json_samples/'
+                  'virtual_media_irmc.json') as f:
+            json_doc = json.load(f)
+        self.sys_virtual_media._parse_attributes(json_doc)
+        self.assertEqual([sushy.VirtualMediaType.CD,
+                          sushy.VirtualMediaType.DVD],
+                         self.sys_virtual_media.media_types)
+        self.assertNotIn('MediaTypes', json_doc)
+
+    def test__parse_attributes_media_types_preferred(self):
+        self.json_doc['MediaType'] = ['CD']
+        self.sys_virtual_media._parse_attributes(self.json_doc)
+        self.assertEqual([sushy.VirtualMediaType.FLOPPY,
+                          sushy.VirtualMediaType.USB_STICK],
+                         self.sys_virtual_media.media_types)
+
+    def test__parse_attributes_media_type_string_ignored(self):
+        del self.json_doc['MediaTypes']
+        self.json_doc['MediaType'] = 'CD'
+        self.sys_virtual_media._parse_attributes(self.json_doc)
+        self.assertEqual([], self.sys_virtual_media.media_types)
+
     def test_insert_media_none(self):
         self.sys_virtual_media._actions.insert_media = None
         self.assertRaisesRegex(

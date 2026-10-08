@@ -1,0 +1,35 @@
+{
+    "@odata.id": "/redfish/v1/Managers/iRMC/VirtualMedia/0",
+    "@odata.type": "#VirtualMedia.v1_5_1.VirtualMedia",
+    "Oem": {},
+    "Id": "0",
+    "Name": "Virtual CD",
+    "ImageName": "boot.iso",
+    "Image": "http://192.0.2.10/boot.iso",
+    "MediaType": [
+        "CD",
+        "DVD"
+    ],
+    "Inserted": false,
+    "WriteProtected": true,
+    "UserName": null,
+    "Password": null,
+    "TransferProtocolType": "HTTP",
+    "TransferProtocolType@Redfish.AllowableValues": [
+        "HTTP",
+        "NFS",
+        "CIFS"
+    ],
+    "Actions": {
+        "#VirtualMedia.InsertMedia": {
+            "title": "Insert virtual media",
+            "target": "/redfish/v1/Managers/iRMC/VirtualMedia/0/Actions/VirtualMedia.InsertMedia",
+            "@Redfish.ActionInfo": "/redfish/v1/Managers/iRMC/VirtualMedia/0/VirtualMediaInsertMediaActionInfo"
+        },
+        "#VirtualMedia.EjectMedia": {
+            "target": "/redfish/v1/Managers/iRMC/VirtualMedia/0/Actions/VirtualMedia.EjectMedia",
+            "title": "Eject virtual media"
+        }
+    },
+    "@Redfish.Copyright": "Copyright 2014-2020 DMTF. For the full DMTF copyright policy, see http://www.dmtf.org/about/policies/copyright"
+}

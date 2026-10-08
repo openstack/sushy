@@ -1,0 +1,8 @@
+---
+fixes:
+  - |
+    Virtual media devices now report their supported media types on BMCs
+    that name the ``MediaTypes`` property ``MediaType``, such as Fujitsu
+    iRMC S5 with firmware 3.54P. Previously ``media_types`` was empty on
+    these BMCs, so Ironic found no device to insert an ISO into. The
+    misnamed property is only used when ``MediaTypes`` is missing.

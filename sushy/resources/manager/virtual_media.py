@@ -83,6 +83,16 @@ class VirtualMedia(base.ResourceBase):
 
     _certificates_path = base.Field(['Certificates', '@odata.id'])
 
+    def _parse_attributes(self, json_doc):
+        # NOTE(maya-faisal) Some BMCs (e.g. Fujitsu iRMC S5 with firmware
+        # 3.54P) name the "MediaTypes" property "MediaType", which is only
+        # the name of its enum type in the schema. Accept it as the list of
+        # supported media types, but only when "MediaTypes" is missing.
+        if ('MediaTypes' not in json_doc
+                and isinstance(json_doc.get('MediaType'), list)):
+            json_doc = dict(json_doc, MediaTypes=json_doc['MediaType'])
+        return super()._parse_attributes(json_doc)
+
     def _get_insert_media_uri(self):
         insert_media = self._actions.insert_media if self._actions else None
         use_patch = False
