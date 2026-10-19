@@ -1,0 +1,6 @@
+---
+features:
+  - |
+    Adds a ``last_reset_time`` attribute to the System object. It maps to
+    the Redfish ``LastResetTime`` property, the date and time when the
+    system was last reset or rebooted.

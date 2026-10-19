@@ -49,6 +49,7 @@
         "LastStateTime": "2017-05-03T23:12:37-05:00",
         "OemLastState": "OS foo running."
     },
+    "LastResetTime": "2017-05-03T23:10:12-05:00",
     "TrustedModules": [
         {
             "FirmwareVersion": "1.13b",

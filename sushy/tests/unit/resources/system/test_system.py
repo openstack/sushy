@@ -91,6 +91,8 @@ class SystemTestCase(base.TestCase):
                          self.sys_inst.boot_progress.last_state_updated_at)
         self.assertEqual("OS foo running.",
                          self.sys_inst.boot_progress.oem_last_state)
+        self.assertEqual(parser.parse('2017-05-03T23:10:12-05:00'),
+                         self.sys_inst.last_reset_time)
 
     def test__parse_attributes_return(self):
         attributes = self.sys_inst._parse_attributes(self.json_doc)
@@ -746,6 +748,11 @@ class SystemTestCase(base.TestCase):
         self.assertRaisesRegex(
             exceptions.MissingAttributeError, 'attribute Processors',
             self.sys_inst._get_processor_collection_path)
+
+    def test_last_reset_time_missing_attr(self):
+        self.sys_inst._json.pop('LastResetTime')
+        self.sys_inst._parse_attributes(self.json_doc)
+        self.assertIsNone(self.sys_inst.last_reset_time)
 
     def test_memory_summary_missing_attr(self):
         # | GIVEN |

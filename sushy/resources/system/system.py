@@ -258,6 +258,9 @@ class System(base.ResourceBase):
     boot_progress = BootProgressField('BootProgress')
     """The last updated boot progress indicator"""
 
+    last_reset_time = base.Field('LastResetTime', adapter=parser.parse)
+    """The date and time when the system was last reset or rebooted"""
+
     def __init__(self, connector, identity, redfish_version=None,
                  registries=None, root=None):
         """A class representing a ComputerSystem
