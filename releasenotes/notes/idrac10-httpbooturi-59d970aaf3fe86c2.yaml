@@ -1,0 +1,9 @@
+---
+fixes:
+  - |
+    Fixed ``set_system_boot_source`` to handle BMCs that do not advertise
+    ``HttpBootUri`` in the Boot section, such as iDRAC 10 which removed
+    this property entirely. The property is now only written when the BMC
+    explicitly advertises it, preventing spurious 400 errors on UefiHTTP
+    boot requests. An explicit URI passed by the caller will still raise
+    ``MissingAttributeError`` when the BMC does not support the property.
