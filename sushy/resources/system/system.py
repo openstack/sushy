@@ -401,7 +401,7 @@ class System(base.ResourceBase):
                 boot_data = data
                 current_value = None
 
-            if not only_if_set or current_value is not None:
+            if not only_if_set or current_value:
                 boot_data['Boot'][name] = value
             return True
 

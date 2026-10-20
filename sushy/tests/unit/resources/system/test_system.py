@@ -652,6 +652,34 @@ class SystemTestCase(base.TestCase):
                            'BootSourceOverrideMode': 'UEFI'}},
             etag=mock.ANY)
 
+    def test_set_system_boot_options_httpboot_empty_unset(self):
+        # An advertised but empty HttpBootUri is already unset, so switching
+        # to another boot target must not send HttpBootUri: null.
+        self.sys_inst._settings = mock.Mock()
+        self.sys_inst._settings.resource_uri = (
+            '/redfish/v1/Systems/437XR1138R2/SD'
+        )
+
+        get_settings = mock.MagicMock(headers={'ETag': '"abc"'})
+        get_settings.json.return_value = {
+            'Boot': {
+                'BootSourceOverrideTarget': 'Hdd',
+                'BootSourceOverrideEnabled': 'Disabled',
+                'HttpBootUri': ''
+            }
+        }
+        self.conn.get.return_value = get_settings
+
+        self.sys_inst.set_system_boot_options(
+            sushy.BootSource.CD,
+            enabled=sushy.BootSourceOverrideEnabled.ONCE)
+
+        self.sys_inst._conn.patch.assert_called_once_with(
+            '/redfish/v1/Systems/437XR1138R2/SD',
+            data={'Boot': {'BootSourceOverrideTarget': 'Cd',
+                           'BootSourceOverrideEnabled': 'Once'}},
+            etag='"abc"')
+
     def test_set_system_boot_source(self):
         self.sys_inst.set_system_boot_source(
             sushy.BootSource.PXE,
