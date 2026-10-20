@@ -1,0 +1,7 @@
+---
+fixes:
+  - |
+    Fixes getting the supported reset types from services that publish them
+    in an ``ActionInfo`` resource, referenced by the system reset action's
+    ``@Redfish.ActionInfo`` annotation, instead of annotating them inline.
+    On such systems every reset type was previously assumed to be supported.
