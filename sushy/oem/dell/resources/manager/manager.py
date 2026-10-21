@@ -81,7 +81,7 @@ class DellManagerExtension(oem_base.OEMResourceBase):
 
     ACTION_DATA = {
         'ShareParameters': {
-            'Target': ['ALL']
+            'Target': ['IDRAC']
         },
         'ImportBuffer': None
     }
