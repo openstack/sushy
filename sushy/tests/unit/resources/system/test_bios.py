@@ -159,6 +159,114 @@ class BiosTestCase(base.TestCase):
         self.sys_bios.pending_attributes
         self.assertTrue(self.conn.get.called)
 
+    def _setUp_cisco_ucs_c880(self):
+        with open('sushy/tests/unit/json_samples/'
+                  'settings-cisco-ucs-c880.json') as f:
+            self.bios_json.update(json.load(f))
+        self.bios_response = mock.MagicMock(headers={})
+        self.bios_response.json.return_value = self.bios_json
+        self.conn.reset_mock()
+
+    def test_set_attribute_cisco_ucs_c880(self):
+        self._setUp_cisco_ucs_c880()
+        self.conn.get.side_effect = [
+            self.bios_response,
+            mock.MagicMock(headers={'ETag': '"1787788683"'})]
+
+        resource = bios.Bios(
+            self.conn, '/redfish/v1/Systems/DGX/Bios',
+            redfish_version='1.0.2')
+        resource.set_attribute('ProcTurboMode', 'Disabled')
+
+        self.assertEqual(
+            [mock.call(path='/redfish/v1/Systems/DGX/Bios'),
+             mock.call(path='/redfish/v1/Systems/DGX/Bios/SD')],
+            self.conn.get.call_args_list)
+        self.conn.patch.assert_called_once_with(
+            '/redfish/v1/Systems/DGX/Bios/SD',
+            data={'Attributes': {'ProcTurboMode': 'Disabled'}},
+            etag='"1787788683"')
+
+    def test_set_attribute_cisco_ucs_c880_twice(self):
+        self._setUp_cisco_ucs_c880()
+        self.conn.get.side_effect = [
+            self.bios_response,
+            mock.MagicMock(headers={'ETag': '"1787788683"'})]
+        self.conn.patch.side_effect = [
+            mock.MagicMock(status_code=http_client.NO_CONTENT,
+                           headers={'ETag': '"1787788690"'}),
+            mock.MagicMock(status_code=http_client.NO_CONTENT,
+                           headers={'ETag': '"1787788695"'})]
+
+        resource = bios.Bios(
+            self.conn, '/redfish/v1/Systems/DGX/Bios',
+            redfish_version='1.0.2')
+        resource.set_attribute('ProcTurboMode', 'Disabled')
+        resource.set_attribute('UsbControl', 'UsbDisabled')
+
+        self.assertEqual(
+            [mock.call(path='/redfish/v1/Systems/DGX/Bios'),
+             mock.call(path='/redfish/v1/Systems/DGX/Bios/SD')],
+            self.conn.get.call_args_list)
+        self.assertEqual(
+            [mock.call('/redfish/v1/Systems/DGX/Bios/SD',
+                       data={'Attributes': {'ProcTurboMode': 'Disabled'}},
+                       etag='"1787788683"'),
+             mock.call('/redfish/v1/Systems/DGX/Bios/SD',
+                       data={'Attributes': {'UsbControl': 'UsbDisabled'}},
+                       etag='"1787788690"')],
+            self.conn.patch.call_args_list)
+
+    def test_set_attribute_cisco_ucs_c880_after_light_refresh(self):
+        self._setUp_cisco_ucs_c880()
+        self.conn.get.side_effect = [
+            self.bios_response,
+            mock.MagicMock(headers={'ETag': '"1787788683"'}),
+            self.bios_response]
+
+        resource = bios.Bios(
+            self.conn, '/redfish/v1/Systems/DGX/Bios',
+            redfish_version='1.0.2')
+        resource.invalidate()
+        resource.set_attribute('ProcTurboMode', 'Disabled')
+
+        # set_attribute() re-reads the stale BIOS without force, which must
+        # not fetch a new SettingsObject ETag on the caller's behalf.
+        self.assertEqual(
+            [mock.call(path='/redfish/v1/Systems/DGX/Bios'),
+             mock.call(path='/redfish/v1/Systems/DGX/Bios/SD'),
+             mock.call(path='/redfish/v1/Systems/DGX/Bios')],
+            self.conn.get.call_args_list)
+        self.conn.patch.assert_called_once_with(
+            '/redfish/v1/Systems/DGX/Bios/SD',
+            data={'Attributes': {'ProcTurboMode': 'Disabled'}},
+            etag=None)
+
+    def test_set_attribute_cisco_ucs_c880_after_forced_refresh(self):
+        self._setUp_cisco_ucs_c880()
+        self.conn.get.side_effect = [
+            self.bios_response,
+            mock.MagicMock(headers={'ETag': '"1787788683"'}),
+            self.bios_response,
+            mock.MagicMock(headers={'ETag': '"1787788690"'})]
+
+        resource = bios.Bios(
+            self.conn, '/redfish/v1/Systems/DGX/Bios',
+            redfish_version='1.0.2')
+        resource.refresh()
+        resource.set_attribute('ProcTurboMode', 'Disabled')
+
+        self.assertEqual(
+            [mock.call(path='/redfish/v1/Systems/DGX/Bios'),
+             mock.call(path='/redfish/v1/Systems/DGX/Bios/SD'),
+             mock.call(path='/redfish/v1/Systems/DGX/Bios'),
+             mock.call(path='/redfish/v1/Systems/DGX/Bios/SD')],
+            self.conn.get.call_args_list)
+        self.conn.patch.assert_called_once_with(
+            '/redfish/v1/Systems/DGX/Bios/SD',
+            data={'Attributes': {'ProcTurboMode': 'Disabled'}},
+            etag='"1787788690"')
+
     def test_set_attributes(self):
         self.conn.get.return_value.json.side_effect = [
             self.bios_json]

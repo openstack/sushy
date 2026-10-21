@@ -13,10 +13,12 @@
 # This is referred from Redfish standard schema.
 # https://redfish.dmtf.org/schemas/Settings.v1_2_0.json
 
+from http import client as http_client
 import logging
 
 from dateutil import parser
 
+from sushy import exceptions
 from sushy.resources import base
 from sushy.resources import common
 from sushy.resources import constants as res_cons
@@ -124,6 +126,9 @@ class SettingsField(base.CompositeField):
     to change this resource
     """
 
+    _settings_object_etag = None
+    """HTTP ETag of the SettingsObject, see capture_etag"""
+
     _supported_apply_times = base.MappedListField(
         'SupportedApplyTimes',
         res_cons.ApplyTime)
@@ -169,8 +174,40 @@ class SettingsField(base.CompositeField):
             to each resource and the caller must format it correctly
         :returns: Response object
         """
+        etag = self._etag or self._settings_object_etag
+        response = connector.patch(self.resource_uri, data=value, etag=etag)
+        if not self._etag:
+            # A successful conditional PATCH produces the observed version
+            # plus our change, so its ETag can be used for the next update.
+            # Otherwise the new version is unknown and the resource has to be
+            # read again first.
+            if response.status_code in (http_client.OK,
+                                        http_client.NO_CONTENT):
+                self._settings_object_etag = response.headers.get('ETag')
+            else:
+                self._settings_object_etag = None
+        return response
 
-        return connector.patch(self.resource_uri, data=value, etag=self._etag)
+    def capture_etag(self, connector):
+        """Record the HTTP ETag of the SettingsObject
+
+        Only done when @Redfish.Settings does not provide an ETag. Must be
+        called when the parent resource is loaded or refreshed with force,
+        so that the ETag used by :meth:`commit` corresponds to the state
+        observed by the caller.
+
+        :param connector: A Connector instance
+        """
+        if self._etag or not self._settings_object_idref:
+            return
+        try:
+            response = connector.get(path=self.resource_uri)
+        except exceptions.HTTPError as e:
+            LOG.warning('Unable to read ETag of settings object %(uri)s, '
+                        'updates will be sent without If-Match: %(err)s',
+                        {'uri': self.resource_uri, 'err': e})
+            return
+        self._settings_object_etag = response.headers.get('ETag')
 
     @property
     def resource_uri(self):

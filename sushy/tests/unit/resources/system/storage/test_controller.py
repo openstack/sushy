@@ -34,6 +34,7 @@ class ControllerTestCase(base.TestCase):
 
         self.conn.get.return_value.json.side_effect = [
             self.json_doc, self.settings_json]
+        self.conn.get.return_value.headers = {'ETag': '"1606829421"'}
 
         self.controller = controller.StorageController(
             self.conn,
@@ -84,9 +85,33 @@ class ControllerTestCase(base.TestCase):
                   '@Redfish.SettingsApplyTime': {
                       '@odata.type': '#Settings.v1_0_0.PreferredApplyTime',
                       'ApplyTime': 'OnReset'}},
-            etag=None)
+            etag='"1606829421"')
         self.assertIsInstance(tm, taskmonitor.TaskMonitor)
         self.assertEqual('/Task/545', tm.task_monitor_uri)
+
+    def test_update_uses_etag_captured_on_load(self):
+        self.conn.get.reset_mock()
+
+        self.controller.update({'ControllerRates': {}})
+
+        self.conn.get.assert_not_called()
+        self.conn.patch.assert_called_once_with(
+            '/redfish/v1/Systems/437XR1138R2/Storage/1/Controllers/1/Settings',
+            data={'ControllerRates': {}}, etag='"1606829421"')
+
+    def test_update_after_light_refresh(self):
+        self.conn.get.reset_mock()
+        self.conn.get.return_value.json.side_effect = [self.json_doc]
+
+        self.controller.invalidate()
+        self.controller.refresh(force=False)
+        self.controller.update({'ControllerRates': {}})
+
+        self.conn.get.assert_called_once_with(
+            path='/redfish/v1/Systems/437XR1138R2/Storage/1/Controllers/1')
+        self.conn.patch.assert_called_once_with(
+            '/redfish/v1/Systems/437XR1138R2/Storage/1/Controllers/1/Settings',
+            data={'ControllerRates': {}}, etag=None)
 
 
 class ControllerCollectionTestCase(base.TestCase):
