@@ -1,0 +1,4 @@
+---
+fixes:
+  - |
+    Fix virtual media payload for improved compatibility with iDRAC10
