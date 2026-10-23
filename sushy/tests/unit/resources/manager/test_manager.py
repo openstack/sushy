@@ -19,6 +19,7 @@ from sushy import exceptions
 from sushy.resources.chassis import chassis
 from sushy.resources import constants as res_cons
 from sushy.resources.manager import manager
+from sushy.resources.manager import network_protocol
 from sushy.resources.manager import virtual_media
 from sushy.resources.system import system
 from sushy.tests.unit import base
@@ -304,6 +305,16 @@ class ManagerTestCase(base.TestCase):
         self.assertIsInstance(actual_chassis[0], chassis.Chassis)
         self.assertEqual(
             '/redfish/v1/Chassis/1U', actual_chassis[0].path)
+
+    def test_network_protocol(self):
+        with open('sushy/tests/unit/json_samples/'
+                  'manager_network_protocol.json') as f:
+            self.conn.get.return_value.json.return_value = json.load(f)
+
+        net_proto = self.manager.network_protocol
+        self.assertIsInstance(
+            net_proto, network_protocol.ManagerNetworkProtocol)
+        self.assertEqual('NetworkProtocol', net_proto.identity)
 
     def test_ethernet_interfaces(self):
         self.conn.get.return_value.json.reset_mock()
