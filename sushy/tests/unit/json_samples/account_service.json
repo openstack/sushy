@@ -1,0 +1,72 @@
+{
+    "@odata.type": "#AccountService.v1_15_1.AccountService",
+    "Id": "AccountService",
+    "Name": "Account Service",
+    "Description": "Account Service",
+    "Status": {
+        "State": "Enabled",
+        "Health": "OK"
+    },
+    "ServiceEnabled": true,
+    "AccountLockoutThreshold": 5,
+    "AccountLockoutDuration": 30,
+    "AccountLockoutCounterResetAfter": 30,
+    "MinPasswordLength": 8,
+    "MaxPasswordLength": 127,
+    "LocalAccountAuth": "Fallback",
+    "Accounts": {
+        "@odata.id": "/redfish/v1/AccountService/Accounts"
+    },
+    "Roles": {
+        "@odata.id": "/redfish/v1/AccountService/Roles"
+    },
+    "LDAP": {
+        "ServiceEnabled": false,
+        "ServiceAddresses": [
+            "ldaps://ldap.contoso.com:636"
+        ],
+        "Authentication": {
+            "AuthenticationType": "UsernameAndPassword",
+            "Username": "cn=manager,dc=contoso,dc=com"
+        },
+        "LDAPService": {
+            "SearchSettings": {
+                "BaseDistinguishedNames": [
+                    "dc=contoso,dc=com"
+                ],
+                "UsernameAttribute": "uid",
+                "GroupNameAttribute": "cn",
+                "GroupsAttribute": "memberof"
+            }
+        },
+        "RemoteRoleMapping": [
+            {
+                "RemoteGroup": "cn=admins,dc=contoso,dc=com",
+                "LocalRole": "Administrator"
+            }
+        ],
+        "Certificates": {
+            "@odata.id": "/redfish/v1/AccountService/LDAP/Certificates"
+        }
+    },
+    "ActiveDirectory": {
+        "ServiceEnabled": false,
+        "ServiceAddresses": [
+            "ad.contoso.com"
+        ],
+        "Authentication": {
+            "AuthenticationType": "KerberosKeytab"
+        },
+        "RemoteRoleMapping": [
+            {
+                "RemoteGroup": "Domain Admins",
+                "LocalRole": "Administrator"
+            }
+        ],
+        "Certificates": {
+            "@odata.id": "/redfish/v1/AccountService/ActiveDirectory/Certificates"
+        }
+    },
+    "@odata.context": "/redfish/v1/$metadata#AccountService.AccountService",
+    "@odata.id": "/redfish/v1/AccountService"
+}

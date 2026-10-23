@@ -20,6 +20,7 @@ from sushy import auth
 from sushy import connector
 from sushy import exceptions
 from sushy import main
+from sushy.resources.accountservice import accountservice
 from sushy.resources.chassis import chassis
 from sushy.resources.compositionservice import compositionservice
 from sushy.resources.eventservice import eventservice
@@ -449,6 +450,14 @@ class MainTestCase(base.TestCase):
         self.assertRaisesRegex(
             exceptions.MissingXAuthToken, 'No X-Auth-Token returned',
             self.root.create_session, 'foo', 'bar')
+
+    @mock.patch.object(accountservice, 'AccountService', autospec=True)
+    def test_get_account_service(self, mock_acct_serv):
+        self.root.get_account_service()
+        mock_acct_serv.assert_called_once_with(
+            self.root._conn, '/redfish/v1/AccountService',
+            redfish_version=self.root.redfish_version,
+            registries=mock.ANY, root=self.root)
 
     @mock.patch.object(updateservice, 'UpdateService', autospec=True)
     def test_get_update_service(self, mock_upd_serv):
