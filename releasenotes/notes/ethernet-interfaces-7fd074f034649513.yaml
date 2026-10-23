@@ -1,0 +1,5 @@
+---
+features:
+  - |
+    Expands the ``EthernetInterfaces`` definitions with fields relevant for
+    Manager NICs, such as DHCP information and IP addresses.

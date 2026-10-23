@@ -81,3 +81,21 @@ ADDRESS_ORIGIN_IPv6_DHCPv6 = IPv6AddressOrigin.DHCP
 ADDRESS_ORIGIN_IPv6_LINKLOCAL = IPv6AddressOrigin.LINK_LOCAL
 ADDRESS_ORIGIN_IPv6_SLAAC = IPv6AddressOrigin.SLAAC
 ADDRESS_ORIGIN_IPv6_STATIC = IPv6AddressOrigin.STATIC
+
+
+class DHCPv6OperatingMode(enum.Enum):
+    DISABLED = 'Disabled'
+
+    ENABLED = 'Enabled'
+
+    STATEFUL = 'Stateful'
+
+    STATELESS = 'Stateless'
+
+
+class DHCPFallback(enum.Enum):
+    STATIC = 'Static'
+
+    AUTO_CONFIG = 'AutoConfig'
+
+    NONE = 'None'
