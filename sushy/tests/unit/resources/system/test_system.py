@@ -754,6 +754,32 @@ class SystemTestCase(base.TestCase):
         self.sys_inst._parse_attributes(self.json_doc)
         self.assertIsNone(self.sys_inst.last_reset_time)
 
+    def _check_unparsable_last_reset_time(self, value):
+        self.sys_inst._json['LastResetTime'] = value
+        with self.assertLogs(system.LOG, level='DEBUG') as logs:
+            self.sys_inst._parse_attributes(self.json_doc)
+        self.assertIsNone(self.sys_inst.last_reset_time)
+        self.assertIn('Ignoring LastResetTime value', logs.output[0])
+        # The rest of the System must still be parsed
+        self.assertEqual(sushy.PowerState.ON, self.sys_inst.power_state)
+
+    def test_last_reset_time_zero_date(self):
+        # Reported by Dell iDRAC while the host is powered off
+        for value in ('0000-00-00T00:00:00+00:00',
+                      '0000-00-00T00:00:00Z',
+                      '0000-00-00T00:00:00'):
+            with self.subTest(value=value):
+                self._check_unparsable_last_reset_time(value)
+
+    def test_last_reset_time_malformed(self):
+        self._check_unparsable_last_reset_time('not-a-date')
+
+    def test_last_reset_time_overflow(self):
+        self._check_unparsable_last_reset_time('99999999999999999999')
+
+    def test_last_reset_time_wrong_type(self):
+        self._check_unparsable_last_reset_time(1700000000)
+
     def test_memory_summary_missing_attr(self):
         # | GIVEN |
         self.sys_inst._json['MemorySummary']['Status'].pop('HealthRollup')

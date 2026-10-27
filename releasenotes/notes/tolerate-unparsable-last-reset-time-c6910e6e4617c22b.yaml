@@ -1,0 +1,8 @@
+---
+fixes:
+  - |
+    A ``LastResetTime`` value that cannot be parsed no longer makes the
+    System resource unusable. The ``last_reset_time`` attribute is set to
+    ``None`` instead. This affected Dell iDRAC, which reports
+    ``0000-00-00T00:00:00+00:00`` while the host is powered off. See `bug
+    2172255 <https://bugs.launchpad.net/sushy/+bug/2172255>`_ for details.

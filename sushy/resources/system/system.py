@@ -45,6 +45,21 @@ LOG = logging.getLogger(__name__)
 EXPAND_QUERY = '?$expand=.($levels=1)'
 
 
+def _parse_last_reset_time(value):
+    """Parse LastResetTime, treating values that cannot be parsed as unset.
+
+    LastResetTime is informational, so a value that cannot be parsed must
+    not make the whole System unusable. For example, Dell iDRAC reports
+    ``0000-00-00T00:00:00+00:00`` while the host is powered off.
+    """
+    try:
+        return parser.parse(value)
+    except (ValueError, TypeError, OverflowError) as exc:
+        LOG.debug('Ignoring LastResetTime value %r that cannot be parsed: '
+                  '%s', value, exc)
+        return None
+
+
 class ActionsField(base.CompositeField):
     reset = common.ResetActionField('#ComputerSystem.Reset')
 
@@ -258,8 +273,13 @@ class System(base.ResourceBase):
     boot_progress = BootProgressField('BootProgress')
     """The last updated boot progress indicator"""
 
-    last_reset_time = base.Field('LastResetTime', adapter=parser.parse)
-    """The date and time when the system was last reset or rebooted"""
+    last_reset_time = base.Field('LastResetTime',
+                                 adapter=_parse_last_reset_time)
+    """The date and time when the system was last reset or rebooted
+
+    None if the system does not report it or reports a value that cannot
+    be parsed.
+    """
 
     def __init__(self, connector, identity, redfish_version=None,
                  registries=None, root=None):
