@@ -1,0 +1,17 @@
+{
+    "@odata.type": "#ManagerAccount.v1_12_1.ManagerAccount",
+    "Id": "2",
+    "Name": "User Account",
+    "Description": "Admin User Account",
+    "UserName": "admin",
+    "Enabled": true,
+    "Locked": false,
+    "RoleId": "Administrator",
+    "PasswordChangeRequired": false,
+    "AccountTypes": [
+        "Redfish",
+        "IPMI"
+    ],
+    "@odata.context": "/redfish/v1/$metadata#ManagerAccount.ManagerAccount",
+    "@odata.id": "/redfish/v1/AccountService/Accounts/2"
+}

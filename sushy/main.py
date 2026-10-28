@@ -22,6 +22,7 @@ import requests
 from sushy import auth as sushy_auth
 from sushy import connector as sushy_connector
 from sushy import exceptions
+from sushy.resources.accountservice import accountservice
 from sushy.resources import base
 from sushy.resources.certificateservice import certificateservice
 from sushy.resources.chassis import chassis
@@ -150,6 +151,9 @@ class Sushy(base.ResourceBase):
 
     _event_service_path = base.Field(['EventService', '@odata.id'])
     """EventService path"""
+
+    _account_service_path = base.Field(['AccountService', '@odata.id'])
+    """AccountService path"""
 
     _certificate_service_path = base.Field(['CertificateService', '@odata.id'])
     """CertificateService path"""
@@ -395,6 +399,22 @@ class Sushy(base.ResourceBase):
         return manager.Manager(self._conn, identity,
                                redfish_version=self.redfish_version,
                                registries=self.lazy_registries, root=self)
+
+    def get_account_service(self):
+        """Get the AccountService object
+
+        :raises: MissingAttributeError, if the collection attribute is
+            not found
+        :returns: an AccountService object
+        """
+        if not self._account_service_path:
+            raise exceptions.MissingAttributeError(
+                attribute='AccountService/@odata.id', resource=self._path)
+
+        return accountservice.AccountService(
+            self._conn, self._account_service_path,
+            redfish_version=self.redfish_version,
+            registries=self.lazy_registries, root=self)
 
     def get_session_service(self):
         """Get the SessionService object
