@@ -219,3 +219,15 @@ class TransferMethod(enum.Enum):
 
     UPLOAD = 'Upload'
     """Upload the entire image file from the source URI to the service."""
+
+
+# This is not a part of the standard, just a helper for our use
+class NetworkProtocolType(enum.Enum):
+
+    DHCPv4 = 'DHCP'
+    DHCPv6 = 'DHCPv6'
+    NTP = 'NTP'
+    HTTP = 'HTTP'
+    HTTPS = 'HTTPS'
+    SSH = 'SSH'
+    IPMI = 'IPMI'
