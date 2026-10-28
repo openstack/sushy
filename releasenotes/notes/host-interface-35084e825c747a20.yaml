@@ -1,0 +1,4 @@
+---
+features:
+  - |
+    Exposes the Manager's HostInterface resource.

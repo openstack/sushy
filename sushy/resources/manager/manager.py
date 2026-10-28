@@ -20,6 +20,7 @@ from sushy.resources import base
 from sushy.resources import common
 from sushy.resources import constants as res_cons
 from sushy.resources.manager import constants as mgr_cons
+from sushy.resources.manager import host_interface
 from sushy.resources.manager import network_protocol
 from sushy.resources.manager import virtual_media
 from sushy.resources.system import ethernet_interface
@@ -207,6 +208,16 @@ class Manager(base.ResourceBase):
         LOG.debug('Resetting the Manager %s ...', self.identity)
         self._conn.post(target_uri, data={'ResetType': value})
         LOG.info('The Manager %s is being reset', self.identity)
+
+    @property
+    @utils.cache_it
+    def host_interfaces(self):
+        """Property to reference the HostInterfaceCollection instance."""
+        return host_interface.HostInterfaceCollection(
+            self._conn,
+            utils.get_sub_resource_path_by(self, 'HostInterfaces'),
+            redfish_version=self.redfish_version,
+            registries=self.registries, root=self.root)
 
     @property
     @utils.cache_it

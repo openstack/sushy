@@ -18,6 +18,7 @@ import sushy
 from sushy import exceptions
 from sushy.resources.chassis import chassis
 from sushy.resources import constants as res_cons
+from sushy.resources.manager import host_interface
 from sushy.resources.manager import manager
 from sushy.resources.manager import network_protocol
 from sushy.resources.manager import virtual_media
@@ -371,6 +372,35 @@ class ManagerWithoutVirtualMedia(base.TestCase):
         with self.assertRaisesRegex(
             exceptions.MissingAttributeError, 'attribute VirtualMedia'):
             self.manager.virtual_media
+
+    def test_host_interfaces(self):
+        with open('sushy/tests/unit/json_samples/'
+                  'host_interface_collection.json') as f:
+            self.conn.get.return_value.json.return_value = json.load(f)
+
+        host_ifaces = self.manager.host_interfaces
+        self.assertIsInstance(
+            host_ifaces, host_interface.HostInterfaceCollection)
+        self.assertEqual('Host Interface Collection', host_ifaces.name)
+
+
+class ManagerWithoutHostInterfaces(base.TestCase):
+
+    def setUp(self):
+        super().setUp()
+        self.conn = mock.Mock()
+        with open('sushy/tests/unit/json_samples/manager.json') as f:
+            self.json_doc = json.load(f)
+
+        self.conn.get.return_value.json.return_value = self.json_doc
+
+        self.manager = manager.Manager(self.conn, '/redfish/v1/Managers/BMC',
+                                       redfish_version='1.0.2')
+
+    def test_no_host_interfaces_attr(self):
+        with self.assertRaisesRegex(
+            exceptions.MissingAttributeError, 'attribute HostInterfaces'):
+            self.manager.host_interfaces
 
 
 class ManagerCollectionTestCase(base.TestCase):

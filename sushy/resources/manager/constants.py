@@ -221,6 +221,29 @@ class TransferMethod(enum.Enum):
     """Upload the entire image file from the source URI to the service."""
 
 
+class HostInterfaceType(enum.Enum):
+    """Host Interface Type constants"""
+
+    NETWORK_HOST_INTERFACE = 'NetworkHostInterface'
+    """A network host interface."""
+
+
+class AuthenticationMode(enum.Enum):
+    """Authentication Mode constants"""
+
+    AUTH_NONE = 'AuthNone'
+    """Requests without any type of authentication are allowed."""
+
+    BASIC_AUTH = 'BasicAuth'
+    """Requests using HTTP Basic Authentication are allowed."""
+
+    REDFISH_SESSION_AUTH = 'RedfishSessionAuth'
+    """Requests using Redfish Session Authentication are allowed."""
+
+    OEM_AUTH = 'OemAuth'
+    """Requests using OEM authentication mechanisms are allowed."""
+
+
 # This is not a part of the standard, just a helper for our use
 class NetworkProtocolType(enum.Enum):
 

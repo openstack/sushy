@@ -1,0 +1,42 @@
+{
+    "@odata.type": "#HostInterface.v1_4_0.HostInterface",
+    "Id": "Host.1",
+    "Name": "Managed Host Interface 1",
+    "Description": "Management for Host Interface",
+    "HostInterfaceType": "NetworkHostInterface",
+    "InterfaceEnabled": true,
+    "ExternallyAccessible": false,
+    "AuthenticationModes": [
+        "BasicAuth",
+        "RedfishSessionAuth"
+    ],
+    "AuthNoneRoleId": "ReadOnly",
+    "Status": {
+        "State": "Enabled",
+        "Health": "OK"
+    },
+    "CredentialBootstrapping": {
+        "Enabled": false,
+        "EnableAfterReset": true,
+        "RoleId": "Administrator",
+        "ExpirationWindowEnabled": true,
+        "ExpirationWindowMinutes": 30
+    },
+    "HostEthernetInterfaces": {
+        "@odata.id": "/redfish/v1/Systems/System.Embedded.1/EthernetInterfaces"
+    },
+    "ManagerEthernetInterface": {
+        "@odata.id": "/redfish/v1/Managers/BMC/EthernetInterfaces/NIC.1"
+    },
+    "NetworkProtocol": {
+        "@odata.id": "/redfish/v1/Managers/BMC/NetworkProtocol"
+    },
+    "Links": {
+        "ComputerSystems": [
+            {
+                "@odata.id": "/redfish/v1/Systems/System.Embedded.1"
+            }
+        ]
+    },
+    "@odata.id": "/redfish/v1/Managers/BMC/HostInterfaces/Host.1"
+}
