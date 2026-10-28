@@ -15,6 +15,7 @@ from unittest import mock
 
 
 from sushy.resources import constants as res_cons
+from sushy.resources import ipaddresses as ip_cons
 from sushy.resources.system import ethernet_interface
 from sushy.tests.unit import base
 
@@ -47,6 +48,30 @@ class EthernetInterfaceTestCase(base.TestCase):
         self.assertEqual(res_cons.State.ENABLED, self.sys_eth.status.state)
         self.assertEqual(res_cons.Health.OK, self.sys_eth.status.health)
         self.assertEqual(1000, self.sys_eth.speed_mbps)
+        self.assertEqual('web483', self.sys_eth.host_name)
+        self.assertEqual('web483.contoso.com', self.sys_eth.fqdn)
+        self.assertEqual('fe80::3ed9:2bff:fe34:600',
+                         self.sys_eth.ipv6_default_gateway)
+        self.assertEqual(['names.contoso.com'], self.sys_eth.name_servers)
+
+    def test_ipv4_addresses(self):
+        self.assertEqual(1, len(self.sys_eth.ipv4_addresses))
+        addr = self.sys_eth.ipv4_addresses[0]
+        self.assertEqual('192.168.0.10', addr.address)
+        self.assertEqual('255.255.252.0', addr.subnet_mask)
+        self.assertEqual('192.168.0.1', addr.gateway)
+        self.assertEqual(ip_cons.IPv4AddressOrigin.STATIC,
+                         addr.address_origin)
+
+    def test_ipv6_addresses(self):
+        self.assertEqual(1, len(self.sys_eth.ipv6_addresses))
+        addr = self.sys_eth.ipv6_addresses[0]
+        self.assertEqual('fe80::1ec1:deff:fe6f:1e24', addr.address)
+        self.assertEqual(64, addr.prefix_length)
+        self.assertEqual(ip_cons.IPv6AddressOrigin.STATIC,
+                         addr.address_origin)
+        self.assertEqual(ip_cons.AddressState.PREFERRED,
+                         addr.address_state)
 
 
 class EthernetInterfaceCollectionTestCase(base.TestCase):
