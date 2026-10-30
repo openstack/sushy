@@ -88,6 +88,13 @@ class Bios(base.ResourceBase):
             registries=None,
             redfish_version=self.redfish_version, root=self.root)
 
+    def _do_refresh(self, force):
+        super()._do_refresh(force)
+        # Like other related resources, only read the SettingsObject on a
+        # forced refresh. Otherwise its ETag is unknown until the next one.
+        if force and self._settings is not None:
+            self._settings.capture_etag(self._conn)
+
     @property
     def pending_attributes(self):
         """Pending BIOS attributes

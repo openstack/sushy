@@ -1,0 +1,11 @@
+---
+fixes:
+  - |
+    When the ``@Redfish.Settings`` annotation of a BIOS or storage controller
+    resource does not include an ``ETag``, the HTTP ETag of the
+    ``SettingsObject`` is now read when the resource is loaded or refreshed
+    (``refresh()`` with the default ``force=True``), and used as ``If-Match``
+    when updating settings. This fixes BIOS updates on BMCs that require
+    ``If-Match`` and reject requests without it with HTTP 428, such as the
+    AMI-based BMC of Cisco UCS C880 servers. See
+    `bug 2169279 <https://bugs.launchpad.net/sushy/+bug/2169279>`_.

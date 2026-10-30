@@ -1,0 +1,7 @@
+{
+  "@Redfish.Settings": {
+    "SettingsObject": {
+      "@odata.id": "/redfish/v1/Systems/DGX/Bios/SD"
+    }
+  }
+}

@@ -13,9 +13,11 @@
 #    License for the specific language governing permissions and limitations
 #    under the License.
 
+from http import client as http_client
 import json
 from unittest import mock
 
+from sushy import exceptions
 from sushy.resources import constants as res_cons
 from sushy.resources.registry import message_registry
 from sushy.resources import settings
@@ -28,6 +30,9 @@ class SettingsFieldTestCase(base.TestCase):
         super().setUp()
         with open('sushy/tests/unit/json_samples/settings.json') as f:
             self.json = json.load(f)
+        with open('sushy/tests/unit/json_samples/'
+                  'settings-cisco-ucs-c880.json') as f:
+            self.json_cisco = json.load(f)
 
         self.settings = settings.SettingsField()
 
@@ -80,6 +85,164 @@ class SettingsFieldTestCase(base.TestCase):
             '/redfish/v1/Systems/437XR1138R2/BIOS/Settings',
             data={'Attributes': {'key': 'value'}},
             etag='9234ac83b9700123cc32')
+
+    def test_capture_etag_cisco_ucs_c880(self):
+        conn = mock.Mock()
+        conn.get.side_effect = [
+            mock.MagicMock(headers={'ETag': '"1787788683"'})]
+        instance = self.settings._load(self.json_cisco, conn)
+
+        instance.capture_etag(conn)
+        instance.commit(conn, {'Attributes': {'key': 'value'}})
+
+        conn.get.assert_called_once_with(
+            path='/redfish/v1/Systems/DGX/Bios/SD')
+        conn.patch.assert_called_once_with(
+            '/redfish/v1/Systems/DGX/Bios/SD',
+            data={'Attributes': {'key': 'value'}},
+            etag='"1787788683"')
+
+    def test_capture_etag_parent_etag_present(self):
+        conn = mock.Mock()
+        instance = self.settings._load(self.json, conn)
+        instance.capture_etag(conn)
+        conn.get.assert_not_called()
+
+    def test_capture_etag_no_settings_object(self):
+        conn = mock.Mock()
+        instance = self.settings._load({'@Redfish.Settings': {}}, conn)
+        instance.capture_etag(conn)
+        conn.get.assert_not_called()
+
+    def test_capture_etag_no_etag_header(self):
+        conn = mock.Mock()
+        conn.get.side_effect = [mock.MagicMock(headers={})]
+        instance = self.settings._load(self.json_cisco, conn)
+
+        instance.capture_etag(conn)
+        instance.commit(conn, {'Attributes': {'key': 'value'}})
+
+        conn.get.assert_called_once_with(
+            path='/redfish/v1/Systems/DGX/Bios/SD')
+        conn.patch.assert_called_once_with(
+            '/redfish/v1/Systems/DGX/Bios/SD',
+            data={'Attributes': {'key': 'value'}},
+            etag=None)
+
+    @mock.patch.object(settings, 'LOG', autospec=True)
+    def test_capture_etag_http_error(self, mock_LOG):
+        conn = mock.Mock()
+        conn.get.side_effect = exceptions.ResourceNotFoundError(
+            method='GET', url='/redfish/v1/Systems/DGX/Bios/SD',
+            response=mock.MagicMock(status_code=404))
+        instance = self.settings._load(self.json_cisco, conn)
+
+        instance.capture_etag(conn)
+        instance.commit(conn, {'Attributes': {'key': 'value'}})
+
+        mock_LOG.warning.assert_called_once()
+        conn.get.assert_called_once_with(
+            path='/redfish/v1/Systems/DGX/Bios/SD')
+        conn.patch.assert_called_once_with(
+            '/redfish/v1/Systems/DGX/Bios/SD',
+            data={'Attributes': {'key': 'value'}},
+            etag=None)
+
+    def test_commit_uses_etag_from_patch_response(self):
+        conn = mock.Mock()
+        conn.get.side_effect = [
+            mock.MagicMock(headers={'ETag': '"1787788683"'})]
+        conn.patch.side_effect = [
+            mock.MagicMock(status_code=http_client.NO_CONTENT,
+                           headers={'ETag': '"1787788690"'}),
+            mock.MagicMock(status_code=http_client.NO_CONTENT,
+                           headers={'ETag': '"1787788695"'})]
+        instance = self.settings._load(self.json_cisco, conn)
+
+        instance.capture_etag(conn)
+        instance.commit(conn, {'Attributes': {'key': 'value1'}})
+        instance.commit(conn, {'Attributes': {'key': 'value2'}})
+
+        conn.get.assert_called_once_with(
+            path='/redfish/v1/Systems/DGX/Bios/SD')
+        conn.patch.assert_has_calls([
+            mock.call('/redfish/v1/Systems/DGX/Bios/SD',
+                      data={'Attributes': {'key': 'value1'}},
+                      etag='"1787788683"'),
+            mock.call('/redfish/v1/Systems/DGX/Bios/SD',
+                      data={'Attributes': {'key': 'value2'}},
+                      etag='"1787788690"')])
+        self.assertEqual(2, conn.patch.call_count)
+
+    def test_commit_patch_response_without_etag(self):
+        conn = mock.Mock()
+        conn.get.side_effect = [
+            mock.MagicMock(headers={'ETag': '"1787788683"'})]
+        conn.patch.side_effect = [
+            mock.MagicMock(status_code=http_client.OK, headers={}),
+            mock.MagicMock(status_code=http_client.OK, headers={})]
+        instance = self.settings._load(self.json_cisco, conn)
+
+        instance.capture_etag(conn)
+        instance.commit(conn, {'Attributes': {'key': 'value1'}})
+        instance.commit(conn, {'Attributes': {'key': 'value2'}})
+
+        conn.get.assert_called_once_with(
+            path='/redfish/v1/Systems/DGX/Bios/SD')
+        conn.patch.assert_has_calls([
+            mock.call('/redfish/v1/Systems/DGX/Bios/SD',
+                      data={'Attributes': {'key': 'value1'}},
+                      etag='"1787788683"'),
+            mock.call('/redfish/v1/Systems/DGX/Bios/SD',
+                      data={'Attributes': {'key': 'value2'}},
+                      etag=None)])
+        self.assertEqual(2, conn.patch.call_count)
+
+    def test_commit_patch_accepted(self):
+        conn = mock.Mock()
+        conn.get.side_effect = [
+            mock.MagicMock(headers={'ETag': '"1787788683"'})]
+        conn.patch.side_effect = [
+            mock.MagicMock(status_code=http_client.ACCEPTED,
+                           headers={'ETag': '"1787788690"'}),
+            mock.MagicMock(status_code=http_client.ACCEPTED, headers={})]
+        instance = self.settings._load(self.json_cisco, conn)
+
+        instance.capture_etag(conn)
+        instance.commit(conn, {'Attributes': {'key': 'value1'}})
+        instance.commit(conn, {'Attributes': {'key': 'value2'}})
+
+        conn.get.assert_called_once_with(
+            path='/redfish/v1/Systems/DGX/Bios/SD')
+        conn.patch.assert_has_calls([
+            mock.call('/redfish/v1/Systems/DGX/Bios/SD',
+                      data={'Attributes': {'key': 'value1'}},
+                      etag='"1787788683"'),
+            mock.call('/redfish/v1/Systems/DGX/Bios/SD',
+                      data={'Attributes': {'key': 'value2'}},
+                      etag=None)])
+        self.assertEqual(2, conn.patch.call_count)
+
+    def test_commit_parent_etag_ignores_patch_response(self):
+        conn = mock.Mock()
+        conn.patch.side_effect = [
+            mock.MagicMock(status_code=http_client.NO_CONTENT,
+                           headers={'ETag': '"1787788690"'}),
+            mock.MagicMock(status_code=http_client.NO_CONTENT,
+                           headers={'ETag': '"1787788695"'})]
+        instance = self.settings._load(self.json, conn)
+
+        instance.commit(conn, {'Attributes': {'key': 'value1'}})
+        instance.commit(conn, {'Attributes': {'key': 'value2'}})
+
+        conn.get.assert_not_called()
+        conn.patch.assert_has_calls([
+            mock.call('/redfish/v1/Systems/437XR1138R2/BIOS/Settings',
+                      data={'Attributes': {'key': 'value1'}},
+                      etag='9234ac83b9700123cc32'),
+            mock.call('/redfish/v1/Systems/437XR1138R2/BIOS/Settings',
+                      data={'Attributes': {'key': 'value2'}},
+                      etag='9234ac83b9700123cc32')])
 
     def test_get_status_failure(self):
         instance = self.settings._load(self.json, mock.Mock())
