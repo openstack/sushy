@@ -1,0 +1,5 @@
+---
+features:
+  - |
+    Adds low-level ``delete``, ``patch``, and ``post`` methods to BaseResource.
+    More specific methods should still be preferred.

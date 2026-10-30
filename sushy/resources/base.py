@@ -792,6 +792,40 @@ class ResourceBase(metaclass=abc.ABCMeta):
     def root(self):
         return self._root
 
+    def delete(self, **kwargs):
+        """DELETE the current resource.
+
+        :param kwargs: Parameters passed to the Connector.
+        :returns: The response object from the requests library.
+        :raises: ConnectionError
+        :raises: HTTPError
+        """
+        return self._conn.delete(self._path, **kwargs)
+
+    def patch(self, **kwargs):
+        """PATCH the current resource.
+
+        Prefer a high-level method if it exists on the target resource.
+
+        :param kwargs: Parameters passed to the Connector.
+        :returns: The response object from the requests library.
+        :raises: ConnectionError
+        :raises: HTTPError
+        """
+        return self._conn.patch(self._path, **kwargs)
+
+    def post(self, **kwargs):
+        """POST the current resource.
+
+        Prefer a high-level method if it exists on the target resource.
+
+        :param kwargs: Parameters passed to the Connector.
+        :returns: The response object from the requests library.
+        :raises: ConnectionError
+        :raises: HTTPError
+        """
+        return self._conn.post(self._path, **kwargs)
+
 
 class ResourceLinksBase(ResourceBase, metaclass=abc.ABCMeta):
 

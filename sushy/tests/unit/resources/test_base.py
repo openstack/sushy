@@ -179,6 +179,18 @@ class ResourceBaseTestCase(base.TestCase):
         self.assertIsNotNone(resource._json)
         self.assertEqual('Test.1.1.1', resource._json['Id'])
 
+    def test_delete(self):
+        self.base_resource.delete()
+        self.conn.delete.assert_called_once_with('/Foo')
+
+    def test_patch(self):
+        self.base_resource.patch(data={'answer': 42})
+        self.conn.patch.assert_called_once_with('/Foo', data={'answer': 42})
+
+    def test_post(self):
+        self.base_resource.post(data={'answer': 42})
+        self.conn.post.assert_called_once_with('/Foo', data={'answer': 42})
+
 
 class TestResource(resource_base.ResourceBase):
     """A concrete Test Resource to test against"""
