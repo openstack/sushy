@@ -1,0 +1,12 @@
+{
+    "@odata.type": "#HostInterfaceCollection.HostInterfaceCollection",
+    "Name": "Host Interface Collection",
+    "Description": "Collection of Host Interfaces for this System",
+    "Members": [
+        {
+            "@odata.id": "/redfish/v1/Managers/BMC/HostInterfaces/Host.1"
+        }
+    ],
+    "Members@odata.count": 1,
+    "@odata.id": "/redfish/v1/Managers/BMC/HostInterfaces"
+}
