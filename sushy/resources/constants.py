@@ -168,6 +168,9 @@ class PowerState(enum.Enum):
     PAUSED = 'Paused'
     """The resource is paused."""
 
+    RESET = 'Reset'
+    """The resource is in reset, with power still applied."""
+
 
 # Backward compatibility
 POWER_STATE_ON = PowerState.ON

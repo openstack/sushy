@@ -1,0 +1,7 @@
+---
+fixes:
+  - |
+    Adds the ``Reset`` value to the ``PowerState`` enumeration. HPE iLO
+    reports it while a system is resetting. It is documented by HPE but is
+    not in the Redfish schema, so until now ``power_state`` was left unset
+    for the whole reset. Affects ProLiant Gen10, Gen10 Plus and Gen11.

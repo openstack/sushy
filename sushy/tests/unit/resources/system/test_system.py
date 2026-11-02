@@ -94,6 +94,11 @@ class SystemTestCase(base.TestCase):
         self.assertEqual(parser.parse('2017-05-03T23:10:12-05:00'),
                          self.sys_inst.last_reset_time)
 
+    def test__parse_attributes_power_state_reset(self):
+        self.json_doc['PowerState'] = 'Reset'
+        self.sys_inst._parse_attributes(self.json_doc)
+        self.assertEqual(sushy.PowerState.RESET, self.sys_inst.power_state)
+
     def test__parse_attributes_return(self):
         attributes = self.sys_inst._parse_attributes(self.json_doc)
 
