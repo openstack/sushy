@@ -12,6 +12,7 @@
 # License for the specific language governing permissions and limitations
 # under the License.
 
+import copy
 import json
 import logging
 import time
@@ -214,11 +215,16 @@ VFDD\
             raise sushy.exceptions.InvalidParameterValue(
                 error=f'Unknown or unsupported device {device}')
 
+        manager = manager or self._parent_resource
         idrac_media = idrac_media % (
-            manager.identity if manager else self._parent_resource.identity,
+            manager.identity,
             'Disabled' if persistent else 'Enabled')
 
         action_data = dict(self.ACTION_DATA, ImportBuffer=idrac_media)
+        if '12' in manager.model or '13' in manager.model:
+            action_data = copy.deepcopy(action_data)
+            # iDRAC v8 expects a string and not an array of strings
+            action_data['ShareParameters']['Target'] = 'ALL'
 
         # TODO(etingof): figure out if on-time or persistent boot can at
         # all be implemented via this OEM call
