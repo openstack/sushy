@@ -33,24 +33,24 @@ BASE_RESOURCE_JSON = {
     "@odata.id": "/redfish/v1/FauxResource/1111AAAA",
     "Oem": {
         "Contoso": {
-            "@odata.type": "http://contoso.com/schemas/extensions.v1_2_1#contoso.AnvilTypes1",  # noqa
+            "@odata.type": "http://contoso.com/schemas/extensions.v1_2_1#contoso.AnvilTypes1",  # noqa: E501
             "slogan": "Contoso never fail",
             "disclaimer": "* Most of the time"
         },
         "EID_412_ASB_123": {
-            "@odata.type": "http://AnotherStandardsBody/schemas.v1_0_1#styleInfoExt",  # noqa
+            "@odata.type": "http://AnotherStandardsBody/schemas.v1_0_1#styleInfoExt",  # noqa: E501
             "Style": "Executive"
         }
     },
     "Links": {
         "Oem": {
             "Contoso": {
-                "@odata.type": "http://contoso.com/schemas/extensions.v1_2_1#contoso.AnvilTypes1",  # noqa
+                "@odata.type": "http://contoso.com/schemas/extensions.v1_2_1#contoso.AnvilTypes1",  # noqa: E501
                 "slogan": "Contoso never fail",
                 "disclaimer": "* Most of the time"
             },
             "EID_420_ASB_345": {
-                "@odata.type": "http://AnotherStandardsBody/schemas.v1_0_1#styleInfoExt",  # noqa
+                "@odata.type": "http://AnotherStandardsBody/schemas.v1_0_1#styleInfoExt",  # noqa: E501
                 "Style": "Executive"
             }
         }

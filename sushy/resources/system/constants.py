@@ -14,7 +14,7 @@
 #    under the License.
 
 # Values come from the Redfish System json-schema 1.0.0:
-# http://redfish.dmtf.org/schemas/v1/ComputerSystem.v1_0_0.json#/definitions/ComputerSystem  # noqa
+# http://redfish.dmtf.org/schemas/v1/ComputerSystem.v1_0_0.json#/definitions/ComputerSystem  # noqa: E501
 
 import enum
 

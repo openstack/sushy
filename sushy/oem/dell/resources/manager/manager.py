@@ -253,8 +253,8 @@ VFDD\
                     'Dell OEM set boot device failed (attempts left '
                     '%d): %s', attempts, exc)
 
-                errors = exc.body and exc.body.get(
-                    '@Message.ExtendedInfo') or []
+                errors = (exc.body and exc.body.get(
+                    '@Message.ExtendedInfo')) or []
 
                 found = False
 

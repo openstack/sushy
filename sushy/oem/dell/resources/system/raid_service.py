@@ -100,7 +100,7 @@ class DellRaidService(base.ResourceBase):
             response = self._conn.post(target_uri, data=payload)
         except exceptions.BadRequestError as ex:
             # Check if failed for no foreign drives
-            errors = ex.body and ex.body.get('@Message.ExtendedInfo') or []
+            errors = (ex.body and ex.body.get('@Message.ExtendedInfo')) or []
 
             no_foreign_conf = [x for x in errors if constants.NO_FOREIGN_CONFIG
                                in x.get('MessageId')]
