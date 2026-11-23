@@ -67,10 +67,9 @@ def http_call(conn, method, *args, **kwargs):
         location = response.headers.get('Location', location)
         if not location:
             raise sushy.exceptions.ExtensionError(
-                error='Response %d to HTTP %s with args %s, kwargs %s '
-                      'does not include Location: in '
-                      'header' % (response.status_code, method.upper(),
-                                  args, kwargs))
+                error=f'Response {response.status_code} to HTTP '
+                      f'{method.upper()} with args {args}, kwargs {kwargs} '
+                      'does not include Location: in header')
 
         retry_after = response.headers.get('Retry-After')
         if retry_after:

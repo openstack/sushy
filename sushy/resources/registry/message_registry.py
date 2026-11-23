@@ -134,10 +134,10 @@ def parse_message(message_registries, message_field):
     msg = reg_msg.message
     for i in range(1, reg_msg.number_of_args + 1):
         if i <= len(message_field.message_args):
-            msg = msg.replace('%%%i' % i,
+            msg = msg.replace(f'%{i}',
                               str(message_field.message_args[i - 1]))
         else:
-            msg = msg.replace('%%%i' % i, 'unknown')
+            msg = msg.replace(f'%{i}', 'unknown')
 
     message_field.message = msg
     if not message_field.severity:

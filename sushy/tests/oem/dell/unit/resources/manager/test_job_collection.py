@@ -58,8 +58,8 @@ class DellJobCollectionTestCase(BaseTestCase):
         members = []
         for index, state in enumerate(states):
             job = {'@odata.id': '/redfish/v1/Managers/iDRAC.Embedded.1'
-                                '/Jobs/JID_%d' % index,
-                   'Id': 'JID_%d' % index}
+                                f'/Jobs/JID_{index}',
+                   'Id': f'JID_{index}'}
             if state is not None:
                 job['JobState'] = state
             members.append(job)
