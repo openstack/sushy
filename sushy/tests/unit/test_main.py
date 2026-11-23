@@ -586,12 +586,32 @@ class MainTestCase(base.TestCase):
         self.assertEqual(expected, self.root.get_sessions_path())
         self.assertEqual(expected, self.root._conn._sessions_uri)
 
-    @mock.patch.object(taskmonitor, 'TaskMonitor', autospec=True)
-    def test_get_task_monitor(self, mock_task_mon):
-        self.root.get_task_monitor('/TaskService/Task/123')
-        mock_task_mon.assert_called_once_with(
-            self.root._conn, '/TaskService/Task/123',
-            self.root.redfish_version, self.root.lazy_registries)
+    @mock.patch.object(main.Sushy, 'registries',
+                       new_callable=mock.PropertyMock)
+    def test_get_task_monitor(self, mock_registries):
+        mock_registries.side_effect = AssertionError(
+            'Unexpected registry lookup')
+        with open('sushy/tests/unit/json_samples/task.json') as f:
+            task_json = json.load(f)
+        for status, uri, body in (
+                (200, '/redfish/v1/Managers/iDRAC.Embedded.1/Oem/Dell/Jobs/'
+                 'JID_123', {'JobState': 'Completed', 'PercentComplete': 100}),
+                (202, '/redfish/v1/TaskService/TaskMonitors/123', task_json)):
+            with self.subTest(status=status):
+                self.conn.reset_mock()
+                response = self.conn.get.return_value
+                response.status_code = status
+                response.content = json.dumps(body).encode('utf-8')
+                response.json.return_value = body
+
+                monitor = self.root.get_task_monitor(uri)
+
+                self.assertIsInstance(monitor, taskmonitor.TaskMonitor)
+                self.assertIs(response, monitor.response)
+                self.assertEqual(body, monitor.response.json())
+                self.assertEqual(status == 202, monitor.is_processing)
+                self.conn.get.assert_called_once_with(path=uri)
+                mock_registries.assert_not_called()
 
 
 class BareMinimumMainTestCase(base.TestCase):
