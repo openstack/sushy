@@ -92,5 +92,6 @@ external = ["H", "E501"]
 quiet-level = 4
 # Words to ignore:
 # assertIn: used in unit testing
-ignore-words-list = "assertIn"
+# joo: Joo Janta 200, a model name in test data
+ignore-words-list = "assertIn,joo"
 skip = "AUTHORS,ChangeLog,*.pyc,*.inv,*.svg,*.png,*.sample,./doc/build/*,./api-ref/build/*,./releasenotes/build/*,./api-ref/build/*,./build/*"

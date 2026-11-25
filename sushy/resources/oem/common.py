@@ -69,8 +69,6 @@ def _get_extension_manager_of_resource(resource_name: str):
     :returns: the ExtensionManager instance
     :raises ExtensionError: on resource OEM extension load error.
     """
-    global _global_extn_mgrs_by_resource
-
     if resource_name not in _global_extn_mgrs_by_resource:
         resource_namespace = f'sushy.resources.{resource_name}.oems'
         _global_extn_mgrs_by_resource[resource_name] = (
