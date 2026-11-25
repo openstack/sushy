@@ -11,7 +11,7 @@
 # under the License.
 
 # Values comes from the Redfish System json-schema 1.0.0:
-# http://redfish.dmtf.org/schemas/v1/Manager.v1_0_0.json#/definitions/Manager  # noqa
+# http://redfish.dmtf.org/schemas/v1/Manager.v1_0_0.json#/definitions/Manager
 
 import enum
 
@@ -149,7 +149,7 @@ class VirtualMediaType(enum.Enum):
 
 
 # Values come from the Redfish VirtualMedia json-schema.
-# https://redfish.dmtf.org/schemas/VirtualMedia.v1_6_5.json#/definitions/TransferProtocolType
+# https://redfish.dmtf.org/schemas/VirtualMedia.v1_6_5.json#/definitions/TransferProtocolType  # noqa: E501
 class VirtualMediaTransferProtocolType(enum.Enum):
     """Transfer Protocol Type constants."""
 

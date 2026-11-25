@@ -66,10 +66,10 @@ class StorageTestCase(base.TestCase):
         self.assertEqual(res_cons.Health.OK, self.storage.status.health_rollup)
         self.assertEqual(res_cons.State.ENABLED, self.storage.status.state)
         self.assertEqual(
-            ('/redfish/v1/Systems/437XR1138R2/Storage/1/Drives/35D38F11ACEF7BD3',  # noqa
-             '/redfish/v1/Systems/437XR1138R2/Storage/1/Drives/3F5A8C54207B7233',  # noqa
-             '/redfish/v1/Systems/437XR1138R2/Storage/1/Drives/32ADF365C6C1B7BD',  # noqa
-             '/redfish/v1/Systems/437XR1138R2/Storage/1/Drives/3D58ECBC375FD9F2',  # noqa
+            ('/redfish/v1/Systems/437XR1138R2/Storage/1/Drives/35D38F11ACEF7BD3',  # noqa: E501
+             '/redfish/v1/Systems/437XR1138R2/Storage/1/Drives/3F5A8C54207B7233',  # noqa: E501
+             '/redfish/v1/Systems/437XR1138R2/Storage/1/Drives/32ADF365C6C1B7BD',  # noqa: E501
+             '/redfish/v1/Systems/437XR1138R2/Storage/1/Drives/3D58ECBC375FD9F2',  # noqa: E501
              ), self.storage.drives_identities)
 
     def test_get_drive(self):
@@ -88,19 +88,19 @@ class StorageTestCase(base.TestCase):
         # | THEN |
         calls = [
             mock.call(self.storage._conn,
-                      '/redfish/v1/Systems/437XR1138R2/Storage/1/Drives/35D38F11ACEF7BD3',  # noqa
+                      '/redfish/v1/Systems/437XR1138R2/Storage/1/Drives/35D38F11ACEF7BD3',  # noqa: E501
                       redfish_version=self.storage.redfish_version,
                       registries=None, root=None),
             mock.call(self.storage._conn,
-                      '/redfish/v1/Systems/437XR1138R2/Storage/1/Drives/3F5A8C54207B7233',  # noqa
+                      '/redfish/v1/Systems/437XR1138R2/Storage/1/Drives/3F5A8C54207B7233',  # noqa: E501
                       redfish_version=self.storage.redfish_version,
                       registries=None, root=None),
             mock.call(self.storage._conn,
-                      '/redfish/v1/Systems/437XR1138R2/Storage/1/Drives/32ADF365C6C1B7BD',  # noqa
+                      '/redfish/v1/Systems/437XR1138R2/Storage/1/Drives/32ADF365C6C1B7BD',  # noqa: E501
                       redfish_version=self.storage.redfish_version,
                       registries=None, root=None),
             mock.call(self.storage._conn,
-                      '/redfish/v1/Systems/437XR1138R2/Storage/1/Drives/3D58ECBC375FD9F2',  # noqa
+                      '/redfish/v1/Systems/437XR1138R2/Storage/1/Drives/3D58ECBC375FD9F2',  # noqa: E501
                       redfish_version=self.storage.redfish_version,
                       registries=None, root=None)
         ]
@@ -158,7 +158,7 @@ class StorageTestCase(base.TestCase):
 
         successive_return_values = []
         # repeating the 3rd one to provide mock data for 4th iteration.
-        for fname in STORAGE_DRIVE_FILE_NAMES + [STORAGE_DRIVE_FILE_NAMES[-1]]:
+        for fname in [*STORAGE_DRIVE_FILE_NAMES, STORAGE_DRIVE_FILE_NAMES[-1]]:
             with open(fname) as f:
                 successive_return_values.append(json.load(f))
         self.conn.get.return_value.json.side_effect = successive_return_values
@@ -174,7 +174,7 @@ class StorageTestCase(base.TestCase):
 
         successive_return_values = []
         # repeating the 3rd one to provide mock data for 4th iteration.
-        for fname in STORAGE_DRIVE_FILE_NAMES + [STORAGE_DRIVE_FILE_NAMES[-1]]:
+        for fname in [*STORAGE_DRIVE_FILE_NAMES, STORAGE_DRIVE_FILE_NAMES[-1]]:
             with open(fname) as f:
                 successive_return_values.append(json.load(f))
         self.conn.get.return_value.json.side_effect = successive_return_values
@@ -192,7 +192,7 @@ class StorageTestCase(base.TestCase):
 
         successive_return_values = []
         # repeating the 3rd one to provide mock data for 4th iteration.
-        for fname in STORAGE_DRIVE_FILE_NAMES + [STORAGE_DRIVE_FILE_NAMES[-1]]:
+        for fname in [*STORAGE_DRIVE_FILE_NAMES, STORAGE_DRIVE_FILE_NAMES[-1]]:
             with open(fname) as f:
                 successive_return_values.append(json.load(f))
         self.conn.get.return_value.json.side_effect = successive_return_values
@@ -300,7 +300,7 @@ class StorageCollectionTestCase(base.TestCase):
         with open('sushy/tests/unit/json_samples/storage.json') as f:
             successive_return_values.append(json.load(f))
         # repeating the 3rd one to provide mock data for 4th iteration.
-        for fname in STORAGE_DRIVE_FILE_NAMES + [STORAGE_DRIVE_FILE_NAMES[-1]]:
+        for fname in [*STORAGE_DRIVE_FILE_NAMES, STORAGE_DRIVE_FILE_NAMES[-1]]:
             with open(fname) as f:
                 successive_return_values.append(json.load(f))
         self.conn.get.return_value.json.side_effect = successive_return_values
@@ -315,7 +315,7 @@ class StorageCollectionTestCase(base.TestCase):
         with open('sushy/tests/unit/json_samples/storage.json') as f:
             successive_return_values.append(json.load(f))
         # repeating the 3rd one to provide mock data for 4th iteration.
-        for fname in STORAGE_DRIVE_FILE_NAMES + [STORAGE_DRIVE_FILE_NAMES[-1]]:
+        for fname in [*STORAGE_DRIVE_FILE_NAMES, STORAGE_DRIVE_FILE_NAMES[-1]]:
             with open(fname) as f:
                 successive_return_values.append(json.load(f))
         self.conn.get.return_value.json.side_effect = successive_return_values
@@ -335,7 +335,7 @@ class StorageCollectionTestCase(base.TestCase):
         with open('sushy/tests/unit/json_samples/storage.json') as f:
             successive_return_values.append(json.load(f))
         # repeating the 3rd one to provide mock data for 4th iteration.
-        for fname in STORAGE_DRIVE_FILE_NAMES + [STORAGE_DRIVE_FILE_NAMES[-1]]:
+        for fname in [*STORAGE_DRIVE_FILE_NAMES, STORAGE_DRIVE_FILE_NAMES[-1]]:
             with open(fname) as f:
                 successive_return_values.append(json.load(f))
         self.conn.get.return_value.json.side_effect = successive_return_values

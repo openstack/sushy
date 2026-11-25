@@ -63,11 +63,25 @@ select = [
     "F",        # pyflakes
     "G",        # flake8-logging-format
     "LOG",      # flake8-logging
+    "RUF",      # ruff-specific rules
     "S",        # flake8-bandit
     "UP",       # pyupgrade
+    "W",        # pycodestyle (warning)
 ]
+ignore = [
+    "S101",     # asserts are used for type narrowing
+    # the following are ignored because they don't provide enough value for
+    # the changes required
+    "RUF012",   # mutable default value for class attribute
+]
+# hacking (H) checks and flake8's E501 (which, unlike ruff, flags long URLs)
+# are still run by the hacking pre-commit hook, so don't remove their noqa
+external = ["H", "E501"]
 
 [tool.ruff.lint.per-file-ignores]
+"sushy/tests/oem/dell/unit/resources/taskservice/test_task.py" = [
+    "RUF001",   # expected values contain NO-BREAK SPACE, as returned by iDRAC
+]
 "sushy/tests/**/*.py" = [
     "S104",     # disable 'hardcoded_bind_all_interfaces' for tests
     "S105",     # disable 'hardcoded_password_string' for tests

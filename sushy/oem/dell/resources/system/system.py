@@ -43,10 +43,10 @@ def _filter_disks_not_in_mode(controller_to_disks, mode):
                      or volumes[0].raid_type is None)):
                 is_raw_device = True
 
-            if (mode == sys_cons.PhysicalDiskStateMode.RAID
-                    and is_raw_device
-                    or mode == sys_cons.PhysicalDiskStateMode.NONRAID
-                    and not is_raw_device):
+            if ((mode == sys_cons.PhysicalDiskStateMode.RAID
+                 and is_raw_device)
+                    or (mode == sys_cons.PhysicalDiskStateMode.NONRAID
+                        and not is_raw_device)):
                 toprocess_drives.append(drive)
         controller_to_disks[controller] = toprocess_drives
     return controller_to_disks
@@ -140,7 +140,7 @@ class DellSystemExtension(oem_base.OEMResourceBase):
         for storage in self._parent_resource.storage.get_members():
             controller = (storage.storage_controllers[0]
                           if storage.storage_controllers else None)
-            if not controller or controller and not controller.raid_types:
+            if not controller or (controller and not controller.raid_types):
                 continue
             controller_to_disks[controller] = storage.drives
         return controller_to_disks
@@ -154,7 +154,7 @@ class DellSystemExtension(oem_base.OEMResourceBase):
         for storage in self._parent_resource.storage.get_members():
             controller = (storage.storage_controllers[0]
                           if storage.storage_controllers else None)
-            if not controller or controller and not controller.raid_types:
+            if not controller or (controller and not controller.raid_types):
                 continue
             storage_list.append(storage)
         return storage_list

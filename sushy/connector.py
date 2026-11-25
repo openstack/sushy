@@ -80,7 +80,7 @@ class TLSHttpAdapter(HTTPAdapter):
                     ctx.set_ciphers(self.tls_ciphers)
                 except ssl.SSLError as e:
                     raise ValueError(
-                        f"Invalid cipher specification: {str(e)}")
+                        f"Invalid cipher specification: {e!s}")
 
             if self.verify:
                 ctx.check_hostname = True
