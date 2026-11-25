@@ -101,7 +101,7 @@ class Field:
                         attribute='/'.join(path),
                         resource=resource.path)
 
-                logging.warning(
+                LOG.warning(
                     'Applying default "%s" on required, but missing '
                     'attribute "%s"', self._default, path)
 

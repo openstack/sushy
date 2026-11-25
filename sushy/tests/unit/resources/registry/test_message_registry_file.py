@@ -262,7 +262,7 @@ class MessageRegistryFileTestCase(base.TestCase):
             'No registry found for %(language)s or default',
             {'language': 'en'})
 
-    @mock.patch('sushy.resources.base.logging.warning',
+    @mock.patch('sushy.resources.base.LOG.warning',
                 autospec=True)
     def test__parse_attributes_missing_registry(self, mock_log):
         self.json_doc.pop('Registry')
